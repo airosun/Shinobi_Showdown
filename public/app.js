@@ -12,7 +12,7 @@ const topinfo = document.getElementById('topinfo');
 
 const S = {
   screen: 'title',          // title | builder | pass | battle | dex
-  dex: { id: null, era: 'all', query: '', sort: 'roster', tf: false, from: 'title' },
+  dex: { mode: 'shinobi', id: null, era: 'all', query: '', sort: 'roster', tf: false, from: 'title', jid: null, jquery: '', jcat: 'all', jsort: 'roster' },
   phase: null,              // select | play | over
   mode: null,               // hotseat | cpu
   names: ['Player 1', 'Player 2'],
@@ -112,7 +112,7 @@ document.addEventListener('click', (e) => {
 app.addEventListener('input', (e) => {
   const el = e.target.closest('[data-input]');
   if (el && el.dataset.input === 'dexSearch') {
-    S.dex.query = el.value;
+    S.dex[S.dex.mode === 'jutsu' ? 'jquery' : 'query'] = el.value;
     const pos = el.selectionStart;
     render();
     const n = document.getElementById('dexSearch');
@@ -135,10 +135,11 @@ document.getElementById('dexBtn').addEventListener('click', () => ACTIONS.openDe
 // Dex: arrow keys flip through entries
 document.addEventListener('keydown', (e) => {
   if (S.screen !== 'dex' || e.target.closest('input, select') || !['ArrowLeft', 'ArrowRight'].includes(e.key)) return;
-  const list = dexList();
-  const i = list.findIndex((x) => x.id === S.dex.id);
+  const jm = S.dex.mode === 'jutsu';
+  const list = jm ? jdexList() : dexList();
+  const i = list.findIndex((x) => x.id === (jm ? S.dex.jid : S.dex.id));
   if (i < 0 || !list.length) return;
-  ACTIONS.dexSel(list[(i + (e.key === 'ArrowRight' ? 1 : -1) + list.length) % list.length].id);
+  ACTIONS[jm ? 'jdexSel' : 'dexSel'](list[(i + (e.key === 'ArrowRight' ? 1 : -1) + list.length) % list.length].id);
 });
 document.getElementById('menuBtn').addEventListener('click', () => {
   if (S.screen === 'battle' && S.phase !== 'over' && !confirm('Leave this battle?')) return;
@@ -150,7 +151,10 @@ function render() {
   topinfo.textContent = S.screen === 'battle' && S.battle ? `${S.mode === 'cpu' ? 'Vs CPU' : 'Hot-seat'} · Turn ${Math.min((S.view || S.battle).turn, S.battle.maxTurns)} / ${S.battle.maxTurns}` : '';
   document.getElementById('dexBtn').classList.toggle('hidden', S.screen === 'battle' || S.screen === 'pass' || S.screen === 'dex');
   document.body.dataset.screen = S.screen;
+  // keep scrolled lists (Dex) where they were
+  const kept = [...app.querySelectorAll('[data-keep-scroll]')].map((el) => [el.dataset.keepScroll, el.scrollTop]);
   app.innerHTML = SCREENS[S.screen]();
+  for (const [k, top] of kept) { const el = app.querySelector(`[data-keep-scroll="${k}"]`); if (el) el.scrollTop = top; }
   if (S.screen === 'battle') { const lg = document.getElementById('blog'); if (lg) lg.scrollTop = lg.scrollHeight; }
 }
 
@@ -270,21 +274,112 @@ function dexList() {
   return d.sort === 'roster' ? list : [...list].sort(by);
 }
 
+const USED_BY = {};
+for (const s of SHINOBI) for (const id of s.catalogue) (USED_BY[id] ||= []).push(s.id);
+const JUTSU_ORDER = Object.keys(USED_BY);
+
+function dexModeTabs() {
+  const d = S.dex;
+  return `<div class="dex-modes">${[['shinobi', 'Shinobi'], ['jutsu', 'Jutsu']].map(([k, l]) => `<button class="${d.mode === k ? 'active' : ''}" data-act="dexMode" data-arg="${k}">${l}</button>`).join('')}</div>`;
+}
+
+function jdexList() {
+  const d = S.dex;
+  const q = d.jquery.toLowerCase();
+  const list = JUTSU_ORDER.map((id) => E.getJutsu(id)).filter((j) => (d.jcat === 'all' || j.category === d.jcat)
+    && (!q || [j.name, j.desc, j.nature, j.category, USED_BY[j.id].map((sid) => SHINOBI_BY_ID[sid].name).join(' ')].join(' ').toLowerCase().includes(q)));
+  const by = { name: (a, b) => a.name.localeCompare(b.name), power: (a, b) => (b.power || 0) - (a.power || 0), cost: (a, b) => b.cost - a.cost, priority: (a, b) => b.priority - a.priority };
+  return by[d.jsort] ? [...list].sort(by[d.jsort]) : list;
+}
+
+// after jumping between the two Dexes, bring the selected entry into view in its list
+function revealSel() {
+  const sel = document.querySelector('.dex-list .dex-item.sel');
+  if (sel) sel.parentElement.scrollTop = sel.offsetTop - sel.parentElement.offsetTop - 120;
+}
+const pctTxt = (v) => `${Math.round(v * 100)}%`;
+const chanceTxt = (c) => (c == null || c >= 1 ? '' : `${pctTxt(c)} chance: `);
+function effectText(e) {
+  const t = e.turns ? ` for ${e.turns} turn${e.turns > 1 ? 's' : ''}` : '';
+  switch (e.type) {
+    case 'burn': case 'paralyze': case 'poison': case 'bind': case 'flinch':
+      return `${chanceTxt(e.chance)}${{ burn: 'Burn', paralyze: 'Paralyze', poison: 'Poison', bind: 'Bind', flinch: 'Flinch' }[e.type]}${t}`;
+    case 'genjutsu': return `Genjutsu${t}`;
+    case 'heal': return `Heals ${pctTxt(e.value)} max HP`;
+    case 'cleanse': return 'Removes negative statuses';
+    case 'buff': return `${STAT_LABEL[e.stat] || e.stat} ×${e.mult}${t}`;
+    case 'debuff': return `Target ${STAT_LABEL[e.stat] || e.stat} ×${e.mult}${t}`;
+    case 'drainChakra': return `Drains ${pctTxt(e.value)} Chakra`;
+    case 'restoreChakra': return `Restores ${pctTxt(e.value)} Chakra`;
+    case 'pierce': return `Ignores ${pctTxt(e.value)} DEF`;
+    case 'recoil': return `User takes ${pctTxt(e.value)} max HP recoil`;
+    case 'bonusVsBound': return `×${e.value} damage to a Bound target`;
+    case 'intel': return `+${e.value} Intel`;
+    case 'decoy': return 'Creates a Decoy that takes the next hit';
+    case 'revealLoadout': return "Reveals the target's loadout";
+    case 'selfVulnerable': return 'User is left vulnerable';
+    case 'rotation': return 'Blocks every hit this turn except genjutsu';
+    case 'revive': return `Once per battle: revives a fallen ally at ${pctTxt(e.value)} HP`;
+    case 'bodyguard': return 'Takes the next single-target hit aimed at the ally';
+    default: return e.type;
+  }
+}
+
+function jdexHtml() {
+  const d = S.dex;
+  const list = jdexList();
+  if (!d.jid || !USED_BY[d.jid]) d.jid = (list[0] || E.getJutsu(JUTSU_ORDER[0])).id;
+  const j = E.getJutsu(d.jid);
+  const idx = list.findIndex((x) => x.id === j.id);
+  const prev = list[(idx - 1 + list.length) % list.length] || j;
+  const next = list[(idx + 1) % list.length] || j;
+  const flags = [j.charged ? 'Charged (2 turns)' : null, j.requiresTransform ? 'Transformed only' : null, j.ignoresSub ? 'Ignores Substitution' : null].filter(Boolean);
+  const cell = (l, v) => `<div class="jstat"><span class="lbl">${l}</span><b>${v}</b></div>`;
+  return `<div class="dex">
+    <div class="dex-side">
+      <div class="dex-head">${dexModeTabs()}<span class="muted small">${JUTSU_ORDER.length} jutsu</span><span class="grow"></span><button class="small ghost" data-act="closeDex">Back</button></div>
+      <div class="tabs">${['all', 'ninjutsu', 'taijutsu', 'genjutsu', 'medical', 'support'].map((c) => `<button class="tab ${d.jcat === c ? 'active' : ''}" data-act="jdexCat" data-arg="${c}">${c === 'all' ? 'All' : CAT_LABEL[c]}</button>`).join('')}</div>
+      <div class="row" style="margin:8px 0">
+        <input type="text" id="dexSearch" placeholder="Name, effect, nature, user…" value="${esc(d.jquery)}" data-input="dexSearch" style="flex:1;min-width:0">
+        <select data-change="jdexSort" title="Sort">${[['roster', 'Roster order'], ['name', 'Name'], ['power', 'Power'], ['cost', 'Chakra'], ['priority', 'Priority']].map(([k, l]) => `<option value="${k}" ${d.jsort === k ? 'selected' : ''}>${l}</option>`).join('')}</select>
+      </div>
+      <div class="dex-list" data-keep-scroll="jutsu">${list.map((x) => `<button class="dex-item jitem ${x.id === j.id ? 'sel' : ''}" data-act="jdexSel" data-arg="${x.id}" style="--c:${FX.jutsuColor(x)}">
+        <span class="nm">${esc(x.name)}</span><span class="small muted">${x.power ? x.power : '—'}</span></button>`).join('') || '<div class="muted small" style="padding:8px">No jutsu match.</div>'}</div>
+    </div>
+    <div class="dex-main">
+      <div class="dex-nav"><button class="small" data-act="jdexSel" data-arg="${prev.id}">‹ ${esc(prev.name)}</button><span class="grow"></span><span class="muted small">${idx + 1} / ${list.length}</span><span class="grow"></span><button class="small" data-act="jdexSel" data-arg="${next.id}">${esc(next.name)} ›</button></div>
+      <div class="dex-card jcard" style="--c:${FX.jutsuColor(j)}">
+        <div>
+          <div class="dex-name">${esc(j.name)}</div>
+          <div class="chips" style="margin:6px 0 12px">${natChip(j.nature)}${!j.nature ? '<span class="nat" style="--c:#8c93a8">Non-elemental</span>' : ''}<span class="chip">${CAT_LABEL[j.category] || j.category}</span>${flags.map((f) => `<span class="chip">${f}</span>`).join('')}</div>
+          <div class="jstats">${cell('Power', j.power || '—')}${cell('Chakra', j.cost)}${cell('Priority', priLabel(j.priority))}${cell('Target', TARGET_LABEL[j.target])}</div>
+          <div class="dex-block"><div class="lbl">Description</div>${esc(j.desc || '')}</div>
+          <div class="dex-block"><div class="lbl">Effects</div>${j.effects.length || flags.length ? `<ul class="fx-list">${[...j.effects.map(effectText), ...flags].map((t) => `<li>${esc(t)}</li>`).join('')}</ul>` : '<span class="muted">Damage only.</span>'}</div>
+        </div>
+      </div>
+      <div class="card" style="margin-top:16px"><h2>Used by (${USED_BY[j.id].length})</h2>
+        <div class="usedby">${USED_BY[j.id].map((sid) => { const sd = SHINOBI_BY_ID[sid]; return `<button class="usedby-item" data-act="dexSel" data-arg="${sid}">${badge(sd, 'sm')}<span>${esc(sd.name)}</span>${sd.defaultLoadout.includes(j.id) ? '<span class="chip def">Default</span>' : ''}</button>`; }).join('')}</div>
+      </div>
+    </div>
+  </div>`;
+}
+
 function dexHtml() {
   const d = S.dex;
+  if (d.mode === 'jutsu') return jdexHtml();
   const list = dexList();
   if (!d.id || !SHINOBI_BY_ID[d.id]) d.id = (list[0] || SHINOBI[0]).id;
   const s = SHINOBI_BY_ID[d.id];
   const idx = list.findIndex((x) => x.id === s.id);
   return `<div class="dex">
     <div class="dex-side">
-      <div class="dex-head"><h3 class="dex-title">Shinobi Dex</h3><span class="muted small">${SHINOBI.length} shinobi</span><span class="grow"></span><button class="small ghost" data-act="closeDex">Back</button></div>
+      <div class="dex-head">${dexModeTabs()}<span class="muted small">${SHINOBI.length} shinobi</span><span class="grow"></span><button class="small ghost" data-act="closeDex">Back</button></div>
       <div class="tabs">${['all', 'Part 1', 'Shippuden'].map((e) => `<button class="tab ${d.era === e ? 'active' : ''}" data-act="dexEra" data-arg="${e}">${e === 'all' ? 'All' : e}</button>`).join('')}</div>
       <div class="row" style="margin:8px 0">
         <input type="text" id="dexSearch" placeholder="Name, role, trait, nature…" value="${esc(d.query)}" data-input="dexSearch" style="flex:1;min-width:0">
         <select data-change="dexSort" title="Sort">${[['roster', 'Roster order'], ['name', 'Name'], ['cost', 'Cost'], ['bst', 'Stat total']].map(([k, l]) => `<option value="${k}" ${d.sort === k ? 'selected' : ''}>${l}</option>`).join('')}</select>
       </div>
-      <div class="dex-list">${list.map((x) => `<button class="dex-item ${x.id === s.id ? 'sel' : ''}" data-act="dexSel" data-arg="${x.id}">
+      <div class="dex-list" data-keep-scroll="shinobi">${list.map((x) => `<button class="dex-item ${x.id === s.id ? 'sel' : ''}" data-act="dexSel" data-arg="${x.id}">
         ${badge(x, 'sm')}<span class="nm">${esc(x.name)}</span><span class="chip cost">${x.cost}</span></button>`).join('') || '<div class="muted small" style="padding:8px">No shinobi match.</div>'}</div>
     </div>
     <div class="dex-main">${dexEntry(s, list, idx)}</div>
@@ -305,7 +400,7 @@ function dexEntry(s, list, idx) {
     const j = E.getJutsu(id);
     const flags = [j.charged ? 'Charged' : null, j.requiresTransform ? 'Transformed only' : null, j.ignoresSub ? 'Ignores Substitution' : null].filter(Boolean);
     return `<div class="dex-jutsu" style="--c:${FX.jutsuColor(j)}">
-      <div class="jt"><span class="jn">${esc(j.name)}</span>${natChip(j.nature)}${s.defaultLoadout.includes(id) ? '<span class="chip def" title="In the default loadout">Default</span>' : ''}</div>
+      <div class="jt"><button class="jn linkish" data-act="jdexSel" data-arg="${j.id}" title="Open in the Jutsu Dex">${esc(j.name)}</button>${natChip(j.nature)}${s.defaultLoadout.includes(id) ? '<span class="chip def" title="In the default loadout">Default</span>' : ''}</div>
       <div class="jm">${CAT_LABEL[j.category] || j.category} · ${j.power ? `POW ${j.power}` : 'no damage'} · CK ${j.cost} · ${priLabel(j.priority)} · ${TARGET_LABEL[j.target]}${flags.length ? ` · ${flags.join(' · ')}` : ''}</div>
       <div class="jd">${esc(j.desc || '')}</div>
     </div>`;
@@ -985,7 +1080,11 @@ const ACTIONS = {
   toTitle() { S.screen = 'title'; render(); },
   openDex() { S.dex.from = S.screen === 'dex' ? S.dex.from : S.screen; S.screen = 'dex'; render(); window.scrollTo(0, 0); },
   closeDex() { S.screen = S.dex.from && S.dex.from !== 'dex' && S.dex.from !== 'battle' ? S.dex.from : 'title'; render(); },
-  dexSel(id) { S.dex.id = id; S.dex.tf = false; render(); if (window.innerWidth < 900) document.querySelector('.dex-main')?.scrollIntoView({ behavior: 'smooth' }); },
+  dexMode(m) { S.dex.mode = m; render(); },
+  jdexSel(id) { const fromOther = S.dex.mode !== 'jutsu'; S.dex.mode = 'jutsu'; S.dex.jid = id; if (fromOther && !jdexList().some((x) => x.id === id)) { S.dex.jcat = 'all'; S.dex.jquery = ''; } render(); if (fromOther) revealSel(); if (fromOther || window.innerWidth < 900) document.querySelector('.dex-main')?.scrollIntoView({ behavior: 'smooth' }); },
+  jdexCat(c) { S.dex.jcat = c; render(); },
+  jdexSort(v) { S.dex.jsort = v; render(); },
+  dexSel(id) { const fromOther = S.dex.mode !== 'shinobi'; S.dex.mode = 'shinobi'; if (fromOther && !dexList().some((x) => x.id === id)) { S.dex.era = 'all'; S.dex.query = ''; } S.dex.id = id; S.dex.tf = false; render(); if (fromOther) { revealSel(); window.scrollTo(0, 0); return; } if (window.innerWidth < 900) document.querySelector('.dex-main')?.scrollIntoView({ behavior: 'smooth' }); },
   dexOf(id) { S.dex.id = id; S.dex.tf = false; S.dex.era = 'all'; S.dex.query = ''; ACTIONS.openDex(); },
   dexEra(e) { S.dex.era = e; render(); },
   dexTf(v) { S.dex.tf = v === '1'; render(); },

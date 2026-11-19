@@ -220,7 +220,7 @@ for s in K.S + [x for x in B2.S if x['status'] != 'Existing']:
 # Gaara is not in this batch: keep him, migrating his passive
 g = existing_s['gaara_p1']
 g['supportAura'] = {'name': g['supportAura']['name'], 'desc': AURAS['gaara_p1'][0], 'effects': AURAS['gaara_p1'][1]}
-out.append(g)
+out.insert(next(i for i, x in enumerate(out) if x['id'] == 'gaara_ship'), g)  # Part I before Shippuden
 
 jutsu = dict(existing_j)
 for jid, j in {**K.NEW_JUTSU, **B2.NEW_JUTSU}.items():

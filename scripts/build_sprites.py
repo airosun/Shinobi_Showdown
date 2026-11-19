@@ -39,7 +39,7 @@ MAP = {
     'temari-part-1': [('temari_p1', 'front')], 'temari-shippuden': [('temari_ship', 'front')],
     'kankuro': [('kankuro_p1', 'front')], 'kankuro-shippuden': [('kankuro_ship', 'front')], 'chiyo': [('chiyo', 'front')],
     'orochimaru': [('orochimaru_p1', 'front'), ('orochimaru_ship', 'front')],
-    'orochimaru-eight-branches': [('orochimaru_p1', 'transform')], 'orochimaru-snake-form': [('orochimaru_ship', 'transform')],
+    'orochimaru-snake-form': [('orochimaru_p1', 'transform')], 'orochimaru-eight-branches': [('orochimaru_ship', 'transform')],
     'kabuto-part-1': [('kabuto_p1', 'front')], 'kabuto-sage-mode': [('kabuto_sage', 'front')], 'kabuto-dragon-sage-mode': [('kabuto_sage', 'transform')],
     'jirobo': [('jirobo', 'front')], 'jirobo-curse-mark': [('jirobo', 'transform')],
     'kidomaru': [('kidomaru', 'front')], 'kidomaru-curse-mark': [('kidomaru', 'transform')],

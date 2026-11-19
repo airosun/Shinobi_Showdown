@@ -2537,6 +2537,78 @@ export const SHINOBI = [
     }
   },
   {
+    "id": "gaara_p1",
+    "baseId": "gaara",
+    "name": "Gaara",
+    "era": "Part 1",
+    "cost": 8,
+    "natures": {
+      "primary": "magnet",
+      "secondary": "wind"
+    },
+    "stats": {
+      "hp": 100,
+      "tai": 45,
+      "nin": 105,
+      "def": 125,
+      "spd": 60,
+      "chk": 120
+    },
+    "roles": [
+      "Tank",
+      "Striker"
+    ],
+    "trait": {
+      "id": "sandShield",
+      "name": "Shield of Sand",
+      "desc": "The first damaging single-target hit he takes each turn is halved."
+    },
+    "substitutions": [
+      "log",
+      "shadowClone"
+    ],
+    "catalogue": [
+      "sand_coffin",
+      "sand_burial",
+      "sand_shuriken",
+      "sand_tsunami",
+      "sand_armor"
+    ],
+    "defaultLoadout": [
+      "sand_coffin",
+      "sand_burial",
+      "sand_shuriken",
+      "sand_armor"
+    ],
+    "transformation": {
+      "name": "Partial Shukaku",
+      "resolve": 60,
+      "cost": 0,
+      "turns": 3,
+      "mods": {
+        "nin": 1.35,
+        "def": 1.2
+      },
+      "berserk": 0.3,
+      "desc": "+35% NIN, +20% DEF for 3 turns. 30% chance each turn that his attack hits a random enemy."
+    },
+    "supportAura": {
+      "name": "Sand Barrier",
+      "desc": "Allies gain +{0} DEF.",
+      "effects": [
+        {
+          "type": "stat",
+          "values": [
+            0.1,
+            0.15,
+            0.25
+          ],
+          "stat": "def"
+        }
+      ]
+    }
+  },
+  {
     "id": "gaara_ship",
     "baseId": "gaara",
     "name": "Gaara (Shippuden)",
@@ -3807,78 +3879,6 @@ export const SHINOBI = [
             4,
             6
           ]
-        }
-      ]
-    }
-  },
-  {
-    "id": "gaara_p1",
-    "baseId": "gaara",
-    "name": "Gaara",
-    "era": "Part 1",
-    "cost": 8,
-    "natures": {
-      "primary": "magnet",
-      "secondary": "wind"
-    },
-    "stats": {
-      "hp": 100,
-      "tai": 45,
-      "nin": 105,
-      "def": 125,
-      "spd": 60,
-      "chk": 120
-    },
-    "roles": [
-      "Tank",
-      "Striker"
-    ],
-    "trait": {
-      "id": "sandShield",
-      "name": "Shield of Sand",
-      "desc": "The first damaging single-target hit he takes each turn is halved."
-    },
-    "substitutions": [
-      "log",
-      "shadowClone"
-    ],
-    "catalogue": [
-      "sand_coffin",
-      "sand_burial",
-      "sand_shuriken",
-      "sand_tsunami",
-      "sand_armor"
-    ],
-    "defaultLoadout": [
-      "sand_coffin",
-      "sand_burial",
-      "sand_shuriken",
-      "sand_armor"
-    ],
-    "transformation": {
-      "name": "Partial Shukaku",
-      "resolve": 60,
-      "cost": 0,
-      "turns": 3,
-      "mods": {
-        "nin": 1.35,
-        "def": 1.2
-      },
-      "berserk": 0.3,
-      "desc": "+35% NIN, +20% DEF for 3 turns. 30% chance each turn that his attack hits a random enemy."
-    },
-    "supportAura": {
-      "name": "Sand Barrier",
-      "desc": "Allies gain +{0} DEF.",
-      "effects": [
-        {
-          "type": "stat",
-          "values": [
-            0.1,
-            0.15,
-            0.25
-          ],
-          "stat": "def"
         }
       ]
     }

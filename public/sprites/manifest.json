@@ -216,14 +216,14 @@
   "orochimaru_p1": {
    "front": "battle/orochimaru.webp",
    "face": "battle/orochimaru-face.webp",
-   "transform": "battle/orochimaru-eight-branches.webp",
-   "transformFace": "battle/orochimaru-eight-branches-face.webp"
+   "transform": "battle/orochimaru-snake-form.webp",
+   "transformFace": "battle/orochimaru-snake-form-face.webp"
   },
   "orochimaru_ship": {
    "front": "battle/orochimaru.webp",
    "face": "battle/orochimaru-face.webp",
-   "transform": "battle/orochimaru-snake-form.webp",
-   "transformFace": "battle/orochimaru-snake-form-face.webp"
+   "transform": "battle/orochimaru-eight-branches.webp",
+   "transformFace": "battle/orochimaru-eight-branches-face.webp"
   },
   "kabuto_p1": {
    "front": "battle/kabuto-part-1.webp",
