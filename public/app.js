@@ -34,7 +34,11 @@ const S = {
   msg: null,
 };
 
-fetch('sprites/manifest.json').then((r) => r.json()).then((m) => { S.sprites = m.sprites || {}; }).catch(() => {});
+fetch('sprites/manifest.json').then((r) => r.json()).then((m) => {
+  S.sprites = m.sprites || {};
+  for (const a of Object.values(S.sprites)) for (const f of [a.front, a.transform]) if (f) new Image().src = `sprites/${f}`; // preload
+  if (S.screen !== 'title' && !(S.screen === 'battle' && S.phase === 'play')) { render(); if (S.screen === 'battle') syncField(); }
+}).catch(() => {});
 
 // ---------------------------------------------------------------- helpers
 const esc = (s) => String(s ?? '').replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
@@ -53,16 +57,28 @@ function initials(name) {
   const base = name.replace(/\s*\(.*\)/, '').split(/\s+/);
   return (base[0][0] + (base[1] ? base[1][0] : base[0][1] || '')).toUpperCase();
 }
+const SHORT = { Rock: 'Lee', Might: 'Guy', Sakon: 'Sakon', Zabuza: 'Zabuza' };
+/** Short display name: first name, except where people use another (Lee, Guy). */
+function shortName(name) {
+  const w = name.replace(/\s*\(.*\)/, '').split(' ');
+  return SHORT[w[0]] || w[0];
+}
 function formTag(name) { const m = name.match(/\((.*)\)/); return m ? m[1] : ''; }
-function badge(def, cls = '') {
+function badge(def, cls = '', transformed = false) {
   const c1 = natColor(def.natures.primary);
   const c2 = def.natures.secondary ? natColor(def.natures.secondary) : '#3a2a2a';
+  const art = S.sprites[def.id];
+  const face = art && ((transformed && art.transformFace) || art.face);
+  if (face) return `<div class="badge face ${cls}" style="--c1:${c1};--c2:${c2}"><img src="sprites/${esc(face)}" alt="${esc(def.name)}" loading="lazy"></div>`;
   return `<div class="badge ${cls}" style="--c1:${c1};--c2:${c2}">${initials(def.name)}</div>`;
 }
-function sprite(def, back) {
-  const s = S.sprites[def.id];
-  const file = s && (back ? s.back || s.front : s.front);
-  if (file) return `<img src="sprites/${esc(file)}" alt="${esc(def.name)}" ${back && !s.back ? 'style="transform:scaleX(-1)"' : ''}>`;
+/** Battle art (front view; your side is mirrored). Falls back to the badge. */
+function sprite(def, back, transformed = false) {
+  const art = S.sprites[def.id];
+  if (art && art.front) {
+    const src = (transformed && art.transform) || art.front;
+    return `<img class="art" src="sprites/${esc(src)}" data-front="sprites/${esc(art.front)}" data-tf="${art.transform ? `sprites/${esc(art.transform)}` : ''}" alt="${esc(def.name)}" ${back ? 'style="transform:scaleX(-1)"' : ''}>`;
+  }
   return badge(def);
 }
 
@@ -305,8 +321,8 @@ function sideMons(vs, side, isFoe, sel) {
     const ghost = u.decoy > 0 && !u.ko ? `<div class="ghost">${badge(d)}</div>` : '';
     const form = formTag(d.name);
     return `<div class="mon ${cls}" id="mon-${uid}" ${pickable ? `data-act="target" data-arg="${pos}"` : `data-tip="${esc(unitTip(vs, u))}"`}>
-      <div class="spr">${ghost}${sprite(d, !isFoe)}</div>
-      <div class="tag">${esc(d.name.replace(/\s*\(.*\)/, '').split(' ')[0])}${form ? ` · ${esc(form)}` : ''}</div>
+      <div class="spr ${S.sprites[d.id]?.front ? 'has-art' : ''}">${ghost}${sprite(d, !isFoe, !!u.transform)}</div>
+      <div class="tag">${esc(shortName(d.name))}${form ? ` · ${esc(form)}` : ''}</div>
       ${pickable ? '<span class="pick-hint">Target</span>' : ''}
     </div>`;
   }).join('');
@@ -335,7 +351,7 @@ function sideHud(vs, side, isFoe, sel) {
   const aura = SHINOBI_BY_ID[sup.id].supportAura;
   const alive = team.slots.filter((uid) => !vs.units[uid].ko).length;
   const stage = alive >= 3 ? 1 : alive === 2 ? 2 : 3;
-  const resChip = `<span class="chip support-chip st${stage}" ${tipAttr(supportTip(sup, stage))}>Support: ${esc(sup.name.split(' ')[0])} · ${'★'.repeat(stage)}</span>`;
+  const resChip = `<span class="chip support-chip st${stage}" ${tipAttr(supportTip(sup, stage))}>Support: ${esc(shortName(sup.name))} · ${'★'.repeat(stage)}</span>`;
   const cards = team.slots.map((uid, pos) => (uid ? hpCard(vs, vs.units[uid], sel && sel.side === side, pos) : '<div class="hpcard empty">—</div>')).join('');
   return `<div class="hud ${isFoe ? 'foe' : 'you'}">
     <div class="sidelabel"><span class="who s${side}">${sideName(side)}</span><span class="pips">${pips}</span>${resChip}</div>
@@ -408,6 +424,11 @@ function syncField() {
     if (mon) {
       mon.classList.toggle('down', u.ko);
       mon.classList.toggle('transformed', !!u.transform);
+      const art = mon.querySelector('img.art');
+      if (art && art.dataset.tf) {
+        const want = u.transform ? art.dataset.tf : art.dataset.front;
+        if (!art.src.endsWith(want)) art.src = want;
+      }
       mon.classList.toggle('weaving', !!u.weaving);
       const hasGhost = !!mon.querySelector('.ghost');
       if (hasGhost !== (u.decoy > 0 && !u.ko)) {
@@ -495,11 +516,11 @@ function commandHtml() {
     <div class="cmd-head">
       ${head}
       <span class="grow"></span>
-      <div class="who-tabs">${mine.map((x) => `<button class="who-tab ${x.uid === S.actor ? 'active' : ''}" data-act="selActor" data-arg="${x.uid}">${badge(SHINOBI_BY_ID[x.id])}${esc(x.name.split(' ')[0])}${S.choices[side][x.uid] ? '<span class="ok">✓</span>' : ''}</button>`).join('')}</div>
+      <div class="who-tabs">${mine.map((x) => `<button class="who-tab ${x.uid === S.actor ? 'active' : ''}" data-act="selActor" data-arg="${x.uid}">${badge(SHINOBI_BY_ID[x.id])}${esc(shortName(x.name))}${S.choices[side][x.uid] ? '<span class="ok">✓</span>' : ''}</button>`).join('')}</div>
     </div>
     ${u ? actionSections(st, u) : ''}
     <div class="orders">
-      <div class="list">${mine.map((x) => `<span class="o ${S.choices[side][x.uid] ? '' : 'none'}"><b>${esc(x.name.split(' ')[0])}:</b> ${S.choices[side][x.uid] ? esc(actionText(st, S.choices[side][x.uid])) : '—'}</span>`).join('')}</div>
+      <div class="list">${mine.map((x) => `<span class="o ${S.choices[side][x.uid] ? '' : 'none'}"><b>${esc(shortName(x.name))}:</b> ${S.choices[side][x.uid] ? esc(actionText(st, S.choices[side][x.uid])) : '—'}</span>`).join('')}</div>
       <button class="primary" data-act="confirm" ${allChosen ? '' : 'disabled'}>Confirm orders</button>
     </div>
   </div>`;
@@ -572,7 +593,7 @@ function actionText(st, a) {
   const u = st.units[a.actor];
   const tname = (side) => {
     const uid = a.target && st.teams[side].slots[a.target.slot];
-    return uid ? st.units[uid].name.split(' ')[0] : '';
+    return uid ? shortName(st.units[uid].name) : '';
   };
   switch (a.type) {
     case 'jutsu': case 'kunai': {
