@@ -37,7 +37,7 @@ NEW_JUTSU = {
   'kirin': J('Kirin', 'ninjutsu', 'lightning', 175, 90, -1, 'enemy', [], 'Charged. Calls down natural lightning shaped like a dragon.', charged=True),
   'amaterasu': J('Amaterasu', 'ninjutsu', 'fire', 70, 50, 0, 'enemy', [burn(1, 4)], 'Black flames wherever he looks. Always Burns (4 turns). Ignores Substitution.', ignoresSub=True),
   'blaze_kagutsuchi': J('Blaze Release: Kagutsuchi', 'ninjutsu', 'fire', 75, 55, 0, 'allEnemies', [burn(0.4)], 'Shapes Amaterasu\'s flames into spikes. 40% Burn.'),
-  'susanoo_arrow': J('Susanoo: Flame Arrow', 'ninjutsu', 'fire', 150, 60, 0, 'enemy', [burn(0.5)], 'Only while Susanoo is active.', requiresTransform=True),
+  'susanoo_arrow': J('Susanoo: Flame Arrow', 'ninjutsu', 'fire', 150, 60, 0, 'enemy', [burn(0.5)], 'Only while transformed (Susanoo / Rinne-Sharingan).', requiresTransform=True),
   'sharingan_genjutsu': J('Sharingan Genjutsu', 'genjutsu', 'yin', 0, 30, 1, 'enemy', [gen(2)], 'A glance is enough. Genjutsu for 2 turns.'),
   # Sakura
   'shuriken_volley': J('Shuriken Volley', 'taijutsu', None, 45, 0, 2, 'enemy', [], 'Basic thrown weapons.'),
@@ -142,7 +142,7 @@ add('naruto_p1', 'Naruto Uzumaki', 'Part I', 'Part 1', 6, 'wind', 'yang', ['Stri
     ['log', 'shadowClone'], ['shadow_clone_barrage', 'rasengan', 'multi_shadow_clone', 'sexy_jutsu', 'summon_gamabunta'])
 add('naruto_ship', 'Naruto Uzumaki', 'Shippuden', 'Shippuden', 7, 'wind', 'yang', ['Striker', 'Tank'], (110, 90, 95, 85, 90, 150),
     ('Uzumaki Vitality', 'Regenerates 6% max HP each turn. +30% max Chakra.'),
-    T('Nine-Tails Cloak (Four Tails)', 70, 3, '+40% TAI, +30% NIN, +20% DEF. Burns 7% HP per turn and 25% chance each turn to hit a random enemy. Exhausted afterwards.'),
+    T('Nine-Tails Cloak (Four Tails)', 70, 3, '+40% TAI, +30% NIN, +20% DEF. Burns 5% HP per turn and 15% chance each turn to hit a random enemy. Exhausted afterwards.'),
     A('Shadow Clone Reinforcements', 'decoyChance', '10% / 20% / 35%', 'Each turn, every ally has a {v} chance to start with a Decoy clone.', new=True),
     ['log', 'shadowClone'], ['rasengan', 'giant_rasengan', 'rasenshuriken', 'shadow_clone_barrage', 'multi_shadow_clone', 'sexy_jutsu'], status='New')
 add('naruto_sage', 'Naruto Uzumaki', 'Sage Mode', 'Shippuden', 9, 'wind', 'yang', ['Striker', 'Sensor'], (120, 100, 115, 90, 95, 150),
@@ -150,9 +150,9 @@ add('naruto_sage', 'Naruto Uzumaki', 'Sage Mode', 'Shippuden', 9, 'wind', 'yang'
     T('Sage Mode', 50, 4, 'Takes a turn to gather natural energy (cancelled if hit). Then +35% TAI/NIN, +20% DEF, +10% SPD.'),
     A('Toad Sage Tutelage', 'chakra', '5% / 8% / 12%', 'Allies regenerate +{v} Chakra per turn.'),
     ['log', 'shadowClone'], ['rasenshuriken', 'massive_rasengan', 'frog_kata', 'shadow_clone_scouts', 'rasengan'])
-add('naruto_war', 'Naruto Uzumaki', 'Great War', 'Shippuden', 10, 'wind', 'yang', ['Striker', 'Sensor', 'Support'], (125, 110, 125, 95, 110, 160),
+add('naruto_war', 'Naruto Uzumaki', 'Kurama Link Mode', 'Shippuden', 10, 'wind', 'yang', ['Striker', 'Sensor', 'Support'], (125, 110, 125, 95, 110, 160),
     ('Kurama Link', 'Regenerates 6% max HP each turn. +30% max Chakra. Immune to genjutsu.', True),
-    T('Tailed Beast Mode', 60, 3, '+35% TAI/NIN, +20% SPD, +20% DEF. Unlocks Tailed Beast Bomb. Exhausted afterwards.'),
+    T('Sage of Six Paths Mode', 60, 3, '+35% TAI/NIN, +20% SPD, +20% DEF. Unlocks Tailed Beast Bomb. Exhausted afterwards.'),
     A('Six Paths Gift', 'heal+resolve', '3% + 5 / 5% + 10 / 8% + 15', 'Allies heal {v1} max HP and gain {v2} Resolve per turn.', new=True),
     ['log', 'shadowClone'], ['kurama_rasengan', 'rasenshuriken', 'chakra_arm', 'kurama_transfer', 'frog_kata', 'tailed_beast_bomb'], status='New')
 # ---- Sasuke
@@ -163,7 +163,7 @@ add('sasuke_p1', 'Sasuke Uchiha', 'Part I', 'Part 1', 7, 'fire', 'lightning', ['
     ['log', 'explosiveTag'], ['great_fireball', 'phoenix_flower', 'chidori', 'lion_combo', 'dragon_flame'])
 add('sasuke_ship', 'Sasuke Uchiha', 'Shippuden', 'Shippuden', 8, 'fire', 'lightning', ['Striker'], (100, 95, 115, 75, 120, 110),
     ('Sharingan', 'Sees through Log Substitution. 25% chance to reflect genjutsu back at the caster.'),
-    T('Curse Mark (Level 2)', 60, 3, '+40% NIN, +30% TAI, +20% SPD. Costs 6% HP per turn. Exhausted afterwards.'),
+    T('Curse Mark (Level 2)', 60, 3, '+40% NIN, +30% TAI, +20% SPD. Costs 4% HP per turn. Exhausted afterwards.'),
     A("Avenger's Focus", 'crit', '+5% / +10% / +15%', 'Allies gain {v} critical-hit chance.', new=True),
     ['log', 'explosiveTag'], ['chidori', 'chidori_nagashi', 'chidori_spear', 'kirin', 'great_fireball', 'phoenix_flower'], status='New')
 add('sasuke_ms', 'Sasuke Uchiha', 'Mangekyō', 'Shippuden', 9, 'fire', 'lightning', ['Striker', 'Controller'], (100, 95, 130, 80, 115, 115),
@@ -171,9 +171,9 @@ add('sasuke_ms', 'Sasuke Uchiha', 'Mangekyō', 'Shippuden', 9, 'fire', 'lightnin
     T('Susanoo', 60, 3, '+50% DEF, +20% NIN. Unlocks Susanoo: Flame Arrow. Exhausted afterwards.'),
     A("Hatred's Edge", 'execute', '10% / 20% / 30%', 'Allies deal +{v} damage to enemies below half HP.', new=True),
     ['log', 'explosiveTag'], ['amaterasu', 'chidori_spear', 'kirin', 'great_fireball', 'sharingan_genjutsu', 'susanoo_arrow'], status='New')
-add('sasuke_war', 'Sasuke Uchiha', 'Great War', 'Shippuden', 10, 'fire', 'lightning', ['Striker', 'Controller'], (110, 105, 135, 90, 120, 130),
+add('sasuke_war', 'Sasuke Uchiha', 'Eternal Mangekyō', 'Shippuden', 10, 'fire', 'lightning', ['Striker', 'Controller'], (110, 105, 135, 90, 120, 130),
     ('Eternal Mangekyō Sharingan', 'Sees through Log Substitution. Immune to genjutsu. His Burns last 2 extra turns.', True),
-    T('Complete Susanoo', 70, 3, '+40% NIN, +50% DEF. Unlocks Susanoo: Flame Arrow. Exhausted afterwards.'),
+    T('Rinne-Sharingan', 70, 3, '+40% NIN, +35% DEF. Unlocks Susanoo: Flame Arrow. Exhausted afterwards.'),
     A('Taka Leader', 'stat:nin+spd', '10%+0% / 15%+5% / 25%+10%', 'Allies gain +{v1} NIN and +{v2} SPD.', new=True),
     ['log', 'explosiveTag'], ['amaterasu', 'blaze_kagutsuchi', 'kirin', 'chidori_spear', 'sharingan_genjutsu', 'susanoo_arrow'], status='New')
 # ---- Sakura
@@ -190,7 +190,7 @@ add('sakura_shippuden', 'Sakura Haruno', 'Shippuden', 'Shippuden', 6, 'earth', '
     notes='CHANGED: Strength of a Hundred Seal moves to her Great War form; this form loses its transformation.')
 add('sakura_war', 'Sakura Haruno', 'Great War', 'Shippuden', 8, 'earth', 'yang', ['Medic', 'Frontliner'], (120, 125, 80, 95, 90, 130),
     ('Perfect Chakra Control', 'All jutsu cost 20% less Chakra. Healing is 25% stronger.'),
-    T('Strength of a Hundred Seal', 60, 3, '+30% TAI, +20% DEF and regenerate 10% HP per turn.'),
+    T('Strength of a Hundred Seal', 60, 3, '+30% TAI, +20% DEF and regenerate 8% HP per turn.'),
     A('Katsuyu Network', 'heal+dr', '3% + 5% / 5% + 8% / 8% + 12%', 'Allies heal {v1} max HP per turn and take {v2} less damage.', new=True),
     ['log', 'explosiveTag'], ['cherry_blossom_impact', 'heavenly_kick', 'ground_splitter', 'healing_transfer', 'katsuyu', 'mystical_palm'], status='New')
 # ---- Kakashi

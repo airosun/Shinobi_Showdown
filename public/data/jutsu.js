@@ -904,7 +904,7 @@ export const JUTSU = {
         "turns": 3
       }
     ],
-    "desc": "Only while Susanoo is active.",
+    "desc": "Only while transformed (Susanoo / Rinne-Sharingan).",
     "requiresTransform": true
   },
   "sharingan_genjutsu": {

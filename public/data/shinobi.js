@@ -141,7 +141,7 @@ export const SHINOBI = [
       "berserk": 0.15,
       "drawback": "exhausted",
       "name": "Nine-Tails Cloak (Four Tails)",
-      "desc": "+40% TAI, +30% NIN, +20% DEF. Burns 7% HP per turn and 25% chance each turn to hit a random enemy. Exhausted afterwards."
+      "desc": "+40% TAI, +30% NIN, +20% DEF. Burns 5% HP per turn and 15% chance each turn to hit a random enemy. Exhausted afterwards."
     },
     "supportAura": {
       "name": "Shadow Clone Reinforcements",
@@ -234,7 +234,7 @@ export const SHINOBI = [
   {
     "id": "naruto_war",
     "baseId": "naruto",
-    "name": "Naruto Uzumaki (Great War)",
+    "name": "Naruto Uzumaki (Kurama Link Mode)",
     "era": "Shippuden",
     "cost": 10,
     "natures": {
@@ -288,7 +288,7 @@ export const SHINOBI = [
         "def": 1.2
       },
       "drawback": "exhausted",
-      "name": "Tailed Beast Mode",
+      "name": "Sage of Six Paths Mode",
       "desc": "+35% TAI/NIN, +20% SPD, +20% DEF. Unlocks Tailed Beast Bomb. Exhausted afterwards."
     },
     "supportAura": {
@@ -443,7 +443,7 @@ export const SHINOBI = [
       "upkeepHpPct": 0.04,
       "drawback": "exhausted",
       "name": "Curse Mark (Level 2)",
-      "desc": "+40% NIN, +30% TAI, +20% SPD. Costs 6% HP per turn. Exhausted afterwards."
+      "desc": "+40% NIN, +30% TAI, +20% SPD. Costs 4% HP per turn. Exhausted afterwards."
     },
     "supportAura": {
       "name": "Avenger's Focus",
@@ -535,7 +535,7 @@ export const SHINOBI = [
   {
     "id": "sasuke_war",
     "baseId": "sasuke",
-    "name": "Sasuke Uchiha (Great War)",
+    "name": "Sasuke Uchiha (Eternal Mangekyō)",
     "era": "Shippuden",
     "cost": 10,
     "natures": {
@@ -586,8 +586,8 @@ export const SHINOBI = [
         "def": 1.35
       },
       "drawback": "exhausted",
-      "name": "Complete Susanoo",
-      "desc": "+40% NIN, +50% DEF. Unlocks Susanoo: Flame Arrow. Exhausted afterwards."
+      "name": "Rinne-Sharingan",
+      "desc": "+40% NIN, +35% DEF. Unlocks Susanoo: Flame Arrow. Exhausted afterwards."
     },
     "supportAura": {
       "name": "Taka Leader",
@@ -787,7 +787,7 @@ export const SHINOBI = [
       },
       "regenHpPct": 0.08,
       "name": "Strength of a Hundred Seal",
-      "desc": "+30% TAI, +20% DEF and regenerate 10% HP per turn."
+      "desc": "+30% TAI, +20% DEF and regenerate 8% HP per turn."
     },
     "supportAura": {
       "name": "Katsuyu Network",
