@@ -414,3 +414,7 @@ input:focus, select:focus { outline: 2px solid #f57c1f55; border-color: var(--ac
 .usedby-item span:not(.chip) { flex: 1; }
 button.linkish { background: none; border: none; padding: 0; font: inherit; font-weight: 800; color: var(--text); text-decoration: underline dotted #f57c1f99; text-underline-offset: 3px; cursor: pointer; }
 button.linkish:hover:not(:disabled) { background: none; color: var(--accent); }
+/* log substitution stand-in */
+.arena .spr img.sub-log { position: absolute; left: 50%; bottom: 0; width: 120px; height: auto; max-width: none; z-index: 2; pointer-events: none; filter: drop-shadow(0 6px 4px #0007); }
+.arena .mon.you .spr img.sub-log { width: 160px; height: auto; }
+.arena .mon.foe .spr img.sub-log { height: auto; }

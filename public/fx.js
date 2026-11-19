@@ -93,6 +93,25 @@ export function faint(el) {
   el?.animate([{ transform: 'translateY(0)', opacity: 1 }, { transform: 'translateY(40px)', opacity: 0.15 }], { duration: 650, easing: 'ease-in', fill: 'forwards' });
 }
 
+/** Log Substitution: the shinobi vanishes, a log takes the hit in their place, then they reappear. */
+export function logSwap(el, src, hold = 1100) {
+  if (!el) return;
+  const log = document.createElement('img');
+  log.src = src;
+  log.className = 'sub-log';
+  el.appendChild(log);
+  const kids = [...el.children].filter((c) => c !== log);
+  kids.forEach((c) => c.animate([{ opacity: 1 }, { opacity: 0, offset: 0.12 }, { opacity: 0, offset: 0.85 }, { opacity: 1 }], { duration: hold + 300 }));
+  log.animate([
+    { opacity: 0, transform: 'translate(-50%, 0) scale(.6)' },
+    { opacity: 1, transform: 'translate(-50%, 0) scale(1.05)', offset: 0.12 },
+    { opacity: 1, transform: 'translate(-50%, 0) rotate(-6deg)', offset: 0.3 },
+    { opacity: 1, transform: 'translate(-50%, 0) rotate(3deg)', offset: 0.45 },
+    { opacity: 1, transform: 'translate(-50%, 0)', offset: 0.75 },
+    { opacity: 0, transform: 'translate(-50%, 20px)' },
+  ], { duration: hold + 300, easing: 'ease-out' }).onfinish = () => log.remove();
+}
+
 export function appear(el) {
   el?.animate([
     { transform: 'scale(.2)', opacity: 0, filter: 'brightness(3)' },

@@ -922,14 +922,14 @@ async function playEvent(ev, apply) {
     }
     case 'heal':
       if (el && e.revive) {
-        el.parentElement.getAnimations().forEach((a) => a.cancel());
+        el.getAnimations().forEach((a) => a.cancel());
         FX.appear(el); FX.banner(arena, 'REVIVED!', '#7ee08a');
       }
       if (el) { FX.ring(arena, el, 'heal', e.chakra ? '#4fb3ff' : null); if (e.amount) FX.pop(arena, el, `+${e.amount}${e.chakra ? ' CK' : ''}`, 'heal'); }
       ms = e.revive ? 1700 : 1000;
       break;
     case 'ko':
-      if (el) FX.faint(el.parentElement);
+      if (el) FX.faint(el);
       ms = 1400;
       break;
     case 'sub':
@@ -939,7 +939,7 @@ async function playEvent(ev, apply) {
         ms = 1200;
       } else if (el && e.negated) {
         FX.fx(arena, 'puff', FX.centerOf(el, arena));
-        if (!e.decoy) FX.fx(arena, 'log', FX.centerOf(el, arena), '🪵');
+        if (e.subType === 'log') FX.logSwap(el, 'sprites/substitution-log.png');
         FX.pop(arena, el, e.decoy ? 'Decoy!' : 'Substitution!', 'sub', true);
         ms = 1300;
       } else if (el) { FX.ring(arena, el, '', '#c9d0dd'); }

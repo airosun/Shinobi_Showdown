@@ -603,7 +603,7 @@ function performJutsu(state, actor, jutsu, target, ctx = {}) {
         } else if (type === 'log' && seesLog(actor)) {
           log(state, `${actor.name} sees through ${tgt.name}'s Log Substitution!`, 'sub', actor);
         } else {
-          log(state, `${tgt.name} was replaced by a ${type === 'log' ? 'log' : 'clone'}! ${jutsu.name} is negated.`, 'sub', tgt, { negated: true });
+          log(state, `${tgt.name} was replaced by a ${type === 'log' ? 'log' : 'clone'}! ${jutsu.name} is negated.`, 'sub', tgt, { negated: true, subType: type });
           onSubstitution(state, tgt, actor, type);
           puppetPoison(state, tgt, actor);
           continue;
