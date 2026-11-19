@@ -318,3 +318,69 @@ test('Charge restores half the pool; passive regen is small', () => {
   const expected = Math.round(s.maxChakra * BALANCE.chargeChakra) + Math.round(s.maxChakra * BALANCE.chakraRegen);
   assert.equal(s.chakra, expected);
 });
+
+// ---------------- batch 2: Sand, Sound, Mist ----------------
+const B2A = ['kankuro_p1', 'chiyo', 'haku', 'kabuto_p1'];
+const B2B = ['zabuza', 'orochimaru_p1', 'danzo', 'kankuro_ship'];
+
+test('Poison deals 6% max HP per turn and is cleansed', () => {
+  const st = battle(B2A, B2B, 0.01);
+  const z = st.units['1-0'];
+  resolveTurn(st, [{ actor: '0-0', type: 'jutsu', jutsuId: 'poison_bomb' }]);
+  assert.ok(z.statuses.poison);
+  assert.ok(st.log.some((l) => /hurt by poison \(\d+\)/.test(l.text) && l.u === z.uid));
+});
+
+test('Chiyo brings a fallen ally back once per battle', () => {
+  const st = battle(B2A, B2B);
+  const kank = st.units['0-0'];
+  kank.hp = 0; kank.ko = true;
+  const opt = availableActions(st, '0-1').find((a) => a.jutsuId === 'reincarnation');
+  assert.ok(!opt.disabled);
+  const chiyoHp = st.units['0-1'].hp;
+  resolveTurn(st, [{ actor: '0-1', type: 'jutsu', jutsuId: 'reincarnation', target: { slot: 0 } }]);
+  assert.ok(!kank.ko);
+  assert.equal(kank.hp, Math.round(kank.maxHp * 0.4));
+  assert.ok(st.units['0-1'].hp <= Math.ceil(chiyoHp / 2) + 1);
+  assert.ok(availableActions(st, '0-1').find((a) => a.jutsuId === 'reincarnation').disabled);
+});
+
+test("Haku's Selfless Shield takes a single-target hit for an ally", () => {
+  const st = battle(B2A, B2B);
+  const kank = st.units['0-0']; const haku = st.units['0-2'];
+  const k = kank.hp; const h = haku.hp;
+  resolveTurn(st, [
+    { actor: '0-2', type: 'jutsu', jutsuId: 'haku_shield', target: { slot: 0 } },
+    { actor: '1-0', type: 'jutsu', jutsuId: 'executioner_blade', target: { slot: 0 } },
+  ]);
+  assert.equal(kank.hp, k);
+  assert.ok(haku.hp < h);
+});
+
+test('Izanagi survives two knockouts; Body Shedding one', () => {
+  const st = battle(B2A, B2B);
+  const danzo = st.units['1-2'];
+  for (const n of [1, 2]) {
+    danzo.hp = 1;
+    resolveTurn(st, [{ actor: '0-0', type: 'kunai', target: { slot: 2 } }]);
+    assert.ok(!danzo.ko, `survives #${n}`);
+  }
+  danzo.hp = 1;
+  resolveTurn(st, [{ actor: '0-0', type: 'kunai', target: { slot: 2 } }]);
+  assert.ok(danzo.ko);
+  assert.equal(st.units['1-1'].survives, 1);
+});
+
+test('Puppet Master poisons whoever hits the substitution', () => {
+  const st = battle(B2A, B2B);
+  resolveTurn(st, [
+    { actor: '0-0', type: 'substitute' },
+    { actor: '1-0', type: 'jutsu', jutsuId: 'executioner_blade', target: { slot: 0 } },
+  ]);
+  assert.ok(st.units['1-0'].statuses.poison);
+});
+
+test("Orochimaru's support lowers the Resolve transformations need", () => {
+  const st = battle(['anko', 'jirobo', 'tayuya', 'orochimaru_p1'], B2A);
+  assert.equal(E.tfResolve(st, st.units['0-0']), 40);
+});

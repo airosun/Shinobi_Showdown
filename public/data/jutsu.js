@@ -2074,6 +2074,1026 @@ export const JUTSU = {
     ],
     "desc": "All enemies −15% SPD for 2 turns."
   },
+  "sand_waterfall_funeral": {
+    "name": "Sand Waterfall Imperial Funeral",
+    "category": "ninjutsu",
+    "nature": "magnet",
+    "power": 90,
+    "cost": 60,
+    "priority": -1,
+    "target": "allEnemies",
+    "effects": [],
+    "desc": "A crushing wave of sand on all enemies."
+  },
+  "kazekage_shield": {
+    "name": "Kazekage's Sand Shield",
+    "category": "support",
+    "nature": "magnet",
+    "power": 0,
+    "cost": 40,
+    "priority": 2,
+    "target": "allAllies",
+    "effects": [
+      {
+        "type": "buff",
+        "stat": "def",
+        "mult": 1.25,
+        "turns": 2
+      }
+    ],
+    "desc": "Sand walls rise in front of every ally: +25% DEF for 2 turns."
+  },
+  "cutting_whirlwind": {
+    "name": "Wind Release: Cutting Whirlwind",
+    "category": "ninjutsu",
+    "nature": "wind",
+    "power": 60,
+    "cost": 30,
+    "priority": 0,
+    "target": "allEnemies",
+    "effects": [],
+    "desc": "A sweep of the giant fan hits all enemies."
+  },
+  "great_sickle_weasel": {
+    "name": "Wind Release: Great Sickle Weasel",
+    "category": "ninjutsu",
+    "nature": "wind",
+    "power": 80,
+    "cost": 45,
+    "priority": -1,
+    "target": "allEnemies",
+    "effects": [],
+    "desc": "A huge blade of wind over the whole field."
+  },
+  "fan_strike": {
+    "name": "Giant Fan Strike",
+    "category": "taijutsu",
+    "nature": "wind",
+    "power": 65,
+    "cost": 10,
+    "priority": 1,
+    "target": "enemy",
+    "effects": [],
+    "desc": "A heavy swing of the closed fan."
+  },
+  "wind_barrier": {
+    "name": "Wind Release: Wind Barrier",
+    "category": "support",
+    "nature": "wind",
+    "power": 0,
+    "cost": 25,
+    "priority": 2,
+    "target": "self",
+    "effects": [
+      {
+        "type": "buff",
+        "stat": "def",
+        "mult": 1.35,
+        "turns": 2
+      }
+    ],
+    "desc": "+35% DEF for 2 turns."
+  },
+  "summon_kamatari": {
+    "name": "Summoning: Kamatari",
+    "category": "ninjutsu",
+    "nature": "wind",
+    "power": 115,
+    "cost": 70,
+    "priority": -1,
+    "target": "allEnemies",
+    "effects": [],
+    "desc": "Charged. The one-eyed weasel cuts through everything.",
+    "charged": true
+  },
+  "dust_wind": {
+    "name": "Wind Release: Great Breakthrough",
+    "category": "ninjutsu",
+    "nature": "wind",
+    "power": 100,
+    "cost": 40,
+    "priority": 0,
+    "target": "enemy",
+    "effects": [
+      {
+        "type": "flinch",
+        "chance": 0.2
+      }
+    ],
+    "desc": "A focused blast of wind. 20% Flinch."
+  },
+  "crow_blades": {
+    "name": "Crow: Hidden Blades",
+    "category": "taijutsu",
+    "nature": null,
+    "power": 70,
+    "cost": 15,
+    "priority": 1,
+    "target": "enemy",
+    "effects": [
+      {
+        "type": "poison",
+        "chance": 0.4,
+        "turns": 3
+      }
+    ],
+    "desc": "Poisoned blades spring from the puppet. 40% Poison."
+  },
+  "crow_embrace": {
+    "name": "Black Secret Technique: Machine of Forbidden Embraces",
+    "category": "taijutsu",
+    "nature": null,
+    "power": 60,
+    "cost": 30,
+    "priority": 0,
+    "target": "enemy",
+    "effects": [
+      {
+        "type": "bind",
+        "chance": 0.6,
+        "turns": 1
+      }
+    ],
+    "desc": "The puppet locks the target in its arms. 60% Bind."
+  },
+  "puppet_switch": {
+    "name": "Puppet Body Switch",
+    "category": "support",
+    "nature": null,
+    "power": 0,
+    "cost": 15,
+    "priority": 1,
+    "target": "self",
+    "effects": [
+      {
+        "type": "decoy"
+      }
+    ],
+    "desc": "Gain a Decoy (a puppet takes the next hit)."
+  },
+  "poison_bomb": {
+    "name": "Poison Smoke Bomb",
+    "category": "ninjutsu",
+    "nature": null,
+    "power": 0,
+    "cost": 30,
+    "priority": 1,
+    "target": "allEnemies",
+    "effects": [
+      {
+        "type": "poison",
+        "chance": 0.5,
+        "turns": 3
+      }
+    ],
+    "desc": "50% Poison on all enemies."
+  },
+  "salamander_shield": {
+    "name": "Salamander Shield",
+    "category": "support",
+    "nature": null,
+    "power": 0,
+    "cost": 35,
+    "priority": 2,
+    "target": "allAllies",
+    "effects": [
+      {
+        "type": "buff",
+        "stat": "def",
+        "mult": 1.3,
+        "turns": 2
+      }
+    ],
+    "desc": "The giant puppet shields everyone: +30% DEF for 2 turns."
+  },
+  "iron_maiden": {
+    "name": "Black Ant: Iron Maiden",
+    "category": "taijutsu",
+    "nature": null,
+    "power": 90,
+    "cost": 40,
+    "priority": 0,
+    "target": "enemy",
+    "effects": [
+      {
+        "type": "poison",
+        "chance": 0.5,
+        "turns": 3
+      },
+      {
+        "type": "bonusVsBound",
+        "value": 1.5
+      }
+    ],
+    "desc": "50% Poison; 50% more damage to a Bound target."
+  },
+  "ten_puppets": {
+    "name": "Ten Puppets of Chikamatsu",
+    "category": "taijutsu",
+    "nature": null,
+    "power": 70,
+    "cost": 35,
+    "priority": 0,
+    "target": "allEnemies",
+    "effects": [
+      {
+        "type": "poison",
+        "chance": 0.25,
+        "turns": 3
+      }
+    ],
+    "desc": "Ten legendary puppets attack together. 25% Poison."
+  },
+  "mother_father": {
+    "name": "White Secret Technique: Mother and Father",
+    "category": "taijutsu",
+    "nature": null,
+    "power": 90,
+    "cost": 30,
+    "priority": 0,
+    "target": "enemy",
+    "effects": [
+      {
+        "type": "bind",
+        "chance": 0.3,
+        "turns": 1
+      }
+    ],
+    "desc": "Chiyo's parent puppets crush the target. 30% Bind."
+  },
+  "antidote": {
+    "name": "Antidote",
+    "category": "medical",
+    "nature": "yang",
+    "power": 0,
+    "cost": 20,
+    "priority": 1,
+    "target": "ally",
+    "effects": [
+      {
+        "type": "cleanse"
+      },
+      {
+        "type": "heal",
+        "value": 0.15
+      }
+    ],
+    "desc": "Cleanse an ally and heal 15%."
+  },
+  "reincarnation": {
+    "name": "One's Own Life Reincarnation",
+    "category": "medical",
+    "nature": "yang",
+    "power": 0,
+    "cost": 60,
+    "priority": -1,
+    "target": "ally",
+    "effects": [
+      {
+        "type": "revive",
+        "value": 0.4
+      }
+    ],
+    "desc": "Once per battle: bring a knocked-out ally back with 40% HP. Chiyo loses half her current HP."
+  },
+  "chakra_threads": {
+    "name": "Chakra Threads",
+    "category": "ninjutsu",
+    "nature": null,
+    "power": 40,
+    "cost": 25,
+    "priority": 1,
+    "target": "enemy",
+    "effects": [
+      {
+        "type": "bind",
+        "chance": 0.5,
+        "turns": 1
+      }
+    ],
+    "desc": "50% Bind."
+  },
+  "shadow_snakes": {
+    "name": "Striking Shadow Snakes",
+    "category": "ninjutsu",
+    "nature": null,
+    "power": 75,
+    "cost": 30,
+    "priority": 1,
+    "target": "enemy",
+    "effects": [
+      {
+        "type": "poison",
+        "chance": 0.3,
+        "turns": 3
+      }
+    ],
+    "desc": "Snakes shoot from the sleeves. 30% Poison."
+  },
+  "great_breakthrough": {
+    "name": "Wind Release: Great Breakthrough Wave",
+    "category": "ninjutsu",
+    "nature": "wind",
+    "power": 70,
+    "cost": 40,
+    "priority": 0,
+    "target": "allEnemies",
+    "effects": [],
+    "desc": "A gale over the whole field."
+  },
+  "five_pronged_seal": {
+    "name": "Five Pronged Seal",
+    "category": "ninjutsu",
+    "nature": "yin",
+    "power": 0,
+    "cost": 35,
+    "priority": 0,
+    "target": "enemy",
+    "effects": [
+      {
+        "type": "drainChakra",
+        "value": 0.4
+      },
+      {
+        "type": "debuff",
+        "stat": "nin",
+        "mult": 0.7,
+        "turns": 3
+      }
+    ],
+    "desc": "Seals the target's chakra: drain 40% Chakra and −30% NIN for 3 turns. Ignores Substitution.",
+    "ignoresSub": true
+  },
+  "summon_manda": {
+    "name": "Summoning: Manda",
+    "category": "ninjutsu",
+    "nature": null,
+    "power": 150,
+    "cost": 75,
+    "priority": -1,
+    "target": "enemy",
+    "effects": [
+      {
+        "type": "poison",
+        "chance": 0.4,
+        "turns": 3
+      }
+    ],
+    "desc": "Charged. The giant snake strikes. 40% Poison.",
+    "charged": true
+  },
+  "kusanagi": {
+    "name": "Sword of Kusanagi",
+    "category": "taijutsu",
+    "nature": null,
+    "power": 100,
+    "cost": 25,
+    "priority": 1,
+    "target": "enemy",
+    "effects": [
+      {
+        "type": "pierce",
+        "value": 0.25
+      }
+    ],
+    "desc": "The blade extends from his mouth. Ignores 25% DEF."
+  },
+  "eight_branches": {
+    "name": "Eight Branches Technique",
+    "category": "ninjutsu",
+    "nature": null,
+    "power": 140,
+    "cost": 60,
+    "priority": 0,
+    "target": "allEnemies",
+    "effects": [
+      {
+        "type": "poison",
+        "chance": 0.4,
+        "turns": 3
+      }
+    ],
+    "desc": "Only while transformed. The eight-headed serpent.",
+    "requiresTransform": true
+  },
+  "hidden_snake_hands": {
+    "name": "Hidden Shadow Snake Hands",
+    "category": "ninjutsu",
+    "nature": null,
+    "power": 60,
+    "cost": 30,
+    "priority": 1,
+    "target": "allEnemies",
+    "effects": [
+      {
+        "type": "poison",
+        "chance": 0.25,
+        "turns": 3
+      }
+    ],
+    "desc": "A hail of snakes on all enemies. 25% Poison."
+  },
+  "twin_snakes": {
+    "name": "Twin Snakes Mutual Death",
+    "category": "ninjutsu",
+    "nature": null,
+    "power": 170,
+    "cost": 50,
+    "priority": 0,
+    "target": "enemy",
+    "effects": [
+      {
+        "type": "recoil",
+        "value": 0.35
+      }
+    ],
+    "desc": "Forbidden. Ignores Substitution. The user takes 35% max HP recoil.",
+    "ignoresSub": true
+  },
+  "dragon_fire": {
+    "name": "Fire Release: Dragon Fire",
+    "category": "ninjutsu",
+    "nature": "fire",
+    "power": 80,
+    "cost": 35,
+    "priority": 0,
+    "target": "enemy",
+    "effects": [
+      {
+        "type": "burn",
+        "chance": 0.3,
+        "turns": 3
+      }
+    ],
+    "desc": "Flame runs along a wire. 30% Burn."
+  },
+  "chakra_scalpel": {
+    "name": "Chakra Scalpel",
+    "category": "taijutsu",
+    "nature": "yang",
+    "power": 75,
+    "cost": 20,
+    "priority": 1,
+    "target": "enemy",
+    "effects": [
+      {
+        "type": "debuff",
+        "stat": "tai",
+        "mult": 0.85,
+        "turns": 2
+      }
+    ],
+    "desc": "Cuts muscles from the inside: −15% TAI for 2 turns."
+  },
+  "temple_of_nirvana": {
+    "name": "Temple of Nirvana",
+    "category": "genjutsu",
+    "nature": "yin",
+    "power": 0,
+    "cost": 45,
+    "priority": 0,
+    "target": "allEnemies",
+    "effects": [
+      {
+        "type": "genjutsu",
+        "turns": 1
+      }
+    ],
+    "desc": "Falling feathers put everyone to sleep: genjutsu on all enemies for 1 turn."
+  },
+  "dead_soul": {
+    "name": "Dead Soul Technique",
+    "category": "support",
+    "nature": "yin",
+    "power": 0,
+    "cost": 25,
+    "priority": 0,
+    "target": "self",
+    "effects": [
+      {
+        "type": "decoy"
+      },
+      {
+        "type": "intel",
+        "value": 6
+      }
+    ],
+    "desc": "Leave a corpse double: gain a Decoy and +6 Intel."
+  },
+  "white_rage": {
+    "name": "Sage Art: White Rage",
+    "category": "ninjutsu",
+    "nature": null,
+    "power": 80,
+    "cost": 45,
+    "priority": 0,
+    "target": "allEnemies",
+    "effects": [
+      {
+        "type": "paralyze",
+        "chance": 0.4,
+        "turns": 2
+      }
+    ],
+    "desc": "A crushing sound wave. 40% Paralyze."
+  },
+  "inorganic_animation": {
+    "name": "Sage Art: Inorganic Animation",
+    "category": "ninjutsu",
+    "nature": "earth",
+    "power": 100,
+    "cost": 50,
+    "priority": -1,
+    "target": "allEnemies",
+    "effects": [],
+    "desc": "The ground itself rises against all enemies."
+  },
+  "snake_dragon": {
+    "name": "Sage Art: Snake Dragon",
+    "category": "ninjutsu",
+    "nature": null,
+    "power": 120,
+    "cost": 55,
+    "priority": 0,
+    "target": "enemy",
+    "effects": [
+      {
+        "type": "poison",
+        "chance": 0.3,
+        "turns": 3
+      }
+    ],
+    "desc": "Only while transformed. 30% Poison.",
+    "requiresTransform": true
+  },
+  "earth_dome": {
+    "name": "Earth Release: Barrier Earth Prison Dome",
+    "category": "ninjutsu",
+    "nature": "earth",
+    "power": 0,
+    "cost": 40,
+    "priority": 0,
+    "target": "enemy",
+    "effects": [
+      {
+        "type": "bind",
+        "chance": 0.7,
+        "turns": 1
+      },
+      {
+        "type": "drainChakra",
+        "value": 0.15
+      }
+    ],
+    "desc": "70% Bind and drain 15% Chakra."
+  },
+  "arhat_fist": {
+    "name": "Arhat Fist",
+    "category": "taijutsu",
+    "nature": null,
+    "power": 105,
+    "cost": 30,
+    "priority": 0,
+    "target": "enemy",
+    "effects": [],
+    "desc": "A brutal sumo-style blow."
+  },
+  "earth_shore_return": {
+    "name": "Earth Release: Earth Shore Return",
+    "category": "ninjutsu",
+    "nature": "earth",
+    "power": 70,
+    "cost": 35,
+    "priority": 0,
+    "target": "allEnemies",
+    "effects": [],
+    "desc": "Throws up a slab of earth over everyone."
+  },
+  "spider_web_area": {
+    "name": "Spider Sticky Gold: Spider Web Area",
+    "category": "ninjutsu",
+    "nature": null,
+    "power": 0,
+    "cost": 35,
+    "priority": 1,
+    "target": "allEnemies",
+    "effects": [
+      {
+        "type": "bind",
+        "chance": 0.3,
+        "turns": 1
+      }
+    ],
+    "desc": "30% Bind on all enemies."
+  },
+  "spider_bow": {
+    "name": "Spider Bow: Fierce Rip",
+    "category": "taijutsu",
+    "nature": null,
+    "power": 150,
+    "cost": 60,
+    "priority": -1,
+    "target": "enemy",
+    "effects": [
+      {
+        "type": "pierce",
+        "value": 0.3
+      }
+    ],
+    "desc": "Charged. A golden arrow that ignores 30% DEF.",
+    "charged": true
+  },
+  "spider_armor": {
+    "name": "Spider Sticky Gold Armor",
+    "category": "support",
+    "nature": null,
+    "power": 0,
+    "cost": 25,
+    "priority": 1,
+    "target": "self",
+    "effects": [
+      {
+        "type": "buff",
+        "stat": "def",
+        "mult": 1.4,
+        "turns": 2
+      }
+    ],
+    "desc": "+40% DEF for 2 turns."
+  },
+  "summon_spider": {
+    "name": "Summoning: Kyodaigumo",
+    "category": "ninjutsu",
+    "nature": null,
+    "power": 60,
+    "cost": 35,
+    "priority": 0,
+    "target": "allEnemies",
+    "effects": [
+      {
+        "type": "bind",
+        "chance": 0.15,
+        "turns": 1
+      }
+    ],
+    "desc": "A giant spider and its brood. 15% Bind."
+  },
+  "connected_fist": {
+    "name": "Multiple Connected Fist",
+    "category": "taijutsu",
+    "nature": null,
+    "power": 85,
+    "cost": 20,
+    "priority": 1,
+    "target": "enemy",
+    "effects": [],
+    "desc": "Ukon's arms burst out mid-combo."
+  },
+  "parasitic_demon": {
+    "name": "Parasitic Demon Destruction",
+    "category": "ninjutsu",
+    "nature": null,
+    "power": 70,
+    "cost": 40,
+    "priority": 0,
+    "target": "enemy",
+    "effects": [
+      {
+        "type": "poison",
+        "chance": 0.6,
+        "turns": 3
+      }
+    ],
+    "desc": "Merges into the target's body. Ignores Substitution. 60% Poison.",
+    "ignoresSub": true
+  },
+  "rashomon": {
+    "name": "Summoning: Rashomon",
+    "category": "support",
+    "nature": null,
+    "power": 0,
+    "cost": 45,
+    "priority": 2,
+    "target": "allAllies",
+    "effects": [
+      {
+        "type": "buff",
+        "stat": "def",
+        "mult": 1.35,
+        "turns": 2
+      }
+    ],
+    "desc": "A demon gate blocks the field: +35% DEF to all allies for 2 turns."
+  },
+  "phantom_sound_chains": {
+    "name": "Demonic Flute: Phantom Sound Chains",
+    "category": "genjutsu",
+    "nature": "yin",
+    "power": 0,
+    "cost": 45,
+    "priority": 0,
+    "target": "allEnemies",
+    "effects": [
+      {
+        "type": "genjutsu",
+        "turns": 1
+      }
+    ],
+    "desc": "Genjutsu on all enemies for 1 turn."
+  },
+  "summon_doki": {
+    "name": "Summoning: Doki",
+    "category": "ninjutsu",
+    "nature": null,
+    "power": 75,
+    "cost": 40,
+    "priority": 0,
+    "target": "allEnemies",
+    "effects": [],
+    "desc": "Three demons on the field."
+  },
+  "spirit_eaters": {
+    "name": "Doki: Spirit Eaters",
+    "category": "ninjutsu",
+    "nature": "yin",
+    "power": 40,
+    "cost": 40,
+    "priority": 0,
+    "target": "allEnemies",
+    "effects": [
+      {
+        "type": "drainChakra",
+        "value": 0.15
+      }
+    ],
+    "desc": "Chakra-eating spirits drain 15% Chakra from all enemies."
+  },
+  "flute_strike": {
+    "name": "Flute Strike",
+    "category": "taijutsu",
+    "nature": null,
+    "power": 50,
+    "cost": 5,
+    "priority": 1,
+    "target": "enemy",
+    "effects": [],
+    "desc": "A quick blow."
+  },
+  "willow_dance": {
+    "name": "Dance of the Willow",
+    "category": "taijutsu",
+    "nature": null,
+    "power": 90,
+    "cost": 20,
+    "priority": 1,
+    "target": "enemy",
+    "effects": [],
+    "desc": "Bones jut from every joint."
+  },
+  "camellia_dance": {
+    "name": "Dance of the Camellia",
+    "category": "taijutsu",
+    "nature": null,
+    "power": 70,
+    "cost": 15,
+    "priority": 2,
+    "target": "enemy",
+    "effects": [
+      {
+        "type": "pierce",
+        "value": 0.2
+      }
+    ],
+    "desc": "A lightning-fast bone sword thrust."
+  },
+  "larch_dance": {
+    "name": "Dance of the Larch",
+    "category": "taijutsu",
+    "nature": null,
+    "power": 65,
+    "cost": 30,
+    "priority": 0,
+    "target": "allEnemies",
+    "effects": [],
+    "desc": "A spinning field of bone spikes."
+  },
+  "finger_bullets": {
+    "name": "Ten-Finger Drilling Bullets",
+    "category": "taijutsu",
+    "nature": null,
+    "power": 60,
+    "cost": 10,
+    "priority": 2,
+    "target": "enemy",
+    "effects": [
+      {
+        "type": "pierce",
+        "value": 0.3
+      }
+    ],
+    "desc": "Fingertip bones fired as bullets."
+  },
+  "bracken_dance": {
+    "name": "Dance of the Seedling Fern",
+    "category": "taijutsu",
+    "nature": null,
+    "power": 120,
+    "cost": 50,
+    "priority": 0,
+    "target": "allEnemies",
+    "effects": [],
+    "desc": "Only with the Curse Mark. A forest of bone.",
+    "requiresTransform": true
+  },
+  "hidden_mist": {
+    "name": "Hidden Mist Technique",
+    "category": "support",
+    "nature": "water",
+    "power": 0,
+    "cost": 25,
+    "priority": 2,
+    "target": "allEnemies",
+    "effects": [
+      {
+        "type": "debuff",
+        "stat": "spd",
+        "mult": 0.8,
+        "turns": 2
+      }
+    ],
+    "desc": "Thick mist: all enemies −20% SPD for 2 turns."
+  },
+  "water_prison": {
+    "name": "Water Release: Water Prison",
+    "category": "ninjutsu",
+    "nature": "water",
+    "power": 0,
+    "cost": 40,
+    "priority": 0,
+    "target": "enemy",
+    "effects": [
+      {
+        "type": "bind",
+        "chance": 0.75,
+        "turns": 2
+      }
+    ],
+    "desc": "75% Bind for 2 turns."
+  },
+  "executioner_blade": {
+    "name": "Executioner's Blade",
+    "category": "taijutsu",
+    "nature": null,
+    "power": 110,
+    "cost": 30,
+    "priority": 0,
+    "target": "enemy",
+    "effects": [],
+    "desc": "The giant cleaver."
+  },
+  "great_waterfall": {
+    "name": "Water Release: Great Waterfall",
+    "category": "ninjutsu",
+    "nature": "water",
+    "power": 85,
+    "cost": 50,
+    "priority": -1,
+    "target": "allEnemies",
+    "effects": [],
+    "desc": "A torrent over the whole field."
+  },
+  "ice_mirrors": {
+    "name": "Demonic Mirroring Ice Crystals",
+    "category": "ninjutsu",
+    "nature": "ice",
+    "power": 95,
+    "cost": 50,
+    "priority": 0,
+    "target": "enemy",
+    "effects": [
+      {
+        "type": "paralyze",
+        "chance": 0.3,
+        "turns": 2
+      }
+    ],
+    "desc": "Senbon from every mirror at once. Ignores Substitution. 30% Paralyze.",
+    "ignoresSub": true
+  },
+  "thousand_needles": {
+    "name": "Thousand Needles of Death",
+    "category": "ninjutsu",
+    "nature": "ice",
+    "power": 60,
+    "cost": 35,
+    "priority": 0,
+    "target": "allEnemies",
+    "effects": [],
+    "desc": "Water turned to ice needles around everyone."
+  },
+  "ice_prison": {
+    "name": "Ice Release: Ice Prison",
+    "category": "ninjutsu",
+    "nature": "ice",
+    "power": 40,
+    "cost": 35,
+    "priority": 0,
+    "target": "enemy",
+    "effects": [
+      {
+        "type": "bind",
+        "chance": 0.5,
+        "turns": 1
+      }
+    ],
+    "desc": "50% Bind."
+  },
+  "haku_shield": {
+    "name": "Selfless Shield",
+    "category": "support",
+    "nature": null,
+    "power": 0,
+    "cost": 20,
+    "priority": 3,
+    "target": "ally",
+    "effects": [
+      {
+        "type": "bodyguard"
+      }
+    ],
+    "desc": "Leap in front of an ally: the next single-target hit on them this turn hits Haku instead."
+  },
+  "vacuum_blade": {
+    "name": "Wind Release: Vacuum Blade",
+    "category": "ninjutsu",
+    "nature": "wind",
+    "power": 85,
+    "cost": 30,
+    "priority": 1,
+    "target": "enemy",
+    "effects": [],
+    "desc": "Wind chakra shaped into a blade."
+  },
+  "vacuum_sphere": {
+    "name": "Wind Release: Vacuum Great Sphere",
+    "category": "ninjutsu",
+    "nature": "wind",
+    "power": 70,
+    "cost": 40,
+    "priority": 0,
+    "target": "allEnemies",
+    "effects": [],
+    "desc": "A volley of air bullets."
+  },
+  "reverse_tetragram": {
+    "name": "Reverse Four Symbols Sealing",
+    "category": "ninjutsu",
+    "nature": "yin",
+    "power": 210,
+    "cost": 40,
+    "priority": 0,
+    "target": "enemy",
+    "effects": [
+      {
+        "type": "recoil",
+        "value": 0.5
+      }
+    ],
+    "desc": "A last resort. Ignores Substitution. The user takes 50% max HP recoil.",
+    "ignoresSub": true
+  },
+  "summon_baku": {
+    "name": "Summoning: Baku",
+    "category": "ninjutsu",
+    "nature": null,
+    "power": 50,
+    "cost": 45,
+    "priority": 0,
+    "target": "allEnemies",
+    "effects": [
+      {
+        "type": "drainChakra",
+        "value": 0.15
+      }
+    ],
+    "desc": "The dream-eater inhales: drains 15% Chakra from all enemies."
+  },
+  "kotoamatsukami": {
+    "name": "Kotoamatsukami",
+    "category": "genjutsu",
+    "nature": "yin",
+    "power": 0,
+    "cost": 70,
+    "priority": 0,
+    "target": "enemy",
+    "effects": [
+      {
+        "type": "genjutsu",
+        "turns": 3
+      }
+    ],
+    "desc": "Shisui's eye: genjutsu for 3 turns."
+  },
   "thrown_rasenshuriken": {
     "name": "Rasenshuriken (Thrown)",
     "category": "ninjutsu",

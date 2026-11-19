@@ -49,7 +49,7 @@ main { padding: 16px; max-width: 1320px; margin: 0 auto; }
 .chip.side0 { background: #16304a; color: #9fd0ff; } .chip.side1 { background: #4a1d16; color: #ffb3a3; }
 .nat { display: inline-block; font-size: 10.5px; font-weight: 700; text-transform: uppercase; letter-spacing: .04em; padding: 1px 6px; border-radius: 5px; color: #fff; text-shadow: 0 1px 1px #0006; background: var(--c, #555); }
 .st { font-size: 10px; font-weight: 800; padding: 1px 5px; border-radius: 4px; color: #fff; }
-.st-burn { background: #e4572e; } .st-paralyze { background: #c9a100; } .st-bind { background: #5b4a8a; } .st-genjutsu { background: #9b3fa0; } .st-exhausted { background: #6b7b8c; }
+.st-burn { background: #e4572e; } .st-poison { background: #7b3fc4; } .st-paralyze { background: #c9a100; } .st-bind { background: #5b4a8a; } .st-genjutsu { background: #9b3fa0; } .st-exhausted { background: #6b7b8c; }
 
 /* ---------- title ---------- */
 .title-screen { text-align: center; padding-top: 8vh; }

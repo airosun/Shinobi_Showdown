@@ -32,6 +32,21 @@ export function chooseActions(state, side, rng = Math.random) {
     if (chance(specialist ? 0.35 : 0.08)) { actions.push({ actor: u.uid, type: 'gather' }); continue; }
     if (chance(0.06)) { actions.push({ actor: u.uid, type: 'guard' }); continue; }
 
+    // Chiyo: bring back a fallen ally
+    const reviveOpt = opts.find((o) => o.type === 'jutsu' && !o.overexert && getJutsu(o.jutsuId).effects.some((e) => e.type === 'revive'));
+    if (reviveOpt && chance(0.85)) {
+      const fallen = state.teams[side].slots.map((id) => state.units[id]).find((x) => x.ko);
+      actions.push({ actor: u.uid, type: 'jutsu', jutsuId: reviveOpt.jutsuId, target: { slot: slotOf(state, fallen) } });
+      continue;
+    }
+    // Haku: shield a badly hurt ally
+    const guardOpt = opts.find((o) => o.type === 'jutsu' && !o.overexert && getJutsu(o.jutsuId).effects.some((e) => e.type === 'bodyguard'));
+    const weak = allies.filter((a) => a !== u && a.hp < a.maxHp * 0.4 && a.hp / a.maxHp < u.hp / u.maxHp - 0.2)[0];
+    if (guardOpt && weak && chance(0.5)) {
+      actions.push({ actor: u.uid, type: 'jutsu', jutsuId: guardOpt.jutsuId, target: { slot: slotOf(state, weak) } });
+      continue;
+    }
+
     // healing
     const hurt = allies.filter((a) => a.hp < a.maxHp * 0.5).sort((a, b) => a.hp / a.maxHp - b.hp / b.maxHp)[0];
     const healOpt = opts.find((o) => o.type === 'jutsu' && !o.overexert && getJutsu(o.jutsuId).effects.some((e) => e.type === 'heal'));
@@ -45,6 +60,7 @@ export function chooseActions(state, side, rng = Math.random) {
     for (const o of opts) {
       if (o.type !== 'jutsu' && o.type !== 'kunai') continue;
       const j = getJutsu(o.jutsuId);
+      if (j.effects.some((e) => e.type === 'revive' || e.type === 'bodyguard')) continue; // handled above
       // overexerting costs HP: only worth it for a knockout (or rarely when desperate)
       const ox = (sc, lethal) => (o.overexert ? (lethal ? sc * 0.9 : sc - o.overexert * 1.6) : sc);
       const tag = (a) => (o.overexert ? { ...a, overexert: true } : a);

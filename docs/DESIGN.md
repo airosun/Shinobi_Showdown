@@ -83,7 +83,9 @@ Fire › Wind › Lightning › Earth › Water › Fire. Yin, Yang and non-elem
 Resolve (0–100) builds from damage taken (0.7 per 1% max HP), ally KOs (+25) and super-effective hits (+8). Transforming spends the threshold, uses the turn (Stance), and can only be done once per battle.
 
 ## Statuses
-Burn (5%/turn), Paralyze (25% fail), Bind (no action), Genjutsu (50% fail, Release clears), Exhausted (−15% stats), Flinch (loses this turn's action if it hasn't moved yet), Decoy (absorbs the next single-target hit).
+Burn (5%/turn), Poison (6%/turn, stacks with Burn), Paralyze (25% fail), Bind (no action), Genjutsu (50% fail, Release clears), Exhausted (−15% stats), Flinch (loses this turn's action if it hasn't moved yet), Decoy (absorbs the next single-target hit).
+
+Special jutsu: **Reincarnation** (Chiyo, once per battle) brings a knocked-out ally back with 40% HP and costs Chiyo half her current HP. **Selfless Shield** (Haku, +3 priority) redirects the next single-target hit on an ally to Haku this turn. **Body Shedding** / **Izanagi** survive one / two knockouts at 25% / 20% HP.
 
 ## Planned next
 - Cell Bonds (Team 7, Ino-Shika-Cho, Team Guy, Sand Siblings) and combo jutsu

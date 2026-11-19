@@ -392,7 +392,7 @@ export const SHINOBI = [
     "baseId": "sasuke",
     "name": "Sasuke Uchiha (Shippuden)",
     "era": "Shippuden",
-    "cost": 8,
+    "cost": 7,
     "natures": {
       "primary": "fire",
       "secondary": "lightning"
@@ -964,7 +964,7 @@ export const SHINOBI = [
     "baseId": "kakashi",
     "name": "Kakashi Hatake (Double Eternal Mangekyō)",
     "era": "Shippuden",
-    "cost": 10,
+    "cost": 9,
     "natures": {
       "primary": "lightning",
       "secondary": "earth"
@@ -2531,6 +2531,1281 @@ export const SHINOBI = [
           "natures": [
             "fire",
             "wind"
+          ]
+        }
+      ]
+    }
+  },
+  {
+    "id": "gaara_ship",
+    "baseId": "gaara",
+    "name": "Gaara (Shippuden)",
+    "era": "Shippuden",
+    "cost": 10,
+    "natures": {
+      "primary": "magnet",
+      "secondary": "wind"
+    },
+    "stats": {
+      "hp": 110,
+      "tai": 50,
+      "nin": 120,
+      "def": 135,
+      "spd": 70,
+      "chk": 135
+    },
+    "roles": [
+      "Tank",
+      "Striker",
+      "Support"
+    ],
+    "trait": {
+      "id": "sandShield",
+      "name": "Shield of Sand",
+      "desc": "The first damaging single-target hit he takes each turn is halved."
+    },
+    "substitutions": [
+      "log",
+      "shadowClone"
+    ],
+    "catalogue": [
+      "sand_coffin",
+      "sand_burial",
+      "sand_waterfall_funeral",
+      "sand_shuriken",
+      "kazekage_shield",
+      "sand_armor"
+    ],
+    "defaultLoadout": [
+      "sand_coffin",
+      "sand_waterfall_funeral",
+      "sand_shuriken",
+      "kazekage_shield"
+    ],
+    "transformation": null,
+    "supportAura": {
+      "name": "Kazekage's Protection",
+      "desc": "Allies take {0} less damage and gain +{1} DEF.",
+      "effects": [
+        {
+          "type": "dr",
+          "values": [
+            0.05,
+            0.08,
+            0.12
+          ]
+        },
+        {
+          "type": "stat",
+          "values": [
+            0,
+            0.1,
+            0.2
+          ],
+          "stat": "def"
+        }
+      ]
+    }
+  },
+  {
+    "id": "temari_p1",
+    "baseId": "temari",
+    "name": "Temari",
+    "era": "Part 1",
+    "cost": 6,
+    "natures": {
+      "primary": "wind",
+      "secondary": null
+    },
+    "stats": {
+      "hp": 85,
+      "tai": 70,
+      "nin": 100,
+      "def": 70,
+      "spd": 95,
+      "chk": 105
+    },
+    "roles": [
+      "Striker"
+    ],
+    "trait": {
+      "id": "galeMastery",
+      "name": "Gale Mastery",
+      "desc": "Her area Wind jutsu deal +15% damage."
+    },
+    "substitutions": [
+      "log"
+    ],
+    "catalogue": [
+      "cutting_whirlwind",
+      "great_sickle_weasel",
+      "fan_strike",
+      "wind_barrier",
+      "summon_kamatari"
+    ],
+    "defaultLoadout": [
+      "cutting_whirlwind",
+      "great_sickle_weasel",
+      "fan_strike",
+      "wind_barrier"
+    ],
+    "transformation": null,
+    "supportAura": {
+      "name": "Wind Strategy",
+      "desc": "Allies' area attacks deal +{0} damage.",
+      "effects": [
+        {
+          "type": "aoeBoost",
+          "values": [
+            0.05,
+            0.1,
+            0.2
+          ]
+        }
+      ]
+    }
+  },
+  {
+    "id": "temari_ship",
+    "baseId": "temari",
+    "name": "Temari (Shippuden)",
+    "era": "Shippuden",
+    "cost": 7,
+    "natures": {
+      "primary": "wind",
+      "secondary": null
+    },
+    "stats": {
+      "hp": 95,
+      "tai": 75,
+      "nin": 115,
+      "def": 80,
+      "spd": 100,
+      "chk": 120
+    },
+    "roles": [
+      "Striker",
+      "Controller"
+    ],
+    "trait": {
+      "id": "galeMastery",
+      "name": "Gale Mastery",
+      "desc": "Her area Wind jutsu deal +15% damage."
+    },
+    "substitutions": [
+      "log"
+    ],
+    "catalogue": [
+      "cutting_whirlwind",
+      "great_sickle_weasel",
+      "dust_wind",
+      "fan_strike",
+      "wind_barrier",
+      "summon_kamatari"
+    ],
+    "defaultLoadout": [
+      "cutting_whirlwind",
+      "great_sickle_weasel",
+      "dust_wind",
+      "wind_barrier"
+    ],
+    "transformation": null,
+    "supportAura": {
+      "name": "Sand Envoy",
+      "desc": "Allies' Wind jutsu deal +{0} damage.",
+      "effects": [
+        {
+          "type": "natureBoost",
+          "values": [
+            0.1,
+            0.15,
+            0.25
+          ],
+          "natures": [
+            "wind"
+          ]
+        }
+      ]
+    }
+  },
+  {
+    "id": "kankuro_p1",
+    "baseId": "kankuro",
+    "name": "Kankuro",
+    "era": "Part 1",
+    "cost": 5,
+    "natures": {
+      "primary": null,
+      "secondary": null
+    },
+    "stats": {
+      "hp": 90,
+      "tai": 75,
+      "nin": 95,
+      "def": 80,
+      "spd": 80,
+      "chk": 100
+    },
+    "roles": [
+      "Controller",
+      "Striker"
+    ],
+    "trait": {
+      "id": "puppetMaster",
+      "name": "Puppet Master",
+      "desc": "When his Decoy or Substitution takes a hit, the attacker is Poisoned."
+    },
+    "substitutions": [
+      "log",
+      "shadowClone"
+    ],
+    "catalogue": [
+      "crow_blades",
+      "crow_embrace",
+      "puppet_switch",
+      "poison_bomb"
+    ],
+    "defaultLoadout": [
+      "crow_blades",
+      "crow_embrace",
+      "puppet_switch",
+      "poison_bomb"
+    ],
+    "transformation": null,
+    "supportAura": {
+      "name": "Poison Supply",
+      "desc": "Allies' attacks have a {0} chance to Poison.",
+      "effects": [
+        {
+          "type": "poisonChance",
+          "values": [
+            0.05,
+            0.1,
+            0.15
+          ]
+        }
+      ]
+    }
+  },
+  {
+    "id": "kankuro_ship",
+    "baseId": "kankuro",
+    "name": "Kankuro (Shippuden)",
+    "era": "Shippuden",
+    "cost": 6,
+    "natures": {
+      "primary": null,
+      "secondary": null
+    },
+    "stats": {
+      "hp": 100,
+      "tai": 80,
+      "nin": 110,
+      "def": 90,
+      "spd": 85,
+      "chk": 115
+    },
+    "roles": [
+      "Controller",
+      "Tank"
+    ],
+    "trait": {
+      "id": "puppetMaster",
+      "name": "Puppet Master",
+      "desc": "When his Decoy or Substitution takes a hit, the attacker is Poisoned."
+    },
+    "substitutions": [
+      "log",
+      "shadowClone"
+    ],
+    "catalogue": [
+      "crow_blades",
+      "crow_embrace",
+      "iron_maiden",
+      "salamander_shield",
+      "puppet_switch",
+      "poison_bomb"
+    ],
+    "defaultLoadout": [
+      "crow_blades",
+      "crow_embrace",
+      "iron_maiden",
+      "poison_bomb"
+    ],
+    "transformation": null,
+    "supportAura": {
+      "name": "Puppet Bulwark",
+      "desc": "Allies take {0} less damage from area attacks.",
+      "effects": [
+        {
+          "type": "aoeDR",
+          "values": [
+            0.1,
+            0.2,
+            0.3
+          ]
+        }
+      ]
+    }
+  },
+  {
+    "id": "chiyo",
+    "baseId": "chiyo",
+    "name": "Chiyo",
+    "era": "Shippuden",
+    "cost": 6,
+    "natures": {
+      "primary": null,
+      "secondary": null
+    },
+    "stats": {
+      "hp": 80,
+      "tai": 70,
+      "nin": 110,
+      "def": 75,
+      "spd": 80,
+      "chk": 125
+    },
+    "roles": [
+      "Controller",
+      "Medic"
+    ],
+    "trait": {
+      "id": "puppetMaster",
+      "name": "Puppet Master",
+      "desc": "When her Decoy or Substitution takes a hit, the attacker is Poisoned."
+    },
+    "substitutions": [
+      "log",
+      "shadowClone"
+    ],
+    "catalogue": [
+      "ten_puppets",
+      "mother_father",
+      "chakra_threads",
+      "antidote",
+      "reincarnation",
+      "puppet_switch"
+    ],
+    "defaultLoadout": [
+      "ten_puppets",
+      "mother_father",
+      "antidote",
+      "reincarnation"
+    ],
+    "transformation": null,
+    "supportAura": {
+      "name": "Elder's Antidotes",
+      "desc": "Each turn, every ally has a {0} chance to be cleansed of negative statuses.",
+      "effects": [
+        {
+          "type": "cleanseChance",
+          "values": [
+            0.1,
+            0.2,
+            0.35
+          ]
+        }
+      ]
+    }
+  },
+  {
+    "id": "orochimaru_p1",
+    "baseId": "orochimaru",
+    "name": "Orochimaru",
+    "era": "Part 1",
+    "cost": 9,
+    "natures": {
+      "primary": "wind",
+      "secondary": "yin"
+    },
+    "stats": {
+      "hp": 115,
+      "tai": 85,
+      "nin": 125,
+      "def": 90,
+      "spd": 105,
+      "chk": 140
+    },
+    "roles": [
+      "Striker",
+      "Controller"
+    ],
+    "trait": {
+      "id": "bodyShedding",
+      "name": "Body Shedding",
+      "desc": "Once per battle, a hit that would knock him out leaves him at 25% HP instead."
+    },
+    "substitutions": [
+      "log",
+      "shadowClone"
+    ],
+    "catalogue": [
+      "shadow_snakes",
+      "great_breakthrough",
+      "five_pronged_seal",
+      "kusanagi",
+      "summon_manda",
+      "eight_branches"
+    ],
+    "defaultLoadout": [
+      "shadow_snakes",
+      "five_pronged_seal",
+      "kusanagi",
+      "eight_branches"
+    ],
+    "transformation": {
+      "resolve": 70,
+      "cost": 0,
+      "turns": 3,
+      "mods": {
+        "nin": 1.3,
+        "def": 1.3
+      },
+      "drawback": "exhausted",
+      "name": "Eight Branches Technique",
+      "desc": "+30% NIN, +30% DEF and unlocks Eight Branches Technique. Exhausted afterwards."
+    },
+    "supportAura": {
+      "name": "Forbidden Research",
+      "desc": "Allies' transformations need {0} less Resolve.",
+      "effects": [
+        {
+          "type": "resolveDiscount",
+          "values": [
+            10,
+            20,
+            30
+          ]
+        }
+      ]
+    }
+  },
+  {
+    "id": "orochimaru_ship",
+    "baseId": "orochimaru",
+    "name": "Orochimaru (Shippuden)",
+    "era": "Shippuden",
+    "cost": 10,
+    "natures": {
+      "primary": "wind",
+      "secondary": "yin"
+    },
+    "stats": {
+      "hp": 120,
+      "tai": 90,
+      "nin": 130,
+      "def": 95,
+      "spd": 105,
+      "chk": 145
+    },
+    "roles": [
+      "Striker",
+      "Controller"
+    ],
+    "trait": {
+      "id": "bodyShedding",
+      "name": "Body Shedding",
+      "desc": "Once per battle, a hit that would knock him out leaves him at 25% HP instead."
+    },
+    "substitutions": [
+      "log",
+      "shadowClone"
+    ],
+    "catalogue": [
+      "shadow_snakes",
+      "hidden_snake_hands",
+      "great_breakthrough",
+      "kusanagi",
+      "summon_manda",
+      "eight_branches"
+    ],
+    "defaultLoadout": [
+      "shadow_snakes",
+      "hidden_snake_hands",
+      "kusanagi",
+      "eight_branches"
+    ],
+    "transformation": {
+      "resolve": 60,
+      "cost": 0,
+      "turns": 3,
+      "mods": {
+        "nin": 1.3,
+        "def": 1.3
+      },
+      "drawback": "exhausted",
+      "name": "Eight Branches Technique",
+      "desc": "+30% NIN, +30% DEF and unlocks Eight Branches Technique. Exhausted afterwards."
+    },
+    "supportAura": {
+      "name": "Immortality Research",
+      "desc": "Allies regenerate {0} max HP per turn.",
+      "effects": [
+        {
+          "type": "heal",
+          "values": [
+            0.03,
+            0.05,
+            0.08
+          ]
+        }
+      ]
+    }
+  },
+  {
+    "id": "kabuto_p1",
+    "baseId": "kabuto",
+    "name": "Kabuto Yakushi",
+    "era": "Part 1",
+    "cost": 6,
+    "natures": {
+      "primary": "yang",
+      "secondary": "earth"
+    },
+    "stats": {
+      "hp": 95,
+      "tai": 85,
+      "nin": 95,
+      "def": 85,
+      "spd": 95,
+      "chk": 120
+    },
+    "roles": [
+      "Medic",
+      "Infiltrator"
+    ],
+    "trait": {
+      "id": "medicalSpy",
+      "name": "Medical Spy",
+      "desc": "Healing is 25% stronger and he regenerates 4% HP per turn."
+    },
+    "substitutions": [
+      "log",
+      "shadowClone"
+    ],
+    "catalogue": [
+      "chakra_scalpel",
+      "mystical_palm",
+      "temple_of_nirvana",
+      "dead_soul",
+      "shadow_snakes"
+    ],
+    "defaultLoadout": [
+      "chakra_scalpel",
+      "mystical_palm",
+      "temple_of_nirvana",
+      "dead_soul"
+    ],
+    "transformation": null,
+    "supportAura": {
+      "name": "Double Agent",
+      "desc": "Team gains {0} Secured Intel per turn; enemy Intel gains are reduced by {1}.",
+      "effects": [
+        {
+          "type": "intel",
+          "values": [
+            1,
+            2,
+            3
+          ]
+        },
+        {
+          "type": "enemyIntel",
+          "values": [
+            0.05,
+            0.1,
+            0.15
+          ]
+        }
+      ]
+    }
+  },
+  {
+    "id": "kabuto_sage",
+    "baseId": "kabuto",
+    "name": "Kabuto Yakushi (Sage Mode)",
+    "era": "Shippuden",
+    "cost": 10,
+    "natures": {
+      "primary": "yang",
+      "secondary": "earth"
+    },
+    "stats": {
+      "hp": 120,
+      "tai": 105,
+      "nin": 130,
+      "def": 100,
+      "spd": 115,
+      "chk": 150
+    },
+    "roles": [
+      "Striker",
+      "Medic",
+      "Sensor"
+    ],
+    "trait": {
+      "id": "whiteSnakeSage",
+      "name": "White Snake Sage",
+      "desc": "Regenerates 6% HP per turn. Sees through Log Substitution and Decoys."
+    },
+    "substitutions": [
+      "log",
+      "shadowClone"
+    ],
+    "catalogue": [
+      "white_rage",
+      "inorganic_animation",
+      "chakra_scalpel",
+      "mystical_palm",
+      "temple_of_nirvana",
+      "snake_dragon"
+    ],
+    "defaultLoadout": [
+      "white_rage",
+      "inorganic_animation",
+      "mystical_palm",
+      "snake_dragon"
+    ],
+    "transformation": {
+      "resolve": 60,
+      "cost": 0,
+      "turns": 3,
+      "mods": {
+        "nin": 1.35,
+        "def": 1.2
+      },
+      "drawback": "exhausted",
+      "name": "Dragon Sage Mode",
+      "desc": "+35% NIN, +20% DEF. Unlocks Sage Art: Snake Dragon. Exhausted afterwards."
+    },
+    "supportAura": {
+      "name": "Sage Healing",
+      "desc": "Allies heal {0} max HP per turn and take {1} less damage.",
+      "effects": [
+        {
+          "type": "heal",
+          "values": [
+            0.03,
+            0.05,
+            0.08
+          ]
+        },
+        {
+          "type": "dr",
+          "values": [
+            0.03,
+            0.06,
+            0.1
+          ]
+        }
+      ]
+    }
+  },
+  {
+    "id": "jirobo",
+    "baseId": "jirobo",
+    "name": "Jirobo",
+    "era": "Part 1",
+    "cost": 6,
+    "natures": {
+      "primary": "earth",
+      "secondary": null
+    },
+    "stats": {
+      "hp": 120,
+      "tai": 105,
+      "nin": 70,
+      "def": 105,
+      "spd": 55,
+      "chk": 110
+    },
+    "roles": [
+      "Tank"
+    ],
+    "trait": {
+      "id": "chakraEater",
+      "name": "Chakra Eater",
+      "desc": "Chakra he drains from enemies is added to his own."
+    },
+    "substitutions": [
+      "log"
+    ],
+    "catalogue": [
+      "earth_dome",
+      "arhat_fist",
+      "earth_shore_return",
+      "shuriken_volley"
+    ],
+    "defaultLoadout": [
+      "earth_dome",
+      "arhat_fist",
+      "earth_shore_return",
+      "shuriken_volley"
+    ],
+    "transformation": {
+      "resolve": 50,
+      "cost": 0,
+      "turns": 3,
+      "mods": {
+        "tai": 1.4,
+        "def": 1.3
+      },
+      "upkeepHpPct": 0.05,
+      "drawback": "exhausted",
+      "name": "Curse Mark (Level 2)",
+      "desc": "+40% TAI, +30% DEF. Costs 5% HP per turn. Exhausted afterwards."
+    },
+    "supportAura": {
+      "name": "Barrier Team",
+      "desc": "Allies take {0} less damage.",
+      "effects": [
+        {
+          "type": "dr",
+          "values": [
+            0.04,
+            0.08,
+            0.12
+          ]
+        }
+      ]
+    }
+  },
+  {
+    "id": "kidomaru",
+    "baseId": "kidomaru",
+    "name": "Kidomaru",
+    "era": "Part 1",
+    "cost": 5,
+    "natures": {
+      "primary": null,
+      "secondary": null
+    },
+    "stats": {
+      "hp": 90,
+      "tai": 90,
+      "nin": 95,
+      "def": 80,
+      "spd": 100,
+      "chk": 105
+    },
+    "roles": [
+      "Controller",
+      "Striker"
+    ],
+    "trait": {
+      "id": "sixArms",
+      "name": "Six Arms",
+      "desc": "His Kunai & Shuriken hit twice."
+    },
+    "substitutions": [
+      "log"
+    ],
+    "catalogue": [
+      "spider_web_area",
+      "spider_bow",
+      "spider_armor",
+      "summon_spider"
+    ],
+    "defaultLoadout": [
+      "spider_web_area",
+      "spider_bow",
+      "spider_armor",
+      "summon_spider"
+    ],
+    "transformation": {
+      "resolve": 50,
+      "cost": 0,
+      "turns": 3,
+      "mods": {
+        "tai": 1.3,
+        "spd": 1.3
+      },
+      "upkeepHpPct": 0.05,
+      "drawback": "exhausted",
+      "name": "Curse Mark (Level 2)",
+      "desc": "+30% TAI, +30% SPD. Costs 5% HP per turn. Exhausted afterwards."
+    },
+    "supportAura": {
+      "name": "Spider Sense",
+      "desc": "Allies dodge single-target attacks {0} more often.",
+      "effects": [
+        {
+          "type": "dodge",
+          "values": [
+            0.04,
+            0.07,
+            0.1
+          ]
+        }
+      ]
+    }
+  },
+  {
+    "id": "sakon_ukon",
+    "baseId": "sakon",
+    "name": "Sakon and Ukon",
+    "era": "Part 1",
+    "cost": 6,
+    "natures": {
+      "primary": null,
+      "secondary": null
+    },
+    "stats": {
+      "hp": 110,
+      "tai": 105,
+      "nin": 80,
+      "def": 85,
+      "spd": 95,
+      "chk": 105
+    },
+    "roles": [
+      "Frontliner"
+    ],
+    "trait": {
+      "id": "twinDemons",
+      "name": "Twin Demons",
+      "desc": "His taijutsu hit a second time for 35% damage."
+    },
+    "substitutions": [
+      "log",
+      "shadowClone"
+    ],
+    "catalogue": [
+      "connected_fist",
+      "parasitic_demon",
+      "rashomon",
+      "arhat_fist"
+    ],
+    "defaultLoadout": [
+      "connected_fist",
+      "parasitic_demon",
+      "rashomon",
+      "arhat_fist"
+    ],
+    "transformation": {
+      "resolve": 50,
+      "cost": 0,
+      "turns": 3,
+      "mods": {
+        "tai": 1.4,
+        "spd": 1.2
+      },
+      "upkeepHpPct": 0.05,
+      "drawback": "exhausted",
+      "name": "Curse Mark (Level 2)",
+      "desc": "+40% TAI, +20% SPD. Costs 5% HP per turn. Exhausted afterwards."
+    },
+    "supportAura": {
+      "name": "Twin Coordination",
+      "desc": "Allies deal +{0} damage to a target an ally already hit this turn.",
+      "effects": [
+        {
+          "type": "focus",
+          "values": [
+            0.05,
+            0.1,
+            0.15
+          ]
+        }
+      ]
+    }
+  },
+  {
+    "id": "tayuya",
+    "baseId": "tayuya",
+    "name": "Tayuya",
+    "era": "Part 1",
+    "cost": 5,
+    "natures": {
+      "primary": "yin",
+      "secondary": null
+    },
+    "stats": {
+      "hp": 80,
+      "tai": 65,
+      "nin": 105,
+      "def": 70,
+      "spd": 95,
+      "chk": 115
+    },
+    "roles": [
+      "Controller"
+    ],
+    "trait": {
+      "id": "demonFlute",
+      "name": "Demon Flute",
+      "desc": "Her genjutsu also have a 30% chance to Paralyze."
+    },
+    "substitutions": [
+      "log"
+    ],
+    "catalogue": [
+      "phantom_sound_chains",
+      "summon_doki",
+      "spirit_eaters",
+      "flute_strike"
+    ],
+    "defaultLoadout": [
+      "phantom_sound_chains",
+      "summon_doki",
+      "spirit_eaters",
+      "flute_strike"
+    ],
+    "transformation": {
+      "resolve": 50,
+      "cost": 0,
+      "turns": 3,
+      "mods": {
+        "nin": 1.3,
+        "spd": 1.2
+      },
+      "upkeepHpPct": 0.05,
+      "drawback": "exhausted",
+      "name": "Curse Mark (Level 2)",
+      "desc": "+30% NIN, +20% SPD. Costs 5% HP per turn. Exhausted afterwards."
+    },
+    "supportAura": {
+      "name": "Sound Barrier",
+      "desc": "Allies shrug off genjutsu {0} of the time.",
+      "effects": [
+        {
+          "type": "genjutsuResist",
+          "values": [
+            0.2,
+            0.3,
+            0.5
+          ]
+        }
+      ]
+    }
+  },
+  {
+    "id": "kimimaro",
+    "baseId": "kimimaro",
+    "name": "Kimimaro",
+    "era": "Part 1",
+    "cost": 9,
+    "natures": {
+      "primary": null,
+      "secondary": null
+    },
+    "stats": {
+      "hp": 115,
+      "tai": 125,
+      "nin": 70,
+      "def": 110,
+      "spd": 105,
+      "chk": 110
+    },
+    "roles": [
+      "Frontliner",
+      "Tank"
+    ],
+    "trait": {
+      "id": "deadBone",
+      "name": "Dead Bone Pulse",
+      "desc": "His taijutsu ignore 20% DEF. Takes 10% less damage from taijutsu."
+    },
+    "substitutions": [
+      "log"
+    ],
+    "catalogue": [
+      "willow_dance",
+      "camellia_dance",
+      "larch_dance",
+      "finger_bullets",
+      "bracken_dance"
+    ],
+    "defaultLoadout": [
+      "willow_dance",
+      "camellia_dance",
+      "larch_dance",
+      "bracken_dance"
+    ],
+    "transformation": {
+      "resolve": 60,
+      "cost": 0,
+      "turns": 3,
+      "mods": {
+        "tai": 1.4,
+        "spd": 1.2
+      },
+      "upkeepHpPct": 0.06,
+      "drawback": "exhausted",
+      "name": "Curse Mark (Level 2)",
+      "desc": "+40% TAI, +20% SPD and unlocks Dance of the Seedling Fern. Costs 6% HP per turn. Exhausted afterwards."
+    },
+    "supportAura": {
+      "name": "Last Loyal Servant",
+      "desc": "Allies below 25% HP take {0} less damage.",
+      "effects": [
+        {
+          "type": "lowHpDR",
+          "values": [
+            0.1,
+            0.2,
+            0.3
+          ]
+        }
+      ]
+    }
+  },
+  {
+    "id": "zabuza",
+    "baseId": "zabuza",
+    "name": "Zabuza Momochi",
+    "era": "Part 1",
+    "cost": 7,
+    "natures": {
+      "primary": "water",
+      "secondary": null
+    },
+    "stats": {
+      "hp": 115,
+      "tai": 115,
+      "nin": 95,
+      "def": 90,
+      "spd": 105,
+      "chk": 115
+    },
+    "roles": [
+      "Frontliner",
+      "Striker"
+    ],
+    "trait": {
+      "id": "silentKilling",
+      "name": "Silent Killing",
+      "desc": "His single-target attacks have +12% critical-hit chance."
+    },
+    "substitutions": [
+      "log",
+      "waterClone"
+    ],
+    "catalogue": [
+      "hidden_mist",
+      "water_prison",
+      "executioner_blade",
+      "great_waterfall",
+      "water_dragon"
+    ],
+    "defaultLoadout": [
+      "hidden_mist",
+      "water_prison",
+      "executioner_blade",
+      "great_waterfall"
+    ],
+    "transformation": null,
+    "supportAura": {
+      "name": "Demon of the Mist",
+      "desc": "Allies gain +{0} critical-hit chance.",
+      "effects": [
+        {
+          "type": "crit",
+          "values": [
+            0.05,
+            0.1,
+            0.15
+          ]
+        }
+      ]
+    }
+  },
+  {
+    "id": "haku",
+    "baseId": "haku",
+    "name": "Haku",
+    "era": "Part 1",
+    "cost": 6,
+    "natures": {
+      "primary": "ice",
+      "secondary": "water"
+    },
+    "stats": {
+      "hp": 85,
+      "tai": 85,
+      "nin": 105,
+      "def": 70,
+      "spd": 125,
+      "chk": 110
+    },
+    "roles": [
+      "Controller",
+      "Support"
+    ],
+    "trait": {
+      "id": "iceMirrors",
+      "name": "Ice Mirrors",
+      "desc": "Dodges single-target attacks 10% more often."
+    },
+    "substitutions": [
+      "log",
+      "waterClone"
+    ],
+    "catalogue": [
+      "ice_mirrors",
+      "thousand_needles",
+      "ice_prison",
+      "senbon_volley",
+      "haku_shield"
+    ],
+    "defaultLoadout": [
+      "ice_mirrors",
+      "thousand_needles",
+      "ice_prison",
+      "haku_shield"
+    ],
+    "transformation": null,
+    "supportAura": {
+      "name": "Devotion",
+      "desc": "The ally with the lowest HP takes {0} less damage.",
+      "effects": [
+        {
+          "type": "protectWeakest",
+          "values": [
+            0.1,
+            0.2,
+            0.3
+          ]
+        }
+      ]
+    }
+  },
+  {
+    "id": "anko",
+    "baseId": "anko",
+    "name": "Anko Mitarashi",
+    "era": "Part 1",
+    "cost": 5,
+    "natures": {
+      "primary": "fire",
+      "secondary": null
+    },
+    "stats": {
+      "hp": 95,
+      "tai": 90,
+      "nin": 95,
+      "def": 80,
+      "spd": 100,
+      "chk": 100
+    },
+    "roles": [
+      "Striker"
+    ],
+    "trait": {
+      "id": "snakeMistress",
+      "name": "Snake Mistress",
+      "desc": "Her attacks that hit have a 25% chance to Poison."
+    },
+    "substitutions": [
+      "log",
+      "shadowClone"
+    ],
+    "catalogue": [
+      "shadow_snakes",
+      "hidden_snake_hands",
+      "twin_snakes",
+      "dragon_fire",
+      "shuriken_volley"
+    ],
+    "defaultLoadout": [
+      "shadow_snakes",
+      "hidden_snake_hands",
+      "twin_snakes",
+      "dragon_fire"
+    ],
+    "transformation": {
+      "resolve": 50,
+      "cost": 0,
+      "turns": 3,
+      "mods": {
+        "nin": 1.3,
+        "tai": 1.2
+      },
+      "upkeepHpPct": 0.05,
+      "drawback": "exhausted",
+      "name": "Curse Mark of Heaven",
+      "desc": "+30% NIN, +20% TAI. Costs 5% HP per turn. Exhausted afterwards."
+    },
+    "supportAura": {
+      "name": "Proctor's Watch",
+      "desc": "Enemy Intel gains are reduced by {0}.",
+      "effects": [
+        {
+          "type": "enemyIntel",
+          "values": [
+            0.1,
+            0.2,
+            0.3
+          ]
+        }
+      ]
+    }
+  },
+  {
+    "id": "danzo",
+    "baseId": "danzo",
+    "name": "Danzo Shimura",
+    "era": "Shippuden",
+    "cost": 9,
+    "natures": {
+      "primary": "wind",
+      "secondary": "water"
+    },
+    "stats": {
+      "hp": 115,
+      "tai": 90,
+      "nin": 120,
+      "def": 95,
+      "spd": 95,
+      "chk": 130
+    },
+    "roles": [
+      "Striker",
+      "Controller",
+      "Infiltrator"
+    ],
+    "trait": {
+      "id": "izanagi",
+      "name": "Izanagi",
+      "desc": "The first two times he would be knocked out, he survives at 20% HP instead."
+    },
+    "substitutions": [
+      "log",
+      "waterClone"
+    ],
+    "catalogue": [
+      "vacuum_blade",
+      "vacuum_sphere",
+      "summon_baku",
+      "kotoamatsukami",
+      "reverse_tetragram"
+    ],
+    "defaultLoadout": [
+      "vacuum_blade",
+      "vacuum_sphere",
+      "summon_baku",
+      "kotoamatsukami"
+    ],
+    "transformation": null,
+    "supportAura": {
+      "name": "Root Command",
+      "desc": "Team gains {0} Secured Intel per turn; allies' Gather Intel gains +{1}.",
+      "effects": [
+        {
+          "type": "intel",
+          "values": [
+            1,
+            2,
+            3
+          ]
+        },
+        {
+          "type": "gatherBonus",
+          "values": [
+            2,
+            4,
+            6
           ]
         }
       ]

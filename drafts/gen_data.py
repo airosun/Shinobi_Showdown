@@ -4,6 +4,7 @@
 import json, sys, os
 sys.path.insert(0, os.path.dirname(__file__))
 import konoha as K
+import batch2 as B2
 
 ROOT = os.path.join(os.path.dirname(__file__), '..')
 existing_j = json.load(open(os.path.join(os.path.dirname(__file__), 'base_jutsu.json')))
@@ -17,7 +18,10 @@ STAT_OVERRIDES = {
 
 # ---- balance pass 1 (CPU sim, cost-adjusted win rates) ----
 COST_OVERRIDES = {'kurenai': 5, 'sakura_war': 9, 'tenten_ship': 7, 'kakashi_p1': 7, 'naruto_sage': 8, 'sai': 5, 'ino_ship': 5, 'shikamaru_p1': 5, 'kakashi_ship': 7, 'shino_p1': 4,
-                  'sasuke_p1': 6, 'choji_p1': 6, 'choji_ship': 8}
+                  'sasuke_p1': 6, 'choji_p1': 6, 'choji_ship': 8,
+                  # balance pass 2 (batch 2)
+                  'kimimaro': 9, 'gaara_ship': 10, 'orochimaru_ship': 10, 'jirobo': 6, 'temari_p1': 6, 'kankuro_ship': 6,
+                  'kakashi_dms': 9, 'sasuke_ship': 7}
 JUTSU_OVERRIDES = {
     'amaterasu': {'effects': [{'type': 'burn', 'chance': 1, 'turns': 3}], 'cost': 55, 'desc': 'Black flames wherever he looks. Always Burns (3 turns). Ignores Substitution.'},
     'katsuyu': {'effects': [{'type': 'heal', 'value': 0.15}, {'type': 'buff', 'stat': 'def', 'mult': 1.2, 'turns': 2}], 'desc': "Katsuyu's clones heal all allies 15% and give +20% DEF for 2 turns."},
@@ -39,12 +43,26 @@ JUTSU_OVERRIDES = {
     'palms_128': {'effects': [{'type': 'pierce', 'value': 0.3}, {'type': 'drainChakra', 'value': 0.2}], 'desc': 'Ignores 30% DEF, drains 20% Chakra.'},
     'twin_lion_fists': {'effects': [{'type': 'pierce', 'value': 0.3}, {'type': 'drainChakra', 'value': 0.25}], 'desc': 'Only while transformed. Drains 25% Chakra.'},
     'lightning_blade': {'cost': 50},
+    # balance pass 2 (batch 2)
+    'bracken_dance': {'power': 120},
+    'sand_waterfall_funeral': {'power': 90},
+    'eight_branches': {'power': 140},
 }
 VITALITY = 'Regenerates 8% max HP each turn. +30% max Chakra.'
-TRAIT_DESC_OVERRIDES = {'Akimichi Appetite': 'Charge Chakra also heals 10% max HP.', 'Kikaichu Host': 'His attacks that hit drain 6% Chakra. Immune to Chakra drain.','Weapon Mistress': 'Her Kunai & Shuriken hit all enemies.',
+TRAIT_DESC_OVERRIDES = {'Akimichi Appetite': 'Charge Chakra also heals 10% max HP.', 'Kikaichu Host': 'His attacks that hit drain 6% Chakra. Immune to Chakra drain.','Weapon Mistress': 'Her Kunai & Shuriken hit all enemies.', 'Gale Mastery': 'Her area Wind jutsu deal +15% damage.',
                         'Mangekyō Sharingan': 'Sees through Log Substitution. 25% genjutsu reflect. His Burns last 1 extra turn.',
                         'Eternal Mangekyō Sharingan': 'Sees through Log Substitution. Immune to genjutsu. His Burns last 1 extra turn.'}
-LOADOUT_OVERRIDES = {'naruto_war': ['kurama_rasengan', 'thrown_rasenshuriken', 'chakra_arm', 'tailed_beast_bomb']}
+LOADOUT_OVERRIDES = {'naruto_war': ['kurama_rasengan', 'thrown_rasenshuriken', 'chakra_arm', 'tailed_beast_bomb'],
+                     # batch 2: put each signature mechanic in the default loadout
+                     'chiyo': ['ten_puppets', 'mother_father', 'antidote', 'reincarnation'],
+                     'haku': ['ice_mirrors', 'thousand_needles', 'ice_prison', 'haku_shield'],
+                     'kabuto_sage': ['white_rage', 'inorganic_animation', 'mystical_palm', 'snake_dragon'],
+                     'orochimaru_p1': ['shadow_snakes', 'five_pronged_seal', 'kusanagi', 'eight_branches'],
+                     'orochimaru_ship': ['shadow_snakes', 'hidden_snake_hands', 'kusanagi', 'eight_branches'],
+                     'kimimaro': ['willow_dance', 'camellia_dance', 'larch_dance', 'bracken_dance'],
+                     'gaara_ship': ['sand_coffin', 'sand_waterfall_funeral', 'sand_shuriken', 'kazekage_shield'],
+                     'temari_ship': ['cutting_whirlwind', 'great_sickle_weasel', 'dust_wind', 'wind_barrier'],
+                     'kankuro_ship': ['crow_blades', 'crow_embrace', 'iron_maiden', 'poison_bomb']}
 CATALOGUE_SWAPS = {'naruto_war': ('rasenshuriken', 'thrown_rasenshuriken')}
 EXTRA_JUTSU = {
     'thrown_rasenshuriken': dict(name='Rasenshuriken (Thrown)', category='ninjutsu', nature='wind', power=95, cost=75, priority=-1,
@@ -69,6 +87,16 @@ TRANSFORMS = {
     'kiba_ship': TF(60, 3, {'tai': 1.4, 'def': 1.2}),
     'choji_p1': TF(50, 3, {'tai': 1.5, 'def': 1.3}, upkeepHpPct=0.08, drawback='exhausted'),
     'choji_ship': TF(60, 3, {'tai': 1.7, 'spd': 1.3}, upkeepHpPct=0.10, drawback='exhausted'),
+    # batch 2
+    'orochimaru_p1': TF(70, 3, {'nin': 1.3, 'def': 1.3}, drawback='exhausted'),
+    'orochimaru_ship': TF(60, 3, {'nin': 1.3, 'def': 1.3}, drawback='exhausted'),
+    'kabuto_sage': TF(60, 3, {'nin': 1.35, 'def': 1.2}, drawback='exhausted'),
+    'jirobo': TF(50, 3, {'tai': 1.4, 'def': 1.3}, upkeepHpPct=0.05, drawback='exhausted'),
+    'kidomaru': TF(50, 3, {'tai': 1.3, 'spd': 1.3}, upkeepHpPct=0.05, drawback='exhausted'),
+    'sakon_ukon': TF(50, 3, {'tai': 1.4, 'spd': 1.2}, upkeepHpPct=0.05, drawback='exhausted'),
+    'tayuya': TF(50, 3, {'nin': 1.3, 'spd': 1.2}, upkeepHpPct=0.05, drawback='exhausted'),
+    'kimimaro': TF(60, 3, {'tai': 1.4, 'spd': 1.2}, upkeepHpPct=0.06, drawback='exhausted'),
+    'anko': TF(50, 3, {'nin': 1.3, 'tai': 1.2}, upkeepHpPct=0.05, drawback='exhausted'),
 }
 
 # ---- traits: id per behaviour ----
@@ -80,6 +108,11 @@ TRAIT_IDS = {
     'Splendid Taijutsu': 'noNinjutsu', 'Sensei of Youth': 'noNinjutsu', 'Weapon Mistress': 'weaponMistress',
     'Akamaru Partner': 'akamaru', 'Kikaichu Host': 'kikaichu', '200 IQ': 'strategist', 'Akimichi Appetite': 'akimichi',
     'Yamanaka Mind Clan': 'yamanaka', 'Genjutsu Mistress': 'genjutsuMistress', 'Chakra Blades': 'chakraBlades',
+    # batch 2
+    'Shield of Sand': 'sandShield', 'Gale Mastery': 'galeMastery', 'Puppet Master': 'puppetMaster', 'Body Shedding': 'bodyShedding',
+    'Medical Spy': 'medicalSpy', 'White Snake Sage': 'whiteSnakeSage', 'Chakra Eater': 'chakraEater', 'Six Arms': 'sixArms',
+    'Twin Demons': 'twinDemons', 'Demon Flute': 'demonFlute', 'Dead Bone Pulse': 'deadBone', 'Silent Killing': 'silentKilling',
+    'Ice Mirrors': 'iceMirrors', 'Snake Mistress': 'snakeMistress', 'Izanagi': 'izanagi',
 }
 
 # ---- support passives: effects with stage values [3 standing, 2, 1] ----
@@ -123,6 +156,26 @@ AURAS = {
     'kurenai': ('Allies dodge {0} more often and shrug off genjutsu {1} of the time.', [E('dodge', [0.03, 0.06, 0.1]), E('genjutsuResist', [0.2, 0.3, 0.5])]),
     'asuma': ("Allies' Fire and Wind jutsu deal +{0} damage.", [E('natureBoost', [0.05, 0.1, 0.2], natures=['fire', 'wind'])]),
     'gaara_p1': ('Allies gain +{0} DEF.', [E('stat', [0.1, 0.15, 0.25], stat='def')]),
+    # batch 2
+    'gaara_ship': ('Allies take {0} less damage and gain +{1} DEF.', [E('dr', [0.05, 0.08, 0.12]), E('stat', [0, 0.1, 0.2], stat='def')]),
+    'temari_p1': ("Allies' area attacks deal +{0} damage.", [E('aoeBoost', [0.05, 0.1, 0.2])]),
+    'temari_ship': ("Allies' Wind jutsu deal +{0} damage.", [E('natureBoost', [0.1, 0.15, 0.25], natures=['wind'])]),
+    'kankuro_p1': ("Allies' attacks have a {0} chance to Poison.", [E('poisonChance', [0.05, 0.1, 0.15])]),
+    'kankuro_ship': ('Allies take {0} less damage from area attacks.', [E('aoeDR', [0.1, 0.2, 0.3])]),
+    'chiyo': ('Each turn, every ally has a {0} chance to be cleansed of negative statuses.', [E('cleanseChance', [0.1, 0.2, 0.35])]),
+    'orochimaru_p1': ("Allies' transformations need {0} less Resolve.", [E('resolveDiscount', [10, 20, 30])]),
+    'orochimaru_ship': ('Allies regenerate {0} max HP per turn.', [E('heal', [0.03, 0.05, 0.08])]),
+    'kabuto_p1': ('Team gains {0} Secured Intel per turn; enemy Intel gains are reduced by {1}.', [E('intel', [1, 2, 3]), E('enemyIntel', [0.05, 0.1, 0.15])]),
+    'kabuto_sage': ('Allies heal {0} max HP per turn and take {1} less damage.', [E('heal', [0.03, 0.05, 0.08]), E('dr', [0.03, 0.06, 0.1])]),
+    'jirobo': ('Allies take {0} less damage.', [E('dr', [0.04, 0.08, 0.12])]),
+    'kidomaru': ('Allies dodge single-target attacks {0} more often.', [E('dodge', [0.04, 0.07, 0.1])]),
+    'sakon_ukon': ('Allies deal +{0} damage to a target an ally already hit this turn.', [E('focus', [0.05, 0.1, 0.15])]),
+    'tayuya': ('Allies shrug off genjutsu {0} of the time.', [E('genjutsuResist', [0.2, 0.3, 0.5])]),
+    'kimimaro': ('Allies below 25% HP take {0} less damage.', [E('lowHpDR', [0.1, 0.2, 0.3])]),
+    'zabuza': ('Allies gain +{0} critical-hit chance.', [E('crit', [0.05, 0.1, 0.15])]),
+    'haku': ('The ally with the lowest HP takes {0} less damage.', [E('protectWeakest', [0.1, 0.2, 0.3])]),
+    'anko': ('Enemy Intel gains are reduced by {0}.', [E('enemyIntel', [0.1, 0.2, 0.3])]),
+    'danzo': ("Team gains {0} Secured Intel per turn; allies' Gather Intel gains +{1}.", [E('intel', [1, 2, 3]), E('gatherBonus', [2, 4, 6])]),
 }
 
 def name_for(s):
@@ -132,7 +185,7 @@ def name_for(s):
     return f"{char} ({s['form']})"
 
 out = []
-for s in K.S:
+for s in K.S + [x for x in B2.S if x['status'] != 'Existing']:
     sid = s['id']
     ex = existing_s.get(sid)
     stats = STAT_OVERRIDES.get(sid, s['stats'])
@@ -170,7 +223,7 @@ g['supportAura'] = {'name': g['supportAura']['name'], 'desc': AURAS['gaara_p1'][
 out.append(g)
 
 jutsu = dict(existing_j)
-for jid, j in K.NEW_JUTSU.items():
+for jid, j in {**K.NEW_JUTSU, **B2.NEW_JUTSU}.items():
     j = dict(j)
     j.pop('NEW', None)
     jutsu[jid] = j

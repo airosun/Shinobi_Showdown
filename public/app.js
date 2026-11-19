@@ -45,9 +45,9 @@ const esc = (s) => String(s ?? '').replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '
 const pct = (a, b) => Math.max(0, Math.min(100, (100 * a) / Math.max(1, b)));
 const priLabel = (p) => (p >= 4 ? 'Stance' : p > 0 ? `+${p}` : `${p}`);
 const TARGET_LABEL = { enemy: '1 enemy', allEnemies: 'All enemies', self: 'Self', ally: '1 ally', allAllies: 'All allies' };
-const STATUS_LABEL = { burn: 'BRN', paralyze: 'PAR', bind: 'BND', genjutsu: 'GEN', exhausted: 'EXH' };
-const STATUS_NAME = { burn: 'Burned', paralyze: 'Paralyzed', bind: 'Bound', genjutsu: 'Genjutsu', exhausted: 'Exhausted' };
-const STATUS_COLOR = { burn: '#e4572e', paralyze: '#e0c020', bind: '#8a6cc4', genjutsu: '#c77dff' };
+const STATUS_LABEL = { burn: 'BRN', poison: 'PSN', paralyze: 'PAR', bind: 'BND', genjutsu: 'GEN', exhausted: 'EXH' };
+const STATUS_NAME = { burn: 'Burned', poison: 'Poisoned', paralyze: 'Paralyzed', bind: 'Bound', genjutsu: 'Genjutsu', exhausted: 'Exhausted' };
+const STATUS_COLOR = { burn: '#e4572e', poison: '#9b5de5', paralyze: '#e0c020', bind: '#8a6cc4', genjutsu: '#c77dff' };
 const hpColor = (p) => (p > 50 ? '#3ddc84' : p > 20 ? '#ffcc4d' : '#ff5c5c');
 const natColor = (n) => (n ? FX.NATURE_COLOR[n] || '#8c93a8' : '#c94a3a');
 const natChip = (n) => (n ? `<span class="nat" style="--c:${natColor(n)}">${NATURE_LABELS[n] || n}</span>` : '');
@@ -306,7 +306,8 @@ function arenaInner() {
 function selectionTargets() {
   if (S.phase !== 'select' || !S.pending) return null;
   const j = E.getJutsu(S.pending.jutsuId);
-  return { side: j.target === 'ally' ? S.side : 1 - S.side };
+  // Reincarnation targets a fallen ally; everything else a standing one
+  return { side: j.target === 'ally' ? S.side : 1 - S.side, fallen: j.effects.some((e) => e.type === 'revive') };
 }
 
 function sideMons(vs, side, isFoe, sel) {
@@ -315,7 +316,7 @@ function sideMons(vs, side, isFoe, sel) {
     if (!uid) return '';
     const u = vs.units[uid];
     const d = SHINOBI_BY_ID[u.id];
-    const pickable = sel && sel.side === side && !u.ko;
+    const pickable = sel && sel.side === side && (sel.fallen ? u.ko : !u.ko);
     const acting = S.phase === 'select' && S.actor === uid;
     const cls = [isFoe ? 'foe' : 'you', `p${pos}`, u.ko ? 'down' : '', u.transform ? 'transformed' : '', u.weaving ? 'weaving' : '', pickable ? 'pickable' : '', acting ? 'acting' : ''].join(' ');
     const ghost = u.decoy > 0 && !u.ko ? `<div class="ghost">${badge(d)}</div>` : '';
@@ -352,7 +353,7 @@ function sideHud(vs, side, isFoe, sel) {
   const alive = team.slots.filter((uid) => !vs.units[uid].ko).length;
   const stage = alive >= 3 ? 1 : alive === 2 ? 2 : 3;
   const resChip = `<span class="chip support-chip st${stage}" ${tipAttr(supportTip(sup, stage))}>Support: ${esc(shortName(sup.name))} · ${'★'.repeat(stage)}</span>`;
-  const cards = team.slots.map((uid, pos) => (uid ? hpCard(vs, vs.units[uid], sel && sel.side === side, pos) : '<div class="hpcard empty">—</div>')).join('');
+  const cards = team.slots.map((uid, pos) => (uid ? hpCard(vs, vs.units[uid], sel && sel.side === side && (sel.fallen ? 'fallen' : true), pos) : '<div class="hpcard empty">—</div>')).join('');
   return `<div class="hud ${isFoe ? 'foe' : 'you'}">
     <div class="sidelabel"><span class="who s${side}">${sideName(side)}</span><span class="pips">${pips}</span>${resChip}</div>
     ${cards}
@@ -367,7 +368,7 @@ function supportTip(sup, stage) {
 
 function hpCard(vs, u, pickableSide, pos) {
   const d = SHINOBI_BY_ID[u.id];
-  const pickable = pickableSide && !u.ko;
+  const pickable = pickableSide && (pickableSide === 'fallen' ? u.ko : !u.ko);
   const acting = S.phase === 'select' && S.actor === u.uid;
   return `<div class="hpcard ${u.ko ? 'down' : ''} ${pickable ? 'pickable' : ''} ${acting ? 'acting' : ''}" id="card-${u.uid}" ${pickable ? `data-act="target" data-arg="${pos}"` : `data-tip="${esc(unitTip(vs, u))}"`}>
     <div class="nm"><span>${esc(d.name)}</span>${natChip(d.natures.primary)}<span class="grow"></span><span class="hptext"></span></div>
@@ -415,7 +416,7 @@ function syncField() {
       ck.firstElementChild.style.width = seeCk ? `${pct(u.chakra, u.maxChakra)}%` : '100%';
       card.querySelector('.bar.rs > i').style.width = `${u.resolve}%`;
       const t = SHINOBI_BY_ID[u.id].transformation;
-      card.querySelector('.hptext').innerHTML = `${own ? `${u.hp}/${u.maxHp}` : `${Math.ceil(hp)}%`} <span style="color:#4fb3ff">${seeCk ? `CK ${u.chakra}` : 'CK ?'}</span> <span style="color:#ffc83d">RS ${u.resolve}${t && !u.transformUsed ? `/${t.resolve}` : ''}</span>`;
+      card.querySelector('.hptext').innerHTML = `${own ? `${u.hp}/${u.maxHp}` : `${Math.ceil(hp)}%`} <span style="color:#4fb3ff">${seeCk ? `CK ${u.chakra}` : 'CK ?'}</span> <span style="color:#ffc83d">RS ${u.resolve}${t && !u.transformUsed ? `/${E.tfResolve(vs, u)}` : ''}</span>`;
       card.querySelector('.chips').innerHTML = cardChips(vs, u);
       card.querySelector('.sts').innerHTML = statusHtml(u);
       card.classList.toggle('down', u.ko);
@@ -557,11 +558,11 @@ function actionSections(st, u) {
   const SUB = {
     kunai: (o) => { const k = E.getJutsu(o.jutsuId); return `POW ${k.power} · free · +2${k.target === 'allEnemies' ? ' · all enemies' : ''}`; },
     charge: () => `+${Math.round(E.BALANCE.chargeChakra * 100)}% Chakra · −2 · vulnerable`,
-    gather: () => `+${E.defOf(u).roles.some((r) => r === 'Sensor' || r === 'Infiltrator') ? 15 : 8} Intel · −1 · fails if hit`,
+    gather: () => `+${(E.defOf(u).roles.some((r) => r === 'Sensor' || r === 'Infiltrator') ? 15 : 8) + E.auraVal(S.battle, u.side, 'gatherBonus')} Intel · −1 · fails if hit`,
     substitute: (o) => `CK ${o.cost} · Stance${o.note ? ` · ${o.note}` : ''}`,
     guard: () => 'Stance · halve enemy Intel',
     release: () => 'Stance · break genjutsu',
-    transform: (o) => o.disabled || `Stance · ${E.defOf(u).transformation.resolve} Resolve`,
+    transform: (o) => o.disabled || `Stance · ${E.tfResolve(S.battle, u)} Resolve`,
   };
   const TIPS = {
     kunai: KUNAI_TIP,
@@ -708,7 +709,7 @@ async function playEvent(ev, apply) {
     case 'damage': {
       if (el) {
         FX.shake(el);
-        FX.pop(arena, el, `-${e.amount}`, e.burn ? 'status' : 'dmg', true);
+        FX.pop(arena, el, `-${e.amount}`, e.burn || e.poison ? 'status' : 'dmg', true);
         if (e.crit) FX.pop(arena, el, 'Critical!', 'crit', false, -30);
         else if (e.adv > 1) FX.pop(arena, el, 'Super effective!', 'se', false, -30);
         else if (e.adv < 1) FX.pop(arena, el, 'Resisted', 'nve', false, -30);
@@ -719,8 +720,12 @@ async function playEvent(ev, apply) {
       break;
     }
     case 'heal':
+      if (el && e.revive) {
+        el.parentElement.getAnimations().forEach((a) => a.cancel());
+        FX.appear(el); FX.banner(arena, 'REVIVED!', '#7ee08a');
+      }
       if (el) { FX.ring(arena, el, 'heal', e.chakra ? '#4fb3ff' : null); if (e.amount) FX.pop(arena, el, `+${e.amount}${e.chakra ? ' CK' : ''}`, 'heal'); }
-      ms = 1000;
+      ms = e.revive ? 1700 : 1000;
       break;
     case 'ko':
       if (el) FX.faint(el.parentElement);
@@ -755,6 +760,8 @@ async function playEvent(ev, apply) {
         if (el) { FX.ring(arena, el, 'aura'); FX.appear(el); }
         FX.banner(arena, E.defOf(S.battle.units[e.u]).transformation.name.toUpperCase(), '#ffc83d'); ms = 1800;
       } else if (e.weave) { if (el) FX.ring(arena, el, 'gen'); ms = 1200; }
+      else if (e.survive) { if (el) { FX.ring(arena, el, 'aura'); FX.pop(arena, el, 'Survived!', 'se', true); } ms = 1500; }
+      else if (e.bodyguard) { const g = monEl(e.bodyguard); if (el) FX.ring(arena, el, 'aura', '#9fe7ff'); if (g) FX.pop(arena, g, 'Protected!', 'sub', true); ms = 1300; }
       else if (e.copy) { if (el) FX.pop(arena, el, 'Copied!', 'se', true); ms = 1300; }
       else if (e.auraStage) { FX.banner(arena, `SUPPORT STAGE ${e.auraStage}`, e.side === 0 ? '#4fa8ff' : '#ff6a4d'); ms = 1800; }
       else ms = 1300;
@@ -920,7 +927,9 @@ const ACTIONS = {
     const action = { actor: u.uid, type: o.type, jutsuId: o.jutsuId };
     if (o.overexert) action.overexert = true;
     if (j && (j.target === 'enemy' || j.target === 'ally')) {
-      const candidates = j.target === 'enemy' ? E.onField(st, 1 - S.side) : E.onField(st, S.side);
+      const revive = j.effects.some((e) => e.type === 'revive');
+      const candidates = revive ? st.teams[S.side].slots.map((id) => st.units[id]).filter((x) => x.ko)
+        : j.target === 'enemy' ? E.onField(st, 1 - S.side) : E.onField(st, S.side).filter((x) => !j.effects.some((e) => e.type === 'bodyguard') || x !== u);
       if (candidates.length === 1) action.target = { slot: E.slotOf(st, candidates[0]) };
       else { S.pending = action; render(); syncField(); return; }
     }
