@@ -286,3 +286,35 @@ test('support passives describe their stages', () => {
   assert.match(E.auraDesc(SHINOBI_BY_ID.kurenai.supportAura, 3), /10%.*50%/);
   assert.match(E.auraStages(SHINOBI_BY_ID.naruto_war.supportAura), /3% \/ 5% \/ 8%/);
 });
+
+// ---------------- chakra economy ----------------
+test('overexerting: a jutsu you cannot afford costs HP and Exhausts you', () => {
+  const st = battle(T0, T1);
+  const naruto = st.units['0-0'];
+  naruto.chakra = 5;
+  const opt = availableActions(st, '0-0').find((a) => a.jutsuId === 'rasengan');
+  assert.ok(!opt.disabled);
+  assert.equal(opt.overexert, Math.round((45 - 5) * BALANCE.overexertHp));
+  const hp = naruto.hp;
+  resolveTurn(st, [{ actor: '0-0', type: 'jutsu', jutsuId: 'rasengan', target: { slot: 1 }, overexert: true }]);
+  assert.ok(st.log.some((l) => l.overexert));
+  assert.ok(naruto.statuses.exhausted);
+  assert.ok(naruto.hp < hp + naruto.maxHp * 0.08 - opt.overexert + 1); // paid the HP (regen aside)
+});
+
+test('overexerting is not allowed when it would knock you out', () => {
+  const st = battle(T0, T1);
+  const naruto = st.units['0-0'];
+  naruto.chakra = 0; naruto.hp = 10;
+  const opt = availableActions(st, '0-0').find((a) => a.jutsuId === 'rasengan');
+  assert.ok(opt.disabled);
+});
+
+test('Charge restores half the pool; passive regen is small', () => {
+  const st = battle(T0, T1);
+  const s = st.units['0-1'];
+  s.chakra = 0;
+  resolveTurn(st, [{ actor: '0-1', type: 'charge' }]);
+  const expected = Math.round(s.maxChakra * BALANCE.chargeChakra) + Math.round(s.maxChakra * BALANCE.chakraRegen);
+  assert.equal(s.chakra, expected);
+});

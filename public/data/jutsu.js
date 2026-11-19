@@ -307,7 +307,7 @@ export const JUTSU = {
     "category": "ninjutsu",
     "nature": "lightning",
     "power": 115,
-    "cost": 55,
+    "cost": 50,
     "priority": 1,
     "target": "enemy",
     "effects": [
@@ -1257,10 +1257,10 @@ export const JUTSU = {
       },
       {
         "type": "drainChakra",
-        "value": 0.1
+        "value": 0.08
       }
     ],
-    "desc": "Strikes the chakra network. Ignores 30% DEF, drains 10% Chakra."
+    "desc": "Strikes the chakra network. Ignores 30% DEF, drains 8% Chakra."
   },
   "palms_32": {
     "name": "Eight Trigrams 32 Palms",
@@ -1277,10 +1277,10 @@ export const JUTSU = {
       },
       {
         "type": "drainChakra",
-        "value": 0.15
+        "value": 0.12
       }
     ],
-    "desc": "Ignores 30% DEF, drains 15% Chakra."
+    "desc": "Ignores 30% DEF, drains 12% Chakra."
   },
   "palms_64": {
     "name": "Eight Trigrams 64 Palms",
@@ -1297,10 +1297,10 @@ export const JUTSU = {
       },
       {
         "type": "drainChakra",
-        "value": 0.2
+        "value": 0.15
       }
     ],
-    "desc": "Ignores 30% DEF, drains 20% Chakra."
+    "desc": "Ignores 30% DEF, drains 15% Chakra."
   },
   "palms_128": {
     "name": "Eight Trigrams 128 Palms",
@@ -1317,10 +1317,10 @@ export const JUTSU = {
       },
       {
         "type": "drainChakra",
-        "value": 0.25
+        "value": 0.2
       }
     ],
-    "desc": "Ignores 30% DEF, drains 25% Chakra."
+    "desc": "Ignores 30% DEF, drains 20% Chakra."
   },
   "vacuum_palm": {
     "name": "Eight Trigrams Vacuum Palm",
@@ -1414,10 +1414,10 @@ export const JUTSU = {
       },
       {
         "type": "drainChakra",
-        "value": 0.3
+        "value": 0.25
       }
     ],
-    "desc": "Only while transformed. Drains 30% Chakra.",
+    "desc": "Only while transformed. Drains 25% Chakra.",
     "requiresTransform": true
   },
   "morning_peacock": {

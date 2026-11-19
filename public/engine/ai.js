@@ -19,7 +19,10 @@ export function chooseActions(state, side, rng = Math.random) {
 
     if (has('release') && chance(0.7)) { actions.push({ actor: u.uid, type: 'release' }); continue; }
     if (has('transform') && chance(0.8)) { actions.push({ actor: u.uid, type: 'transform' }); continue; }
-    if (u.chakra < u.maxChakra * 0.2 && chance(0.6)) { actions.push({ actor: u.uid, type: 'charge' }); continue; }
+    // Chakra management: when low, usually Charge (more often if nothing affordable is worth casting)
+    const affordable = opts.filter((o) => o.type === 'jutsu' && !o.overexert);
+    const lowCk = u.chakra < u.maxChakra * 0.25;
+    if (lowCk && chance(affordable.length ? 0.45 : 0.7)) { actions.push({ actor: u.uid, type: 'charge' }); continue; }
     if (u.hp < u.maxHp * 0.35 && u.subStreak === 0 && has('substitute') && chance(0.35)) {
       actions.push({ actor: u.uid, type: 'substitute' }); continue;
     }
@@ -31,7 +34,7 @@ export function chooseActions(state, side, rng = Math.random) {
 
     // healing
     const hurt = allies.filter((a) => a.hp < a.maxHp * 0.5).sort((a, b) => a.hp / a.maxHp - b.hp / b.maxHp)[0];
-    const healOpt = opts.find((o) => o.type === 'jutsu' && getJutsu(o.jutsuId).effects.some((e) => e.type === 'heal'));
+    const healOpt = opts.find((o) => o.type === 'jutsu' && !o.overexert && getJutsu(o.jutsuId).effects.some((e) => e.type === 'heal'));
     if (hurt && healOpt) {
       actions.push({ actor: u.uid, type: 'jutsu', jutsuId: healOpt.jutsuId, target: { slot: slotOf(state, hurt) } });
       continue;
@@ -42,6 +45,9 @@ export function chooseActions(state, side, rng = Math.random) {
     for (const o of opts) {
       if (o.type !== 'jutsu' && o.type !== 'kunai') continue;
       const j = getJutsu(o.jutsuId);
+      // overexerting costs HP: only worth it for a knockout (or rarely when desperate)
+      const ox = (sc, lethal) => (o.overexert ? (lethal ? sc * 0.9 : sc - o.overexert * 1.6) : sc);
+      const tag = (a) => (o.overexert ? { ...a, overexert: true } : a);
       if (j.target === 'enemy') {
         for (const e of enemies) {
           let s = j.power ? computeDamage(state, u, e, j, { noRandom: true }).damage : 0;
@@ -50,20 +56,24 @@ export function chooseActions(state, side, rng = Math.random) {
           if (unsecuredTotal(e) > 0) s *= 1.3;
           if (j.power && s >= e.hp) s *= 1.4;
           if (j.charged) s *= 0.55;
-          scored.push({ s, action: { actor: u.uid, type: o.type, jutsuId: o.jutsuId, target: { slot: slotOf(state, e) } } });
+          s = ox(s, j.power && s >= e.hp);
+          scored.push({ s, action: tag({ actor: u.uid, type: o.type, jutsuId: o.jutsuId, target: { slot: slotOf(state, e) } }) });
         }
       } else if (j.target === 'allEnemies') {
         let s = 0;
         for (const e of enemies) s += j.power ? computeDamage(state, u, e, j, { noRandom: true }).damage : 15;
         if (j.charged) s *= 0.55;
-        scored.push({ s, action: { actor: u.uid, type: o.type, jutsuId: o.jutsuId } });
+        s = ox(s, false);
+        scored.push({ s, action: tag({ actor: u.uid, type: o.type, jutsuId: o.jutsuId }) });
       } else {
-        const s = j.effects.some((x) => x.type === 'intel') ? 30 : 25;
-        scored.push({ s, action: { actor: u.uid, type: 'jutsu', jutsuId: o.jutsuId, target: { slot: slotOf(state, u) } } });
+        const s = ox(j.effects.some((x) => x.type === 'intel') ? 30 : 25, false);
+        scored.push({ s, action: tag({ actor: u.uid, type: 'jutsu', jutsuId: o.jutsuId, target: { slot: slotOf(state, u) } }) });
       }
     }
     if (!scored.length) { actions.push({ actor: u.uid, type: 'charge' }); continue; }
     scored.sort((a, b) => b.s - a.s);
+    // nothing worth doing: refill instead
+    if (scored[0].s <= 0) { actions.push({ actor: u.uid, type: 'charge' }); continue; }
     // mostly pick the best, sometimes the second best
     const pick = scored.length > 1 && chance(0.25) ? scored[1] : scored[0];
     actions.push(pick.action);

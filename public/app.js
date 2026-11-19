@@ -227,6 +227,7 @@ function rulesHtml() {
       <li><b>Intel:</b> Gather Intel, land genjutsu, reveal enemy jutsu and score KOs. New Intel is <i>unsecured</i> until the carrier survives the end of the next turn — KO the spy and it's lost. Guard halves enemy Intel gains (sensors quarter it).</li>
       <li><b>Milestones:</b> 25 Intel reveals an enemy loadout, 50 reveals another and makes enemy Chakra visible, 75 lets you see one enemy order before choosing.</li>
       <li><b>Win:</b> KO all 3 enemy shinobi, <i>or</i> secure 100 Intel. After turn 20, the highest Mission Score (25 per KO + Intel) wins.</li>
+      <li><b>Chakra</b> is scarce: pools are small and only ~4% comes back each turn. <b>Charge Chakra</b> restores half your pool (but you take +25% damage that turn). Out of Chakra? Throw kunai, Charge, or <b>overexert</b> — force the jutsu out anyway by paying the shortfall in HP and becoming Exhausted. Ending a turn at 0 Chakra also costs HP.</li>
       <li><b>Resolve</b> builds as you take hits or lose allies and powers transformations.</li>
     </ul>
   </div>`;
@@ -394,6 +395,7 @@ function syncField() {
       hpI.style.width = `${hp}%`; hpI.style.background = hpColor(hp);
       const ck = card.querySelector('.bar.ck');
       ck.classList.toggle('hidden-info', !seeCk);
+      ck.classList.toggle('low', seeCk && u.chakra < u.maxChakra * 0.25);
       ck.firstElementChild.style.width = seeCk ? `${pct(u.chakra, u.maxChakra)}%` : '100%';
       card.querySelector('.bar.rs > i').style.width = `${u.resolve}%`;
       const t = SHINOBI_BY_ID[u.id].transformation;
@@ -523,15 +525,17 @@ function actionSections(st, u) {
   const moveBtn = (o) => {
     const j = E.getJutsu(o.jutsuId);
     const pri = j.priority + (j.category === 'taijutsu' && E.traitOf(u) === 'noNinjutsu' ? 1 : 0);
-    return `<button class="move-btn ${isOn(o) ? 'on' : ''} ${o.copied ? 'copied' : ''}" style="--c:${FX.jutsuColor(j)}" data-act="chooseAction" data-arg="${idx(o)}" ${o.disabled ? 'disabled' : ''} ${tipAttr(jutsuTip(j, o.cost))}>
+    const overTip = o.overexert ? `<br><b style="color:#ffcc4d">Not enough Chakra.</b> Overexert to force it out anyway: costs ${o.overexert} HP and leaves you Exhausted (−15% stats) for 2 turns.` : '';
+    return `<button class="move-btn ${isOn(o) ? 'on' : ''} ${o.copied ? 'copied' : ''} ${o.overexert ? 'over' : ''}" style="--c:${FX.jutsuColor(j)}" data-act="chooseAction" data-arg="${idx(o)}" ${o.disabled ? 'disabled' : ''} ${tipAttr(jutsuTip(j, o.cost) + overTip)}>
       <span class="mn">${esc(j.name)} ${natChip(j.nature)}${o.copied ? '<span class="chip down">Copied</span>' : ''}</span>
       <span class="mi">${j.power ? `POW ${j.power}` : j.category.toUpperCase()} · CK ${o.cost} · ${priLabel(j.charged ? j.priority : pri)} · ${TARGET_LABEL[j.target]}${j.charged ? ' · 2 turns' : ''}</span>
       ${o.disabled ? `<span class="why">${esc(o.disabled)}</span>` : ''}
+      ${o.overexert ? `<span class="why">⚠ Overexert: −${o.overexert} HP + Exhausted</span>` : ''}
     </button>`;
   };
   const SUB = {
     kunai: (o) => { const k = E.getJutsu(o.jutsuId); return `POW ${k.power} · free · +2${k.target === 'allEnemies' ? ' · all enemies' : ''}`; },
-    charge: () => '+35% Chakra · −2 · vulnerable',
+    charge: () => `+${Math.round(E.BALANCE.chargeChakra * 100)}% Chakra · −2 · vulnerable`,
     gather: () => `+${E.defOf(u).roles.some((r) => r === 'Sensor' || r === 'Infiltrator') ? 15 : 8} Intel · −1 · fails if hit`,
     substitute: (o) => `CK ${o.cost} · Stance${o.note ? ` · ${o.note}` : ''}`,
     guard: () => 'Stance · halve enemy Intel',
@@ -540,7 +544,7 @@ function actionSections(st, u) {
   };
   const TIPS = {
     kunai: KUNAI_TIP,
-    charge: 'Restore 35% of max Chakra at the end of the turn. You take +25% damage this turn.',
+    charge: 'Restore half of your max Chakra (it resolves last). You take +25% damage this turn. Passive regen is small, so this is how you refill.',
     gather: 'Priority −1. Gain Intel (Sensors and Infiltrators gain more). Fails if you were hit earlier this turn. The Intel is unsecured until you survive the end of next turn.',
     substitute: `${SUBSTITUTIONS[u.substitution].desc} Success drops to 50% / 25% if used on consecutive turns. Area attacks are only halved.`,
     guard: 'Stance. Enemy Intel gains are halved this turn (quartered if a Sensor guards), and you take 25% less damage.',
@@ -555,7 +559,7 @@ function actionSections(st, u) {
     return `<div class="sect"><h2>${title} ${hint ? `<span class="hint muted">${hint}</span>` : ''}</h2><div class="opt-grid">${list.map(optBtn).join('')}</div></div>`;
   };
   return `<div class="sections">
-    <div class="sect"><h2>Jutsu <span class="hint muted">${u.chakra}/${u.maxChakra} Chakra</span></h2><div class="moves">${jutsu.map(moveBtn).join('')}</div></div>
+    <div class="sect"><h2>Jutsu <span class="hint ${u.chakra < u.maxChakra * 0.25 ? 'lowck' : 'muted'}">${u.chakra}/${u.maxChakra} Chakra${u.chakra < u.maxChakra * 0.25 ? ' — running low' : ''}</span></h2><div class="moves">${jutsu.map(moveBtn).join('')}</div></div>
     <div class="others">
       ${group('Tactics', GROUPS.tactics)}
       ${group('Defense', GROUPS.defense, u.subStreak ? 'substitution less reliable' : '')}
@@ -574,7 +578,7 @@ function actionText(st, a) {
     case 'jutsu': case 'kunai': {
       const j = E.getJutsu(a.jutsuId || 'kunai');
       const t = j.target === 'enemy' ? ` → ${tname(1 - u.side)}` : j.target === 'ally' ? ` → ${tname(u.side)}` : '';
-      return `${j.name}${t}`;
+      return `${j.name}${t}${a.overexert ? ' (overexert)' : ''}`;
     }
     case 'weaveRelease': return `Release ${E.getJutsu(u.weaving.jutsuId).name}`;
     case 'substitute': return SUBSTITUTIONS[u.substitution].name;
@@ -688,6 +692,7 @@ async function playEvent(ev, apply) {
         else if (e.adv > 1) FX.pop(arena, el, 'Super effective!', 'se', false, -30);
         else if (e.adv < 1) FX.pop(arena, el, 'Resisted', 'nve', false, -30);
         if (e.boom) FX.fx(arena, 'burst', FX.centerOf(el, arena)).style.background = '#ff9a3c';
+        if (e.overexert) { FX.pop(arena, el, 'Overexert!', 'crit', false, -30); FX.ring(arena, el, '', '#ff9a3c'); }
       }
       ms = 1150;
       break;
@@ -892,6 +897,7 @@ const ACTIONS = {
     if (!o || o.disabled) return;
     const j = o.jutsuId ? E.getJutsu(o.jutsuId) : null;
     const action = { actor: u.uid, type: o.type, jutsuId: o.jutsuId };
+    if (o.overexert) action.overexert = true;
     if (j && (j.target === 'enemy' || j.target === 'ally')) {
       const candidates = j.target === 'enemy' ? E.onField(st, 1 - S.side) : E.onField(st, S.side);
       if (candidates.length === 1) action.target = { slot: E.slotOf(st, candidates[0]) };

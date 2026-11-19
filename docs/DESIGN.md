@@ -16,7 +16,15 @@ All numbers live in `BALANCE` in `public/engine/battle.js` or in the data files.
 | NIN | ninjutsu damage, genjutsu accuracy |
 | DEF | reduces all damage |
 | SPD | order within a priority tier, small dodge chance (max 12%) |
-| CHK | max Chakra = base × 2, genjutsu resistance |
+| CHK | max Chakra = base × 1.25, genjutsu resistance |
+
+## Chakra
+Chakra is meant to run low a few times per battle.
+- Pools are small (CHK × 1.25) and only **4%** regenerates per turn.
+- **Charge Chakra** restores **50%** of the pool (resolves last; +25% damage taken that turn).
+- **Overexert**: a jutsu you can't afford can still be used — Chakra drops to 0, the shortfall is paid in HP (1.2 HP per missing point) and you're **Exhausted** (−15% stats) for 2 turns. Not allowed if it would KO you.
+- Ending a turn at 0 Chakra costs 6% max HP (Lee/Guy are immune).
+- Sim targets (CPU vs CPU): ~18% of shinobi-turns start below 25% Chakra, ~4–5 Charges and ~2 overexerts per battle.
 
 ## Turn order
 Both sides choose in secret, then actions resolve by priority, then SPD:

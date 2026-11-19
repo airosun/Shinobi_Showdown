@@ -281,3 +281,9 @@ main { padding: 16px; max-width: 1320px; margin: 0 auto; }
 .chip.support-chip.st2 { background: #4a3214; color: #ffc83d; }
 .chip.support-chip.st3 { background: #5a2410; color: #ffb070; box-shadow: 0 0 8px #ff8c1a88; }
 .slot.support .nm::after { content: ' · passive only'; color: var(--muted); font-weight: 400; font-size: 11px; }
+
+.move-btn.over { border-left-style: dashed; }
+.move-btn.over .mn { color: #ffd9a0; }
+.hint.lowck { color: var(--warn); font-weight: 700; text-transform: none; letter-spacing: 0; }
+.bar.ck.low > i { background: #ff9a3c; animation: lowck 1s ease-in-out infinite; }
+@keyframes lowck { 50% { opacity: .45; } }

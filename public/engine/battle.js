@@ -12,13 +12,15 @@ import { makeRng } from './rng.js';
 // ---------------------------------------------------------------------------
 export const BALANCE = {
   hpScale: 3,             // max HP = base hp * hpScale
-  chakraScale: 2,         // max Chakra = base chk * chakraScale
+  chakraScale: 1.25,       // max Chakra = base chk * chakraScale
   damageScale: 0.42,
   maxTurns: 20,
   intelToWin: 100,
   koScore: 25,            // Mission Score per KO (turn-limit tiebreak)
-  chakraRegen: 0.1,
-  chargeChakra: 0.35,
+  chakraRegen: 0.04,      // passive regen per turn (Charge is the real refill)
+  chargeChakra: 0.5,
+  overexertHp: 1.2,       // HP paid per missing Chakra point when overexerting
+  overexertExhaust: 2,    // turns of Exhausted after overexerting
   vulnerableMult: 1.25,   // charging / weaving / exposed
   guardDamageMult: 0.75,
   critChance: 1 / 16,
@@ -28,7 +30,7 @@ export const BALANCE = {
   collabMult: 1.3,
   subChain: [1, 0.5, 0.25], // substitution success on consecutive turns
   aoeSubMult: 0.5,
-  exhaustionDamage: 0.1,
+  exhaustionDamage: 0.06, // end of turn at 0 Chakra
   burnDamage: 0.05,
   paralyzeFail: 0.25,
   genjutsuFail: 0.5,
@@ -268,6 +270,11 @@ export function jutsuCost(state, unit, jutsu) {
   return Math.round(c);
 }
 
+/** HP it costs to force out a jutsu the user can't afford. */
+export function overexertHpCost(unit, cost) {
+  return Math.max(0, Math.round((cost - unit.chakra) * BALANCE.overexertHp));
+}
+
 export function subCost(state, unit) {
   let c = SUBSTITUTIONS[unit.substitution].cost * unit.maxChakra;
   c *= 1 - Math.min(0.9, auraVal(state, unit.side, 'subDiscount'));
@@ -314,9 +321,15 @@ export function availableActions(state, uid) {
     const j = getJutsu(id);
     const cost = jutsuCost(state, u, j);
     let disabled = null;
-    if (cost > u.chakra) disabled = 'Not enough Chakra';
+    let overexert = null;
+    if (cost > u.chakra) {
+      // not enough Chakra: it can still be forced out, paying the shortfall in HP
+      const hp = overexertHpCost(u, cost);
+      if (hp >= u.hp) disabled = 'Not enough Chakra (overexerting would knock you out)';
+      else overexert = hp;
+    }
     if (j.requiresTransform && !u.transform) disabled = 'Requires transformation';
-    acts.push({ type: 'jutsu', jutsuId: id, label: j.name, cost, targetType: j.target, disabled, copied: id === u.copied });
+    acts.push({ type: 'jutsu', jutsuId: id, label: j.name, cost, targetType: j.target, disabled, overexert, copied: id === u.copied });
   }
   const kunai = traitOf(u) === 'weaponMistress' ? KUNAI_STORM : KUNAI;
   acts.push({ type: 'kunai', jutsuId: kunai.id, label: kunai.name, cost: 0, targetType: kunai.target });
@@ -592,7 +605,7 @@ function performJutsu(state, actor, jutsu, target, ctx = {}) {
       }
       // Shino: chakra-eating insects on every hit
       if (traitOf(actor) === 'kikaichu' && !tgt.ko && traitOf(tgt) !== 'kikaichu') {
-        const amt = Math.round(tgt.maxChakra * 0.08);
+        const amt = Math.round(tgt.maxChakra * 0.06);
         tgt.chakra = Math.max(0, tgt.chakra - amt);
         log(state, `Kikaichu drain ${amt} Chakra from ${tgt.name}.`, 'status', tgt, { minor: true });
       }
@@ -920,7 +933,7 @@ function executeAction(state, u, a, clashes, cancelled, entries) {
       u.chakra += amt;
       log(state, `${u.name} charges Chakra (+${amt}).`, 'info', u);
       if (traitOf(u) === 'akimichi') {
-        const h = heal(state, u, 0.15);
+        const h = heal(state, u, 0.1);
         if (h) log(state, `${u.name} snacks and recovers ${h} HP.`, 'heal', u, { amount: h });
       }
       return;
@@ -942,8 +955,16 @@ function executeAction(state, u, a, clashes, cancelled, entries) {
         if (a.type === 'jutsu' && !u.loadout.includes(jutsu.id) && u.copied !== jutsu.id) return;
         if (jutsu.requiresTransform && !u.transform) { log(state, `${u.name} can't use ${jutsu.name} right now.`, 'info', u); return; }
         const cost = jutsuCost(state, u, jutsu);
-        if (cost > u.chakra) { log(state, `${u.name} doesn't have enough Chakra for ${jutsu.name}.`, 'info', u); return; }
-        u.chakra -= cost;
+        if (cost > u.chakra) {
+          const hp = overexertHpCost(u, cost);
+          if (hp >= u.hp) { log(state, `${u.name} doesn't have enough Chakra for ${jutsu.name}.`, 'info', u); return; }
+          u.chakra = 0;
+          dealDamage(state, u, hp, null, `${u.name} overexerts to force out ${jutsu.name}! (-${hp} HP)`, { overexert: true });
+          applyStatus(state, u, 'exhausted', BALANCE.overexertExhaust);
+          log(state, `${u.name} is Exhausted.`, 'status', u, { status: 'exhausted' });
+        } else {
+          u.chakra -= cost;
+        }
         if (jutsu.charged) {
           u.weaving = { kind: 'jutsu', jutsuId: jutsu.id, target, startedTurn: state.turn };
           log(state, `${u.name} begins weaving signs for ${jutsu.name}...`, 'special', u, { weave: jutsu.id });

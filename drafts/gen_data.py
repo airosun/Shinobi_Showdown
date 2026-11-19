@@ -16,7 +16,7 @@ STAT_OVERRIDES = {
 }
 
 # ---- balance pass 1 (CPU sim, cost-adjusted win rates) ----
-COST_OVERRIDES = {'tenten_ship': 7, 'kakashi_p1': 7, 'naruto_sage': 8, 'sai': 5, 'ino_ship': 5, 'shikamaru_p1': 5, 'kakashi_ship': 8, 'shino_p1': 4,
+COST_OVERRIDES = {'kurenai': 5, 'sakura_war': 9, 'tenten_ship': 7, 'kakashi_p1': 7, 'naruto_sage': 8, 'sai': 5, 'ino_ship': 5, 'shikamaru_p1': 5, 'kakashi_ship': 7, 'shino_p1': 4,
                   'sasuke_p1': 6, 'choji_p1': 6, 'choji_ship': 8}
 JUTSU_OVERRIDES = {
     'amaterasu': {'effects': [{'type': 'burn', 'chance': 1, 'turns': 3}], 'cost': 55, 'desc': 'Black flames wherever he looks. Always Burns (3 turns). Ignores Substitution.'},
@@ -32,9 +32,16 @@ JUTSU_OVERRIDES = {
     'chidori_nagashi': {'power': 65},
     'rising_dragons_explosion': {'power': 60},
     'twin_rising_dragons': {'power': 50},
+    # chakra rework: Chakra is scarcer, so drains hit harder
+    'gentle_fist': {'effects': [{'type': 'pierce', 'value': 0.3}, {'type': 'drainChakra', 'value': 0.08}], 'desc': 'Strikes the chakra network. Ignores 30% DEF, drains 8% Chakra.'},
+    'palms_32': {'effects': [{'type': 'pierce', 'value': 0.3}, {'type': 'drainChakra', 'value': 0.12}], 'desc': 'Ignores 30% DEF, drains 12% Chakra.'},
+    'palms_64': {'effects': [{'type': 'pierce', 'value': 0.3}, {'type': 'drainChakra', 'value': 0.15}], 'desc': 'Ignores 30% DEF, drains 15% Chakra.'},
+    'palms_128': {'effects': [{'type': 'pierce', 'value': 0.3}, {'type': 'drainChakra', 'value': 0.2}], 'desc': 'Ignores 30% DEF, drains 20% Chakra.'},
+    'twin_lion_fists': {'effects': [{'type': 'pierce', 'value': 0.3}, {'type': 'drainChakra', 'value': 0.25}], 'desc': 'Only while transformed. Drains 25% Chakra.'},
+    'lightning_blade': {'cost': 50},
 }
 VITALITY = 'Regenerates 8% max HP each turn. +30% max Chakra.'
-TRAIT_DESC_OVERRIDES = {'Weapon Mistress': 'Her Kunai & Shuriken hit all enemies.',
+TRAIT_DESC_OVERRIDES = {'Akimichi Appetite': 'Charge Chakra also heals 10% max HP.', 'Kikaichu Host': 'His attacks that hit drain 6% Chakra. Immune to Chakra drain.','Weapon Mistress': 'Her Kunai & Shuriken hit all enemies.',
                         'Mangekyō Sharingan': 'Sees through Log Substitution. 25% genjutsu reflect. His Burns last 1 extra turn.',
                         'Eternal Mangekyō Sharingan': 'Sees through Log Substitution. Immune to genjutsu. His Burns last 1 extra turn.'}
 LOADOUT_OVERRIDES = {'naruto_war': ['kurama_rasengan', 'thrown_rasenshuriken', 'chakra_arm', 'tailed_beast_bomb']}

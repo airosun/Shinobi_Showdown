@@ -737,7 +737,7 @@ export const SHINOBI = [
     "baseId": "sakura",
     "name": "Sakura Haruno (Great War)",
     "era": "Shippuden",
-    "cost": 8,
+    "cost": 9,
     "natures": {
       "primary": "earth",
       "secondary": "yang"
@@ -880,7 +880,7 @@ export const SHINOBI = [
     "baseId": "kakashi",
     "name": "Kakashi Hatake (Shippuden)",
     "era": "Shippuden",
-    "cost": 8,
+    "cost": 7,
     "natures": {
       "primary": "lightning",
       "secondary": "earth"
@@ -1918,7 +1918,7 @@ export const SHINOBI = [
     "trait": {
       "id": "kikaichu",
       "name": "Kikaichu Host",
-      "desc": "His attacks that hit drain 8% Chakra. Immune to Chakra drain."
+      "desc": "His attacks that hit drain 6% Chakra. Immune to Chakra drain."
     },
     "substitutions": [
       "log"
@@ -1977,7 +1977,7 @@ export const SHINOBI = [
     "trait": {
       "id": "kikaichu",
       "name": "Kikaichu Host",
-      "desc": "His attacks that hit drain 8% Chakra. Immune to Chakra drain."
+      "desc": "His attacks that hit drain 6% Chakra. Immune to Chakra drain."
     },
     "substitutions": [
       "log"
@@ -2157,7 +2157,7 @@ export const SHINOBI = [
     "trait": {
       "id": "akimichi",
       "name": "Akimichi Appetite",
-      "desc": "Charge Chakra also heals 15% max HP."
+      "desc": "Charge Chakra also heals 10% max HP."
     },
     "substitutions": [
       "log"
@@ -2235,7 +2235,7 @@ export const SHINOBI = [
     "trait": {
       "id": "akimichi",
       "name": "Akimichi Appetite",
-      "desc": "Charge Chakra also heals 15% max HP."
+      "desc": "Charge Chakra also heals 10% max HP."
     },
     "substitutions": [
       "log"
@@ -2412,7 +2412,7 @@ export const SHINOBI = [
     "baseId": "kurenai",
     "name": "Kurenai Yuhi",
     "era": "Part 1",
-    "cost": 6,
+    "cost": 5,
     "natures": {
       "primary": "yin",
       "secondary": null
