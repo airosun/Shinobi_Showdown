@@ -10,6 +10,10 @@ npm test           # engine rules tests
 npm run sim 2000   # AI-vs-AI balance sim (win types, per-shinobi win rate)
 ```
 
+## Deploy (Render)
+
+`render.yaml` defines a free Node web service (`npm install` / `npm start`, auto-deploys on push to `main`). In Render: **New → Blueprint** → pick this repo, or **New → Web Service** with those two commands.
+
 Modes: **Hot-Seat** (two players, one device, with pass-the-device screens) and **Vs CPU** (quick testing).
 
 ## Project layout
