@@ -11,7 +11,8 @@ const tip = document.getElementById('tooltip');
 const topinfo = document.getElementById('topinfo');
 
 const S = {
-  screen: 'title',          // title | builder | pass | battle
+  screen: 'title',          // title | builder | pass | battle | dex
+  dex: { id: null, era: 'all', query: '', sort: 'roster', tf: false, from: 'title' },
   phase: null,              // select | play | over
   mode: null,               // hotseat | cpu
   names: ['Player 1', 'Player 2'],
@@ -110,6 +111,14 @@ document.addEventListener('click', (e) => {
 });
 app.addEventListener('input', (e) => {
   const el = e.target.closest('[data-input]');
+  if (el && el.dataset.input === 'dexSearch') {
+    S.dex.query = el.value;
+    const pos = el.selectionStart;
+    render();
+    const n = document.getElementById('dexSearch');
+    if (n) { n.focus(); n.setSelectionRange(pos, pos); }
+    return;
+  }
   if (el && el.dataset.input === 'search') {
     S.builder.query = el.value;
     const pos = el.selectionStart;
@@ -122,6 +131,15 @@ app.addEventListener('change', (e) => {
   const el = e.target.closest('[data-change]');
   if (el) ACTIONS[el.dataset.change]?.(el.value, el, e);
 });
+document.getElementById('dexBtn').addEventListener('click', () => ACTIONS.openDex());
+// Dex: arrow keys flip through entries
+document.addEventListener('keydown', (e) => {
+  if (S.screen !== 'dex' || e.target.closest('input, select') || !['ArrowLeft', 'ArrowRight'].includes(e.key)) return;
+  const list = dexList();
+  const i = list.findIndex((x) => x.id === S.dex.id);
+  if (i < 0 || !list.length) return;
+  ACTIONS.dexSel(list[(i + (e.key === 'ArrowRight' ? 1 : -1) + list.length) % list.length].id);
+});
 document.getElementById('menuBtn').addEventListener('click', () => {
   if (S.screen === 'battle' && S.phase !== 'over' && !confirm('Leave this battle?')) return;
   S.skip = true; S.screen = 'title'; render();
@@ -130,6 +148,8 @@ document.getElementById('menuBtn').addEventListener('click', () => {
 function render() {
   tip.classList.add('hidden');
   topinfo.textContent = S.screen === 'battle' && S.battle ? `${S.mode === 'cpu' ? 'Vs CPU' : 'Hot-seat'} · Turn ${Math.min((S.view || S.battle).turn, S.battle.maxTurns)} / ${S.battle.maxTurns}` : '';
+  document.getElementById('dexBtn').classList.toggle('hidden', S.screen === 'battle' || S.screen === 'pass' || S.screen === 'dex');
+  document.body.dataset.screen = S.screen;
   app.innerHTML = SCREENS[S.screen]();
   if (S.screen === 'battle') { const lg = document.getElementById('blog'); if (lg) lg.scrollTop = lg.scrollHeight; }
 }
@@ -144,6 +164,7 @@ const SCREENS = {
         <button class="primary big" data-act="startHotseat">Hot-Seat Battle</button>
         <button class="big" data-act="startCpu">Vs CPU</button>
       </div>
+      <div class="row" style="margin-top:12px"><button class="big scroll-btn" data-act="openDex">📜 Shinobi Dex</button></div>
       <div class="row" style="margin-top:14px"><button class="ghost" data-act="toggleRules">${S.showRules ? 'Hide rules' : 'How to play'}</button></div>
       ${S.showRules ? rulesHtml() : ''}
     </div>`;
@@ -206,6 +227,8 @@ const SCREENS = {
       </div>`;
   },
 
+  dex() { return dexHtml(); },
+
   pass() {
     return `<div class="pass">
       <div class="muted">Hot-seat — hide the screen from your opponent</div>
@@ -228,6 +251,89 @@ const SCREENS = {
     </div>`;
   },
 };
+
+// ---------------------------------------------------------------- Shinobi Dex
+const STAT_LABEL = { hp: 'HP', tai: 'TAI', nin: 'NIN', def: 'DEF', spd: 'SPD', chk: 'CHK' };
+const CAT_LABEL = { ninjutsu: 'Ninjutsu', taijutsu: 'Taijutsu', genjutsu: 'Genjutsu', medical: 'Medical', support: 'Support' };
+const bst = (s, chk = true) => Object.entries(s.stats).reduce((t, [k, v]) => t + (chk || k !== 'chk' ? v : 0), 0);
+function dexList() {
+  const d = S.dex;
+  const q = d.query.toLowerCase();
+  const list = SHINOBI.filter((s) => (d.era === 'all' || s.era === d.era)
+    && (!q || [s.name, s.roles.join(' '), s.trait.name, s.natures.primary, s.natures.secondary].join(' ').toLowerCase().includes(q)));
+  const by = {
+    roster: () => 0,
+    name: (a, b) => a.name.localeCompare(b.name),
+    cost: (a, b) => b.cost - a.cost || a.name.localeCompare(b.name),
+    bst: (a, b) => bst(b, false) - bst(a, false),
+  }[d.sort];
+  return d.sort === 'roster' ? list : [...list].sort(by);
+}
+
+function dexHtml() {
+  const d = S.dex;
+  const list = dexList();
+  if (!d.id || !SHINOBI_BY_ID[d.id]) d.id = (list[0] || SHINOBI[0]).id;
+  const s = SHINOBI_BY_ID[d.id];
+  const idx = list.findIndex((x) => x.id === s.id);
+  return `<div class="dex">
+    <div class="dex-side">
+      <div class="dex-head"><h3 class="dex-title">Shinobi Dex</h3><span class="muted small">${SHINOBI.length} shinobi</span><span class="grow"></span><button class="small ghost" data-act="closeDex">Back</button></div>
+      <div class="tabs">${['all', 'Part 1', 'Shippuden'].map((e) => `<button class="tab ${d.era === e ? 'active' : ''}" data-act="dexEra" data-arg="${e}">${e === 'all' ? 'All' : e}</button>`).join('')}</div>
+      <div class="row" style="margin:8px 0">
+        <input type="text" id="dexSearch" placeholder="Name, role, trait, nature…" value="${esc(d.query)}" data-input="dexSearch" style="flex:1;min-width:0">
+        <select data-change="dexSort" title="Sort">${[['roster', 'Roster order'], ['name', 'Name'], ['cost', 'Cost'], ['bst', 'Stat total']].map(([k, l]) => `<option value="${k}" ${d.sort === k ? 'selected' : ''}>${l}</option>`).join('')}</select>
+      </div>
+      <div class="dex-list">${list.map((x) => `<button class="dex-item ${x.id === s.id ? 'sel' : ''}" data-act="dexSel" data-arg="${x.id}">
+        ${badge(x, 'sm')}<span class="nm">${esc(x.name)}</span><span class="chip cost">${x.cost}</span></button>`).join('') || '<div class="muted small" style="padding:8px">No shinobi match.</div>'}</div>
+    </div>
+    <div class="dex-main">${dexEntry(s, list, idx)}</div>
+  </div>`;
+}
+
+function dexEntry(s, list, idx) {
+  const art = S.sprites[s.id] || {};
+  const showTf = S.dex.tf && art.transform;
+  const src = showTf ? art.transform : art.front;
+  const prev = list[(idx - 1 + list.length) % list.length];
+  const next = list[(idx + 1) % list.length];
+  const max = 150;
+  const sc = (v) => (v >= 110 ? 'var(--good)' : v >= 85 ? 'var(--warn)' : v >= 60 ? '#ff9a3c' : 'var(--bad)');
+  const t = s.transformation;
+  const a = s.supportAura;
+  const jutsuRow = (id) => {
+    const j = E.getJutsu(id);
+    const flags = [j.charged ? 'Charged' : null, j.requiresTransform ? 'Transformed only' : null, j.ignoresSub ? 'Ignores Substitution' : null].filter(Boolean);
+    return `<div class="dex-jutsu" style="--c:${FX.jutsuColor(j)}">
+      <div class="jt"><span class="jn">${esc(j.name)}</span>${natChip(j.nature)}${s.defaultLoadout.includes(id) ? '<span class="chip def" title="In the default loadout">Default</span>' : ''}</div>
+      <div class="jm">${CAT_LABEL[j.category] || j.category} · ${j.power ? `POW ${j.power}` : 'no damage'} · CK ${j.cost} · ${priLabel(j.priority)} · ${TARGET_LABEL[j.target]}${flags.length ? ` · ${flags.join(' · ')}` : ''}</div>
+      <div class="jd">${esc(j.desc || '')}</div>
+    </div>`;
+  };
+  return `<div class="dex-nav"><button class="small" data-act="dexSel" data-arg="${prev.id}">‹ ${esc(prev.name)}</button><span class="grow"></span><span class="muted small">${idx + 1} / ${list.length}</span><span class="grow"></span><button class="small" data-act="dexSel" data-arg="${next.id}">${esc(next.name)} ›</button></div>
+  <div class="dex-card">
+    <div class="dex-art">
+      <div class="dex-stage">${src ? `<img src="sprites/${esc(src)}" alt="${esc(s.name)}">` : badge(s, 'lg')}</div>
+      ${art.transform ? `<div class="row" style="justify-content:center"><button class="small ${showTf ? '' : 'primary'}" data-act="dexTf" data-arg="0">Base</button><button class="small ${showTf ? 'primary' : ''}" data-act="dexTf" data-arg="1">${esc(t?.name || 'Transformed')}</button></div>` : ''}
+    </div>
+    <div class="dex-info">
+      <div class="dex-name">${esc(s.name)}</div>
+      <div class="chips" style="margin:6px 0 10px">${natChip(s.natures.primary)}${natChip(s.natures.secondary)}${!s.natures.primary ? '<span class="nat" style="--c:#8c93a8">Non-elemental</span>' : ''}<span class="chip">${s.era}</span><span class="chip cost">Cost ${s.cost}</span>${s.roles.map((r) => `<span class="chip">${r}</span>`).join('')}</div>
+      <div class="dex-stats">${Object.entries(s.stats).map(([k, v]) => `<span class="muted">${STAT_LABEL[k]}</span><div class="statbar"><i style="width:${pct(v, max)}%;background:${sc(v)}"></i></div><span class="mono">${v}</span>`).join('')}
+        <span class="muted">BST</span><span class="small muted">without CHK: <b class="mono" style="color:var(--text)">${bst(s, false)}</b></span><span class="mono"><b>${bst(s)}</b></span></div>
+      <div class="dex-block"><div class="lbl">Trait</div><b>${esc(s.trait.name)}</b> — ${esc(s.trait.desc)}</div>
+      <div class="dex-block"><div class="lbl">Transformation</div>${t ? `<b>${esc(t.name)}</b> <span class="muted small">(${t.resolve} Resolve${t.turns ? ` · ${t.turns} turns` : ''})</span> — ${esc(t.desc)}` : '<span class="muted">None.</span>'}</div>
+      <div class="dex-block"><div class="lbl">Substitutions</div>${s.substitutions.map((k) => `<b>${SUBSTITUTIONS[k].name}</b> <span class="muted small">(${Math.round(SUBSTITUTIONS[k].cost * 100)}% CK)</span>`).join(' · ')}</div>
+    </div>
+  </div>
+  <div class="dex-cols">
+    <div class="card"><h2>Jutsu catalogue <span class="muted" style="text-transform:none;letter-spacing:0;font-weight:400">· pick 4</span></h2><div class="dex-jlist">${s.catalogue.map(jutsuRow).join('')}</div></div>
+    <div class="card support-panel"><h2>Support passive — ${esc(a.name)}</h2>
+      <div class="small muted" style="margin-bottom:8px">As the support, ${esc(s.name.split(' (')[0])} never fights. The passive grows as the cell falls.</div>
+      ${[1, 2, 3].map((n) => `<div class="stage-row"><span class="stg">${'★'.repeat(n)}</span><span class="muted small">${4 - n} standing</span><span>${esc(E.auraDesc(a, n))}</span></div>`).join('')}
+    </div>
+  </div>`;
+}
 
 function rulesHtml() {
   return `<div class="card rules">
@@ -254,7 +360,7 @@ function memberEditor(m, slot) {
   const max = { hp: 130, tai: 130, nin: 130, def: 130, spd: 130, chk: 150 };
   const sc = (v) => (v >= 110 ? '#3ddc84' : v >= 85 ? '#ffcc4d' : v >= 60 ? '#ff9a3c' : '#ff5c5c');
   return `<div>
-    <div class="row">${badge(s)}<div><h3 style="margin:0">${esc(s.name)}</h3><div class="chips" style="margin-top:3px">${natChip(s.natures.primary)}${natChip(s.natures.secondary)}${s.roles.map((r) => `<span class="chip">${r}</span>`).join('')}</div></div><span class="grow"></span><button class="small ghost" data-act="removeMember">Remove</button></div>
+    <div class="row">${badge(s)}<div><h3 style="margin:0">${esc(s.name)}</h3><div class="chips" style="margin-top:3px">${natChip(s.natures.primary)}${natChip(s.natures.secondary)}${s.roles.map((r) => `<span class="chip">${r}</span>`).join('')}</div></div><span class="grow"></span><button class="small ghost" data-act="dexOf" data-arg="${s.id}">📜 Dex</button><button class="small ghost" data-act="removeMember">Remove</button></div>
     <div class="statgrid">${Object.entries(s.stats).map(([k, v]) => `<span class="muted">${k.toUpperCase()}</span><div class="statbar"><i style="width:${pct(v, max[k])}%;background:${sc(v)}"></i></div><span class="mono">${v}</span>`).join('')}</div>
     <div class="small"><b>${esc(s.trait.name)}:</b> ${esc(s.trait.desc)}</div>
     ${s.transformation ? `<div class="small" style="margin-top:4px"><b>${esc(s.transformation.name)}</b> (${s.transformation.resolve} Resolve): ${esc(s.transformation.desc)}</div>` : '<div class="small muted" style="margin-top:4px">No transformation.</div>'}
@@ -877,6 +983,13 @@ const ACTIONS = {
   startCpu() { S.mode = 'cpu'; S.names = ['Player 1', 'CPU']; S.specs = [null, randomTeam()]; newBuilder(0); render(); },
   toggleRules() { S.showRules = !S.showRules; render(); },
   toTitle() { S.screen = 'title'; render(); },
+  openDex() { S.dex.from = S.screen === 'dex' ? S.dex.from : S.screen; S.screen = 'dex'; render(); window.scrollTo(0, 0); },
+  closeDex() { S.screen = S.dex.from && S.dex.from !== 'dex' && S.dex.from !== 'battle' ? S.dex.from : 'title'; render(); },
+  dexSel(id) { S.dex.id = id; S.dex.tf = false; render(); if (window.innerWidth < 900) document.querySelector('.dex-main')?.scrollIntoView({ behavior: 'smooth' }); },
+  dexOf(id) { S.dex.id = id; S.dex.tf = false; S.dex.era = 'all'; S.dex.query = ''; ACTIONS.openDex(); },
+  dexEra(e) { S.dex.era = e; render(); },
+  dexTf(v) { S.dex.tf = v === '1'; render(); },
+  dexSort(v) { S.dex.sort = v; render(); },
   rename(v) { S.names[S.builder.side] = v.trim() || `Player ${S.builder.side + 1}`; },
   era(e) { S.builder.era = e; render(); },
   pick(id) {
