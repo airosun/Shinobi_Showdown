@@ -1,16 +1,19 @@
 // Shinobi Showdown — local hot-seat / vs CPU client.
 import { SHINOBI, SHINOBI_BY_ID, SUBSTITUTIONS, COST_CAP } from './data/shinobi.js';
-import { NATURE_LABELS, KEKKEI_GENKAI } from './engine/natures.js';
+import { NATURE_LABELS } from './engine/natures.js';
 import * as E from './engine/battle.js';
 import { chooseActions } from './engine/ai.js';
 import { randomTeam } from './engine/teams.js';
+import * as FX from './fx.js';
 
 const app = document.getElementById('app');
 const tip = document.getElementById('tooltip');
+const topinfo = document.getElementById('topinfo');
 
 const S = {
-  screen: 'title',
-  mode: null,              // 'hotseat' | 'cpu'
+  screen: 'title',          // title | builder | pass | battle
+  phase: null,              // select | play | over
+  mode: null,               // hotseat | cpu
   names: ['Player 1', 'Player 2'],
   specs: [null, null],
   builder: null,
@@ -18,74 +21,104 @@ const S = {
   choices: [{}, {}],
   order: [0, 1],
   step: 0,
-  side: 0,                 // side currently choosing
-  actor: null,             // uid being configured
-  pending: null,           // action waiting for a target
+  side: 0,                  // side choosing orders
+  actor: null,
+  pending: null,
   preview: null,
-  lastLog: [],
+  view: null,               // snapshot shown during playback
+  logShown: 0,
+  speed: 1,                 // 1 normal, 0.5 fast
+  skip: false,
   showRules: false,
-  passTo: null,
-  passNext: null,
+  sprites: {},
+  msg: null,
 };
+
+fetch('sprites/manifest.json').then((r) => r.json()).then((m) => { S.sprites = m.sprites || {}; }).catch(() => {});
 
 // ---------------------------------------------------------------- helpers
 const esc = (s) => String(s ?? '').replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
-const natureChip = (n) => (n ? `<span class="chip ${KEKKEI_GENKAI[n] ? 'kg' : n}">${NATURE_LABELS[n] || n}</span>` : '');
 const pct = (a, b) => Math.max(0, Math.min(100, (100 * a) / Math.max(1, b)));
 const priLabel = (p) => (p >= 4 ? 'Stance' : p > 0 ? `+${p}` : `${p}`);
 const TARGET_LABEL = { enemy: '1 enemy', allEnemies: 'All enemies', self: 'Self', ally: '1 ally', allAllies: 'All allies' };
+const STATUS_LABEL = { burn: 'BRN', paralyze: 'PAR', bind: 'BND', genjutsu: 'GEN', exhausted: 'EXH' };
+const STATUS_NAME = { burn: 'Burned', paralyze: 'Paralyzed', bind: 'Bound', genjutsu: 'Genjutsu', exhausted: 'Exhausted' };
+const STATUS_COLOR = { burn: '#e4572e', paralyze: '#e0c020', bind: '#8a6cc4', genjutsu: '#c77dff' };
+const hpColor = (p) => (p > 50 ? '#3ddc84' : p > 20 ? '#ffcc4d' : '#ff5c5c');
+const natColor = (n) => (n ? FX.NATURE_COLOR[n] || '#8c93a8' : '#c94a3a');
+const natChip = (n) => (n ? `<span class="nat" style="--c:${natColor(n)}">${NATURE_LABELS[n] || n}</span>` : '');
+const sideName = (side) => esc(S.names[side]);
 
-function jutsuTip(j) {
+function initials(name) {
+  const base = name.replace(/\s*\(.*\)/, '').split(/\s+/);
+  return (base[0][0] + (base[1] ? base[1][0] : base[0][1] || '')).toUpperCase();
+}
+function formTag(name) { const m = name.match(/\((.*)\)/); return m ? m[1] : ''; }
+function badge(def, cls = '') {
+  const c1 = natColor(def.natures.primary);
+  const c2 = def.natures.secondary ? natColor(def.natures.secondary) : '#3a2a2a';
+  return `<div class="badge ${cls}" style="--c1:${c1};--c2:${c2}">${initials(def.name)}</div>`;
+}
+function sprite(def, back) {
+  const s = S.sprites[def.id];
+  const file = s && (back ? s.back || s.front : s.front);
+  if (file) return `<img src="sprites/${esc(file)}" alt="${esc(def.name)}" ${back && !s.back ? 'style="transform:scaleX(-1)"' : ''}>`;
+  return badge(def);
+}
+
+function jutsuTip(j, cost) {
   if (!j) return '';
-  const bits = [j.category, j.power ? `Power ${j.power}` : null, `Cost ${j.cost}`, `Priority ${priLabel(j.priority)}`, TARGET_LABEL[j.target], j.charged ? 'Charged (2 turns)' : null].filter(Boolean);
-  return `<b>${esc(j.name)}</b><br>${esc(bits.join(' · '))}<br>${esc(j.desc || '')}`;
+  const bits = [j.category, j.power ? `Power ${j.power}` : null, `Chakra ${cost ?? j.cost}`, `Priority ${priLabel(j.priority)}`, TARGET_LABEL[j.target], j.charged ? 'Charged (2 turns)' : null].filter(Boolean);
+  return `<b>${esc(j.name)}</b> ${natChip(j.nature)}<div class="tip-s">${esc(bits.join(' · '))}</div>${esc(j.desc || '')}`;
 }
-
-function render() {
-  const fn = SCREENS[S.screen];
-  app.innerHTML = fn();
-  hideTip();
-}
+const tipAttr = (html) => `data-tip="${esc(html)}"`;
 
 // tooltips
 document.addEventListener('mouseover', (e) => {
   const el = e.target.closest('[data-tip]');
-  if (!el) return hideTip();
+  if (!el) { tip.classList.add('hidden'); return; }
   tip.innerHTML = el.dataset.tip;
   tip.classList.remove('hidden');
 });
 document.addEventListener('mousemove', (e) => {
   if (tip.classList.contains('hidden')) return;
-  const x = Math.min(window.innerWidth - tip.offsetWidth - 12, e.clientX + 14);
-  const y = Math.min(window.innerHeight - tip.offsetHeight - 12, e.clientY + 14);
-  tip.style.left = `${x}px`; tip.style.top = `${y}px`;
+  tip.style.left = `${Math.min(window.innerWidth - tip.offsetWidth - 12, e.clientX + 14)}px`;
+  tip.style.top = `${Math.min(window.innerHeight - tip.offsetHeight - 12, e.clientY + 14)}px`;
 });
-function hideTip() { tip.classList.add('hidden'); }
-const tipAttr = (html) => `data-tip="${esc(html)}"`;
 
-// click dispatcher: data-act="name" data-arg="..."
-app.addEventListener('click', (e) => {
+// click dispatcher
+document.addEventListener('click', (e) => {
   const el = e.target.closest('[data-act]');
   if (!el || el.disabled) return;
-  const fn = ACTIONS[el.dataset.act];
-  if (fn) fn(el.dataset.arg, el, e);
+  ACTIONS[el.dataset.act]?.(el.dataset.arg, el, e);
 });
 app.addEventListener('change', (e) => {
   const el = e.target.closest('[data-change]');
   if (el) ACTIONS[el.dataset.change]?.(el.value, el, e);
 });
+document.getElementById('menuBtn').addEventListener('click', () => {
+  if (S.screen === 'battle' && S.phase !== 'over' && !confirm('Leave this battle?')) return;
+  S.skip = true; S.screen = 'title'; render();
+});
+
+function render() {
+  tip.classList.add('hidden');
+  topinfo.textContent = S.screen === 'battle' && S.battle ? `${S.mode === 'cpu' ? 'Vs CPU' : 'Hot-seat'} · Turn ${Math.min((S.view || S.battle).turn, S.battle.maxTurns)} / ${S.battle.maxTurns}` : '';
+  app.innerHTML = SCREENS[S.screen]();
+  if (S.screen === 'battle') { const lg = document.getElementById('blog'); if (lg) lg.scrollTop = lg.scrollHeight; }
+}
 
 // ---------------------------------------------------------------- screens
 const SCREENS = {
   title() {
     return `<div class="title-screen">
-      <div class="logo">SHINOBI SHOWDOWN</div>
-      <div class="tagline">Build a three-man cell plus a support. Win by wiping out the enemy cell or by stealing 100 Intel.</div>
+      <div class="logo"><span class="b1">SHINOBI</span><br><span class="b2">SHOWDOWN</span></div>
+      <div class="tagline">Build a three-man cell plus a support. Wipe out the enemy cell — or steal 100 Intel.</div>
       <div class="row">
-        <button class="btn primary big" data-act="startHotseat">Hot-Seat Battle</button>
-        <button class="btn big" data-act="startCpu">Vs CPU (quick test)</button>
+        <button class="primary big" data-act="startHotseat">Hot-Seat Battle</button>
+        <button class="big" data-act="startCpu">Vs CPU</button>
       </div>
-      <div class="row" style="margin-top:14px"><button class="btn ghost" data-act="toggleRules">${S.showRules ? 'Hide' : 'How to play'}</button></div>
+      <div class="row" style="margin-top:14px"><button class="ghost" data-act="toggleRules">${S.showRules ? 'Hide rules' : 'How to play'}</button></div>
       ${S.showRules ? rulesHtml() : ''}
     </div>`;
   },
@@ -99,44 +132,46 @@ const SCREENS = {
     const selBase = selMember && SHINOBI_BY_ID[selMember.id].baseId;
     const roster = SHINOBI.filter((s) => b.era === 'all' || s.era === b.era);
     return `<div class="row" style="margin-bottom:12px">
-        <h2 style="margin:0">${esc(S.names[b.side])} — build your team</h2>
-        <span class="spacer"></span>
+        <h3 style="margin:0;font-size:20px">${sideName(b.side)} — build your team</h3>
+        <span class="grow"></span>
         <label class="small muted">Name <input type="text" value="${esc(S.names[b.side])}" data-change="rename" maxlength="18"></label>
-        <button class="btn" data-act="backToTitle">Menu</button>
       </div>
       <div class="builder">
         <div>
-          <div class="row" style="margin-bottom:8px">
-            ${['all', 'Part 1', 'Shippuden'].map((e) => `<button class="tab ${b.era === e ? 'on' : ''}" data-act="era" data-arg="${e}">${e === 'all' ? 'All eras' : e}</button>`).join('')}
+          <div class="tabs" style="margin-bottom:10px">
+            ${['all', 'Part 1', 'Shippuden'].map((e) => `<button class="tab ${b.era === e ? 'active' : ''}" data-act="era" data-arg="${e}">${e === 'all' ? 'All eras' : e}</button>`).join('')}
           </div>
           <div class="roster">
             ${roster.map((s) => {
               const isTaken = taken.has(s.baseId) && s.baseId !== selBase;
-              return `<button class="rcard ${isTaken ? 'taken' : ''}" data-act="pick" data-arg="${s.id}" ${isTaken ? 'disabled' : ''}
-                  ${tipAttr(`<b>${s.name}</b> (${s.era})<br>Trait — ${s.trait.name}: ${s.trait.desc}${s.transformation ? `<br>Transformation — ${s.transformation.name}` : ''}<br>Support — ${s.supportAura.name}: ${s.supportAura.desc}`)}>
-                <div class="row" style="gap:6px"><span class="name">${esc(s.name)}</span><span class="spacer"></span><span class="chip cost">${s.cost}</span></div>
-                <div class="chips">${natureChip(s.natures.primary)}${natureChip(s.natures.secondary)}${!s.natures.primary ? '<span class="chip">Taijutsu</span>' : ''}<span class="chip">${s.era}</span></div>
-                <div class="small muted">${s.roles.join(' · ')}</div>
+              return `<button class="rcard" data-act="pick" data-arg="${s.id}" ${isTaken ? 'disabled' : ''}
+                  ${tipAttr(`<b>${esc(s.name)}</b> (${s.era})<div class="tip-s">${s.roles.join(' · ')}</div><b>${esc(s.trait.name)}:</b> ${esc(s.trait.desc)}${s.transformation ? `<br><b>${esc(s.transformation.name)}</b> (${s.transformation.resolve} Resolve)` : ''}<br><b>Support — ${esc(s.supportAura.name)}:</b> ${esc(s.supportAura.desc)}`)}>
+                ${badge(s)}
+                <div class="meta">
+                  <div class="row" style="gap:6px"><span class="nm">${esc(s.name)}</span></div>
+                  <div class="chips">${natChip(s.natures.primary)}${natChip(s.natures.secondary)}${!s.natures.primary ? '<span class="nat" style="--c:#c94a3a">Taijutsu</span>' : ''}<span class="chip">${s.era}</span><span class="chip cost">${s.cost}</span></div>
+                  <div class="small muted">${s.roles.join(' · ')}</div>
+                </div>
               </button>`;
             }).join('')}
           </div>
         </div>
-        <div class="panel">
+        <div class="card">
           <div class="slots">
             ${members.map((m, i) => `<button class="slot ${i === 3 ? 'support' : ''} ${b.sel === i ? 'sel' : ''}" data-act="selSlot" data-arg="${i}">
               <div class="lbl">${i === 3 ? 'Support' : `Active ${i + 1}`}</div>
-              ${m ? `<div style="font-weight:600;font-size:.85rem">${esc(SHINOBI_BY_ID[m.id].name)}</div><span class="chip cost">${SHINOBI_BY_ID[m.id].cost}</span>` : '<div class="muted small">empty</div>'}
+              ${m ? `${badge(SHINOBI_BY_ID[m.id], 'sm')}<div class="nm">${esc(SHINOBI_BY_ID[m.id].name)}</div>` : '<div class="muted small">empty</div>'}
             </button>`).join('')}
           </div>
-          <div class="row small"><span>Team cost</span><span class="spacer"></span><b>${cost} / ${COST_CAP}</b></div>
-          <div class="costbar ${cost > COST_CAP ? 'over' : ''}"><div style="width:${pct(cost, COST_CAP)}%"></div></div>
-          ${selMember ? memberEditor(selMember, b.sel) : `<div class="muted small">Select a shinobi from the roster for ${b.sel === 3 ? 'the support slot' : `active slot ${b.sel + 1}`}.</div>`}
+          <div class="row small"><span>Team cost</span><span class="grow"></span><b>${cost} / ${COST_CAP}</b></div>
+          <div class="costbar ${cost > COST_CAP ? 'over' : ''}"><i style="width:${pct(cost, COST_CAP)}%"></i></div>
+          ${selMember ? memberEditor(selMember, b.sel) : `<div class="muted small">Pick a shinobi from the roster for ${b.sel === 3 ? 'the support slot' : `active slot ${b.sel + 1}`}.</div>`}
           ${b.errors.length ? `<div class="errors">${b.errors.map(esc).join('<br>')}</div>` : ''}
           <div class="row" style="margin-top:12px">
-            <button class="btn" data-act="randomTeam">Random team</button>
-            <button class="btn ghost" data-act="clearTeam">Clear</button>
-            <span class="spacer"></span>
-            <button class="btn primary" data-act="ready">Ready</button>
+            <button data-act="randomTeam">Random team</button>
+            <button class="ghost" data-act="clearTeam">Clear</button>
+            <span class="grow"></span>
+            <button class="primary" data-act="ready">Ready</button>
           </div>
         </div>
       </div>`;
@@ -145,83 +180,39 @@ const SCREENS = {
   pass() {
     return `<div class="pass">
       <div class="muted">Hot-seat — hide the screen from your opponent</div>
-      <h1>Pass to ${esc(S.names[S.passTo])}</h1>
+      <h1>Pass to ${sideName(S.passTo)}</h1>
       <p class="muted">${esc(S.passNote || '')}</p>
-      <button class="btn primary big" data-act="passContinue">I'm ${esc(S.names[S.passTo])} — continue</button>
+      <button class="primary big" data-act="passContinue">I'm ${sideName(S.passTo)} — continue</button>
     </div>`;
   },
 
-  select() {
-    const st = S.battle;
-    const side = S.side;
-    const mine = E.onField(st, side);
-    const actor = st.units[S.actor];
-    const allChosen = mine.every((u) => S.choices[side][u.uid]);
-    const targetSide = S.pending ? (['ally'].includes(E.getJutsu(S.pending.jutsuId)?.target) ? side : 1 - side) : null;
-    return `${topbar(st)}
-      ${S.preview ? `<div class="banner">🕵️ <b>Intel advantage:</b> ${esc(S.preview)}</div>` : ''}
-      ${S.pending ? `<div class="banner warn">Choose a target for <b>${esc(E.getJutsu(S.pending.jutsuId).name)}</b> <button class="btn ghost small" data-act="cancelTarget">Cancel</button></div>` : ''}
-      ${fieldHtml(st, 1 - side, side, { targetable: targetSide === 1 - side })}
-      ${fieldHtml(st, side, side, { targetable: targetSide === side, acting: S.actor })}
-      <div class="actionpanel">
-        <div class="panel">
-          <div class="tabs">
-            ${mine.map((u) => `<button class="tab ${u.uid === S.actor ? 'on' : ''} ${S.choices[side][u.uid] ? 'done' : ''}" data-act="selActor" data-arg="${u.uid}">${esc(u.name)}</button>`).join('')}
-          </div>
-          ${actor ? actionButtons(st, actor) : ''}
-        </div>
-        <div class="panel">
-          <h3>${esc(S.names[side])}'s orders</h3>
-          <ul class="summary">${mine.map((u) => `<li><b>${esc(u.name)}:</b> ${S.choices[side][u.uid] ? esc(actionText(st, S.choices[side][u.uid])) : '<span class="muted">—</span>'}</li>`).join('')}</ul>
-          <button class="btn primary" style="width:100%" data-act="confirm" ${allChosen ? '' : 'disabled'}>Confirm orders</button>
-          ${S.lastLog.length ? `<h3 style="margin-top:14px">Last turn</h3><div class="log">${logHtml(S.lastLog)}</div>` : ''}
-        </div>
-      </div>`;
-  },
-
-  results() {
-    const st = S.battle;
-    const viewer = S.mode === 'cpu' ? 0 : null;
-    return `${topbar(st)}
-      ${fieldHtml(st, 1, viewer)}
-      ${fieldHtml(st, 0, viewer)}
-      <div class="panel"><div class="row"><h3 style="margin:0">Turn ${st.turn - 1} results</h3><span class="spacer"></span>
-        <button class="btn primary" data-act="nextTurn">Next turn →</button></div>
-        <div class="log" style="max-height:none">${logHtml(S.lastLog)}</div></div>`;
-  },
-
-  over() {
-    const st = S.battle;
-    const w = st.winner;
-    return `<div class="winner">
-        <h1>${w === 'draw' ? 'Draw!' : `${esc(st.teams[w].name)} wins!`}</h1>
-        <div class="muted">${esc(st.winReason || '')} · Mission Score ${E.missionScore(st, 0)} – ${E.missionScore(st, 1)}</div>
-        <div class="row" style="justify-content:center;margin-top:14px">
-          <button class="btn primary" data-act="rematch">Rematch (same teams)</button>
-          <button class="btn" data-act="newTeams">New teams</button>
-          <button class="btn ghost" data-act="backToTitle">Menu</button>
-        </div>
+  battle() {
+    return `<div class="battle">
+      <div>
+        <div class="arena" id="arena">${arenaInner()}</div>
+        <div class="controls" id="controls">${controlsHtml()}</div>
       </div>
-      ${topbar(st)}
-      ${fieldHtml(st, 1, 'all')}
-      ${fieldHtml(st, 0, 'all')}
-      <div class="panel"><h3>Full battle log</h3><div class="log" style="max-height:520px">${logHtml(st.log)}</div></div>`;
+      <aside>
+        <div class="card mission" id="mission">${missionHtml()}</div>
+        <div class="log" id="blog">${logHtml(S.battle.log.slice(0, S.logShown))}</div>
+      </aside>
+    </div>`;
   },
 };
 
 function rulesHtml() {
-  return `<div class="panel rules">
+  return `<div class="card rules">
     <h3>How to play</h3>
     <ul>
       <li><b>Team:</b> 3 active shinobi + 1 support, ${COST_CAP} cost points max, one version of each character. Each shinobi brings 4 jutsu.</li>
-      <li><b>Turns:</b> both players pick orders in secret, then everything resolves by priority (Stance → +3 … −2), then SPD.</li>
+      <li><b>Turns:</b> both players pick orders in secret, then actions play out one by one — Stances first, then by priority (+3 … −2), then by SPD.</li>
       <li><b>Natures:</b> Fire › Wind › Lightning › Earth › Water › Fire (×1.5 / ×0.75). Jutsu matching your primary nature get ×1.25, secondary ×1.1. Kekkei genkai count as both parent natures.</li>
       <li><b>Jutsu Clash:</b> two ninjutsu aimed at each other collide — the stronger nature breaks through at 70% power.</li>
       <li><b>Collaboration:</b> Wind then Fire (or Water then Lightning) on the same target in one turn = ×1.3.</li>
       <li><b>Substitution:</b> a Stance that negates the first single-target hit. Repeating it lowers the odds (100/50/25%). Area attacks are only halved; Sharingan sees through logs; genjutsu ignores it.</li>
-      <li><b>Intel:</b> Gather Intel, land genjutsu, reveal enemy jutsu and score KOs to earn it. New Intel is <i>unsecured</i> until the carrier survives the end of the next turn — KO the spy and it's lost. Guard halves enemy Intel gains (sensors quarter it).</li>
+      <li><b>Intel:</b> Gather Intel, land genjutsu, reveal enemy jutsu and score KOs. New Intel is <i>unsecured</i> until the carrier survives the end of the next turn — KO the spy and it's lost. Guard halves enemy Intel gains (sensors quarter it).</li>
       <li><b>Milestones:</b> 25 Intel reveals an enemy loadout, 50 exposes their support and Chakra, 75 lets you see one enemy order before choosing.</li>
-      <li><b>Win:</b> KO all 4 enemies, <i>or</i> secure 100 Intel. After turn 20, highest Mission Score (25 per KO + Intel) wins.</li>
+      <li><b>Win:</b> KO all 4 enemies, <i>or</i> secure 100 Intel. After turn 20, the highest Mission Score (25 per KO + Intel) wins.</li>
       <li><b>Resolve</b> builds as you take hits or lose allies and powers transformations. The support waits off-field granting an aura, can Swap in once, and auto-enters when an ally falls.</li>
     </ul>
   </div>`;
@@ -230,139 +221,330 @@ function rulesHtml() {
 function memberEditor(m, slot) {
   const s = SHINOBI_BY_ID[m.id];
   const max = { hp: 130, tai: 130, nin: 130, def: 130, spd: 130, chk: 150 };
+  const sc = (v) => (v >= 110 ? '#3ddc84' : v >= 85 ? '#ffcc4d' : v >= 60 ? '#ff9a3c' : '#ff5c5c');
   return `<div>
-    <div class="row"><h3 style="margin:0">${esc(s.name)}</h3><span class="chip">${s.era}</span><span class="spacer"></span><button class="btn ghost small" data-act="removeMember">Remove</button></div>
-    <div class="chips">${natureChip(s.natures.primary)}${natureChip(s.natures.secondary)}${s.roles.map((r) => `<span class="chip">${r}</span>`).join('')}</div>
-    <div class="statgrid">${Object.entries(s.stats).map(([k, v]) => `<span class="muted">${k.toUpperCase()}</span><div class="statbar"><div style="width:${pct(v, max[k])}%"></div></div><span>${v}</span>`).join('')}</div>
+    <div class="row">${badge(s)}<div><h3 style="margin:0">${esc(s.name)}</h3><div class="chips" style="margin-top:3px">${natChip(s.natures.primary)}${natChip(s.natures.secondary)}${s.roles.map((r) => `<span class="chip">${r}</span>`).join('')}</div></div><span class="grow"></span><button class="small ghost" data-act="removeMember">Remove</button></div>
+    <div class="statgrid">${Object.entries(s.stats).map(([k, v]) => `<span class="muted">${k.toUpperCase()}</span><div class="statbar"><i style="width:${pct(v, max[k])}%;background:${sc(v)}"></i></div><span class="mono">${v}</span>`).join('')}</div>
     <div class="small"><b>${esc(s.trait.name)}:</b> ${esc(s.trait.desc)}</div>
     ${s.transformation ? `<div class="small" style="margin-top:4px"><b>${esc(s.transformation.name)}</b> (${s.transformation.resolve} Resolve): ${esc(s.transformation.desc)}</div>` : '<div class="small muted" style="margin-top:4px">No transformation.</div>'}
-    <div class="small" style="margin-top:4px;${slot === 3 ? '' : 'opacity:.6'}"><b>Support aura — ${esc(s.supportAura.name)}:</b> ${esc(s.supportAura.desc)}</div>
-    <h3 style="margin-top:10px">Jutsu (${m.loadout.length}/4)</h3>
+    <div class="small" style="margin-top:4px;${slot === 3 ? '' : 'opacity:.55'}"><b>Support aura — ${esc(s.supportAura.name)}:</b> ${esc(s.supportAura.desc)}</div>
+    <h2 style="margin-top:12px">Jutsu (${m.loadout.length}/4)</h2>
     <div class="jlist">${s.catalogue.map((id) => {
       const j = E.getJutsu(id);
       const on = m.loadout.includes(id);
-      return `<div class="jopt ${on ? 'on' : ''}" data-act="toggleJutsu" data-arg="${id}" ${tipAttr(jutsuTip(j))}>
-        <input type="checkbox" ${on ? 'checked' : ''} tabindex="-1" style="pointer-events:none">
-        <div><div>${esc(j.name)} ${natureChip(j.nature)}</div>
-        <div class="jmeta">${j.category}${j.power ? ` · ${j.power} pow` : ''} · ${j.cost} ck · ${priLabel(j.priority)} · ${TARGET_LABEL[j.target]}${j.charged ? ' · charged' : ''}${j.requiresTransform ? ' · needs transformation' : ''}</div></div>
-      </div>`;
+      return `<button class="jopt ${on ? 'on' : ''}" style="--c:${FX.jutsuColor(j)}" data-act="toggleJutsu" data-arg="${id}" ${tipAttr(jutsuTip(j))}>
+        <span class="box">${on ? '✓' : ''}</span>
+        <div><div>${esc(j.name)} ${natChip(j.nature)}</div>
+        <div class="jm">${j.category}${j.power ? ` · POW ${j.power}` : ''} · CK ${j.cost} · ${priLabel(j.priority)} · ${TARGET_LABEL[j.target]}${j.charged ? ' · charged' : ''}${j.requiresTransform ? ' · transformed only' : ''}</div></div>
+      </button>`;
     }).join('')}</div>
-    <h3 style="margin-top:10px">Substitution</h3>
-    <div class="jlist">${s.substitutions.map((k) => `<div class="jopt ${m.substitution === k ? 'on' : ''}" data-act="setSub" data-arg="${k}">
-      <input type="radio" ${m.substitution === k ? 'checked' : ''} tabindex="-1" style="pointer-events:none">
-      <div><div>${SUBSTITUTIONS[k].name}</div><div class="jmeta">${Math.round(SUBSTITUTIONS[k].cost * 100)}% max Chakra · ${SUBSTITUTIONS[k].desc}</div></div></div>`).join('')}</div>
+    <h2 style="margin-top:12px">Substitution</h2>
+    <div class="jlist">${s.substitutions.map((k) => `<button class="jopt ${m.substitution === k ? 'on' : ''}" style="--c:#c9d0dd" data-act="setSub" data-arg="${k}">
+      <span class="box">${m.substitution === k ? '✓' : ''}</span>
+      <div><div>${SUBSTITUTIONS[k].name}</div><div class="jm">${Math.round(SUBSTITUTIONS[k].cost * 100)}% max Chakra · ${esc(SUBSTITUTIONS[k].desc)}</div></div></button>`).join('')}</div>
   </div>`;
 }
 
-function topbar(st) {
+// ---------------------------------------------------------------- battlefield
+const vsNow = () => S.view || S.battle;
+function bottomSide() { return S.phase === 'select' ? S.side : 0; }
+function viewer() {
+  if (S.phase === 'over') return 'all';
+  if (S.phase === 'select') return S.side;
+  return S.mode === 'cpu' ? 0 : null; // hot-seat playback is watched by both players
+}
+
+function arenaInner() {
+  const vs = vsNow();
+  const me = bottomSide();
+  const sel = selectionTargets();
+  return `<div class="plat foe"></div><div class="plat you"></div>
+    ${sideMons(vs, 1 - me, true, sel)}${sideMons(vs, me, false, sel)}
+    ${sideHud(vs, 1 - me, true, sel)}${sideHud(vs, me, false, sel)}`;
+}
+
+function selectionTargets() {
+  if (S.phase !== 'select' || !S.pending) return null;
+  const j = E.getJutsu(S.pending.jutsuId);
+  return { side: j.target === 'ally' ? S.side : 1 - S.side };
+}
+
+function sideMons(vs, side, isFoe, sel) {
+  const team = vs.teams[side];
+  return team.slots.map((uid, pos) => {
+    if (!uid) return '';
+    const u = vs.units[uid];
+    const d = SHINOBI_BY_ID[u.id];
+    const pickable = sel && sel.side === side && !u.ko;
+    const acting = S.phase === 'select' && S.actor === uid;
+    const cls = [isFoe ? 'foe' : 'you', `p${pos}`, u.ko ? 'down' : '', u.transform ? 'transformed' : '', u.weaving ? 'weaving' : '', pickable ? 'pickable' : '', acting ? 'acting' : ''].join(' ');
+    const ghost = u.decoy > 0 && !u.ko ? `<div class="ghost">${badge(d)}</div>` : '';
+    const form = formTag(d.name);
+    return `<div class="mon ${cls}" id="mon-${uid}" ${pickable ? `data-act="target" data-arg="${pos}"` : `data-tip="${esc(unitTip(vs, u))}"`}>
+      <div class="spr">${ghost}${sprite(d, !isFoe)}</div>
+      <div class="tag">${esc(d.name.replace(/\s*\(.*\)/, '').split(' ')[0])}${form ? ` · ${esc(form)}` : ''}</div>
+      ${pickable ? '<span class="pick-hint">Target</span>' : ''}
+    </div>`;
+  }).join('');
+}
+
+function unitTip(vs, u) {
+  const d = SHINOBI_BY_ID[u.id];
+  const v = viewer();
+  const own = v === 'all' || v === u.side;
+  const known = own ? u.loadout : vs.teams[u.side].revealed[u.uid];
+  const hidden = own ? 0 : u.loadout.filter((j) => !known.includes(j)).length;
+  const list = [...known, ...(u.copied ? [u.copied] : [])].map((j) => esc(E.getJutsu(j).name) + (j === u.copied ? ' (copied)' : '')).join(', ');
+  return `<b>${esc(d.name)}</b> ${natChip(d.natures.primary)}${natChip(d.natures.secondary)}<div class="tip-s">${d.roles.join(' · ')} · ${d.era}</div>
+    <b>${esc(d.trait.name)}:</b> ${esc(d.trait.desc)}<br>
+    ${d.transformation ? `<b>${esc(d.transformation.name)}</b> (${d.transformation.resolve} Resolve${u.transformUsed ? ', used' : ''})<br>` : ''}
+    <b>Jutsu:</b> ${list || '—'}${hidden ? ` <i>+${hidden} hidden</i>` : ''}`;
+}
+
+function sideHud(vs, side, isFoe, sel) {
+  const team = vs.teams[side];
+  const pips = team.uids.map((uid) => {
+    const u = vs.units[uid];
+    return `<span class="pip ${u.ko ? 'fainted' : uid === team.reserve ? 'reserve' : ''}" title="${esc(u.name)}"></span>`;
+  }).join('');
+  const res = team.reserve ? vs.units[team.reserve] : null;
+  const aura = res && !res.ko && team.reserve === team.supportUid ? SHINOBI_BY_ID[res.id].supportAura : null;
+  const resChip = res ? `<span class="chip" ${tipAttr(`<b>${esc(res.name)}</b> waits in reserve${aura ? `<br><b>${esc(aura.name)}:</b> ${esc(aura.desc)}` : ''}<br>HP ${res.hp}/${res.maxHp}`)}>Reserve: ${esc(res.name.split(' ')[0])}</span>` : '';
+  const cards = team.slots.map((uid, pos) => (uid ? hpCard(vs, vs.units[uid], sel && sel.side === side, pos) : '<div class="hpcard empty">—</div>')).join('');
+  return `<div class="hud ${isFoe ? 'foe' : 'you'}">
+    <div class="sidelabel"><span class="who s${side}">${sideName(side)}</span><span class="pips">${pips}</span>${resChip}</div>
+    ${cards}
+  </div>`;
+}
+
+function hpCard(vs, u, pickableSide, pos) {
+  const d = SHINOBI_BY_ID[u.id];
+  const pickable = pickableSide && !u.ko;
+  const acting = S.phase === 'select' && S.actor === u.uid;
+  return `<div class="hpcard ${u.ko ? 'down' : ''} ${pickable ? 'pickable' : ''} ${acting ? 'acting' : ''}" id="card-${u.uid}" ${pickable ? `data-act="target" data-arg="${pos}"` : `data-tip="${esc(unitTip(vs, u))}"`}>
+    <div class="nm"><span>${esc(d.name)}</span>${natChip(d.natures.primary)}<span class="grow"></span><span class="hptext"></span></div>
+    <div class="bars">
+      <div class="bar hp"><i></i></div>
+      <div class="bar thin ck"><i></i></div>
+      <div class="bar thin rs"><i></i></div>
+    </div>
+    <div class="hprow"><span class="sts"></span><span class="chips"></span></div>
+  </div>`;
+}
+
+function statusHtml(u) {
+  return Object.keys(u.statuses).map((k) => `<span class="st st-${k}" title="${STATUS_NAME[k]}">${STATUS_LABEL[k] || k}</span>`).join(' ');
+}
+
+function cardChips(vs, u) {
+  const d = SHINOBI_BY_ID[u.id];
+  const c = [];
+  if (u.transform) c.push(`<span class="chip up" ${tipAttr(esc(d.transformation.desc))}>${esc(d.transformation.name.split(' (')[0])} ${u.transform.turnsLeft}</span>`);
+  if (u.weaving) c.push(`<span class="chip">${u.weaving.kind === 'jutsu' ? 'Weaving' : 'Gathering'}</span>`);
+  if (u.decoy > 0) c.push('<span class="chip up">Decoy</span>');
+  for (const b of u.buffs) c.push(`<span class="chip ${b.mult >= 1 ? 'up' : 'down'}">${b.stat.toUpperCase()}${b.mult >= 1 ? '▲' : '▼'}</span>`);
+  if (u.subStreak) c.push(`<span class="chip" ${tipAttr('Substituted last turn — the next one is less reliable')}>Sub×${u.subStreak}</span>`);
+  const uns = E.unsecuredTotal(u);
+  if (uns) c.push(`<span class="chip intel" ${tipAttr('Unsecured Intel — secures if this shinobi survives the end of next turn')}>📜${uns}</span>`);
+  return c.join('');
+}
+
+/** Fill in / update the dynamic parts of every HP card and sprite from a snapshot. */
+function syncField() {
+  const vs = vsNow();
+  const v = viewer();
+  for (const u of Object.values(vs.units)) {
+    const card = document.getElementById(`card-${u.uid}`);
+    if (card) {
+      const own = v === 'all' || v === u.side;
+      const seeCk = own || vs.teams[u.side].seesChakra;
+      const hp = pct(u.hp, u.maxHp);
+      const hpI = card.querySelector('.bar.hp > i');
+      hpI.style.width = `${hp}%`; hpI.style.background = hpColor(hp);
+      const ck = card.querySelector('.bar.ck');
+      ck.classList.toggle('hidden-info', !seeCk);
+      ck.firstElementChild.style.width = seeCk ? `${pct(u.chakra, u.maxChakra)}%` : '100%';
+      card.querySelector('.bar.rs > i').style.width = `${u.resolve}%`;
+      const t = SHINOBI_BY_ID[u.id].transformation;
+      card.querySelector('.hptext').innerHTML = `${own ? `${u.hp}/${u.maxHp}` : `${Math.ceil(hp)}%`} <span style="color:#4fb3ff">${seeCk ? `CK ${u.chakra}` : 'CK ?'}</span> <span style="color:#ffc83d">RS ${u.resolve}${t && !u.transformUsed ? `/${t.resolve}` : ''}</span>`;
+      card.querySelector('.chips').innerHTML = cardChips(vs, u);
+      card.querySelector('.sts').innerHTML = statusHtml(u);
+      card.classList.toggle('down', u.ko);
+    }
+    const mon = document.getElementById(`mon-${u.uid}`);
+    if (mon) {
+      mon.classList.toggle('down', u.ko);
+      mon.classList.toggle('transformed', !!u.transform);
+      mon.classList.toggle('weaving', !!u.weaving);
+      const hasGhost = !!mon.querySelector('.ghost');
+      if (hasGhost !== (u.decoy > 0 && !u.ko)) {
+        const spr = mon.querySelector('.spr');
+        if (hasGhost) spr.querySelector('.ghost').remove();
+        else spr.insertAdjacentHTML('afterbegin', `<div class="ghost">${badge(SHINOBI_BY_ID[u.id])}</div>`);
+      }
+    }
+  }
+  const m = document.getElementById('mission');
+  if (m) m.innerHTML = missionHtml();
+  topinfo.textContent = `${S.mode === 'cpu' ? 'Vs CPU' : 'Hot-seat'} · Turn ${Math.min(vs.turn, S.battle.maxTurns)} / ${S.battle.maxTurns}`;
+}
+
+function fieldSignature(vs) {
+  return vs.teams.map((t) => `${t.slots.join(',')}|${t.reserve}`).join('/');
+}
+function redrawArena() {
+  const ar = document.getElementById('arena');
+  if (!ar) return;
+  [...ar.children].forEach((c) => { if (!c.classList.contains('fx')) c.remove(); });
+  ar.insertAdjacentHTML('afterbegin', arenaInner());
+  syncField();
+}
+
+function missionHtml() {
+  const vs = vsNow();
   const box = (side) => {
-    const t = st.teams[side];
-    const uns = t.uids.reduce((s, u) => s + (st.units[u].ko ? 0 : E.unsecuredTotal(st.units[u])), 0);
-    return `<div class="intelbox side${side}" ${side === 1 ? 'style="text-align:right"' : ''}>
-      <div><span class="name">${esc(t.name)}</span> <span class="muted small">· KOs ${t.kos} · Score ${E.missionScore(st, side)}</span></div>
+    const t = vs.teams[side];
+    const uns = t.uids.reduce((s, uid) => s + (vs.units[uid].ko ? 0 : E.unsecuredTotal(vs.units[uid])), 0);
+    return `<div class="team-intel">
+      <div class="hdr"><span class="nm s${side}">${sideName(side)}</span><span class="grow"></span><span class="small muted">KOs ${t.kos} · Score ${t.kos * E.BALANCE.koScore + t.securedIntel}</span></div>
       <div class="small">Intel <b>${t.securedIntel}</b>/100 ${uns ? `<span class="muted">(+${uns} unsecured)</span>` : ''}</div>
-      <div class="intelbar"><div class="sec" style="width:${pct(t.securedIntel, 100)}%"></div>
+      <div class="intelbar" ${tipAttr('Secured Intel (solid) and unsecured Intel being carried (striped). Milestones at 25 / 50 / 75; 100 wins.')}>
+        <div class="sec" style="width:${pct(t.securedIntel, 100)}%"></div>
         <div class="uns" style="left:${pct(t.securedIntel, 100)}%;width:${pct(uns, 100)}%"></div>
-        ${E.MILESTONES.map((m) => `<div class="mark" style="left:${m}%"></div>`).join('')}</div>
+        ${E.MILESTONES.map((m) => `<div class="mark ${t.securedIntel >= m ? 'hit' : ''}" style="left:${m}%"></div>`).join('')}
+      </div>
     </div>`;
   };
-  return `<div class="topbar panel">${box(0)}<div class="turnbox"><div class="muted small">TURN</div><div class="t">${Math.min(st.turn, st.maxTurns)} / ${st.maxTurns}</div></div>${box(1)}</div>`;
+  return `<div class="row"><h2 style="margin:0">Mission</h2><span class="grow"></span><span class="turn">Turn ${Math.min(vs.turn, S.battle.maxTurns)}<span class="muted" style="font-size:18px"> / ${S.battle.maxTurns}</span></span></div>
+    ${box(0)}${box(1)}`;
 }
 
-/** viewer: side number, null (public view) or 'all' (everything, for game over) */
-function fieldHtml(st, side, viewer, opts = {}) {
-  const team = st.teams[side];
-  const cards = team.slots.map((uid, i) => (uid
-    ? unitCard(st, uid, viewer, { targetable: opts.targetable && !st.units[uid].ko, slot: i, acting: opts.acting === uid })
-    : `<div class="ucard empty side${side}">—</div>`));
-  const res = team.reserve ? st.units[team.reserve] : null;
-  cards.push(res ? unitCard(st, res.uid, viewer, { reserve: true }) : `<div class="ucard empty side${side}">no reserve</div>`);
-  return `<div class="field">${cards.join('')}</div>`;
+function logHtml(entries) {
+  return entries.map((l) => `<div class="l ${l.kind} ${l.side === 0 ? 's0' : l.side === 1 ? 's1' : ''}">${esc(l.text)}</div>`).join('');
+}
+function appendLog(entry) {
+  const lg = document.getElementById('blog');
+  if (!lg) return;
+  lg.insertAdjacentHTML('beforeend', logHtml([entry]));
+  lg.scrollTop = lg.scrollHeight;
 }
 
-function unitCard(st, uid, viewer, { targetable, slot, acting, reserve } = {}) {
-  const u = st.units[uid];
-  const d = SHINOBI_BY_ID[u.id];
-  const team = st.teams[u.side];
-  const own = viewer === 'all' || viewer === u.side;
-  const seeChakra = own || team.seesChakra;
-  const hpP = pct(u.hp, u.maxHp);
-  const chips = [];
-  for (const [k, s] of Object.entries(u.statuses)) chips.push(`<span class="chip status">${k[0].toUpperCase() + k.slice(1)} ${s.turns}</span>`);
-  if (u.transform) chips.push(`<span class="chip good" ${tipAttr(esc(d.transformation.desc))}>${esc(d.transformation.name)} ${u.transform.turnsLeft}</span>`);
-  if (u.weaving) chips.push(`<span class="chip status">${u.weaving.kind === 'jutsu' ? `Weaving ${esc(E.getJutsu(u.weaving.jutsuId).name)}` : 'Gathering energy'}</span>`);
-  if (u.decoy > 0) chips.push('<span class="chip good">Decoy</span>');
-  for (const b of u.buffs) chips.push(`<span class="chip ${b.mult >= 1 ? 'good' : 'status'}">${b.stat.toUpperCase()}${b.mult >= 1 ? '↑' : '↓'}</span>`);
-  if (u.subStreak) chips.push(`<span class="chip" ${tipAttr('Substitution used last turn — next one is less reliable')}>Sub ×${u.subStreak}</span>`);
-  const uns = E.unsecuredTotal(u);
-  if (uns) chips.push(`<span class="chip intel" ${tipAttr('Unsecured Intel — secures if this shinobi survives the end of next turn')}>📜 ${uns}</span>`);
-  if (reserve && team.supportUid === uid && !u.ko) chips.push(`<span class="chip" ${tipAttr(esc(d.supportAura.desc))}>Aura: ${esc(d.supportAura.name)}</span>`);
+// ---------------------------------------------------------------- controls
+function controlsHtml() {
+  if (S.phase === 'play') {
+    const e = S.msg;
+    return `<div class="textbox ${e && e.side !== null && e.side !== undefined ? `s${e.side}` : ''}" id="textbox" data-act="advance">
+      <span id="tbtext">${esc(e ? e.text : '')}</span>
+      <div class="tools"><button class="small ${S.speed === 0.5 ? 'primary' : ''}" data-act="toggleSpeed">${S.speed === 0.5 ? 'Fast ✓' : 'Fast'}</button><button class="small" data-act="skipPlayback">Skip ⏭</button></div>
+      <span class="more">▼</span>
+    </div>`;
+  }
+  if (S.phase === 'over') {
+    const st = S.battle;
+    const w = st.winner;
+    return `<div class="endbanner"><span>${w === 'draw' ? 'Draw!' : `${sideName(w)} wins!`} <span class="muted small">${esc(st.winReason || '')} · Mission Score ${E.missionScore(st, 0)} – ${E.missionScore(st, 1)}</span></span>
+      <div class="row"><button class="primary" data-act="rematch">Rematch</button><button data-act="newTeams">New teams</button><button class="ghost" data-act="toTitle">Menu</button></div></div>`;
+  }
+  return commandHtml();
+}
 
-  const known = own ? u.loadout : team.revealed[uid];
-  const hidden = own ? 0 : u.loadout.length - known.filter((j) => u.loadout.includes(j)).length;
-  const knownList = [...known, ...(u.copied ? [u.copied] : [])]
-    .map((j) => `<b ${tipAttr(jutsuTip(E.getJutsu(j)))}>${esc(E.getJutsu(j).name)}${j === u.copied ? ' (copied)' : ''}</b>`).join(', ');
-
-  const attrs = targetable ? `data-act="target" data-arg="${slot}"` : (own && !reserve && viewer !== 'all' && !u.ko ? `data-act="selActor" data-arg="${uid}"` : '');
-  return `<div class="ucard side${u.side} ${reserve ? 'reserve' : ''} ${u.ko ? 'ko' : ''} ${targetable ? 'targetable' : ''} ${acting ? 'acting' : ''}" ${attrs}>
-    <div class="row" style="gap:6px"><span class="name">${esc(u.name)}</span>${reserve ? '<span class="chip">Reserve</span>' : ''}<span class="spacer"></span>${natureChip(d.natures.primary)}${natureChip(d.natures.secondary)}</div>
-    <div class="small muted" ${tipAttr(`<b>${esc(d.trait.name)}</b><br>${esc(d.trait.desc)}`)}>${esc(d.trait.name)}</div>
-    <div class="barlbl"><span>HP</span><span>${u.hp}/${u.maxHp}</span></div>
-    <div class="bar hp ${hpP < 25 ? 'low' : hpP < 55 ? 'mid' : ''}"><div style="width:${hpP}%"></div></div>
-    <div class="barlbl"><span>Chakra</span><span>${seeChakra ? `${u.chakra}/${u.maxChakra}` : '???'}</span></div>
-    <div class="bar ck"><div style="width:${seeChakra ? pct(u.chakra, u.maxChakra) : 0}%"></div></div>
-    <div class="barlbl"><span>Resolve</span><span>${u.resolve}${d.transformation && !u.transformUsed ? ` / ${d.transformation.resolve}` : ''}</span></div>
-    <div class="bar rs"><div style="width:${u.resolve}%"></div></div>
-    <div class="chips">${chips.join('')}</div>
-    <div class="known">${knownList || ''}${hidden ? `${knownList ? ', ' : ''}<span>${hidden} hidden</span>` : ''}</div>
+function commandHtml() {
+  const st = S.battle;
+  const side = S.side;
+  const mine = E.onField(st, side);
+  const u = st.units[S.actor];
+  const allChosen = mine.every((x) => S.choices[side][x.uid]);
+  const head = S.pending
+    ? `<span class="q tgt-note">Choose a target for ${esc(E.getJutsu(S.pending.jutsuId).name)} — tap a shinobi on the field</span><button class="small ghost" data-act="cancelTarget">Cancel</button>`
+    : `<span class="q">What will <b>${esc(u ? u.name : '')}</b> do?</span>`;
+  return `<div class="card cmd">
+    ${S.preview ? `<div class="banner-note">🕵️ <b>Intel advantage:</b> ${esc(S.preview)}</div>` : ''}
+    <div class="cmd-head">
+      ${head}
+      <span class="grow"></span>
+      <div class="who-tabs">${mine.map((x) => `<button class="who-tab ${x.uid === S.actor ? 'active' : ''}" data-act="selActor" data-arg="${x.uid}">${badge(SHINOBI_BY_ID[x.id])}${esc(x.name.split(' ')[0])}${S.choices[side][x.uid] ? '<span class="ok">✓</span>' : ''}</button>`).join('')}</div>
+    </div>
+    ${u ? actionSections(st, u) : ''}
+    <div class="orders">
+      <div class="list">${mine.map((x) => `<span class="o ${S.choices[side][x.uid] ? '' : 'none'}"><b>${esc(x.name.split(' ')[0])}:</b> ${S.choices[side][x.uid] ? esc(actionText(st, S.choices[side][x.uid])) : '—'}</span>`).join('')}</div>
+      <button class="primary" data-act="confirm" ${allChosen ? '' : 'disabled'}>Confirm orders</button>
+    </div>
   </div>`;
 }
 
-function actionButtons(st, u) {
+const GROUPS = {
+  tactics: ['kunai', 'charge', 'gather'],
+  defense: ['substitute', 'guard', 'release'],
+  special: ['transform', 'swap'],
+};
+const KUNAI_TIP = 'Free, fast thrown weapons (priority +2). Good for baiting out a Substitution before your big jutsu lands.';
+
+function actionSections(st, u) {
   const opts = E.availableActions(st, u.uid);
   const chosen = S.choices[S.side][u.uid];
-  return `<div class="actions">${opts.map((o, i) => {
-    const j = o.jutsuId ? E.getJutsu(o.jutsuId) : null;
-    const on = chosen && chosen.type === o.type && (chosen.jutsuId || null) === (o.jutsuId || null);
-    let meta = '';
-    let tipHtml = '';
-    if (j) {
-      const pri = o.type === 'kunai' ? 2 : j.priority + (j.category === 'taijutsu' && E.traitOf(u) === 'noNinjutsu' ? 1 : 0);
-      meta = `${j.category}${j.power ? ` · ${j.power}` : ''} · ${o.cost} ck · ${priLabel(pri)} · ${TARGET_LABEL[j.target]}`;
-      tipHtml = jutsuTip(j);
-    } else {
-      const D = {
-        substitute: `${o.cost} ck · Stance · ${SUBSTITUTIONS[u.substitution].desc}${o.note ? ` (${o.note})` : ''}`,
-        charge: 'Priority −2 · restore 35% Chakra, take +25% damage this turn',
-        gather: `Priority −1 · +${E.defOf(u).roles.some((r) => r === 'Sensor' || r === 'Infiltrator') ? 15 : 8} Intel, fails if hit first`,
-        guard: 'Stance · halve enemy Intel gains this turn, take 25% less damage',
-        release: 'Stance · break free of genjutsu',
-        transform: `Stance · ${E.defOf(u).transformation?.desc || ''}`,
-        swap: 'Stance · once per battle, switch with your reserve',
-        none: '', weaveRelease: 'Automatically released this turn',
-      };
-      meta = D[o.type] || '';
-      tipHtml = esc(meta);
-    }
-    const stance = ['substitute', 'guard', 'release', 'transform', 'swap'].includes(o.type);
-    return `<button class="abtn ${on ? 'on' : ''} ${stance ? 'stance' : ''} ${o.copied ? 'copy' : ''}" data-act="chooseAction" data-arg="${i}" ${o.disabled ? 'disabled' : ''} ${tipAttr(tipHtml + (o.disabled ? `<br><i>${esc(o.disabled)}</i>` : ''))}>
-      <div class="an">${esc(o.label)} ${j ? natureChip(j.nature) : ''}</div>
-      <div class="am">${o.disabled ? esc(o.disabled) : esc(meta).slice(0, 90)}</div>
+  const isOn = (o) => chosen && chosen.type === o.type && (chosen.jutsuId || null) === (o.jutsuId || null);
+  const forced = opts.length === 1 && (opts[0].type === 'none' || opts[0].type === 'weaveRelease');
+  if (forced) {
+    return `<div class="banner-note">${esc(opts[0].type === 'none' ? `${u.name} is Bound and can't act this turn.` : `${u.name} is weaving signs — ${opts[0].label} happens automatically this turn.`)}</div>`;
+  }
+  const idx = (o) => opts.indexOf(o);
+  const jutsu = opts.filter((o) => o.type === 'jutsu');
+  const moveBtn = (o) => {
+    const j = E.getJutsu(o.jutsuId);
+    const pri = j.priority + (j.category === 'taijutsu' && E.traitOf(u) === 'noNinjutsu' ? 1 : 0);
+    return `<button class="move-btn ${isOn(o) ? 'on' : ''} ${o.copied ? 'copied' : ''}" style="--c:${FX.jutsuColor(j)}" data-act="chooseAction" data-arg="${idx(o)}" ${o.disabled ? 'disabled' : ''} ${tipAttr(jutsuTip(j, o.cost))}>
+      <span class="mn">${esc(j.name)} ${natChip(j.nature)}${o.copied ? '<span class="chip down">Copied</span>' : ''}</span>
+      <span class="mi">${j.power ? `POW ${j.power}` : j.category.toUpperCase()} · CK ${o.cost} · ${priLabel(j.charged ? j.priority : pri)} · ${TARGET_LABEL[j.target]}${j.charged ? ' · 2 turns' : ''}</span>
+      ${o.disabled ? `<span class="why">${esc(o.disabled)}</span>` : ''}
     </button>`;
-  }).join('')}</div>`;
+  };
+  const SUB = {
+    kunai: () => 'POW 35 · free · +2',
+    charge: () => '+35% Chakra · −2 · vulnerable',
+    gather: () => `+${E.defOf(u).roles.some((r) => r === 'Sensor' || r === 'Infiltrator') ? 15 : 8} Intel · −1 · fails if hit`,
+    substitute: (o) => `CK ${o.cost} · Stance${o.note ? ` · ${o.note}` : ''}`,
+    guard: () => 'Stance · halve enemy Intel',
+    release: () => 'Stance · break genjutsu',
+    transform: (o) => o.disabled || `Stance · ${E.defOf(u).transformation.resolve} Resolve`,
+    swap: () => 'Stance · once per battle',
+  };
+  const TIPS = {
+    kunai: KUNAI_TIP,
+    charge: 'Restore 35% of max Chakra at the end of the turn. You take +25% damage this turn.',
+    gather: 'Priority −1. Gain Intel (Sensors and Infiltrators gain more). Fails if you were hit earlier this turn. The Intel is unsecured until you survive the end of next turn.',
+    substitute: `${SUBSTITUTIONS[u.substitution].desc} Success drops to 50% / 25% if used on consecutive turns. Area attacks are only halved.`,
+    guard: 'Stance. Enemy Intel gains are halved this turn (quartered if a Sensor guards), and you take 25% less damage.',
+    release: 'Stance. Break free of genjutsu.',
+    transform: E.defOf(u).transformation?.desc || '',
+    swap: 'Stance. Once per battle, switch this shinobi with your reserve. The incoming shinobi takes hits aimed at this slot.',
+  };
+  const optBtn = (o) => `<button class="opt-btn ${isOn(o) ? 'on' : ''}" data-act="chooseAction" data-arg="${idx(o)}" ${o.disabled ? 'disabled' : ''} ${tipAttr(`<b>${esc(o.label)}</b><br>${esc(TIPS[o.type] || '')}`)}>
+      <span>${esc(o.label)}</span><span class="mi">${esc(SUB[o.type] ? SUB[o.type](o) : '')}</span></button>`;
+  const group = (title, types, hint = '') => {
+    const list = opts.filter((o) => types.includes(o.type));
+    if (!list.length) return '';
+    return `<div class="sect"><h2>${title} ${hint ? `<span class="hint muted">${hint}</span>` : ''}</h2><div class="opt-grid">${list.map(optBtn).join('')}</div></div>`;
+  };
+  return `<div class="sections">
+    <div class="sect"><h2>Jutsu <span class="hint muted">${u.chakra}/${u.maxChakra} Chakra</span></h2><div class="moves">${jutsu.map(moveBtn).join('')}</div></div>
+    <div class="others">
+      ${group('Tactics', GROUPS.tactics)}
+      ${group('Defense', GROUPS.defense, u.subStreak ? 'substitution less reliable' : '')}
+      ${group('Special', GROUPS.special, `Resolve ${u.resolve}`)}
+    </div>
+  </div>`;
 }
 
 function actionText(st, a) {
   const u = st.units[a.actor];
-  const enemySide = 1 - u.side;
   const tname = (side) => {
     const uid = a.target && st.teams[side].slots[a.target.slot];
-    return uid ? st.units[uid].name : '';
+    return uid ? st.units[uid].name.split(' ')[0] : '';
   };
   switch (a.type) {
     case 'jutsu': case 'kunai': {
       const j = E.getJutsu(a.jutsuId || 'kunai');
-      const t = j.target === 'enemy' ? ` → ${tname(enemySide)}` : j.target === 'ally' ? ` → ${tname(u.side)}` : '';
+      const t = j.target === 'enemy' ? ` → ${tname(1 - u.side)}` : j.target === 'ally' ? ` → ${tname(u.side)}` : '';
       return `${j.name}${t}`;
     }
     case 'weaveRelease': return `Release ${E.getJutsu(u.weaving.jutsuId).name}`;
@@ -373,13 +555,161 @@ function actionText(st, a) {
     case 'release': return 'Release genjutsu';
     case 'transform': return E.defOf(u).transformation.name;
     case 'swap': return 'Swap with reserve';
-    case 'none': return 'Bound — no action';
+    case 'none': return 'Bound';
     default: return a.type;
   }
 }
 
-function logHtml(entries) {
-  return entries.map((l) => `<div class="l ${l.kind} ${l.side === 0 ? 's0' : l.side === 1 ? 's1' : ''}">${esc(l.text)}</div>`).join('');
+// ---------------------------------------------------------------- playback
+let advanceNow = null;
+function pause(ms) {
+  if (S.skip) return Promise.resolve();
+  return new Promise((res) => {
+    const t = setTimeout(() => { advanceNow = null; res(); }, ms * S.speed);
+    advanceNow = () => { clearTimeout(t); advanceNow = null; res(); };
+  });
+}
+
+function setText(entry) {
+  S.msg = entry;
+  const tb = document.getElementById('textbox');
+  if (!tb) return;
+  document.getElementById('tbtext').textContent = entry.text;
+  tb.classList.remove('s0', 's1');
+  if (entry.side === 0 || entry.side === 1) tb.classList.add(`s${entry.side}`);
+}
+
+const monEl = (uid) => document.querySelector(`#mon-${uid} .spr`);
+
+async function playback(events, startSnap) {
+  S.phase = 'play';
+  S.view = startSnap;
+  S.skip = false;
+  S.msg = null;
+  S.logShown = S.battle.log.length - events.length;
+  render();
+  syncField();
+  let sig = fieldSignature(S.view);
+  for (const ev of events) {
+    if (S.skip || S.screen !== 'battle') break;
+    await playEvent(ev, () => {
+      S.view = ev.snap;
+      const ns = fieldSignature(S.view);
+      if (ns !== sig) { sig = ns; redrawArena(); } else syncField();
+    });
+    S.logShown += 1;
+  }
+  if (S.screen !== 'battle') return;
+  S.view = null;
+  S.logShown = S.battle.log.length;
+  if (S.battle.winner !== null) { S.phase = 'over'; render(); syncField(); return; }
+  beginTurn();
+}
+
+async function playEvent(ev, apply) {
+  const e = ev.entry;
+  const arena = document.getElementById('arena');
+  const sp = S.speed;
+  appendLog(e);
+  if (e.kind === 'turn') { apply(); setText({ text: `Turn ${e.turn}`, side: null }); await pause(450); return; }
+  setText(e);
+
+  // the attacker moves before the HP changes
+  if (e.kind === 'action' && e.jutsu) {
+    const j = E.getJutsu(e.jutsu);
+    const user = monEl(e.u);
+    const targets = (e.targets || []).map(monEl).filter(Boolean);
+    if (user) {
+      const from = FX.centerOf(user, arena);
+      const color = FX.jutsuColor(j);
+      if (j.category === 'taijutsu' && targets.length && j.id !== 'kunai') {
+        FX.lunge(user, from, FX.centerOf(targets[0], arena), sp);
+        setTimeout(() => targets.forEach((t) => { FX.fx(arena, 'slash', FX.centerOf(t, arena)); }), 230 * sp);
+      } else if (j.category === 'genjutsu') {
+        FX.ring(arena, user, 'gen');
+        targets.forEach((t) => setTimeout(() => FX.ring(arena, t, 'gen'), 250 * sp));
+      } else if (j.target === 'self' || j.target === 'ally' || j.target === 'allAllies') {
+        targets.forEach((t) => FX.ring(arena, t, j.category === 'medical' ? 'heal' : 'aura'));
+      } else {
+        targets.forEach((t) => FX.orb(arena, from, FX.centerOf(t, arena), color, { small: j.id === 'kunai', sp }));
+      }
+    }
+    apply();
+    await pause(e.collab ? 1000 : 850);
+    return;
+  }
+  apply();
+  const el = monEl(e.u);
+  let ms = 650;
+  switch (e.kind) {
+    case 'damage': {
+      if (el) {
+        FX.shake(el);
+        FX.pop(arena, el, `-${e.amount}`, e.burn ? 'status' : 'dmg', true);
+        if (e.crit) FX.pop(arena, el, 'Critical!', 'crit', false, -30);
+        else if (e.adv > 1) FX.pop(arena, el, 'Super effective!', 'se', false, -30);
+        else if (e.adv < 1) FX.pop(arena, el, 'Resisted', 'nve', false, -30);
+        if (e.boom) FX.fx(arena, 'burst', FX.centerOf(el, arena)).style.background = '#ff9a3c';
+      }
+      ms = 750;
+      break;
+    }
+    case 'heal':
+      if (el) { FX.ring(arena, el, 'heal'); if (e.amount) FX.pop(arena, el, `+${e.amount}`, 'heal'); }
+      ms = e.minor ? 400 : 650;
+      break;
+    case 'ko':
+      if (el) FX.faint(el.parentElement);
+      ms = 950;
+      break;
+    case 'sub':
+      if (el && e.negated) {
+        FX.fx(arena, 'puff', FX.centerOf(el, arena));
+        if (!e.decoy) FX.fx(arena, 'log', FX.centerOf(el, arena), '🪵');
+        FX.pop(arena, el, e.decoy ? 'Decoy!' : 'Substitution!', 'sub', true);
+        ms = 900;
+      } else if (el) { FX.ring(arena, el, '', '#c9d0dd'); }
+      break;
+    case 'status':
+      if (el) { FX.ring(arena, el, '', STATUS_COLOR[e.status] || '#ffcf9e'); if (e.status) FX.pop(arena, el, STATUS_NAME[e.status], 'status'); }
+      break;
+    case 'intel':
+      if (el) {
+        if (e.secured) FX.pop(arena, el, `📜 Secured +${e.secured}`, 'intel');
+        else if (e.amount) FX.pop(arena, el, `📜 +${e.amount}`, 'intel');
+        else if (/lost/.test(e.text)) FX.pop(arena, el, '📜 Intel lost', 'dmg');
+      }
+      ms = e.minor ? 380 : 650;
+      break;
+    case 'special':
+      if (e.clash) { FX.banner(arena, 'JUTSU CLASH!', '#ff5c5c'); ms = 1200; }
+      else if (e.transform) {
+        if (el) { FX.ring(arena, el, 'aura'); FX.appear(el); }
+        FX.banner(arena, E.defOf(S.battle.units[e.u]).transformation.name.toUpperCase(), '#ffc83d'); ms = 1300;
+      } else if (e.weave) { if (el) FX.ring(arena, el, 'gen'); ms = 800; }
+      else if (e.copy) { if (el) FX.pop(arena, el, 'Copied!', 'se', true); ms = 900; }
+      else ms = 900;
+      break;
+    case 'action':
+      if (e.enter) { const n = monEl(e.enter); if (n) FX.appear(n); ms = 800; }
+      break;
+    case 'milestone': {
+      const m = e.text.match(/reached (\d+) Intel/);
+      if (m) { FX.banner(arena, `INTEL ${m[1]}`, '#b98cff'); ms = 1300; } else ms = 1000;
+      break;
+    }
+    case 'system':
+      if (S.battle.winner !== null) FX.banner(arena, S.battle.winner === 'draw' ? 'DRAW' : `${S.names[S.battle.winner].toUpperCase()} WINS`, '#3ddc84');
+      ms = 1500;
+      break;
+    case 'info':
+      if (e.dodge && el) FX.pop(arena, el, 'Dodged!', 'sub', true);
+      break;
+    default: break;
+  }
+  if (/flinch/.test(e.text) && el) FX.pop(arena, el, 'Flinched!', 'status', true);
+  if (/cannot move|can't move|does nothing/.test(e.text) && el) FX.shake(el);
+  await pause(ms);
 }
 
 // ---------------------------------------------------------------- flow
@@ -397,7 +727,8 @@ function showPass(side, note, next) {
 
 function startBattle() {
   S.battle = E.createBattle(S.specs, { seed: Date.now() & 0x7fffffff, names: S.names });
-  S.lastLog = [];
+  S.logShown = S.battle.log.length;
+  S.view = null;
   beginTurn();
 }
 
@@ -414,19 +745,17 @@ function beginTurn() {
 
 function nextStep() {
   const st = S.battle;
-  if (S.step >= 2) return resolve();
+  if (S.step >= 2) { resolve(); return; }
   const side = S.order[S.step];
-  // forced actions
   for (const u of E.onField(st, side)) {
     const opts = E.availableActions(st, u.uid);
-    if (opts.length === 1 && (opts[0].type === 'none' || opts[0].type === 'weaveRelease')) {
-      S.choices[side][u.uid] = { actor: u.uid, type: opts[0].type };
-    }
+    if (opts.length === 1 && (opts[0].type === 'none' || opts[0].type === 'weaveRelease')) S.choices[side][u.uid] = { actor: u.uid, type: opts[0].type };
   }
   if (S.mode === 'cpu' && side === 1) {
     for (const a of chooseActions(st, 1)) S.choices[1][a.actor] = a;
     S.step += 1;
-    return nextStep();
+    nextStep();
+    return;
   }
   const go = () => {
     S.side = side;
@@ -442,8 +771,10 @@ function nextStep() {
     }
     const firstOpen = E.onField(st, side).find((u) => !S.choices[side][u.uid]);
     S.actor = (firstOpen || E.onField(st, side)[0])?.uid || null;
-    S.screen = 'select';
+    S.screen = 'battle';
+    S.phase = 'select';
     render();
+    syncField();
   };
   showPass(side, `Turn ${st.turn}: choose your orders.`, go);
 }
@@ -451,10 +782,20 @@ function nextStep() {
 function resolve() {
   const st = S.battle;
   const actions = [...Object.values(S.choices[0]), ...Object.values(S.choices[1])];
-  S.lastLog = E.resolveTurn(st, actions) || [];
-  S.screen = st.winner !== null ? 'over' : 'results';
+  const startSnap = E.snapshot(st);
+  const events = [];
+  E.resolveTurn(st, actions, { onLog: (entry, state) => events.push({ entry, snap: E.snapshot(state) }) });
+  S.screen = 'battle';
+  playback(events, startSnap);
+}
+
+function commit(action) {
+  const st = S.battle;
+  S.choices[S.side][action.actor] = action;
+  const next = E.onField(st, S.side).find((u) => !S.choices[S.side][u.uid]);
+  if (next) S.actor = next.uid;
   render();
-  window.scrollTo(0, 0);
+  syncField();
 }
 
 // ---------------------------------------------------------------- actions
@@ -462,7 +803,7 @@ const ACTIONS = {
   startHotseat() { S.mode = 'hotseat'; S.names = ['Player 1', 'Player 2']; S.specs = [null, null]; newBuilder(0); render(); },
   startCpu() { S.mode = 'cpu'; S.names = ['Player 1', 'CPU']; S.specs = [null, randomTeam()]; newBuilder(0); render(); },
   toggleRules() { S.showRules = !S.showRules; render(); },
-  backToTitle() { S.screen = 'title'; render(); },
+  toTitle() { S.screen = 'title'; render(); },
   rename(v) { S.names[S.builder.side] = v.trim() || `Player ${S.builder.side + 1}`; },
   era(e) { S.builder.era = e; render(); },
   pick(id) {
@@ -470,11 +811,7 @@ const ACTIONS = {
     const s = SHINOBI_BY_ID[id];
     b.members[b.sel] = { id, loadout: [...s.defaultLoadout], substitution: s.substitutions[0] };
     const nextEmpty = b.members.findIndex((m) => !m);
-    if (nextEmpty !== -1 && nextEmpty !== b.sel) {
-      // stay on the filled slot only if everything is full
-      b.lastFilled = b.sel;
-      b.sel = nextEmpty;
-    }
+    if (nextEmpty !== -1) b.sel = nextEmpty;
     b.errors = [];
     render();
   },
@@ -504,9 +841,9 @@ const ACTIONS = {
   },
   passContinue() { const n = S.passNext; S.passNext = null; n?.(); },
   selActor(uid) {
-    if (S.screen !== 'select' || S.pending) return;
+    if (S.phase !== 'select' || S.pending) return;
     if (S.battle.units[uid]?.side !== S.side) return;
-    S.actor = uid; render();
+    S.actor = uid; render(); syncField();
   },
   chooseAction(i) {
     const st = S.battle;
@@ -517,11 +854,8 @@ const ACTIONS = {
     const action = { actor: u.uid, type: o.type, jutsuId: o.jutsuId };
     if (j && (j.target === 'enemy' || j.target === 'ally')) {
       const candidates = j.target === 'enemy' ? E.onField(st, 1 - S.side) : E.onField(st, S.side);
-      if (candidates.length === 1) {
-        action.target = { slot: E.slotOf(st, candidates[0]) };
-      } else {
-        S.pending = action; render(); return;
-      }
+      if (candidates.length === 1) action.target = { slot: E.slotOf(st, candidates[0]) };
+      else { S.pending = action; render(); syncField(); return; }
     }
     commit(action);
   },
@@ -531,22 +865,16 @@ const ACTIONS = {
     S.pending = null;
     commit(action);
   },
-  cancelTarget() { S.pending = null; render(); },
+  cancelTarget() { S.pending = null; render(); syncField(); },
   confirm() { S.step += 1; nextStep(); },
-  nextTurn() { beginTurn(); },
+  advance(_, el, e) { if (e.target.closest('button')) return; advanceNow?.(); },
+  toggleSpeed() { S.speed = S.speed === 1 ? 0.5 : 1; const b = document.querySelector('[data-act=toggleSpeed]'); if (b) { b.textContent = S.speed === 0.5 ? 'Fast ✓' : 'Fast'; b.classList.toggle('primary', S.speed === 0.5); } },
+  skipPlayback() { S.skip = true; advanceNow?.(); },
   rematch() { startBattle(); },
   newTeams() {
     if (S.mode === 'cpu') S.specs[1] = randomTeam();
     newBuilder(0); render();
   },
 };
-
-function commit(action) {
-  const st = S.battle;
-  S.choices[S.side][action.actor] = action;
-  const next = E.onField(st, S.side).find((u) => !S.choices[S.side][u.uid]);
-  if (next) S.actor = next.uid;
-  render();
-}
 
 render();
