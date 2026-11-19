@@ -1,6 +1,6 @@
 // Shinobi Showdown — local hot-seat / vs CPU client.
 import { SHINOBI, SHINOBI_BY_ID, SUBSTITUTIONS, COST_CAP } from './data/shinobi.js';
-import { NATURE_LABELS } from './engine/natures.js';
+import { NATURE_LABELS, KEKKEI_GENKAI } from './engine/natures.js';
 import * as E from './engine/battle.js';
 import { chooseActions } from './engine/ai.js';
 import { randomTeam } from './engine/teams.js';
@@ -182,7 +182,8 @@ const SCREENS = {
     const selMember = members[b.sel];
     const selBase = selMember && SHINOBI_BY_ID[selMember.id].baseId;
     const q = (b.query || '').toLowerCase();
-    const roster = SHINOBI.filter((s) => (b.era === 'all' || s.era === b.era) && (!q || s.name.toLowerCase().includes(q) || s.roles.join(' ').toLowerCase().includes(q)));
+    const roster = sortRoster(SHINOBI.filter((s) => (b.era === 'all' || s.era === b.era) && (!q || s.name.toLowerCase().includes(q) || s.roles.join(' ').toLowerCase().includes(q))
+      && (!b.role || s.roles.includes(b.role)) && (!b.nature || hasAffinity(s, b.nature))), b.sort);
     return `<div class="row" style="margin-bottom:12px">
         <h3 style="margin:0;font-size:20px">${sideName(b.side)} — build your team</h3>
         <span class="grow"></span>
@@ -194,6 +195,12 @@ const SCREENS = {
             ${['all', 'Part 1', 'Shippuden'].map((e) => `<button class="tab ${b.era === e ? 'active' : ''}" data-act="era" data-arg="${e}">${e === 'all' ? 'All eras' : e}</button>`).join('')}
             <span class="grow"></span>
             <input type="text" id="rosterSearch" placeholder="Search name or role…" value="${esc(b.query || '')}" data-input="search" style="min-width:200px">
+          </div>
+          <div class="row roster-filters">
+            <label class="small muted">Role <select data-change="bRole"><option value="">All roles</option>${ROLES.map((r) => `<option ${b.role === r ? 'selected' : ''}>${r}</option>`).join('')}</select></label>
+            <label class="small muted">Affinity <select data-change="bNature"><option value="">All natures</option>${AFFINITIES.map((n) => `<option value="${n}" ${b.nature === n ? 'selected' : ''}>${NATURE_LABELS[n] || n}</option>`).join('')}<option value="none" ${b.nature === 'none' ? 'selected' : ''}>Non-elemental</option></select></label>
+            <label class="small muted">Sort <select data-change="bSort">${[['roster', 'Roster order'], ['role', 'Role'], ['nature', 'Chakra affinity'], ['cost', 'Cost'], ['name', 'Name']].map(([k, l]) => `<option value="${k}" ${(b.sort || 'roster') === k ? 'selected' : ''}>${l}</option>`).join('')}</select></label>
+            <span class="small muted">${roster.length} shown</span>
           </div>
           <div class="roster">
             ${roster.map((s) => {
@@ -260,6 +267,27 @@ const SCREENS = {
 const STAT_LABEL = { hp: 'HP', tai: 'TAI', nin: 'NIN', def: 'DEF', spd: 'SPD', chk: 'CHK' };
 const CAT_LABEL = { ninjutsu: 'Ninjutsu', taijutsu: 'Taijutsu', genjutsu: 'Genjutsu', medical: 'Medical', support: 'Support' };
 const bst = (s, chk = true) => Object.entries(s.stats).reduce((t, [k, v]) => t + (chk || k !== 'chk' ? v : 0), 0);
+// builder filters: roles and chakra affinities present in the roster
+const ROLES = [...new Set(SHINOBI.flatMap((s) => s.roles))].sort();
+const BASIC_NATURES = ['fire', 'wind', 'lightning', 'earth', 'water', 'yin', 'yang'];
+const AFFINITIES = [...BASIC_NATURES, ...[...new Set(SHINOBI.flatMap((s) => [s.natures.primary, s.natures.secondary]).filter((n) => n && !BASIC_NATURES.includes(n)))].sort()];
+/** A nature filter matches a primary/secondary nature, or a kekkei genkai built from it (Ice counts as Water and Wind). */
+function hasAffinity(s, n) {
+  const ns = [s.natures.primary, s.natures.secondary].filter(Boolean);
+  if (n === 'none') return !ns.length;
+  return ns.some((x) => x === n || (KEKKEI_GENKAI[x] || []).includes(n));
+}
+function sortRoster(list, sort) {
+  const natIdx = (s) => { const i = AFFINITIES.indexOf(s.natures.primary); return i < 0 ? 99 : i; };
+  const by = {
+    role: (a, b) => a.roles[0].localeCompare(b.roles[0]) || a.name.localeCompare(b.name),
+    nature: (a, b) => natIdx(a) - natIdx(b) || a.name.localeCompare(b.name),
+    cost: (a, b) => b.cost - a.cost || a.name.localeCompare(b.name),
+    name: (a, b) => a.name.localeCompare(b.name),
+  }[sort];
+  return by ? [...list].sort(by) : list;
+}
+
 function dexList() {
   const d = S.dex;
   const q = d.query.toLowerCase();
@@ -1089,6 +1117,9 @@ const ACTIONS = {
   dexEra(e) { S.dex.era = e; render(); },
   dexTf(v) { S.dex.tf = v === '1'; render(); },
   dexSort(v) { S.dex.sort = v; render(); },
+  bRole(v) { S.builder.role = v; render(); },
+  bNature(v) { S.builder.nature = v; render(); },
+  bSort(v) { S.builder.sort = v; render(); },
   rename(v) { S.names[S.builder.side] = v.trim() || `Player ${S.builder.side + 1}`; },
   era(e) { S.builder.era = e; render(); },
   pick(id) {

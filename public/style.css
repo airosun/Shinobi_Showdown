@@ -418,3 +418,5 @@ button.linkish:hover:not(:disabled) { background: none; color: var(--accent); }
 .arena .spr img.sub-log { position: absolute; left: 50%; bottom: 0; width: 120px; height: auto; max-width: none; z-index: 2; pointer-events: none; filter: drop-shadow(0 6px 4px #0007); }
 .arena .mon.you .spr img.sub-log { width: 160px; height: auto; }
 .arena .mon.foe .spr img.sub-log { height: auto; }
+.roster-filters { gap: 10px; margin: -2px 0 10px; flex-wrap: wrap; }
+.roster-filters label { display: flex; align-items: center; gap: 6px; }

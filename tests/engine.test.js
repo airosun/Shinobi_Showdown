@@ -384,3 +384,42 @@ test("Orochimaru's support lowers the Resolve transformations need", () => {
   const st = battle(['anko', 'jirobo', 'tayuya', 'orochimaru_p1'], B2A);
   assert.equal(E.tfResolve(st, st.units['0-0']), 40);
 });
+
+// ---------------- batch 3: Akatsuki, Zetsu, Taka ----------------
+const AK = ['hidan', 'deidara', 'kakuzu', 'sasori'];
+const TK = ['suigetsu', 'zetsu_black', 'itachi', 'karin'];
+const custom = (id, loadout) => ({ ...member(id), loadout });
+
+test("Hidan's curse passes the damage he takes to the linked enemy", () => {
+  const st = battle([custom('hidan', ['curse_ritual', 'triple_scythe', 'jashin_spike', 'ritual_stab']), 'deidara', 'kakuzu', 'sasori'], TK);
+  resolveTurn(st, [{ actor: '0-0', type: 'jutsu', jutsuId: 'curse_ritual', target: { slot: 0 } }]);
+  resolveTurn(st, [{ actor: '1-1', type: 'kunai', target: { slot: 0 } }]);
+  assert.ok(st.log.some((l) => /curse passes it on — Suigetsu/.test(l.text)), 'linked Suigetsu took the mirrored damage');
+});
+
+test('Deidara is knocked out by C0', () => {
+  const st = battle(AK, TK);
+  resolveTurn(st, [{ actor: '0-1', type: 'jutsu', jutsuId: 'c0' }]);
+  assert.ok(st.units['0-1'].ko);
+  assert.ok(st.log.some((l) => /consumed by the blast/.test(l.text)));
+});
+
+test('Kakuzu heals when he knocks an enemy out', () => {
+  const st = battle(AK, TK);
+  const kak = st.units['0-2']; kak.hp = Math.round(kak.maxHp / 2);
+  st.units['1-0'].hp = 1;
+  const h = kak.hp;
+  resolveTurn(st, [{ actor: '0-2', type: 'kunai', target: { slot: 0 } }]);
+  assert.ok(st.units['1-0'].ko);
+  assert.ok(kak.hp > h);
+});
+
+test('Sasori is immune to poison; Black Zetsu merges through the first hit', () => {
+  const st = battle(AK, ['kankuro_p1', 'zetsu_black', 'itachi', 'karin'], 0.01);
+  resolveTurn(st, [{ actor: '1-0', type: 'jutsu', jutsuId: 'poison_bomb' }]);
+  assert.ok(!st.units['0-3'].statuses.poison);
+  const z = st.units['1-1']; const hp = z.hp;
+  resolveTurn(st, [{ actor: '0-0', type: 'kunai', target: { slot: 1 } }]);
+  assert.equal(z.hp, hp);
+  assert.ok(!z.merge);
+});

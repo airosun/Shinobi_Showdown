@@ -88,7 +88,7 @@ export const SHINOBI = [
     "baseId": "naruto",
     "name": "Naruto Uzumaki (Shippuden)",
     "era": "Shippuden",
-    "cost": 7,
+    "cost": 6,
     "natures": {
       "primary": "wind",
       "secondary": "yang"
@@ -465,7 +465,7 @@ export const SHINOBI = [
     "baseId": "sasuke",
     "name": "Sasuke Uchiha (Mangekyō)",
     "era": "Shippuden",
-    "cost": 9,
+    "cost": 8,
     "natures": {
       "primary": "fire",
       "secondary": "lightning"
@@ -1690,7 +1690,7 @@ export const SHINOBI = [
     "baseId": "guy",
     "name": "Might Guy",
     "era": "Shippuden",
-    "cost": 9,
+    "cost": 8,
     "natures": {
       "primary": null,
       "secondary": null
@@ -2925,7 +2925,7 @@ export const SHINOBI = [
     "baseId": "chiyo",
     "name": "Chiyo",
     "era": "Shippuden",
-    "cost": 6,
+    "cost": 5,
     "natures": {
       "primary": null,
       "secondary": null
@@ -3878,6 +3878,1037 @@ export const SHINOBI = [
             2,
             4,
             6
+          ]
+        }
+      ]
+    }
+  },
+  {
+    "id": "obito_tobi",
+    "baseId": "obito",
+    "name": "Obito Uchiha (Tobi)",
+    "era": "Shippuden",
+    "cost": 6,
+    "natures": {
+      "primary": "fire",
+      "secondary": "wood"
+    },
+    "stats": {
+      "hp": 90,
+      "tai": 80,
+      "nin": 90,
+      "def": 85,
+      "spd": 105,
+      "chk": 120
+    },
+    "roles": [
+      "Infiltrator",
+      "Controller"
+    ],
+    "trait": {
+      "id": "kamuiPhase",
+      "name": "Kamui Intangibility",
+      "desc": "Single-target attacks have a 20% chance to pass straight through him."
+    },
+    "substitutions": [
+      "log",
+      "shadowClone"
+    ],
+    "catalogue": [
+      "kamui_warp_strike",
+      "great_fireball",
+      "kamui_phase",
+      "tobi_antics",
+      "wood_spikes"
+    ],
+    "defaultLoadout": [
+      "kamui_warp_strike",
+      "great_fireball",
+      "kamui_phase",
+      "tobi_antics"
+    ],
+    "transformation": null,
+    "supportAura": {
+      "name": "Akatsuki Recruiter",
+      "desc": "Allies' substitutions cost {0} less Chakra.",
+      "effects": [
+        {
+          "type": "subDiscount",
+          "values": [
+            0.05,
+            0.1,
+            0.15
+          ]
+        }
+      ]
+    }
+  },
+  {
+    "id": "obito_masked",
+    "baseId": "obito",
+    "name": "Obito Uchiha (Masked Man)",
+    "era": "Shippuden",
+    "cost": 10,
+    "natures": {
+      "primary": "fire",
+      "secondary": "wood"
+    },
+    "stats": {
+      "hp": 115,
+      "tai": 100,
+      "nin": 120,
+      "def": 100,
+      "spd": 110,
+      "chk": 145
+    },
+    "roles": [
+      "Striker",
+      "Controller"
+    ],
+    "trait": {
+      "id": "kamuiPhase",
+      "name": "Kamui Intangibility",
+      "desc": "Single-target attacks have a 20% chance to pass straight through him."
+    },
+    "substitutions": [
+      "log",
+      "shadowClone"
+    ],
+    "catalogue": [
+      "kamui_absorb",
+      "fire_annihilation",
+      "gedo_chains",
+      "kamui_warp_strike",
+      "wood_dragon",
+      "kamui_phase"
+    ],
+    "defaultLoadout": [
+      "kamui_absorb",
+      "fire_annihilation",
+      "gedo_chains",
+      "kamui_phase"
+    ],
+    "transformation": null,
+    "supportAura": {
+      "name": "Moon's Eye Plan",
+      "desc": "Allies gain {0} Resolve per turn.",
+      "effects": [
+        {
+          "type": "resolve",
+          "values": [
+            3,
+            5,
+            8
+          ]
+        }
+      ]
+    }
+  },
+  {
+    "id": "zetsu_white",
+    "baseId": "zetsu",
+    "name": "Zetsu (White)",
+    "era": "Shippuden",
+    "cost": 4,
+    "natures": {
+      "primary": "wood",
+      "secondary": null
+    },
+    "stats": {
+      "hp": 80,
+      "tai": 60,
+      "nin": 65,
+      "def": 70,
+      "spd": 95,
+      "chk": 95
+    },
+    "roles": [
+      "Infiltrator"
+    ],
+    "trait": {
+      "id": "sporeSpy",
+      "name": "Spore Spy",
+      "desc": "Starts the battle with a Decoy, and his Gather Intel gains +6."
+    },
+    "substitutions": [
+      "log"
+    ],
+    "catalogue": [
+      "spore_clone",
+      "wood_spikes",
+      "spore_grab",
+      "mayfly"
+    ],
+    "defaultLoadout": [
+      "spore_clone",
+      "wood_spikes",
+      "spore_grab",
+      "mayfly"
+    ],
+    "transformation": null,
+    "supportAura": {
+      "name": "Zetsu Network",
+      "desc": "Team gains {0} Secured Intel per turn.",
+      "effects": [
+        {
+          "type": "intel",
+          "values": [
+            1,
+            2,
+            3
+          ]
+        }
+      ]
+    }
+  },
+  {
+    "id": "zetsu_black",
+    "baseId": "zetsu",
+    "name": "Zetsu (Black)",
+    "era": "Shippuden",
+    "cost": 4,
+    "natures": {
+      "primary": "yin",
+      "secondary": "earth"
+    },
+    "stats": {
+      "hp": 75,
+      "tai": 55,
+      "nin": 95,
+      "def": 75,
+      "spd": 100,
+      "chk": 110
+    },
+    "roles": [
+      "Infiltrator",
+      "Controller"
+    ],
+    "trait": {
+      "id": "groundMerge",
+      "name": "Ground Merge",
+      "desc": "The first single-target hit of the battle passes through him."
+    },
+    "substitutions": [
+      "log"
+    ],
+    "catalogue": [
+      "body_hijack",
+      "black_spear",
+      "mayfly",
+      "spore_clone"
+    ],
+    "defaultLoadout": [
+      "body_hijack",
+      "black_spear",
+      "mayfly",
+      "spore_clone"
+    ],
+    "transformation": null,
+    "supportAura": {
+      "name": "Mother's Will",
+      "desc": "Enemy Intel gains are reduced by {0}.",
+      "effects": [
+        {
+          "type": "enemyIntel",
+          "values": [
+            0.1,
+            0.15,
+            0.25
+          ]
+        }
+      ]
+    }
+  },
+  {
+    "id": "kisame",
+    "baseId": "kisame",
+    "name": "Kisame Hoshigaki",
+    "era": "Shippuden",
+    "cost": 8,
+    "natures": {
+      "primary": "water",
+      "secondary": null
+    },
+    "stats": {
+      "hp": 135,
+      "tai": 105,
+      "nin": 100,
+      "def": 105,
+      "spd": 80,
+      "chk": 160
+    },
+    "roles": [
+      "Tank",
+      "Frontliner"
+    ],
+    "trait": {
+      "id": "samehada",
+      "name": "Samehada",
+      "desc": "His taijutsu steal Chakra: what they drain is added to his own."
+    },
+    "substitutions": [
+      "log",
+      "waterClone"
+    ],
+    "catalogue": [
+      "samehada_shred",
+      "shark_bomb",
+      "thousand_sharks",
+      "shark_dance",
+      "hidden_mist"
+    ],
+    "defaultLoadout": [
+      "samehada_shred",
+      "shark_bomb",
+      "thousand_sharks",
+      "shark_dance"
+    ],
+    "transformation": {
+      "resolve": 50,
+      "cost": 0,
+      "turns": 3,
+      "mods": {
+        "tai": 1.3,
+        "spd": 1.3
+      },
+      "regenHpPct": 0.06,
+      "drawback": "exhausted",
+      "name": "Samehada Fusion",
+      "desc": "+30% TAI, +30% SPD. Regenerates 6% HP per turn. Exhausted afterwards."
+    },
+    "supportAura": {
+      "name": "Tailless Tailed Beast",
+      "desc": "Allies regenerate {0} max Chakra per turn.",
+      "effects": [
+        {
+          "type": "chakra",
+          "values": [
+            0.03,
+            0.05,
+            0.08
+          ]
+        }
+      ]
+    }
+  },
+  {
+    "id": "itachi",
+    "baseId": "itachi",
+    "name": "Itachi Uchiha",
+    "era": "Shippuden",
+    "cost": 8,
+    "natures": {
+      "primary": "fire",
+      "secondary": "yin"
+    },
+    "stats": {
+      "hp": 95,
+      "tai": 90,
+      "nin": 125,
+      "def": 85,
+      "spd": 120,
+      "chk": 135
+    },
+    "roles": [
+      "Controller",
+      "Striker"
+    ],
+    "trait": {
+      "id": "itachiGenius",
+      "name": "Itachi's Genius",
+      "desc": "Sharingan (sees through Log Substitution) and his genjutsu last 1 turn longer."
+    },
+    "substitutions": [
+      "log",
+      "shadowClone"
+    ],
+    "catalogue": [
+      "tsukuyomi",
+      "amaterasu",
+      "crow_clone",
+      "phoenix_flower",
+      "great_fireball",
+      "totsuka_blade"
+    ],
+    "defaultLoadout": [
+      "tsukuyomi",
+      "amaterasu",
+      "crow_clone",
+      "totsuka_blade"
+    ],
+    "transformation": {
+      "resolve": 70,
+      "cost": 0,
+      "turns": 3,
+      "mods": {
+        "def": 1.4,
+        "nin": 1.2
+      },
+      "drawback": "exhausted",
+      "name": "Susano'o",
+      "desc": "+40% DEF, +20% NIN and unlocks Totsuka Blade. Exhausted afterwards."
+    },
+    "supportAura": {
+      "name": "Crow Genjutsu",
+      "desc": "Allies' Bind, Paralyze and Flinch chances are {0} higher.",
+      "effects": [
+        {
+          "type": "controlChance",
+          "values": [
+            0.05,
+            0.1,
+            0.15
+          ]
+        }
+      ]
+    }
+  },
+  {
+    "id": "deidara",
+    "baseId": "deidara",
+    "name": "Deidara",
+    "era": "Shippuden",
+    "cost": 8,
+    "natures": {
+      "primary": "explosion",
+      "secondary": null
+    },
+    "stats": {
+      "hp": 90,
+      "tai": 65,
+      "nin": 120,
+      "def": 75,
+      "spd": 110,
+      "chk": 125
+    },
+    "roles": [
+      "Striker"
+    ],
+    "trait": {
+      "id": "artExplosion",
+      "name": "Art Is an Explosion",
+      "desc": "His area attacks deal +10% damage. Takes 20% less damage from taijutsu (he fights from the air)."
+    },
+    "substitutions": [
+      "log",
+      "explosiveTag"
+    ],
+    "catalogue": [
+      "c1_spiders",
+      "c2_dragon",
+      "c3_bomb",
+      "c4_karura",
+      "clay_bird",
+      "c0"
+    ],
+    "defaultLoadout": [
+      "c1_spiders",
+      "c2_dragon",
+      "c4_karura",
+      "c0"
+    ],
+    "transformation": null,
+    "supportAura": {
+      "name": "Explosive Expertise",
+      "desc": "Allies' area attacks deal +{0} damage.",
+      "effects": [
+        {
+          "type": "aoeBoost",
+          "values": [
+            0.05,
+            0.1,
+            0.15
+          ]
+        }
+      ]
+    }
+  },
+  {
+    "id": "hidan",
+    "baseId": "hidan",
+    "name": "Hidan",
+    "era": "Shippuden",
+    "cost": 6,
+    "natures": {
+      "primary": null,
+      "secondary": null
+    },
+    "stats": {
+      "hp": 125,
+      "tai": 105,
+      "nin": 65,
+      "def": 90,
+      "spd": 85,
+      "chk": 100
+    },
+    "roles": [
+      "Frontliner",
+      "Tank"
+    ],
+    "trait": {
+      "id": "jashin",
+      "name": "Jashinist Immortality",
+      "desc": "Burn and Poison can't knock him out, and once per battle a hit that would knock him out leaves him at 30% HP."
+    },
+    "substitutions": [
+      "log"
+    ],
+    "catalogue": [
+      "triple_scythe",
+      "scythe_throw",
+      "jashin_spike",
+      "curse_ritual",
+      "ritual_stab"
+    ],
+    "defaultLoadout": [
+      "triple_scythe",
+      "jashin_spike",
+      "curse_ritual",
+      "ritual_stab"
+    ],
+    "transformation": {
+      "resolve": 50,
+      "cost": 0,
+      "turns": 3,
+      "mods": {
+        "tai": 1.3
+      },
+      "drawback": "exhausted",
+      "name": "Death Possession Blood",
+      "desc": "+30% TAI. Unlocks Sacrificial Stab. Exhausted afterwards."
+    },
+    "supportAura": {
+      "name": "Blood Price",
+      "desc": "Allies gain +{0} TAI.",
+      "effects": [
+        {
+          "type": "stat",
+          "values": [
+            0.1,
+            0.15,
+            0.25
+          ],
+          "stat": "tai"
+        }
+      ]
+    }
+  },
+  {
+    "id": "kakuzu",
+    "baseId": "kakuzu",
+    "name": "Kakuzu",
+    "era": "Shippuden",
+    "cost": 9,
+    "natures": {
+      "primary": "earth",
+      "secondary": "lightning"
+    },
+    "stats": {
+      "hp": 140,
+      "tai": 90,
+      "nin": 115,
+      "def": 110,
+      "spd": 70,
+      "chk": 140
+    },
+    "roles": [
+      "Tank",
+      "Striker"
+    ],
+    "trait": {
+      "id": "fiveHearts",
+      "name": "Five Hearts",
+      "desc": "Each time he knocks out an enemy he steals its heart: heal 25% max HP."
+    },
+    "substitutions": [
+      "log"
+    ],
+    "catalogue": [
+      "false_darkness",
+      "searing_migraine",
+      "earth_grudge_threads",
+      "earth_spear",
+      "pressure_damage"
+    ],
+    "defaultLoadout": [
+      "false_darkness",
+      "searing_migraine",
+      "earth_grudge_threads",
+      "pressure_damage"
+    ],
+    "transformation": {
+      "resolve": 60,
+      "cost": 0,
+      "turns": 3,
+      "mods": {
+        "nin": 1.3,
+        "def": 1.2
+      },
+      "drawback": "exhausted",
+      "name": "Earth Grudge Fear Masks",
+      "desc": "+30% NIN, +20% DEF and unlocks Pressure Damage. Exhausted afterwards."
+    },
+    "supportAura": {
+      "name": "Bounty Ledger",
+      "desc": "Team gains {0} extra Intel whenever an enemy is knocked out.",
+      "effects": [
+        {
+          "type": "koIntel",
+          "values": [
+            4,
+            6,
+            10
+          ]
+        }
+      ]
+    }
+  },
+  {
+    "id": "sasori",
+    "baseId": "sasori",
+    "name": "Sasori",
+    "era": "Shippuden",
+    "cost": 8,
+    "natures": {
+      "primary": "magnet",
+      "secondary": null
+    },
+    "stats": {
+      "hp": 90,
+      "tai": 85,
+      "nin": 115,
+      "def": 90,
+      "spd": 100,
+      "chk": 125
+    },
+    "roles": [
+      "Controller",
+      "Striker"
+    ],
+    "trait": {
+      "id": "humanPuppet",
+      "name": "Human Puppet",
+      "desc": "Immune to Poison and genjutsu. When his Decoy or Substitution takes a hit, the attacker is Poisoned."
+    },
+    "substitutions": [
+      "log",
+      "shadowClone"
+    ],
+    "catalogue": [
+      "hiruko_tail",
+      "iron_sand_drizzle",
+      "iron_sand_world_order",
+      "puppet_switch",
+      "hundred_puppets"
+    ],
+    "defaultLoadout": [
+      "hiruko_tail",
+      "iron_sand_drizzle",
+      "puppet_switch",
+      "hundred_puppets"
+    ],
+    "transformation": {
+      "resolve": 50,
+      "cost": 0,
+      "turns": 3,
+      "mods": {
+        "nin": 1.3,
+        "spd": 1.3
+      },
+      "drawback": "exhausted",
+      "name": "Human Puppet Body",
+      "desc": "+30% NIN, +30% SPD and unlocks Performance of a Hundred Puppets. Exhausted afterwards."
+    },
+    "supportAura": {
+      "name": "Master Toxicologist",
+      "desc": "Enemies take {0} more max HP from Poison each turn.",
+      "effects": [
+        {
+          "type": "poisonPower",
+          "values": [
+            0.01,
+            0.02,
+            0.04
+          ]
+        }
+      ]
+    }
+  },
+  {
+    "id": "konan",
+    "baseId": "konan",
+    "name": "Konan",
+    "era": "Shippuden",
+    "cost": 7,
+    "natures": {
+      "primary": "wind",
+      "secondary": null
+    },
+    "stats": {
+      "hp": 90,
+      "tai": 65,
+      "nin": 110,
+      "def": 80,
+      "spd": 110,
+      "chk": 125
+    },
+    "roles": [
+      "Striker",
+      "Support"
+    ],
+    "trait": {
+      "id": "paperBody",
+      "name": "Paper Body",
+      "desc": "Scatters into paper: dodges single-target attacks 15% more often."
+    },
+    "substitutions": [
+      "log",
+      "explosiveTag"
+    ],
+    "catalogue": [
+      "paper_shuriken",
+      "paper_spear",
+      "paper_butterflies",
+      "paper_clone",
+      "paper_ocean"
+    ],
+    "defaultLoadout": [
+      "paper_shuriken",
+      "paper_spear",
+      "paper_butterflies",
+      "paper_ocean"
+    ],
+    "transformation": {
+      "resolve": 60,
+      "cost": 0,
+      "turns": 3,
+      "mods": {
+        "nin": 1.3,
+        "spd": 1.2
+      },
+      "drawback": "exhausted",
+      "name": "Paper Angel",
+      "desc": "+30% NIN, +20% SPD and unlocks Six Hundred Billion Exploding Tags. Exhausted afterwards."
+    },
+    "supportAura": {
+      "name": "Angel of Ame",
+      "desc": "Allies' substitutions cost {0} less Chakra.",
+      "effects": [
+        {
+          "type": "subDiscount",
+          "values": [
+            0.05,
+            0.1,
+            0.2
+          ]
+        }
+      ]
+    }
+  },
+  {
+    "id": "nagato_pain",
+    "baseId": "nagato",
+    "name": "Nagato (Six Paths of Pain)",
+    "era": "Shippuden",
+    "cost": 10,
+    "natures": {
+      "primary": "yin",
+      "secondary": "yang"
+    },
+    "stats": {
+      "hp": 120,
+      "tai": 95,
+      "nin": 130,
+      "def": 100,
+      "spd": 105,
+      "chk": 160
+    },
+    "roles": [
+      "Striker",
+      "Controller"
+    ],
+    "trait": {
+      "id": "rinnegan",
+      "name": "Rinnegan",
+      "desc": "Sees through Log Substitution and Decoys. Takes 20% less damage from ninjutsu (Preta Path)."
+    },
+    "substitutions": [
+      "shadowClone"
+    ],
+    "catalogue": [
+      "shinra_tensei",
+      "almighty_push",
+      "universal_pull",
+      "preta_absorb",
+      "asura_missiles",
+      "chibaku_tensei"
+    ],
+    "defaultLoadout": [
+      "shinra_tensei",
+      "almighty_push",
+      "universal_pull",
+      "preta_absorb"
+    ],
+    "transformation": null,
+    "supportAura": {
+      "name": "God of Amegakure",
+      "desc": "Allies gain +{0} NIN.",
+      "effects": [
+        {
+          "type": "stat",
+          "values": [
+            0.1,
+            0.15,
+            0.25
+          ],
+          "stat": "nin"
+        }
+      ]
+    }
+  },
+  {
+    "id": "nagato_reanimated",
+    "baseId": "nagato",
+    "name": "Nagato (Reanimated)",
+    "era": "Shippuden",
+    "cost": 10,
+    "natures": {
+      "primary": "yin",
+      "secondary": "yang"
+    },
+    "stats": {
+      "hp": 105,
+      "tai": 60,
+      "nin": 135,
+      "def": 95,
+      "spd": 80,
+      "chk": 160
+    },
+    "roles": [
+      "Striker",
+      "Support"
+    ],
+    "trait": {
+      "id": "reanimated",
+      "name": "Reanimated Body",
+      "desc": "Regenerates 6% HP per turn and is immune to Poison. Rinnegan: sees through Log Substitution and Decoys."
+    },
+    "substitutions": [
+      "log"
+    ],
+    "catalogue": [
+      "shinra_tensei",
+      "universal_pull",
+      "preta_absorb",
+      "chibaku_tensei",
+      "samsara_revival"
+    ],
+    "defaultLoadout": [
+      "shinra_tensei",
+      "universal_pull",
+      "preta_absorb",
+      "samsara_revival"
+    ],
+    "transformation": null,
+    "supportAura": {
+      "name": "Edo Tensei",
+      "desc": "Allies regenerate {0} max HP per turn.",
+      "effects": [
+        {
+          "type": "heal",
+          "values": [
+            0.03,
+            0.05,
+            0.08
+          ]
+        }
+      ]
+    }
+  },
+  {
+    "id": "suigetsu",
+    "baseId": "suigetsu",
+    "name": "Suigetsu Hozuki",
+    "era": "Shippuden",
+    "cost": 5,
+    "natures": {
+      "primary": "water",
+      "secondary": null
+    },
+    "stats": {
+      "hp": 95,
+      "tai": 100,
+      "nin": 80,
+      "def": 75,
+      "spd": 100,
+      "chk": 110
+    },
+    "roles": [
+      "Frontliner"
+    ],
+    "trait": {
+      "id": "hydrification",
+      "name": "Hydrification",
+      "desc": "Takes 20% less damage from taijutsu and Fire jutsu."
+    },
+    "substitutions": [
+      "log",
+      "waterClone"
+    ],
+    "catalogue": [
+      "executioner_blade",
+      "water_gun",
+      "great_water_arm",
+      "hydrification"
+    ],
+    "defaultLoadout": [
+      "executioner_blade",
+      "water_gun",
+      "great_water_arm",
+      "hydrification"
+    ],
+    "transformation": null,
+    "supportAura": {
+      "name": "Hozuki Water",
+      "desc": "Allies' Water jutsu deal +{0} damage.",
+      "effects": [
+        {
+          "type": "natureBoost",
+          "values": [
+            0.1,
+            0.15,
+            0.25
+          ],
+          "natures": [
+            "water"
+          ]
+        }
+      ]
+    }
+  },
+  {
+    "id": "karin",
+    "baseId": "karin",
+    "name": "Karin",
+    "era": "Shippuden",
+    "cost": 4,
+    "natures": {
+      "primary": "yang",
+      "secondary": null
+    },
+    "stats": {
+      "hp": 85,
+      "tai": 55,
+      "nin": 85,
+      "def": 75,
+      "spd": 90,
+      "chk": 115
+    },
+    "roles": [
+      "Medic",
+      "Sensor"
+    ],
+    "trait": {
+      "id": "kaguraSensing",
+      "name": "Kagura Sensing",
+      "desc": "Sees through Decoys, and her Gather Intel gains +4."
+    },
+    "substitutions": [
+      "log"
+    ],
+    "catalogue": [
+      "healing_bite",
+      "adamantine_chains",
+      "karin_punch",
+      "mind_eye_sensing"
+    ],
+    "defaultLoadout": [
+      "healing_bite",
+      "adamantine_chains",
+      "karin_punch",
+      "mind_eye_sensing"
+    ],
+    "transformation": null,
+    "supportAura": {
+      "name": "Healing Bite",
+      "desc": "Allies regenerate {0} max HP per turn.",
+      "effects": [
+        {
+          "type": "heal",
+          "values": [
+            0.03,
+            0.05,
+            0.08
+          ]
+        }
+      ]
+    }
+  },
+  {
+    "id": "jugo",
+    "baseId": "jugo",
+    "name": "Jugo",
+    "era": "Shippuden",
+    "cost": 6,
+    "natures": {
+      "primary": null,
+      "secondary": null
+    },
+    "stats": {
+      "hp": 130,
+      "tai": 120,
+      "nin": 70,
+      "def": 95,
+      "spd": 80,
+      "chk": 110
+    },
+    "roles": [
+      "Frontliner",
+      "Tank"
+    ],
+    "trait": {
+      "id": "berserker",
+      "name": "Berserker",
+      "desc": "Deals +25% damage while below 50% HP."
+    },
+    "substitutions": [
+      "log"
+    ],
+    "catalogue": [
+      "sage_arm_cannon",
+      "axe_arm",
+      "jet_punch",
+      "cell_share"
+    ],
+    "defaultLoadout": [
+      "sage_arm_cannon",
+      "axe_arm",
+      "jet_punch",
+      "cell_share"
+    ],
+    "transformation": {
+      "resolve": 50,
+      "cost": 0,
+      "turns": 3,
+      "mods": {
+        "tai": 1.4,
+        "def": 1.3
+      },
+      "upkeepHpPct": 0.05,
+      "drawback": "exhausted",
+      "name": "Sage Transformation",
+      "desc": "+40% TAI, +30% DEF. Costs 5% HP per turn. Exhausted afterwards."
+    },
+    "supportAura": {
+      "name": "Natural Energy",
+      "desc": "Allies regenerate {0} max Chakra per turn.",
+      "effects": [
+        {
+          "type": "chakra",
+          "values": [
+            0.03,
+            0.05,
+            0.08
           ]
         }
       ]

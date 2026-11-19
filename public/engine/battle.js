@@ -36,8 +36,8 @@ export const BALANCE = {
   paralyzeFail: 0.25,
   genjutsuFail: 0.5,
   exhaustedMult: 0.85,
-  intelGather: 12,
-  intelGatherSpecialist: 22,
+  intelGather: 14,
+  intelGatherSpecialist: 24,
   intelKO: 15,
   intelGenjutsu: 4,
   intelReveal: 1,
@@ -79,15 +79,24 @@ export const TRAITS = {
   byakugan: ['dojutsu', 'seesDecoy'],
   noNinjutsu: ['noNinjutsu'],
   whiteSnakeSage: ['seesDecoy', 'seesLog'],
+  itachiGenius: ['dojutsu', 'reflect'],
+  humanPuppet: ['genjutsuImmune', 'poisonImmune'],
+  rinnegan: ['dojutsu', 'seesDecoy'],
+  reanimated: ['dojutsu', 'seesDecoy', 'poisonImmune'],
+  kaguraSensing: ['seesDecoy'],
 };
+// passive dodge bonus against single-target attacks
+const DODGE = { iceMirrors: 0.1, paperBody: 0.15, kamuiPhase: 0.2 };
+// extra Gather Intel
+const GATHER = { sporeSpy: 6, kaguraSensing: 4 };
 // once-per-battle KO survival: [charges, HP left]
-const SURVIVE = { bodyShedding: [1, 0.25], izanagi: [2, 0.2] };
+const SURVIVE = { bodyShedding: [1, 0.25], izanagi: [2, 0.2], jashin: [1, 0.3] };
 // passive HP regen per turn by trait
-const REGEN = { medicalSpy: 0.04, whiteSnakeSage: 0.06 };
+const REGEN = { medicalSpy: 0.04, whiteSnakeSage: 0.06, reanimated: 0.06 };
 export const hasFlag = (unit, flag) => (TRAITS[SHINOBI_BY_ID[unit.id].trait.id] || []).includes(flag);
 const PCT_AURAS = new Set(['stat', 'heal', 'chakra', 'subDiscount', 'decoyChance', 'crit', 'execute', 'dr', 'aoeDR', 'lowHpDR',
   'protectWeakest', 'genjutsuResist', 'dodge', 'pierce', 'kunai', 'taiDamage', 'focus', 'enemyIntel', 'enemyDrain', 'controlChance', 'natureBoost',
-  'aoeBoost', 'poisonChance', 'cleanseChance']);
+  'aoeBoost', 'poisonChance', 'cleanseChance', 'poisonPower']);
 
 // ---------------------------------------------------------------------------
 // Team validation
@@ -142,11 +151,13 @@ function makeUnit(side, index, member) {
     transform: null, // { turnsLeft }
     transformUsed: false,
     weaving: null,   // { kind: 'jutsu'|'transform', jutsuId?, target?, startedTurn }
-    decoy: 0,
+    decoy: def.trait.id === 'sporeSpy' ? 2 : 0,
     subStreak: 0,
     unsecured: [],   // { amount, turn }
     ko: false,
     survives: SURVIVE[def.trait.id]?.[0] || 0,
+    merge: def.trait.id === 'groundMerge',
+    link: null,
     reviveUsed: false,
     flags: {},       // per-turn flags, reset every turn
   };
@@ -447,6 +458,11 @@ export function computeDamage(state, att, def, jutsu, ctx = {}) {
   if (ctx.aoe) dmg *= 1 + auraVal(state, att.side, 'aoeBoost');
   if (ctx.aoe && jutsu.nature === 'wind' && traitOf(att) === 'galeMastery') dmg *= 1.15;
   if (traitOf(def) === 'deadBone' && jutsu.category === 'taijutsu') dmg *= 0.9;
+  if (ctx.aoe && traitOf(att) === 'artExplosion') dmg *= 1.1;
+  if (traitOf(def) === 'artExplosion' && jutsu.category === 'taijutsu') dmg *= 0.8;
+  if (traitOf(def) === 'rinnegan' && jutsu.category === 'ninjutsu') dmg *= 0.8;
+  if (traitOf(def) === 'hydrification' && (jutsu.category === 'taijutsu' || jutsu.nature === 'fire')) dmg *= 0.8;
+  if (traitOf(att) === 'berserker' && att.hp < att.maxHp * 0.5) dmg *= 1.25;
   // defender-side reductions
   dmg *= 1 - Math.min(0.6, auraVal(state, def.side, 'dr'));
   if (ctx.aoe) dmg *= 1 - Math.min(0.6, auraVal(state, def.side, 'aoeDR'));
@@ -482,6 +498,11 @@ function dealDamage(state, target, amount, source, msg = null, extra = {}) {
   if (msg) log(state, msg, 'damage', target, { amount, src: source?.uid, ...extra });
   target.flags.tookDamage = true;
   target.resolve = Math.min(100, target.resolve + Math.round((amount / target.maxHp) * 100 * BALANCE.resolveFromDamage));
+  // Hidan's curse: damage he takes is also dealt to the linked enemy
+  if (target.link && !extra.mirrored) {
+    const linked = state.units[target.link.uid];
+    if (linked && !linked.ko) dealDamage(state, linked, amount, target, `The curse passes it on — ${linked.name} takes ${amount} damage.`, { mirrored: true, hit: true });
+  }
   if (survived) {
     const t = defOf(target).trait;
     log(state, `${t.name}! ${target.name} cheats death and is left at ${target.hp} HP.`, 'special', target, { survive: true });
@@ -502,7 +523,17 @@ function knockOut(state, unit, source) {
   unit.unsecured = [];
   state.teams[other(unit.side)].kos += 1;
   for (const ally of onField(state, unit.side)) ally.resolve = Math.min(100, ally.resolve + BALANCE.resolveAllyKO);
-  if (source && source.side !== unit.side && !source.ko) awardIntel(state, source, BALANCE.intelKO, 'interrogation');
+  if (source && source.side !== unit.side && !source.ko) {
+    awardIntel(state, source, BALANCE.intelKO, 'interrogation');
+    const bounty = auraVal(state, source.side, 'koIntel');
+    if (bounty) awardIntel(state, source, bounty, 'bounty');
+    if (traitOf(source) === 'fiveHearts') {
+      const amt = heal(state, source, 0.25);
+      if (amt) log(state, `${source.name} takes ${unit.name}'s heart and recovers ${amt} HP.`, 'heal', source, { amount: amt });
+    }
+  }
+  unit.link = null;
+  for (const u of Object.values(state.units)) if (u.link?.uid === unit.uid) u.link = null;
 }
 
 function heal(state, unit, pct, healer) {
@@ -608,17 +639,26 @@ function performJutsu(state, actor, jutsu, target, ctx = {}) {
           puppetPoison(state, tgt, actor);
           continue;
         }
+      } else if (!aoe && tgt.merge) {
+        tgt.merge = false;
+        log(state, `${tgt.name} sinks into the ground — ${jutsu.name} passes through!`, 'sub', tgt, { negated: true, decoy: true });
+        continue;
       } else if (blockable && !aoe && tgt.decoy > 0 && !hasFlag(actor, 'seesDecoy')) {
         tgt.decoy = 0;
         log(state, `${tgt.name}'s decoy clone absorbs the hit and pops!`, 'sub', tgt, { negated: true, decoy: true });
         puppetPoison(state, tgt, actor);
+        if (tgt.decoyGen && !actor.ko && !hasFlag(actor, 'genjutsuImmune')) {
+          applyStatus(state, actor, 'genjutsu', tgt.decoyGen);
+          log(state, `The crows scatter — ${actor.name} is caught in genjutsu!`, 'status', actor, { status: 'genjutsu' });
+        }
+        tgt.decoyGen = 0;
         continue;
       }
       // dodge (single-target attacks only)
       if (!aoe && jutsu.power > 0) {
         const dodge = Math.min(BALANCE.maxDodge, Math.max(0, (stat(state, tgt, 'spd') - stat(state, actor, 'spd')) / 500)) + auraVal(state, tgt.side, 'dodge')
-          + (traitOf(tgt) === 'iceMirrors' ? 0.1 : 0);
-        if (rng() < dodge) { log(state, `${tgt.name} dodges!`, 'info', tgt, { dodge: true }); continue; }
+          + (DODGE[traitOf(tgt)] || 0);
+        if (rng() < dodge) { log(state, traitOf(tgt) === 'kamuiPhase' ? `${jutsu.name} passes straight through ${tgt.name}!` : `${tgt.name} dodges!`, 'info', tgt, { dodge: true }); continue; }
       }
     }
 
@@ -691,6 +731,11 @@ function performJutsu(state, actor, jutsu, target, ctx = {}) {
     }
     if (eff.type === 'intel' && jutsu.target !== 'enemy') awardIntel(state, actor, eff.value, jutsu.name);
     if (eff.type === 'selfVulnerable') actor.flags.vulnerable = true;
+    if (eff.type === 'selfKO' && !actor.ko) {
+      actor.hp = 0;
+      log(state, `${actor.name} is consumed by the blast.`, 'special', actor);
+      knockOut(state, actor, null);
+    }
   }
 }
 
@@ -763,7 +808,7 @@ function applyEffect(state, actor, tgt, eff, jutsu) {
       }
       break;
     case 'genjutsu':
-      applyStatus(state, tgt, 'genjutsu', eff.turns + (traitOf(actor) === 'genjutsuMistress' ? 1 : 0));
+      applyStatus(state, tgt, 'genjutsu', eff.turns + (traitOf(actor) === 'genjutsuMistress' || traitOf(actor) === 'itachiGenius' ? 1 : 0));
       break;
     case 'restoreChakra': {
       const amt = Math.min(tgt.maxChakra - tgt.chakra, Math.round(tgt.maxChakra * eff.value));
@@ -784,8 +829,20 @@ function applyEffect(state, actor, tgt, eff, jutsu) {
         log(state, `${tgt.name} flinches!`, 'status', tgt);
       }
       break;
+    case 'curseLink':
+      if (tgt.side !== actor.side) {
+        actor.link = { uid: tgt.uid, turns: eff.turns };
+        log(state, `${actor.name} tastes ${tgt.name}'s blood — they are linked by the curse!`, 'special', actor);
+      }
+      break;
+    case 'selfStab': {
+      const dmg = Math.round(actor.maxHp * eff.value);
+      dealDamage(state, actor, dmg, actor.link ? actor : null, `${actor.name} stabs himself for ${dmg} damage.`);
+      break;
+    }
     case 'decoy':
       tgt.decoy = 2;
+      tgt.decoyGen = eff.genjutsu || 0;
       log(state, `${tgt.name} has a decoy clone ready.`, 'sub', tgt);
       break;
     case 'heal': {
@@ -814,7 +871,8 @@ function applyEffect(state, actor, tgt, eff, jutsu) {
       const lost = Math.min(tgt.chakra, amt);
       tgt.chakra -= lost;
       log(state, `${tgt.name} loses ${amt} Chakra.`, 'status', tgt);
-      if (traitOf(actor) === 'chakraEater' && lost > 0 && !actor.ko) {
+      const stealer = eff.steal || traitOf(actor) === 'chakraEater' || (traitOf(actor) === 'samehada' && jutsu?.category === 'taijutsu');
+      if (stealer && lost > 0 && !actor.ko) {
         const g = Math.min(actor.maxChakra - actor.chakra, lost);
         actor.chakra += g;
         if (g) log(state, `${actor.name} eats the stolen Chakra (+${g}).`, 'heal', actor, { amount: g, chakra: true, minor: true });
@@ -836,13 +894,14 @@ function applyEffect(state, actor, tgt, eff, jutsu) {
 }
 
 function inflictPoison(state, tgt, turns) {
+  if (hasFlag(tgt, 'poisonImmune')) { log(state, `${tgt.name} is immune to poison.`, 'info', tgt); return; }
   applyStatus(state, tgt, 'poison', turns);
   log(state, `${tgt.name} is Poisoned!`, 'status', tgt, { status: 'poison' });
 }
 
 // Kankuro / Chiyo: a puppet took the hit, and its blades were poisoned
 function puppetPoison(state, unit, attacker) {
-  if (traitOf(unit) !== 'puppetMaster' || attacker.ko || attacker.side === unit.side) return;
+  if ((traitOf(unit) !== 'puppetMaster' && traitOf(unit) !== 'humanPuppet') || attacker.ko || attacker.side === unit.side) return;
   log(state, `The puppet's hidden blades nick ${attacker.name}.`, 'sub', unit);
   inflictPoison(state, attacker, 3);
 }
@@ -866,7 +925,7 @@ function performRevive(state, actor, jutsu, target) {
   t.flags = { acted: true };
   log(state, `${t.name} is brought back to life with ${t.hp} HP!`, 'heal', t, { amount: t.hp, revive: true });
   const cost = Math.floor(actor.hp / 2);
-  if (cost) dealDamage(state, actor, cost, null, `${actor.name} gives up ${cost} HP of her own life.`);
+  if (cost) dealDamage(state, actor, cost, null, `${actor.name} gives up ${cost} HP of their own life force.`);
 }
 
 function onSubstitution(state, unit, attacker, type) {
@@ -1055,7 +1114,7 @@ function executeAction(state, u, a, clashes, cancelled, entries) {
     }
     case 'gather': {
       if (u.flags.tookDamage) { log(state, `${u.name} was hit and couldn't gather Intel!`, 'intel', u); return; }
-      awardIntel(state, u, (isSpecialist(u) ? BALANCE.intelGatherSpecialist : BALANCE.intelGather) + auraVal(state, u.side, 'gatherBonus'), 'reconnaissance');
+      awardIntel(state, u, (isSpecialist(u) ? BALANCE.intelGatherSpecialist : BALANCE.intelGather) + auraVal(state, u.side, 'gatherBonus') + (GATHER[traitOf(u)] || 0), 'reconnaissance');
       return;
     }
     case 'kunai':
@@ -1160,12 +1219,14 @@ function endOfTurn(state) {
     }
 
     if (u.statuses.burn) {
-      const dmg = Math.round(u.maxHp * B.burnDamage);
+      let dmg = Math.round(u.maxHp * B.burnDamage);
+      if (traitOf(u) === 'jashin') dmg = Math.min(dmg, u.hp - 1);
       dealDamage(state, u, dmg, null, `${u.name} is hurt by its burn (${dmg}).`, { burn: true });
       if (u.ko) continue;
     }
     if (u.statuses.poison) {
-      const dmg = Math.round(u.maxHp * B.poisonDamage);
+      let dmg = Math.round(u.maxHp * (B.poisonDamage + auraVal(state, other(u.side), 'poisonPower')));
+      if (traitOf(u) === 'jashin') dmg = Math.min(dmg, u.hp - 1);
       dealDamage(state, u, dmg, null, `${u.name} is hurt by poison (${dmg}).`, { poison: true });
       if (u.ko) continue;
     }
@@ -1187,6 +1248,8 @@ function endOfTurn(state) {
         log(state, `${state.units[state.teams[u.side].supportUid].name}'s antidote cleanses ${u.name}.`, 'heal', u);
       }
     }
+
+    if (u.link && --u.link.turns <= 0) { u.link = null; log(state, `${u.name}'s curse link fades.`, 'info', u); }
 
     // transformation upkeep (not on the turn it was activated)
     if (u.transform && u.transform.since !== state.turn) {

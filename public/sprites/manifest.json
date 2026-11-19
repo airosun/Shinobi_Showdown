@@ -280,6 +280,84 @@
   "danzo": {
    "front": "battle/danzo.webp",
    "face": "battle/danzo-face.webp"
+  },
+  "obito_tobi": {
+   "front": "battle/tobi.webp",
+   "face": "battle/tobi-face.webp"
+  },
+  "obito_masked": {
+   "front": "battle/masked-man.webp",
+   "face": "battle/masked-man-face.webp"
+  },
+  "zetsu_white": {
+   "front": "battle/white-zetsu.webp",
+   "face": "battle/white-zetsu-face.webp"
+  },
+  "zetsu_black": {
+   "front": "battle/black-zetsu.webp",
+   "face": "battle/black-zetsu-face.webp"
+  },
+  "kisame": {
+   "front": "battle/kisame.webp",
+   "face": "battle/kisame-face.webp",
+   "transform": "battle/kisame-fused.webp",
+   "transformFace": "battle/kisame-fused-face.webp"
+  },
+  "itachi": {
+   "front": "battle/itachi.webp",
+   "face": "battle/itachi-face.webp",
+   "transform": "battle/itachi-susanoo.webp",
+   "transformFace": "battle/itachi-susanoo-face.webp"
+  },
+  "deidara": {
+   "front": "battle/deidara.webp",
+   "face": "battle/deidara-face.webp"
+  },
+  "hidan": {
+   "front": "battle/hidan.webp",
+   "face": "battle/hidan-face.webp",
+   "transform": "battle/hidan-death-possession-blood.webp",
+   "transformFace": "battle/hidan-death-possession-blood-face.webp"
+  },
+  "kakuzu": {
+   "front": "battle/kakuzu.webp",
+   "face": "battle/kakuzu-face.webp",
+   "transform": "battle/kakuzu-earth-grudge.webp",
+   "transformFace": "battle/kakuzu-earth-grudge-face.webp"
+  },
+  "sasori": {
+   "front": "battle/sasori.webp",
+   "face": "battle/sasori-face.webp",
+   "transform": "battle/sasori-puppet-form.webp",
+   "transformFace": "battle/sasori-puppet-form-face.webp"
+  },
+  "konan": {
+   "front": "battle/konan.webp",
+   "face": "battle/konan-face.webp",
+   "transform": "battle/konan-paper-angel.webp",
+   "transformFace": "battle/konan-paper-angel-face.webp"
+  },
+  "nagato_pain": {
+   "front": "battle/pain.webp",
+   "face": "battle/pain-face.webp"
+  },
+  "nagato_reanimated": {
+   "front": "battle/nagato.webp",
+   "face": "battle/nagato-face.webp"
+  },
+  "suigetsu": {
+   "front": "battle/suigetsu.webp",
+   "face": "battle/suigetsu-face.webp"
+  },
+  "karin": {
+   "front": "battle/karin.webp",
+   "face": "battle/karin-face.webp"
+  },
+  "jugo": {
+   "front": "battle/jugo.webp",
+   "face": "battle/jugo-face.webp",
+   "transform": "battle/jugo-sage-mode.webp",
+   "transformFace": "battle/jugo-sage-mode-face.webp"
   }
  }
 }

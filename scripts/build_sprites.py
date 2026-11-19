@@ -47,6 +47,14 @@ MAP = {
     'tayuya': [('tayuya', 'front')], 'tayuya-curse-mark': [('tayuya', 'transform')],
     'kimimaro': [('kimimaro', 'front')], 'kimimaro-curse-mark': [('kimimaro', 'transform')],
     'zabuza': [('zabuza', 'front')], 'haku': [('haku', 'front')], 'anko': [('anko', 'front')], 'danzo': [('danzo', 'front')],
+    # batch 3
+    'tobi': [('obito_tobi', 'front')], 'masked-man': [('obito_masked', 'front')],
+    'white-zetsu': [('zetsu_white', 'front')], 'black-zetsu': [('zetsu_black', 'front')],
+    'kisame': [('kisame', 'front')], 'kisame-fused': [('kisame', 'transform')], 'itachi': [('itachi', 'front')], 'itachi-susanoo': [('itachi', 'transform')],
+    'deidara': [('deidara', 'front')], 'hidan': [('hidan', 'front')], 'hidan-death-possession-blood': [('hidan', 'transform')],
+    'kakuzu': [('kakuzu', 'front')], 'kakuzu-earth-grudge': [('kakuzu', 'transform')], 'sasori': [('sasori', 'front')], 'sasori-puppet-form': [('sasori', 'transform')],
+    'konan': [('konan', 'front')], 'konan-paper-angel': [('konan', 'transform')], 'pain': [('nagato_pain', 'front')], 'nagato': [('nagato_reanimated', 'front')],
+    'suigetsu': [('suigetsu', 'front')], 'karin': [('karin', 'front')], 'jugo': [('jugo', 'front')], 'jugo-sage-mode': [('jugo', 'transform')],
 }
 # manual portrait boxes for poses the automatic crop gets wrong: (centre x, centre y, size) as fractions of the trimmed image width/height/width
 FACE = {
@@ -57,7 +65,9 @@ FACE = {
     'kiba-two-headed-wolf': (0.16, 0.55, 0.3), 'kidomaru-curse-mark': (0.6, 0.38, 0.22), 'kidomaru': (0.5, 0.3, 0.22),
     'kimimaro-curse-mark': (0.6, 0.46, 0.22), 'naruto-four-tails-cloak': (0.22, 0.52, 0.22), 'orochimaru-eight-branches': (0.55, 0.41, 0.3),
     'rock-lee-shippuden-gates': (0.25, 0.25, 0.55), 'sakon-ukon-curse-mark': (0.15, 0.43, 0.3), 'sasuke-shippuden-curse-mark': (0.6, 0.29, 0.13),
-    'sasuke-susanoo': (0.47, 0.29, 0.3), 'zabuza': (0.6, 0.37, 0.22), 'kakashi-perfect-susanoo': (0.56, 0.1, 0.3),
+    'sasuke-susanoo': (0.47, 0.29, 0.3),
+    'white-zetsu': (0.5, 0.36, 0.55), 'black-zetsu': (0.51, 0.32, 0.45), 'kisame-fused': (0.24, 0.43, 0.25), 'itachi-susanoo': (0.55, 0.4, 0.4),
+    'kakuzu-earth-grudge': (0.42, 0.45, 0.3), 'konan-paper-angel': (0.48, 0.28, 0.17), 'jugo-sage-mode': (0.6, 0.22, 0.25), 'zabuza': (0.6, 0.37, 0.22), 'kakashi-perfect-susanoo': (0.56, 0.1, 0.3),
 }
 BATTLE_H = 440   # battle sprite height (px)
 AVATAR = 128     # menu portrait size (px)

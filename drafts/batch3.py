@@ -6,6 +6,9 @@ from batch2 import poison, revive
 
 selfKO = {'type': 'selfKO'}                         # NEW: the user is knocked out after the jutsu resolves
 curseLink = lambda t=3: {'type': 'curseLink', 'turns': t}   # NEW: damage Hidan takes is also dealt to the linked target
+selfStab = lambda v: {'type': 'selfStab', 'value': v}        # NEW: the user hurts himself (mirrored through the curse)
+crowDecoy = {'type': 'decoy', 'genjutsu': 1}                 # NEW: whoever pops the decoy is caught in genjutsu
+steal = lambda v: {'type': 'drainChakra', 'value': v, 'steal': True}  # drained Chakra goes to the user
 
 NEW_JUTSU = {
   # Obito
@@ -29,7 +32,7 @@ NEW_JUTSU = {
   'shark_dance': J('Water Prison Shark Dance', 'ninjutsu', 'water', 50, 55, 0, 'enemy', [bind(0.7, 2), drain(0.2)], 'A sphere of water full of sharks: 70% Bind for 2 turns, drain 20% Chakra.'),
   # Itachi
   'tsukuyomi': J('Tsukuyomi', 'genjutsu', 'yin', 60, 60, 1, 'enemy', [gen(2)], 'Seventy-two hours in an instant: damage and genjutsu for 2 turns.'),
-  'crow_clone': J('Crow Clone', 'support', 'yin', 0, 20, 2, 'self', [decoy, gen(1)], 'Bursts into crows: gain a Decoy; whoever hits it is caught in genjutsu for 1 turn.'),
+  'crow_clone': J('Crow Clone', 'support', 'yin', 0, 20, 2, 'self', [crowDecoy], 'Bursts into crows: gain a Decoy; whoever hits it is caught in genjutsu for 1 turn.'),
   'totsuka_blade': J('Totsuka Blade', 'ninjutsu', 'fire', 150, 60, 0, 'enemy', [], 'Only while transformed. Seals the target away. Ignores Substitution.', requiresTransform=True, ignoresSub=True),
   # Deidara
   'c1_spiders': J('C1: Clay Spiders', 'ninjutsu', 'explosion', 60, 25, 1, 'allEnemies', [], 'Little clay spiders scatter and explode.'),
@@ -43,7 +46,7 @@ NEW_JUTSU = {
   'scythe_throw': J('Scythe Throw', 'taijutsu', None, 70, 15, 1, 'enemy', [], 'Hurls the scythe on its cable.'),
   'jashin_spike': J('Jashin Spike', 'taijutsu', None, 80, 20, 0, 'enemy', [pierce(0.3)], 'A retractable spear. Ignores 30% DEF.'),
   'curse_ritual': J('Curse Ritual: Death Possession Blood', 'ninjutsu', 'yin', 0, 40, 0, 'enemy', [curseLink(3)], 'Links Hidan to the target for 3 turns: damage Hidan takes is also dealt to the target. Ignores Substitution.', ignoresSub=True, NEW=True),
-  'ritual_stab': J('Sacrificial Stab', 'taijutsu', None, 0, 20, 0, 'self', [], 'Hidan stabs himself for 20% max HP; a linked enemy takes the same through the curse.', NEW=True),
+  'ritual_stab': J('Sacrificial Stab', 'taijutsu', None, 0, 20, 0, 'self', [selfStab(0.2)], 'Only while transformed. Hidan stabs himself for 20% max HP; a linked enemy takes the same through the curse.', requiresTransform=True, NEW=True),
   # Kakuzu
   'earth_spear': J('Earth Release: Earth Spear', 'support', 'earth', 0, 30, 2, 'self', [buff('def', 1.5, 2)], 'Hardens his skin: +50% DEF for 2 turns.'),
   'false_darkness': J('Lightning Release: False Darkness', 'ninjutsu', 'lightning', 110, 45, 0, 'enemy', [pierce(0.2)], 'A piercing spear of lightning. Ignores 20% DEF.'),
@@ -66,7 +69,7 @@ NEW_JUTSU = {
   'almighty_push': J('Almighty Push', 'ninjutsu', 'yang', 90, 35, 1, 'enemy', [], 'A focused repulsion.'),
   'universal_pull': J('Universal Pull', 'ninjutsu', 'yin', 40, 30, 1, 'enemy', [bind(0.6), vsBound(1.0)], 'Drags the target in: 60% Bind.'),
   'chibaku_tensei': J('Chibaku Tensei', 'ninjutsu', 'yin', 165, 100, -1, 'allEnemies', [bind(0.5, 2)], 'Charged. A planetary prison: 50% Bind for 2 turns.', charged=True),
-  'preta_absorb': J('Preta Path: Absorb', 'ninjutsu', 'yin', 0, 10, 2, 'enemy', [drain(0.3)], 'Absorbs chakra: drain 30% Chakra from the target and take it for himself.'),
+  'preta_absorb': J('Preta Path: Absorb', 'ninjutsu', 'yin', 0, 10, 2, 'enemy', [steal(0.3)], 'Absorbs chakra: drain 30% Chakra from the target and take it for himself.'),
   'asura_missiles': J('Asura Path: Missiles', 'ninjutsu', None, 90, 50, 0, 'allEnemies', [], 'Mechanical arms fire a volley of missiles.'),
   'samsara_revival': J('Outer Path: Samsara of Heavenly Life', 'medical', 'yang', 0, 80, -1, 'ally', [revive], 'Once per battle: bring a knocked-out ally back with 40% HP. Nagato loses half his current HP.'),
   # Suigetsu

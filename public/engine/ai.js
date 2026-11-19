@@ -61,6 +61,10 @@ export function chooseActions(state, side, rng = Math.random) {
       if (o.type !== 'jutsu' && o.type !== 'kunai') continue;
       const j = getJutsu(o.jutsuId);
       if (j.effects.some((e) => e.type === 'revive' || e.type === 'bodyguard')) continue; // handled above
+      // Deidara's C0 is a last resort; Hidan's stab only makes sense while the curse is up
+      if (j.effects.some((e) => e.type === 'selfKO') && u.hp > u.maxHp * 0.35) continue;
+      if (j.effects.some((e) => e.type === 'selfStab') && !u.link) continue;
+      if (j.effects.some((e) => e.type === 'curseLink') && u.link) continue;
       // overexerting costs HP: only worth it for a knockout (or rarely when desperate)
       const ox = (sc, lethal) => (o.overexert ? (lethal ? sc * 0.9 : sc - o.overexert * 1.6) : sc);
       const tag = (a) => (o.overexert ? { ...a, overexert: true } : a);

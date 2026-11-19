@@ -3094,6 +3094,958 @@ export const JUTSU = {
     ],
     "desc": "Shisui's eye: genjutsu for 3 turns."
   },
+  "kamui_phase": {
+    "name": "Kamui: Phase",
+    "category": "support",
+    "nature": "yin",
+    "power": 0,
+    "cost": 20,
+    "priority": 2,
+    "target": "self",
+    "effects": [
+      {
+        "type": "decoy"
+      }
+    ],
+    "desc": "Slip partly into Kamui: gain a Decoy that takes the next hit."
+  },
+  "kamui_warp_strike": {
+    "name": "Kamui Warp Strike",
+    "category": "taijutsu",
+    "nature": null,
+    "power": 75,
+    "cost": 15,
+    "priority": 1,
+    "target": "enemy",
+    "effects": [],
+    "desc": "Appears behind the target out of a swirl."
+  },
+  "tobi_antics": {
+    "name": "Tobi Is a Good Boy!",
+    "category": "support",
+    "nature": null,
+    "power": 0,
+    "cost": 10,
+    "priority": 1,
+    "target": "enemy",
+    "effects": [
+      {
+        "type": "debuff",
+        "stat": "nin",
+        "mult": 0.8,
+        "turns": 2
+      },
+      {
+        "type": "intel",
+        "value": 4
+      }
+    ],
+    "desc": "Goofing around throws the target off: −20% NIN for 2 turns and +4 Intel."
+  },
+  "kamui_absorb": {
+    "name": "Kamui: Absorption",
+    "category": "ninjutsu",
+    "nature": "yin",
+    "power": 100,
+    "cost": 65,
+    "priority": -1,
+    "target": "enemy",
+    "effects": [],
+    "desc": "Warps part of the target into another dimension. Ignores Substitution.",
+    "ignoresSub": true
+  },
+  "fire_annihilation": {
+    "name": "Fire Release: Great Fire Annihilation",
+    "category": "ninjutsu",
+    "nature": "fire",
+    "power": 95,
+    "cost": 55,
+    "priority": 0,
+    "target": "allEnemies",
+    "effects": [
+      {
+        "type": "burn",
+        "chance": 0.2,
+        "turns": 3
+      }
+    ],
+    "desc": "A sea of flame over the field. 20% Burn."
+  },
+  "gedo_chains": {
+    "name": "Demonic Statue Chains",
+    "category": "ninjutsu",
+    "nature": "yin",
+    "power": 0,
+    "cost": 40,
+    "priority": 0,
+    "target": "enemy",
+    "effects": [
+      {
+        "type": "bind",
+        "chance": 0.75,
+        "turns": 2
+      },
+      {
+        "type": "drainChakra",
+        "value": 0.2
+      }
+    ],
+    "desc": "75% Bind for 2 turns and drain 20% Chakra."
+  },
+  "spore_clone": {
+    "name": "Spore Clone",
+    "category": "support",
+    "nature": "wood",
+    "power": 0,
+    "cost": 20,
+    "priority": 1,
+    "target": "self",
+    "effects": [
+      {
+        "type": "decoy"
+      },
+      {
+        "type": "intel",
+        "value": 4
+      }
+    ],
+    "desc": "A spore copy takes the next hit and spies: Decoy and +4 Intel."
+  },
+  "wood_spikes": {
+    "name": "Wood Release: Spikes",
+    "category": "ninjutsu",
+    "nature": "wood",
+    "power": 60,
+    "cost": 20,
+    "priority": 1,
+    "target": "enemy",
+    "effects": [],
+    "desc": "Spikes burst from the ground."
+  },
+  "spore_grab": {
+    "name": "Spore Absorption",
+    "category": "taijutsu",
+    "nature": "wood",
+    "power": 55,
+    "cost": 20,
+    "priority": 0,
+    "target": "enemy",
+    "effects": [
+      {
+        "type": "bind",
+        "chance": 0.3,
+        "turns": 1
+      },
+      {
+        "type": "drainChakra",
+        "value": 0.15
+      }
+    ],
+    "desc": "Clings to the target: 30% Bind and drain 15% Chakra."
+  },
+  "mayfly": {
+    "name": "Mayfly",
+    "category": "support",
+    "nature": "earth",
+    "power": 0,
+    "cost": 30,
+    "priority": 0,
+    "target": "self",
+    "effects": [
+      {
+        "type": "intel",
+        "value": 10
+      }
+    ],
+    "desc": "Sinks into the ground to scout: +10 Intel."
+  },
+  "body_hijack": {
+    "name": "Body Hijack",
+    "category": "genjutsu",
+    "nature": "yin",
+    "power": 0,
+    "cost": 40,
+    "priority": 0,
+    "target": "enemy",
+    "effects": [
+      {
+        "type": "bind",
+        "chance": 0.8,
+        "turns": 2
+      }
+    ],
+    "desc": "Seizes the target's body: 80% Bind for 2 turns."
+  },
+  "black_spear": {
+    "name": "Black Spike",
+    "category": "ninjutsu",
+    "nature": "earth",
+    "power": 70,
+    "cost": 25,
+    "priority": 1,
+    "target": "enemy",
+    "effects": [
+      {
+        "type": "pierce",
+        "value": 0.2
+      }
+    ],
+    "desc": "A spear of black matter. Ignores 20% DEF."
+  },
+  "samehada_shred": {
+    "name": "Samehada Shred",
+    "category": "taijutsu",
+    "nature": null,
+    "power": 95,
+    "cost": 20,
+    "priority": 0,
+    "target": "enemy",
+    "effects": [
+      {
+        "type": "drainChakra",
+        "value": 0.15
+      }
+    ],
+    "desc": "Samehada shaves chakra away: drain 15% Chakra."
+  },
+  "shark_bomb": {
+    "name": "Water Release: Shark Bomb",
+    "category": "ninjutsu",
+    "nature": "water",
+    "power": 100,
+    "cost": 45,
+    "priority": 0,
+    "target": "enemy",
+    "effects": [],
+    "desc": "A shark of water slams the target."
+  },
+  "thousand_sharks": {
+    "name": "Water Release: Thousand Feeding Sharks",
+    "category": "ninjutsu",
+    "nature": "water",
+    "power": 85,
+    "cost": 60,
+    "priority": -1,
+    "target": "allEnemies",
+    "effects": [],
+    "desc": "A swarm of sharks hits every enemy."
+  },
+  "shark_dance": {
+    "name": "Water Prison Shark Dance",
+    "category": "ninjutsu",
+    "nature": "water",
+    "power": 50,
+    "cost": 55,
+    "priority": 0,
+    "target": "enemy",
+    "effects": [
+      {
+        "type": "bind",
+        "chance": 0.7,
+        "turns": 2
+      },
+      {
+        "type": "drainChakra",
+        "value": 0.2
+      }
+    ],
+    "desc": "A sphere of water full of sharks: 70% Bind for 2 turns, drain 20% Chakra."
+  },
+  "tsukuyomi": {
+    "name": "Tsukuyomi",
+    "category": "genjutsu",
+    "nature": "yin",
+    "power": 80,
+    "cost": 60,
+    "priority": 1,
+    "target": "enemy",
+    "effects": [
+      {
+        "type": "genjutsu",
+        "turns": 2
+      }
+    ],
+    "desc": "Seventy-two hours in an instant: damage and genjutsu for 2 turns."
+  },
+  "crow_clone": {
+    "name": "Crow Clone",
+    "category": "support",
+    "nature": "yin",
+    "power": 0,
+    "cost": 20,
+    "priority": 2,
+    "target": "self",
+    "effects": [
+      {
+        "type": "decoy",
+        "genjutsu": 1
+      }
+    ],
+    "desc": "Bursts into crows: gain a Decoy; whoever hits it is caught in genjutsu for 1 turn."
+  },
+  "totsuka_blade": {
+    "name": "Totsuka Blade",
+    "category": "ninjutsu",
+    "nature": "fire",
+    "power": 150,
+    "cost": 60,
+    "priority": 0,
+    "target": "enemy",
+    "effects": [],
+    "desc": "Only while transformed. Seals the target away. Ignores Substitution.",
+    "requiresTransform": true,
+    "ignoresSub": true
+  },
+  "c1_spiders": {
+    "name": "C1: Clay Spiders",
+    "category": "ninjutsu",
+    "nature": "explosion",
+    "power": 60,
+    "cost": 25,
+    "priority": 1,
+    "target": "allEnemies",
+    "effects": [],
+    "desc": "Little clay spiders scatter and explode."
+  },
+  "c2_dragon": {
+    "name": "C2: Clay Dragon",
+    "category": "ninjutsu",
+    "nature": "explosion",
+    "power": 100,
+    "cost": 50,
+    "priority": 0,
+    "target": "allEnemies",
+    "effects": [],
+    "desc": "A clay dragon spits bombs over the field."
+  },
+  "c3_bomb": {
+    "name": "C3: Giant Clay Bomb",
+    "category": "ninjutsu",
+    "nature": "explosion",
+    "power": 140,
+    "cost": 80,
+    "priority": -1,
+    "target": "allEnemies",
+    "effects": [],
+    "desc": "Charged. A colossal bomb levels the field.",
+    "charged": true
+  },
+  "c4_karura": {
+    "name": "C4: Karura",
+    "category": "ninjutsu",
+    "nature": "explosion",
+    "power": 55,
+    "cost": 60,
+    "priority": 0,
+    "target": "allEnemies",
+    "effects": [
+      {
+        "type": "poison",
+        "chance": 0.4,
+        "turns": 3
+      }
+    ],
+    "desc": "Microscopic bombs inside every enemy. Ignores Substitution. 40% Poison.",
+    "ignoresSub": true
+  },
+  "c0": {
+    "name": "C0: Ultimate Art",
+    "category": "ninjutsu",
+    "nature": "explosion",
+    "power": 260,
+    "cost": 0,
+    "priority": -1,
+    "target": "allEnemies",
+    "effects": [
+      {
+        "type": "selfKO"
+      }
+    ],
+    "desc": "Deidara becomes the bomb. Massive damage to all enemies; Deidara is knocked out."
+  },
+  "clay_bird": {
+    "name": "Clay Bird Flight",
+    "category": "support",
+    "nature": "explosion",
+    "power": 0,
+    "cost": 20,
+    "priority": 2,
+    "target": "self",
+    "effects": [
+      {
+        "type": "buff",
+        "stat": "spd",
+        "mult": 1.3,
+        "turns": 3
+      }
+    ],
+    "desc": "Takes to the sky: +30% SPD for 3 turns."
+  },
+  "triple_scythe": {
+    "name": "Triple-Bladed Scythe",
+    "category": "taijutsu",
+    "nature": null,
+    "power": 95,
+    "cost": 20,
+    "priority": 0,
+    "target": "enemy",
+    "effects": [],
+    "desc": "A wide swing of the three-bladed scythe."
+  },
+  "scythe_throw": {
+    "name": "Scythe Throw",
+    "category": "taijutsu",
+    "nature": null,
+    "power": 70,
+    "cost": 15,
+    "priority": 1,
+    "target": "enemy",
+    "effects": [],
+    "desc": "Hurls the scythe on its cable."
+  },
+  "jashin_spike": {
+    "name": "Jashin Spike",
+    "category": "taijutsu",
+    "nature": null,
+    "power": 80,
+    "cost": 20,
+    "priority": 0,
+    "target": "enemy",
+    "effects": [
+      {
+        "type": "pierce",
+        "value": 0.3
+      }
+    ],
+    "desc": "A retractable spear. Ignores 30% DEF."
+  },
+  "curse_ritual": {
+    "name": "Curse Ritual: Death Possession Blood",
+    "category": "ninjutsu",
+    "nature": "yin",
+    "power": 0,
+    "cost": 40,
+    "priority": 0,
+    "target": "enemy",
+    "effects": [
+      {
+        "type": "curseLink",
+        "turns": 3
+      }
+    ],
+    "desc": "Links Hidan to the target for 3 turns: damage Hidan takes is also dealt to the target. Ignores Substitution.",
+    "ignoresSub": true
+  },
+  "ritual_stab": {
+    "name": "Sacrificial Stab",
+    "category": "taijutsu",
+    "nature": null,
+    "power": 0,
+    "cost": 20,
+    "priority": 0,
+    "target": "self",
+    "effects": [
+      {
+        "type": "selfStab",
+        "value": 0.2
+      }
+    ],
+    "desc": "Only while transformed. Hidan stabs himself for 20% max HP; a linked enemy takes the same through the curse.",
+    "requiresTransform": true
+  },
+  "earth_spear": {
+    "name": "Earth Release: Earth Spear",
+    "category": "support",
+    "nature": "earth",
+    "power": 0,
+    "cost": 30,
+    "priority": 2,
+    "target": "self",
+    "effects": [
+      {
+        "type": "buff",
+        "stat": "def",
+        "mult": 1.5,
+        "turns": 2
+      }
+    ],
+    "desc": "Hardens his skin: +50% DEF for 2 turns."
+  },
+  "false_darkness": {
+    "name": "Lightning Release: False Darkness",
+    "category": "ninjutsu",
+    "nature": "lightning",
+    "power": 100,
+    "cost": 45,
+    "priority": 0,
+    "target": "enemy",
+    "effects": [
+      {
+        "type": "pierce",
+        "value": 0.2
+      }
+    ],
+    "desc": "A piercing spear of lightning. Ignores 20% DEF."
+  },
+  "searing_migraine": {
+    "name": "Fire Release: Searing Migraine",
+    "category": "ninjutsu",
+    "nature": "fire",
+    "power": 85,
+    "cost": 50,
+    "priority": -1,
+    "target": "allEnemies",
+    "effects": [
+      {
+        "type": "burn",
+        "chance": 0.2,
+        "turns": 3
+      }
+    ],
+    "desc": "A blast of fire from the mask. 20% Burn."
+  },
+  "pressure_damage": {
+    "name": "Wind Release: Pressure Damage",
+    "category": "ninjutsu",
+    "nature": "wind",
+    "power": 140,
+    "cost": 65,
+    "priority": -1,
+    "target": "allEnemies",
+    "effects": [],
+    "desc": "Only while transformed. A crushing gale.",
+    "requiresTransform": true
+  },
+  "earth_grudge_threads": {
+    "name": "Earth Grudge Fear Threads",
+    "category": "taijutsu",
+    "nature": null,
+    "power": 65,
+    "cost": 25,
+    "priority": 1,
+    "target": "enemy",
+    "effects": [
+      {
+        "type": "bind",
+        "chance": 0.5,
+        "turns": 1
+      }
+    ],
+    "desc": "Black threads lash the target: 50% Bind."
+  },
+  "hiruko_tail": {
+    "name": "Hiruko: Poison Tail",
+    "category": "taijutsu",
+    "nature": null,
+    "power": 80,
+    "cost": 20,
+    "priority": 1,
+    "target": "enemy",
+    "effects": [
+      {
+        "type": "poison",
+        "chance": 0.5,
+        "turns": 3
+      }
+    ],
+    "desc": "A whip of the puppet's tail. 50% Poison."
+  },
+  "iron_sand_drizzle": {
+    "name": "Iron Sand: Drizzle",
+    "category": "ninjutsu",
+    "nature": "magnet",
+    "power": 85,
+    "cost": 45,
+    "priority": 0,
+    "target": "allEnemies",
+    "effects": [
+      {
+        "type": "poison",
+        "chance": 0.3,
+        "turns": 3
+      }
+    ],
+    "desc": "Poisoned iron needles rain down. 30% Poison."
+  },
+  "iron_sand_world_order": {
+    "name": "Iron Sand: World Order",
+    "category": "ninjutsu",
+    "nature": "magnet",
+    "power": 0,
+    "cost": 45,
+    "priority": 0,
+    "target": "allEnemies",
+    "effects": [
+      {
+        "type": "bind",
+        "chance": 0.45,
+        "turns": 1
+      }
+    ],
+    "desc": "A lattice of iron spikes: 45% Bind on all enemies."
+  },
+  "hundred_puppets": {
+    "name": "Red Secret Technique: Performance of a Hundred Puppets",
+    "category": "taijutsu",
+    "nature": null,
+    "power": 125,
+    "cost": 60,
+    "priority": 0,
+    "target": "allEnemies",
+    "effects": [
+      {
+        "type": "poison",
+        "chance": 0.4,
+        "turns": 3
+      }
+    ],
+    "desc": "Only while transformed. A hundred puppets attack. 40% Poison.",
+    "requiresTransform": true
+  },
+  "paper_shuriken": {
+    "name": "Paper Shuriken",
+    "category": "ninjutsu",
+    "nature": "wind",
+    "power": 70,
+    "cost": 20,
+    "priority": 1,
+    "target": "enemy",
+    "effects": [],
+    "desc": "Razor-edged paper."
+  },
+  "paper_spear": {
+    "name": "Paper Spear",
+    "category": "ninjutsu",
+    "nature": "wind",
+    "power": 100,
+    "cost": 40,
+    "priority": 0,
+    "target": "enemy",
+    "effects": [
+      {
+        "type": "pierce",
+        "value": 0.2
+      }
+    ],
+    "desc": "Folded into a lance. Ignores 20% DEF."
+  },
+  "paper_butterflies": {
+    "name": "Dance of the Shikigami",
+    "category": "ninjutsu",
+    "nature": "wind",
+    "power": 65,
+    "cost": 35,
+    "priority": 0,
+    "target": "allEnemies",
+    "effects": [
+      {
+        "type": "flinch",
+        "chance": 0.15
+      }
+    ],
+    "desc": "A storm of paper butterflies. 15% Flinch."
+  },
+  "paper_clone": {
+    "name": "Paper Clone",
+    "category": "support",
+    "nature": "wind",
+    "power": 0,
+    "cost": 20,
+    "priority": 2,
+    "target": "self",
+    "effects": [
+      {
+        "type": "decoy"
+      }
+    ],
+    "desc": "A paper double takes the next hit."
+  },
+  "paper_ocean": {
+    "name": "Six Hundred Billion Exploding Tags",
+    "category": "ninjutsu",
+    "nature": "wind",
+    "power": 190,
+    "cost": 95,
+    "priority": -1,
+    "target": "allEnemies",
+    "effects": [],
+    "desc": "Only while transformed. A sea of exploding tags.",
+    "requiresTransform": true
+  },
+  "shinra_tensei": {
+    "name": "Shinra Tensei",
+    "category": "ninjutsu",
+    "nature": "yang",
+    "power": 110,
+    "cost": 65,
+    "priority": -1,
+    "target": "allEnemies",
+    "effects": [
+      {
+        "type": "flinch",
+        "chance": 0.25
+      }
+    ],
+    "desc": "Repels everything around him. 25% Flinch."
+  },
+  "almighty_push": {
+    "name": "Almighty Push",
+    "category": "ninjutsu",
+    "nature": "yang",
+    "power": 90,
+    "cost": 35,
+    "priority": 1,
+    "target": "enemy",
+    "effects": [],
+    "desc": "A focused repulsion."
+  },
+  "universal_pull": {
+    "name": "Universal Pull",
+    "category": "ninjutsu",
+    "nature": "yin",
+    "power": 40,
+    "cost": 30,
+    "priority": 1,
+    "target": "enemy",
+    "effects": [
+      {
+        "type": "bind",
+        "chance": 0.6,
+        "turns": 1
+      },
+      {
+        "type": "bonusVsBound",
+        "value": 1.0
+      }
+    ],
+    "desc": "Drags the target in: 60% Bind."
+  },
+  "chibaku_tensei": {
+    "name": "Chibaku Tensei",
+    "category": "ninjutsu",
+    "nature": "yin",
+    "power": 165,
+    "cost": 100,
+    "priority": -1,
+    "target": "allEnemies",
+    "effects": [
+      {
+        "type": "bind",
+        "chance": 0.5,
+        "turns": 2
+      }
+    ],
+    "desc": "Charged. A planetary prison: 50% Bind for 2 turns.",
+    "charged": true
+  },
+  "preta_absorb": {
+    "name": "Preta Path: Absorb",
+    "category": "ninjutsu",
+    "nature": "yin",
+    "power": 0,
+    "cost": 10,
+    "priority": 2,
+    "target": "enemy",
+    "effects": [
+      {
+        "type": "drainChakra",
+        "value": 0.3,
+        "steal": true
+      }
+    ],
+    "desc": "Absorbs chakra: drain 30% Chakra from the target and take it for himself."
+  },
+  "asura_missiles": {
+    "name": "Asura Path: Missiles",
+    "category": "ninjutsu",
+    "nature": null,
+    "power": 90,
+    "cost": 50,
+    "priority": 0,
+    "target": "allEnemies",
+    "effects": [],
+    "desc": "Mechanical arms fire a volley of missiles."
+  },
+  "samsara_revival": {
+    "name": "Outer Path: Samsara of Heavenly Life",
+    "category": "medical",
+    "nature": "yang",
+    "power": 0,
+    "cost": 80,
+    "priority": -1,
+    "target": "ally",
+    "effects": [
+      {
+        "type": "revive",
+        "value": 0.4
+      }
+    ],
+    "desc": "Once per battle: bring a knocked-out ally back with 40% HP. Nagato loses half his current HP."
+  },
+  "water_gun": {
+    "name": "Water Release: Water Gun",
+    "category": "ninjutsu",
+    "nature": "water",
+    "power": 70,
+    "cost": 15,
+    "priority": 1,
+    "target": "enemy",
+    "effects": [],
+    "desc": "A bullet of water from his fingertip."
+  },
+  "great_water_arm": {
+    "name": "Great Water Arm",
+    "category": "taijutsu",
+    "nature": "water",
+    "power": 100,
+    "cost": 25,
+    "priority": 0,
+    "target": "enemy",
+    "effects": [],
+    "desc": "A swollen, hydrified arm."
+  },
+  "hydrification": {
+    "name": "Hydrification Technique",
+    "category": "support",
+    "nature": "water",
+    "power": 0,
+    "cost": 25,
+    "priority": 2,
+    "target": "self",
+    "effects": [
+      {
+        "type": "buff",
+        "stat": "def",
+        "mult": 1.4,
+        "turns": 2
+      }
+    ],
+    "desc": "Turns his body to water: +40% DEF for 2 turns."
+  },
+  "healing_bite": {
+    "name": "Healing Bite",
+    "category": "medical",
+    "nature": "yang",
+    "power": 0,
+    "cost": 20,
+    "priority": 1,
+    "target": "ally",
+    "effects": [
+      {
+        "type": "heal",
+        "value": 0.35
+      },
+      {
+        "type": "recoil",
+        "value": 0.1
+      }
+    ],
+    "desc": "An ally bites Karin to heal 35%; Karin loses 10% max HP."
+  },
+  "adamantine_chains": {
+    "name": "Adamantine Sealing Chains",
+    "category": "ninjutsu",
+    "nature": "yang",
+    "power": 0,
+    "cost": 45,
+    "priority": 0,
+    "target": "enemy",
+    "effects": [
+      {
+        "type": "bind",
+        "chance": 0.75,
+        "turns": 2
+      },
+      {
+        "type": "drainChakra",
+        "value": 0.1
+      }
+    ],
+    "desc": "Uzumaki chakra chains: 75% Bind for 2 turns, drain 10% Chakra."
+  },
+  "karin_punch": {
+    "name": "Karin Punch",
+    "category": "taijutsu",
+    "nature": null,
+    "power": 60,
+    "cost": 5,
+    "priority": 1,
+    "target": "enemy",
+    "effects": [],
+    "desc": "An angry punch."
+  },
+  "mind_eye_sensing": {
+    "name": "Mind's Eye of the Kagura",
+    "category": "support",
+    "nature": "yang",
+    "power": 0,
+    "cost": 20,
+    "priority": 0,
+    "target": "enemy",
+    "effects": [
+      {
+        "type": "revealLoadout"
+      },
+      {
+        "type": "intel",
+        "value": 6
+      }
+    ],
+    "desc": "Senses the target's chakra: reveal its loadout and +6 Intel."
+  },
+  "sage_arm_cannon": {
+    "name": "Sage Art: Arm Cannon",
+    "category": "taijutsu",
+    "nature": null,
+    "power": 125,
+    "cost": 40,
+    "priority": -1,
+    "target": "enemy",
+    "effects": [],
+    "desc": "His arm becomes a chakra cannon."
+  },
+  "axe_arm": {
+    "name": "Axe Arm",
+    "category": "taijutsu",
+    "nature": null,
+    "power": 95,
+    "cost": 20,
+    "priority": 0,
+    "target": "enemy",
+    "effects": [],
+    "desc": "An arm shaped like an axe."
+  },
+  "jet_punch": {
+    "name": "Jet Punch",
+    "category": "taijutsu",
+    "nature": null,
+    "power": 75,
+    "cost": 15,
+    "priority": 1,
+    "target": "enemy",
+    "effects": [],
+    "desc": "Chakra jets on his elbow drive the punch."
+  },
+  "cell_share": {
+    "name": "Natural Energy Transfer",
+    "category": "medical",
+    "nature": "yang",
+    "power": 0,
+    "cost": 30,
+    "priority": 1,
+    "target": "ally",
+    "effects": [
+      {
+        "type": "heal",
+        "value": 0.35
+      },
+      {
+        "type": "recoil",
+        "value": 0.15
+      }
+    ],
+    "desc": "Gives his own cells to an ally: heal 35%; Jugo loses 15% max HP."
+  },
   "thrown_rasenshuriken": {
     "name": "Rasenshuriken (Thrown)",
     "category": "ninjutsu",
