@@ -36,8 +36,8 @@ export const BALANCE = {
   paralyzeFail: 0.25,
   genjutsuFail: 0.5,
   exhaustedMult: 0.85,
-  intelGather: 14,
-  intelGatherSpecialist: 24,
+  intelGather: 16,
+  intelGatherSpecialist: 27,
   intelKO: 15,
   intelGenjutsu: 4,
   intelReveal: 1,
@@ -84,15 +84,17 @@ export const TRAITS = {
   rinnegan: ['dojutsu', 'seesDecoy'],
   reanimated: ['dojutsu', 'seesDecoy', 'poisonImmune'],
   kaguraSensing: ['seesDecoy'],
+  sensoryGenius: ['seesDecoy', 'seesLog'],
+  perfectJinchuriki: ['genjutsuImmune'],
 };
 // passive dodge bonus against single-target attacks
-const DODGE = { iceMirrors: 0.1, paperBody: 0.15, kamuiPhase: 0.2 };
+const DODGE = { iceMirrors: 0.1, paperBody: 0.15, kamuiPhase: 0.2, ftg: 0.15, invisibility: 0.15 };
 // extra Gather Intel
-const GATHER = { sporeSpy: 6, kaguraSensing: 4 };
+const GATHER = { sporeSpy: 6, kaguraSensing: 4, sensoryGenius: 4, pervertSpy: 6 };
 // once-per-battle KO survival: [charges, HP left]
 const SURVIVE = { bodyShedding: [1, 0.25], izanagi: [2, 0.2], jashin: [1, 0.3] };
 // passive HP regen per turn by trait
-const REGEN = { medicalSpy: 0.04, whiteSnakeSage: 0.06, reanimated: 0.06 };
+const REGEN = { medicalSpy: 0.04, whiteSnakeSage: 0.06, reanimated: 0.06, hashiramaCells: 0.04, perfectJinchuriki: 0.06 };
 export const hasFlag = (unit, flag) => (TRAITS[SHINOBI_BY_ID[unit.id].trait.id] || []).includes(flag);
 const PCT_AURAS = new Set(['stat', 'heal', 'chakra', 'subDiscount', 'decoyChance', 'crit', 'execute', 'dr', 'aoeDR', 'lowHpDR',
   'protectWeakest', 'genjutsuResist', 'dodge', 'pierce', 'kunai', 'taiDamage', 'focus', 'enemyIntel', 'enemyDrain', 'controlChance', 'natureBoost',
@@ -293,6 +295,7 @@ export function jutsuCost(state, unit, jutsu) {
   let c = jutsu.cost;
   if (traitOf(unit) === 'chakraControl') c *= 0.8;
   if (traitOf(unit) === 'genjutsuTalent' && (jutsu.category === 'genjutsu' || jutsu.nature === 'yin')) c *= 0.7;
+  if (traitOf(unit) === 'professor') c *= 0.85;
   return Math.round(c);
 }
 
@@ -323,6 +326,7 @@ function actionPriority(state, unit, action) {
       if (j.charged) return P_STANCE; // starting the weave
       let p = j.priority;
       if (j.category === 'taijutsu' && hasFlag(unit, 'noNinjutsu')) p += 1;
+      if (traitOf(unit) === 'ftg' && j.target === 'enemy') p += 1; // Flying Thunder God
       return p;
     }
     default: return 0;
@@ -438,7 +442,8 @@ export function computeDamage(state, att, def, jutsu, ctx = {}) {
   const rng = state.rng;
   const A = jutsu.category === 'taijutsu' ? stat(state, att, 'tai') : stat(state, att, 'nin');
   const pierce = Math.min(0.8, (jutsu.effects.find((e) => e.type === 'pierce')?.value || 0) + auraVal(state, att.side, 'pierce')
-    + (traitOf(att) === 'deadBone' && jutsu.category === 'taijutsu' ? 0.2 : 0));
+    + (traitOf(att) === 'deadBone' && jutsu.category === 'taijutsu' ? 0.2 : 0)
+    + (traitOf(att) === 'lightningArmor' && jutsu.category === 'taijutsu' ? 0.15 : 0));
   const D = Math.max(1, stat(state, def, 'def') * (1 - pierce));
   let dmg = jutsu.power * (A / D) * BALANCE.damageScale;
   dmg *= affinity(jutsu.nature, defOf(att).natures);
@@ -463,6 +468,10 @@ export function computeDamage(state, att, def, jutsu, ctx = {}) {
   if (traitOf(def) === 'rinnegan' && jutsu.category === 'ninjutsu') dmg *= 0.8;
   if (traitOf(def) === 'hydrification' && (jutsu.category === 'taijutsu' || jutsu.nature === 'fire')) dmg *= 0.8;
   if (traitOf(att) === 'berserker' && att.hp < att.maxHp * 0.5) dmg *= 1.25;
+  if (traitOf(def) === 'lightningArmor') dmg *= 0.9;
+  if (traitOf(def) === 'levitation' && jutsu.category === 'taijutsu') dmg *= 0.8;
+  if (traitOf(def) === 'rockSolid' && !ctx.aoe) dmg *= 0.85;
+  if (traitOf(att) === 'twoKekkei' && (jutsu.nature === 'lava' || jutsu.nature === 'boil')) dmg *= 1.1;
   // defender-side reductions
   dmg *= 1 - Math.min(0.6, auraVal(state, def.side, 'dr'));
   if (ctx.aoe) dmg *= 1 - Math.min(0.6, auraVal(state, def.side, 'aoeDR'));
@@ -539,7 +548,7 @@ function knockOut(state, unit, source) {
 function heal(state, unit, pct, healer) {
   if (unit.ko) return 0;
   let p = pct;
-  if (healer && (traitOf(healer) === 'chakraControl' || traitOf(healer) === 'medicalSpy')) p *= 1.25;
+  if (healer && ['chakraControl', 'medicalSpy', 'legendaryMedic'].includes(traitOf(healer))) p *= 1.25;
   const amt = Math.min(unit.maxHp - unit.hp, Math.round(unit.maxHp * p));
   unit.hp += amt;
   return amt;
@@ -671,6 +680,11 @@ function performJutsu(state, actor, jutsu, target, ctx = {}) {
       const focus = hitBy.some((uid) => uid !== actor.uid && state.units[uid].side === actor.side);
       let { damage, crit, adv } = computeDamage(state, actor, tgt, jutsu, { collab, clashWinner: ctx.clashWinner, aoe, focus });
       damage = Math.round(damage * damageMult);
+      if (traitOf(tgt) === 'coralShell' && !aoe && !tgt.flags.shieldUsed) {
+        tgt.flags.shieldUsed = true;
+        damage = Math.round(damage * 0.65);
+        log(state, `${tgt.name}'s coral shell absorbs part of the blow.`, 'sub', tgt);
+      }
       if (traitOf(tgt) === 'sandShield' && !aoe && !tgt.flags.shieldUsed) {
         tgt.flags.shieldUsed = true;
         damage = Math.round(damage / 2);
@@ -696,10 +710,16 @@ function performJutsu(state, actor, jutsu, target, ctx = {}) {
       if (traitOf(actor) === 'sixArms' && isKunai(jutsu) && !tgt.ko && !actor.ko) {
         dealDamage(state, tgt, damage, actor, `A second volley from the other arms — ${tgt.name} takes ${damage} more damage.`, { hit: true });
       }
-      // Sakon and Ukon: the twin strikes again
-      if (traitOf(actor) === 'twinDemons' && jutsu.category === 'taijutsu' && !isKunai(jutsu) && !tgt.ko && !actor.ko) {
-        const extra = Math.max(1, Math.round(damage * 0.35));
-        dealDamage(state, tgt, extra, actor, `Ukon strikes too — ${tgt.name} takes ${extra} more damage.`, { hit: true });
+      // Sakon and Ukon / Chojuro: a second strike
+      const twin = { twinDemons: [0.35, 'Ukon strikes too'], twinBlades: [0.25, 'Hiramekarei cuts again'] }[traitOf(actor)];
+      if (twin && jutsu.category === 'taijutsu' && !isKunai(jutsu) && !tgt.ko && !actor.ko) {
+        const extra = Math.max(1, Math.round(damage * twin[0]));
+        dealDamage(state, tgt, extra, actor, `${twin[1]} — ${tgt.name} takes ${extra} more damage.`, { hit: true });
+      }
+      // Darui: black lightning paralyzes
+      if (traitOf(actor) === 'blackLightning' && (jutsu.nature === 'lightning' || jutsu.nature === 'storm') && !tgt.ko && !tgt.statuses.paralyze && rng() < 0.2) {
+        applyStatus(state, tgt, 'paralyze', 2);
+        log(state, `Black lightning — ${tgt.name} is Paralyzed!`, 'status', tgt, { status: 'paralyze' });
       }
       // poison on hit (Anko's trait, Kankuro's support passive)
       if (!tgt.ko && !tgt.statuses.poison) {
@@ -798,7 +818,7 @@ function applyEffect(state, actor, tgt, eff, jutsu) {
       break;
     case 'bind':
       if (tgt.side !== actor.side && roll(ctl(eff.chance))) {
-        const turns = eff.turns + (traitOf(actor) === 'strategist' ? 1 : 0);
+        const turns = eff.turns + (traitOf(actor) === 'strategist' || traitOf(actor) === 'quicklime' ? 1 : 0);
         applyStatus(state, tgt, 'bind', turns);
         if (tgt.weaving) { tgt.weaving = null; log(state, `${tgt.name}'s jutsu is interrupted!`, 'status', tgt); }
         log(state, `${tgt.name} is Bound!`, 'status', tgt, { status: 'bind' });

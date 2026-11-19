@@ -423,3 +423,22 @@ test('Sasori is immune to poison; Black Zetsu merges through the first hit', () 
   assert.equal(z.hp, hp);
   assert.ok(!z.merge);
 });
+
+// ---------------- batch 4: Hokage, Sannin, Kage villages ----------------
+test('Flying Thunder God: Minato single-target jutsu gain +1 priority; Hiruzen pays 15% less', () => {
+  const st = battle(['minato', 'hiruzen', 'onoki', 'tsunade'], ['raikage_a', 'killer_bee', 'mei', 'ao']);
+  const opt = availableActions(st, '0-1').find((a) => a.jutsuId === 'fire_dragon_flame');
+  assert.equal(opt.cost, Math.round(45 * 0.85));
+  resolveTurn(st, [
+    { actor: '1-0', type: 'jutsu', jutsuId: 'lariat', target: { slot: 0 } },
+    { actor: '0-0', type: 'jutsu', jutsuId: 'ftg_strike', target: { slot: 0 } },
+  ]);
+  const order = st.log.filter((l) => / uses /.test(l.text)).map((l) => l.u);
+  assert.equal(order[0], '0-0');
+});
+
+test("Yagura's coral shell softens the first single-target hit each turn", () => {
+  const st = battle(['raikage_a', 'killer_bee', 'mei', 'ao'], ['yagura', 'chojuro', 'gengetsu', 'mu']);
+  resolveTurn(st, [{ actor: '0-0', type: 'kunai', target: { slot: 0 } }]);
+  assert.ok(st.log.some((l) => /coral shell/.test(l.text)));
+});

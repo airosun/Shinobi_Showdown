@@ -23,6 +23,7 @@ export const KEKKEI_GENKAI = {
   scorch: ['fire', 'wind'],
   boil: ['fire', 'water'],
   explosion: ['earth', 'lightning'],
+  dust: ['earth', 'wind', 'fire'], // kekkei tota
 };
 
 // Collaboration: if an ally already hit the same target this turn with a
@@ -38,7 +39,7 @@ export const ADV_WEAK = 0.75;
 export const NATURE_LABELS = {
   fire: 'Fire', wind: 'Wind', lightning: 'Lightning', earth: 'Earth', water: 'Water',
   yin: 'Yin', yang: 'Yang', wood: 'Wood', ice: 'Ice', lava: 'Lava', storm: 'Storm',
-  magnet: 'Magnet', scorch: 'Scorch', boil: 'Boil', explosion: 'Explosion',
+  magnet: 'Magnet', scorch: 'Scorch', boil: 'Boil', explosion: 'Explosion', dust: 'Dust',
 };
 
 /** Break a nature into its basic components ([] for neutral / none). */

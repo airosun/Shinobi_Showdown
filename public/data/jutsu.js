@@ -4046,6 +4046,899 @@ export const JUTSU = {
     ],
     "desc": "Gives his own cells to an ally: heal 35%; Jugo loses 15% max HP."
   },
+  "deep_forest": {
+    "name": "Wood Release: Deep Forest Emergence",
+    "category": "ninjutsu",
+    "nature": "wood",
+    "power": 75,
+    "cost": 50,
+    "priority": 0,
+    "target": "allEnemies",
+    "effects": [
+      {
+        "type": "bind",
+        "chance": 0.25,
+        "turns": 1
+      }
+    ],
+    "desc": "A forest erupts under the enemy. 25% Bind."
+  },
+  "wood_golem": {
+    "name": "Wood Release: Wood Golem",
+    "category": "taijutsu",
+    "nature": "wood",
+    "power": 100,
+    "cost": 45,
+    "priority": -1,
+    "target": "enemy",
+    "effects": [],
+    "desc": "A giant wooden warrior strikes."
+  },
+  "hashirama_regen": {
+    "name": "Seal-less Healing",
+    "category": "medical",
+    "nature": "yang",
+    "power": 0,
+    "cost": 25,
+    "priority": 1,
+    "target": "self",
+    "effects": [
+      {
+        "type": "heal",
+        "value": 0.3
+      }
+    ],
+    "desc": "Heals himself without hand seals: 30% max HP."
+  },
+  "thousand_hands": {
+    "name": "Sage Art: True Several Thousand Hands",
+    "category": "ninjutsu",
+    "nature": "wood",
+    "power": 150,
+    "cost": 85,
+    "priority": -1,
+    "target": "allEnemies",
+    "effects": [],
+    "desc": "Only while transformed. A colossal Buddha of a thousand hands.",
+    "requiresTransform": true
+  },
+  "water_shockwave": {
+    "name": "Water Release: Exploding Water Shockwave",
+    "category": "ninjutsu",
+    "nature": "water",
+    "power": 85,
+    "cost": 50,
+    "priority": 0,
+    "target": "allEnemies",
+    "effects": [],
+    "desc": "A wall of water floods the field."
+  },
+  "ftg_slash": {
+    "name": "Flying Thunder God Slash",
+    "category": "taijutsu",
+    "nature": null,
+    "power": 95,
+    "cost": 25,
+    "priority": 2,
+    "target": "enemy",
+    "effects": [],
+    "desc": "Teleports to his marker and cuts before anyone moves."
+  },
+  "water_formation_wall": {
+    "name": "Water Release: Water Formation Wall",
+    "category": "support",
+    "nature": "water",
+    "power": 0,
+    "cost": 40,
+    "priority": 2,
+    "target": "allAllies",
+    "effects": [
+      {
+        "type": "buff",
+        "stat": "def",
+        "mult": 1.25,
+        "turns": 2
+      }
+    ],
+    "desc": "A wall of water shields the team: +25% DEF for 2 turns."
+  },
+  "shadow_clone_ambush": {
+    "name": "Shadow Clone Ambush",
+    "category": "taijutsu",
+    "nature": null,
+    "power": 70,
+    "cost": 25,
+    "priority": 1,
+    "target": "allEnemies",
+    "effects": [],
+    "desc": "The inventor of the Shadow Clone hits everyone at once."
+  },
+  "fire_dragon_flame": {
+    "name": "Fire Release: Fire Dragon Flame Bullet",
+    "category": "ninjutsu",
+    "nature": "fire",
+    "power": 105,
+    "cost": 45,
+    "priority": 0,
+    "target": "enemy",
+    "effects": [
+      {
+        "type": "burn",
+        "chance": 0.25,
+        "turns": 3
+      }
+    ],
+    "desc": "A dragon of flame. 25% Burn."
+  },
+  "shuriken_shadow_clone": {
+    "name": "Shuriken Shadow Clone",
+    "category": "taijutsu",
+    "nature": null,
+    "power": 65,
+    "cost": 25,
+    "priority": 1,
+    "target": "allEnemies",
+    "effects": [],
+    "desc": "One shuriken becomes a thousand."
+  },
+  "adamantine_staff": {
+    "name": "Enma: Adamantine Staff",
+    "category": "taijutsu",
+    "nature": null,
+    "power": 105,
+    "cost": 30,
+    "priority": 0,
+    "target": "enemy",
+    "effects": [
+      {
+        "type": "pierce",
+        "value": 0.2
+      }
+    ],
+    "desc": "The Monkey King as an unbreakable staff. Ignores 20% DEF."
+  },
+  "reaper_death_seal": {
+    "name": "Reaper Death Seal",
+    "category": "ninjutsu",
+    "nature": "yin",
+    "power": 230,
+    "cost": 60,
+    "priority": -1,
+    "target": "enemy",
+    "effects": [
+      {
+        "type": "selfKO"
+      }
+    ],
+    "desc": "Seals the target's soul. Ignores Substitution. Hiruzen is knocked out.",
+    "ignoresSub": true
+  },
+  "ftg_strike": {
+    "name": "Flying Thunder God Strike",
+    "category": "taijutsu",
+    "nature": null,
+    "power": 100,
+    "cost": 20,
+    "priority": 2,
+    "target": "enemy",
+    "effects": [],
+    "desc": "A three-pronged kunai, then he is already there."
+  },
+  "ftg_barrier": {
+    "name": "Space-Time Barrier",
+    "category": "support",
+    "nature": "yang",
+    "power": 0,
+    "cost": 35,
+    "priority": 4,
+    "target": "self",
+    "effects": [
+      {
+        "type": "rotation"
+      }
+    ],
+    "desc": "Teleports every incoming attack away this turn (except genjutsu)."
+  },
+  "ftg_rasengan": {
+    "name": "Flying Thunder God: Rasengan",
+    "category": "ninjutsu",
+    "nature": "wind",
+    "power": 125,
+    "cost": 45,
+    "priority": 1,
+    "target": "enemy",
+    "effects": [],
+    "desc": "Warps in with a Rasengan already in hand."
+  },
+  "kurama_bomb_minato": {
+    "name": "Yang Kurama: Tailed Beast Bomb",
+    "category": "ninjutsu",
+    "nature": "yang",
+    "power": 170,
+    "cost": 80,
+    "priority": -1,
+    "target": "allEnemies",
+    "effects": [],
+    "desc": "Only while transformed. Yang Kurama fires a Tailed Beast Bomb.",
+    "requiresTransform": true
+  },
+  "tsunade_punch": {
+    "name": "Chakra Enhanced Strength",
+    "category": "taijutsu",
+    "nature": "earth",
+    "power": 115,
+    "cost": 25,
+    "priority": 0,
+    "target": "enemy",
+    "effects": [
+      {
+        "type": "flinch",
+        "chance": 0.2
+      }
+    ],
+    "desc": "A punch that splits the ground. 20% Flinch."
+  },
+  "creation_rebirth": {
+    "name": "Creation Rebirth",
+    "category": "medical",
+    "nature": "yang",
+    "power": 0,
+    "cost": 50,
+    "priority": 3,
+    "target": "self",
+    "effects": [
+      {
+        "type": "heal",
+        "value": 0.5
+      },
+      {
+        "type": "cleanse"
+      }
+    ],
+    "desc": "Only while transformed. Rebuilds her body: heal 50% and cleanse.",
+    "requiresTransform": true
+  },
+  "toad_oil_flame": {
+    "name": "Fire Release: Toad Oil Flame Bullet",
+    "category": "ninjutsu",
+    "nature": "fire",
+    "power": 95,
+    "cost": 50,
+    "priority": 0,
+    "target": "allEnemies",
+    "effects": [
+      {
+        "type": "burn",
+        "chance": 0.3,
+        "turns": 3
+      }
+    ],
+    "desc": "Gamabunta's oil set alight. 30% Burn."
+  },
+  "needle_jizo": {
+    "name": "Wild Lion's Mane: Needle Jizo",
+    "category": "support",
+    "nature": null,
+    "power": 0,
+    "cost": 25,
+    "priority": 2,
+    "target": "self",
+    "effects": [
+      {
+        "type": "buff",
+        "stat": "def",
+        "mult": 1.5,
+        "turns": 2
+      }
+    ],
+    "desc": "Hardened hair wraps him: +50% DEF for 2 turns."
+  },
+  "frog_song": {
+    "name": "Demonic Illusion: Gamarinsho",
+    "category": "genjutsu",
+    "nature": "yin",
+    "power": 50,
+    "cost": 60,
+    "priority": 0,
+    "target": "allEnemies",
+    "effects": [
+      {
+        "type": "genjutsu",
+        "turns": 2
+      }
+    ],
+    "desc": "Only while transformed. The Two Great Sage Toads sing every enemy into genjutsu for 2 turns.",
+    "requiresTransform": true
+  },
+  "toad_mouth_trap": {
+    "name": "Toad Mouth Bind",
+    "category": "ninjutsu",
+    "nature": "earth",
+    "power": 40,
+    "cost": 40,
+    "priority": 0,
+    "target": "enemy",
+    "effects": [
+      {
+        "type": "bind",
+        "chance": 0.7,
+        "turns": 2
+      }
+    ],
+    "desc": "Swallows the target in a toad's gullet: 70% Bind for 2 turns."
+  },
+  "liger_bomb": {
+    "name": "Lightning Release: Liger Bomb",
+    "category": "taijutsu",
+    "nature": "lightning",
+    "power": 125,
+    "cost": 40,
+    "priority": 0,
+    "target": "enemy",
+    "effects": [],
+    "desc": "A lightning-charged piledriver."
+  },
+  "lariat": {
+    "name": "Lightning Release: Lariat",
+    "category": "taijutsu",
+    "nature": "lightning",
+    "power": 100,
+    "cost": 25,
+    "priority": 1,
+    "target": "enemy",
+    "effects": [],
+    "desc": "A charging, lightning-clad arm."
+  },
+  "guillotine_drop": {
+    "name": "Lightning Release: Guillotine Drop",
+    "category": "taijutsu",
+    "nature": "lightning",
+    "power": 125,
+    "cost": 45,
+    "priority": -1,
+    "target": "enemy",
+    "effects": [
+      {
+        "type": "flinch",
+        "chance": 0.3
+      }
+    ],
+    "desc": "A heel drop from above. 30% Flinch."
+  },
+  "lightning_armor": {
+    "name": "Lightning Release Armor",
+    "category": "support",
+    "nature": "lightning",
+    "power": 0,
+    "cost": 30,
+    "priority": 2,
+    "target": "self",
+    "effects": [
+      {
+        "type": "buff",
+        "stat": "spd",
+        "mult": 1.3,
+        "turns": 3
+      },
+      {
+        "type": "buff",
+        "stat": "def",
+        "mult": 1.2,
+        "turns": 3
+      }
+    ],
+    "desc": "Coats himself in lightning: +30% SPD and +20% DEF for 3 turns."
+  },
+  "seven_swords": {
+    "name": "Seven Swords Dance",
+    "category": "taijutsu",
+    "nature": null,
+    "power": 100,
+    "cost": 25,
+    "priority": 0,
+    "target": "enemy",
+    "effects": [],
+    "desc": "Seven blades held in elbows, knees and mouth."
+  },
+  "ink_creation": {
+    "name": "Ink Creation",
+    "category": "ninjutsu",
+    "nature": "yin",
+    "power": 40,
+    "cost": 30,
+    "priority": 1,
+    "target": "enemy",
+    "effects": [
+      {
+        "type": "bind",
+        "chance": 0.5,
+        "turns": 1
+      }
+    ],
+    "desc": "Sticky octopus ink. 50% Bind."
+  },
+  "octopus_clone": {
+    "name": "Octopus Leg Substitute",
+    "category": "support",
+    "nature": null,
+    "power": 0,
+    "cost": 20,
+    "priority": 2,
+    "target": "self",
+    "effects": [
+      {
+        "type": "decoy"
+      }
+    ],
+    "desc": "A severed tentacle takes the next hit."
+  },
+  "gyuki_bomb": {
+    "name": "Gyuki: Tailed Beast Bomb",
+    "category": "ninjutsu",
+    "nature": null,
+    "power": 175,
+    "cost": 80,
+    "priority": -1,
+    "target": "allEnemies",
+    "effects": [],
+    "desc": "Only while transformed. The Eight-Tails fires a Tailed Beast Bomb.",
+    "requiresTransform": true
+  },
+  "black_panther": {
+    "name": "Black Lightning: Black Panther",
+    "category": "ninjutsu",
+    "nature": "lightning",
+    "power": 110,
+    "cost": 45,
+    "priority": 0,
+    "target": "enemy",
+    "effects": [
+      {
+        "type": "paralyze",
+        "chance": 0.3,
+        "turns": 2
+      }
+    ],
+    "desc": "A panther of black lightning. 30% Paralyze."
+  },
+  "laser_circus": {
+    "name": "Storm Release: Laser Circus",
+    "category": "ninjutsu",
+    "nature": "storm",
+    "power": 75,
+    "cost": 50,
+    "priority": 0,
+    "target": "allEnemies",
+    "effects": [],
+    "desc": "Bending beams of light hit every enemy."
+  },
+  "cleaver_sword": {
+    "name": "Cleaver Sword Slash",
+    "category": "taijutsu",
+    "nature": null,
+    "power": 90,
+    "cost": 20,
+    "priority": 0,
+    "target": "enemy",
+    "effects": [],
+    "desc": "A swing of the heavy cleaver."
+  },
+  "karui_combo": {
+    "name": "Cloud-Style Front Beheading",
+    "category": "taijutsu",
+    "nature": null,
+    "power": 95,
+    "cost": 20,
+    "priority": 0,
+    "target": "enemy",
+    "effects": [],
+    "desc": "A downward cut with full body weight."
+  },
+  "karui_flurry": {
+    "name": "Cloud-Style Flurry",
+    "category": "taijutsu",
+    "nature": null,
+    "power": 65,
+    "cost": 10,
+    "priority": 1,
+    "target": "enemy",
+    "effects": [
+      {
+        "type": "flinch",
+        "chance": 0.15
+      }
+    ],
+    "desc": "A fast flurry of punches. 15% Flinch."
+  },
+  "karui_lightning_blade": {
+    "name": "Lightning Release: Lightning Blade Edge",
+    "category": "taijutsu",
+    "nature": "lightning",
+    "power": 85,
+    "cost": 25,
+    "priority": 0,
+    "target": "enemy",
+    "effects": [
+      {
+        "type": "pierce",
+        "value": 0.15
+      }
+    ],
+    "desc": "A lightning-charged sword. Ignores 15% DEF."
+  },
+  "lava_monster": {
+    "name": "Lava Release: Lava Monster",
+    "category": "ninjutsu",
+    "nature": "lava",
+    "power": 105,
+    "cost": 50,
+    "priority": 0,
+    "target": "enemy",
+    "effects": [
+      {
+        "type": "burn",
+        "chance": 0.3,
+        "turns": 3
+      }
+    ],
+    "desc": "Spits molten lava. 30% Burn."
+  },
+  "solid_fog": {
+    "name": "Boil Release: Solid Fog",
+    "category": "ninjutsu",
+    "nature": "boil",
+    "power": 70,
+    "cost": 45,
+    "priority": 0,
+    "target": "allEnemies",
+    "effects": [
+      {
+        "type": "debuff",
+        "stat": "def",
+        "mult": 0.85,
+        "turns": 2
+      }
+    ],
+    "desc": "Corrosive acid mist: −15% DEF for 2 turns on all enemies."
+  },
+  "water_dragon_mist": {
+    "name": "Water Release: Water Dragon Bullet",
+    "category": "ninjutsu",
+    "nature": "water",
+    "power": 100,
+    "cost": 50,
+    "priority": 0,
+    "target": "enemy",
+    "effects": [],
+    "desc": "A dragon of water."
+  },
+  "hiramekarei_slash": {
+    "name": "Hiramekarei Slash",
+    "category": "taijutsu",
+    "nature": "water",
+    "power": 90,
+    "cost": 20,
+    "priority": 0,
+    "target": "enemy",
+    "effects": [],
+    "desc": "The twin sword releases stored chakra."
+  },
+  "hiramekarei_unleashed": {
+    "name": "Hiramekarei Unleashing",
+    "category": "taijutsu",
+    "nature": "water",
+    "power": 125,
+    "cost": 40,
+    "priority": -1,
+    "target": "enemy",
+    "effects": [
+      {
+        "type": "pierce",
+        "value": 0.2
+      }
+    ],
+    "desc": "A giant chakra blade. Ignores 20% DEF."
+  },
+  "hiramekarei_guard": {
+    "name": "Hiramekarei Guard",
+    "category": "support",
+    "nature": "water",
+    "power": 0,
+    "cost": 20,
+    "priority": 2,
+    "target": "self",
+    "effects": [
+      {
+        "type": "buff",
+        "stat": "def",
+        "mult": 1.4,
+        "turns": 2
+      }
+    ],
+    "desc": "Shapes the stored chakra into a shield: +40% DEF for 2 turns."
+  },
+  "raging_waves": {
+    "name": "Water Release: Raging Waves",
+    "category": "ninjutsu",
+    "nature": "water",
+    "power": 80,
+    "cost": 45,
+    "priority": 0,
+    "target": "allEnemies",
+    "effects": [],
+    "desc": "A torrent from his mouth."
+  },
+  "ao_sensing": {
+    "name": "Byakugan Sensing",
+    "category": "support",
+    "nature": "yang",
+    "power": 0,
+    "cost": 20,
+    "priority": 0,
+    "target": "enemy",
+    "effects": [
+      {
+        "type": "revealLoadout"
+      },
+      {
+        "type": "intel",
+        "value": 6
+      }
+    ],
+    "desc": "His stolen Byakugan reads the target: reveal its loadout and +6 Intel."
+  },
+  "steaming_tyrant": {
+    "name": "Water Release: Steaming Danger Tyrant",
+    "category": "ninjutsu",
+    "nature": "boil",
+    "power": 95,
+    "cost": 45,
+    "priority": 0,
+    "target": "enemy",
+    "effects": [
+      {
+        "type": "burn",
+        "chance": 0.2,
+        "turns": 3
+      }
+    ],
+    "desc": "Boiling water doubles that explode. 20% Burn."
+  },
+  "clam_mirage": {
+    "name": "Clam Mirage",
+    "category": "genjutsu",
+    "nature": "yin",
+    "power": 0,
+    "cost": 40,
+    "priority": 0,
+    "target": "allEnemies",
+    "effects": [
+      {
+        "type": "genjutsu",
+        "turns": 1
+      }
+    ],
+    "desc": "A giant clam's mirage: genjutsu on all enemies for 1 turn."
+  },
+  "coral_palm": {
+    "name": "Water Release: Coral Palm",
+    "category": "ninjutsu",
+    "nature": "water",
+    "power": 75,
+    "cost": 35,
+    "priority": 0,
+    "target": "enemy",
+    "effects": [
+      {
+        "type": "bind",
+        "chance": 0.4,
+        "turns": 1
+      }
+    ],
+    "desc": "Coral grows over the target. 40% Bind."
+  },
+  "hook_staff": {
+    "name": "Hook Staff",
+    "category": "taijutsu",
+    "nature": null,
+    "power": 85,
+    "cost": 15,
+    "priority": 1,
+    "target": "enemy",
+    "effects": [],
+    "desc": "A strike with his flower-hooked staff."
+  },
+  "water_mirror": {
+    "name": "Water Mirror Technique",
+    "category": "support",
+    "nature": "water",
+    "power": 0,
+    "cost": 25,
+    "priority": 2,
+    "target": "self",
+    "effects": [
+      {
+        "type": "decoy"
+      }
+    ],
+    "desc": "A reflection steps in front of him: gain a Decoy."
+  },
+  "isobu_bomb": {
+    "name": "Isobu: Tailed Beast Bomb",
+    "category": "ninjutsu",
+    "nature": "water",
+    "power": 160,
+    "cost": 75,
+    "priority": -1,
+    "target": "allEnemies",
+    "effects": [],
+    "desc": "Only while transformed. The Three-Tails fires a Tailed Beast Bomb.",
+    "requiresTransform": true
+  },
+  "particle_detachment": {
+    "name": "Dust Release: Detachment of the Primitive World",
+    "category": "ninjutsu",
+    "nature": "dust",
+    "power": 170,
+    "cost": 90,
+    "priority": -1,
+    "target": "enemy",
+    "effects": [],
+    "desc": "A cube of light disintegrates the target. Ignores Substitution.",
+    "ignoresSub": true
+  },
+  "weighted_boulder": {
+    "name": "Earth Release: Added Weight Rock",
+    "category": "ninjutsu",
+    "nature": "earth",
+    "power": 0,
+    "cost": 30,
+    "priority": 1,
+    "target": "enemy",
+    "effects": [
+      {
+        "type": "debuff",
+        "stat": "spd",
+        "mult": 0.6,
+        "turns": 2
+      }
+    ],
+    "desc": "Makes the target heavy: −40% SPD for 2 turns."
+  },
+  "lightened_boulder": {
+    "name": "Earth Release: Light Weight Rock",
+    "category": "support",
+    "nature": "earth",
+    "power": 0,
+    "cost": 20,
+    "priority": 2,
+    "target": "allAllies",
+    "effects": [
+      {
+        "type": "buff",
+        "stat": "spd",
+        "mult": 1.25,
+        "turns": 2
+      }
+    ],
+    "desc": "Lightens the team: +25% SPD for 2 turns."
+  },
+  "golem": {
+    "name": "Earth Release: Golem",
+    "category": "taijutsu",
+    "nature": "earth",
+    "power": 100,
+    "cost": 35,
+    "priority": 0,
+    "target": "enemy",
+    "effects": [],
+    "desc": "A stone golem pounds the target."
+  },
+  "quicklime": {
+    "name": "Lava Release: Quicklime Congealing",
+    "category": "ninjutsu",
+    "nature": "lava",
+    "power": 0,
+    "cost": 40,
+    "priority": 0,
+    "target": "enemy",
+    "effects": [
+      {
+        "type": "bind",
+        "chance": 0.7,
+        "turns": 2
+      }
+    ],
+    "desc": "Quick-setting lime: 70% Bind for 2 turns."
+  },
+  "lava_globs": {
+    "name": "Lava Release: Lava Globs",
+    "category": "ninjutsu",
+    "nature": "lava",
+    "power": 75,
+    "cost": 40,
+    "priority": 0,
+    "target": "allEnemies",
+    "effects": [
+      {
+        "type": "burn",
+        "chance": 0.15,
+        "turns": 3
+      }
+    ],
+    "desc": "Blobs of lava rain down. 15% Burn."
+  },
+  "rock_fist": {
+    "name": "Earth Release: Rock Fist",
+    "category": "taijutsu",
+    "nature": "earth",
+    "power": 85,
+    "cost": 15,
+    "priority": 1,
+    "target": "enemy",
+    "effects": [],
+    "desc": "A fist encased in stone."
+  },
+  "stone_wall": {
+    "name": "Earth Release: Earth Dome",
+    "category": "support",
+    "nature": "earth",
+    "power": 0,
+    "cost": 35,
+    "priority": 2,
+    "target": "allAllies",
+    "effects": [
+      {
+        "type": "buff",
+        "stat": "def",
+        "mult": 1.3,
+        "turns": 2
+      }
+    ],
+    "desc": "A dome of stone over the team: +30% DEF for 2 turns."
+  },
+  "mu_split": {
+    "name": "Splitting Technique",
+    "category": "support",
+    "nature": "dust",
+    "power": 0,
+    "cost": 25,
+    "priority": 2,
+    "target": "self",
+    "effects": [
+      {
+        "type": "decoy"
+      }
+    ],
+    "desc": "Splits his body in two: gain a Decoy."
+  },
+  "mu_invisibility": {
+    "name": "Invisibility Technique",
+    "category": "support",
+    "nature": null,
+    "power": 0,
+    "cost": 25,
+    "priority": 0,
+    "target": "self",
+    "effects": [
+      {
+        "type": "intel",
+        "value": 10
+      }
+    ],
+    "desc": "Vanishes to scout: +10 Intel."
+  },
+  "dust_cone": {
+    "name": "Dust Release: Cone of Light",
+    "category": "ninjutsu",
+    "nature": "dust",
+    "power": 110,
+    "cost": 55,
+    "priority": 0,
+    "target": "enemy",
+    "effects": [],
+    "desc": "A smaller detachment cone."
+  },
   "thrown_rasenshuriken": {
     "name": "Rasenshuriken (Thrown)",
     "category": "ninjutsu",

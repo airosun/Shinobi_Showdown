@@ -537,7 +537,7 @@ export const SHINOBI = [
     "baseId": "sasuke",
     "name": "Sasuke Uchiha (Eternal Mangekyō)",
     "era": "Shippuden",
-    "cost": 10,
+    "cost": 9,
     "natures": {
       "primary": "fire",
       "secondary": "lightning"
@@ -817,7 +817,7 @@ export const SHINOBI = [
     "baseId": "kakashi",
     "name": "Kakashi Hatake",
     "era": "Part 1",
-    "cost": 7,
+    "cost": 6,
     "natures": {
       "primary": "lightning",
       "secondary": "earth"
@@ -2541,7 +2541,7 @@ export const SHINOBI = [
     "baseId": "gaara",
     "name": "Gaara",
     "era": "Part 1",
-    "cost": 8,
+    "cost": 7,
     "natures": {
       "primary": "magnet",
       "secondary": "wind"
@@ -2986,7 +2986,7 @@ export const SHINOBI = [
     "baseId": "orochimaru",
     "name": "Orochimaru",
     "era": "Part 1",
-    "cost": 9,
+    "cost": 8,
     "natures": {
       "primary": "wind",
       "secondary": "yin"
@@ -4196,7 +4196,7 @@ export const SHINOBI = [
     "baseId": "itachi",
     "name": "Itachi Uchiha",
     "era": "Shippuden",
-    "cost": 8,
+    "cost": 7,
     "natures": {
       "primary": "fire",
       "secondary": "yin"
@@ -4909,6 +4909,1213 @@ export const SHINOBI = [
             0.03,
             0.05,
             0.08
+          ]
+        }
+      ]
+    }
+  },
+  {
+    "id": "hashirama",
+    "baseId": "hashirama",
+    "name": "Hashirama Senju",
+    "era": "Shippuden",
+    "cost": 10,
+    "natures": {
+      "primary": "wood",
+      "secondary": "earth"
+    },
+    "stats": {
+      "hp": 120,
+      "tai": 100,
+      "nin": 130,
+      "def": 110,
+      "spd": 100,
+      "chk": 170
+    },
+    "roles": [
+      "Tank",
+      "Striker",
+      "Controller"
+    ],
+    "trait": {
+      "id": "hashiramaCells",
+      "name": "Hashirama Cells",
+      "desc": "Regenerates 4% HP per turn."
+    },
+    "substitutions": [
+      "log",
+      "shadowClone"
+    ],
+    "catalogue": [
+      "wood_dragon",
+      "deep_forest",
+      "wood_golem",
+      "wood_prison",
+      "hashirama_regen",
+      "thousand_hands"
+    ],
+    "defaultLoadout": [
+      "wood_dragon",
+      "deep_forest",
+      "wood_golem",
+      "thousand_hands"
+    ],
+    "transformation": {
+      "resolve": 60,
+      "cost": 0,
+      "turns": 3,
+      "mods": {
+        "nin": 1.3,
+        "def": 1.3
+      },
+      "drawback": "exhausted",
+      "name": "Sage Mode",
+      "desc": "+30% NIN, +30% DEF and unlocks True Several Thousand Hands. Exhausted afterwards."
+    },
+    "supportAura": {
+      "name": "God of Shinobi",
+      "desc": "Allies take {0} less damage.",
+      "effects": [
+        {
+          "type": "dr",
+          "values": [
+            0.05,
+            0.08,
+            0.12
+          ]
+        }
+      ]
+    }
+  },
+  {
+    "id": "tobirama",
+    "baseId": "tobirama",
+    "name": "Tobirama Senju",
+    "era": "Shippuden",
+    "cost": 9,
+    "natures": {
+      "primary": "water",
+      "secondary": "lightning"
+    },
+    "stats": {
+      "hp": 110,
+      "tai": 95,
+      "nin": 120,
+      "def": 95,
+      "spd": 125,
+      "chk": 150
+    },
+    "roles": [
+      "Striker",
+      "Sensor"
+    ],
+    "trait": {
+      "id": "sensoryGenius",
+      "name": "Sensory Genius",
+      "desc": "Sees through Log Substitution and Decoys, and his Gather Intel gains +4."
+    },
+    "substitutions": [
+      "log",
+      "shadowClone"
+    ],
+    "catalogue": [
+      "water_dragon",
+      "water_shockwave",
+      "ftg_slash",
+      "water_formation_wall",
+      "shadow_clone_ambush"
+    ],
+    "defaultLoadout": [
+      "water_dragon",
+      "water_shockwave",
+      "ftg_slash",
+      "water_formation_wall"
+    ],
+    "transformation": null,
+    "supportAura": {
+      "name": "Second Hokage's Order",
+      "desc": "Allies gain +{0} SPD.",
+      "effects": [
+        {
+          "type": "stat",
+          "values": [
+            0.1,
+            0.15,
+            0.25
+          ],
+          "stat": "spd"
+        }
+      ]
+    }
+  },
+  {
+    "id": "hiruzen",
+    "baseId": "hiruzen",
+    "name": "Hiruzen Sarutobi",
+    "era": "Part 1",
+    "cost": 8,
+    "natures": {
+      "primary": "fire",
+      "secondary": "earth"
+    },
+    "stats": {
+      "hp": 105,
+      "tai": 90,
+      "nin": 120,
+      "def": 95,
+      "spd": 95,
+      "chk": 150
+    },
+    "roles": [
+      "Striker",
+      "Controller",
+      "Support"
+    ],
+    "trait": {
+      "id": "professor",
+      "name": "The Professor",
+      "desc": "His jutsu cost 15% less Chakra."
+    },
+    "substitutions": [
+      "log",
+      "shadowClone"
+    ],
+    "catalogue": [
+      "fire_dragon_flame",
+      "shuriken_shadow_clone",
+      "adamantine_staff",
+      "mud_wall",
+      "reaper_death_seal"
+    ],
+    "defaultLoadout": [
+      "fire_dragon_flame",
+      "shuriken_shadow_clone",
+      "adamantine_staff",
+      "reaper_death_seal"
+    ],
+    "transformation": null,
+    "supportAura": {
+      "name": "Will of Fire",
+      "desc": "Allies gain {0} Resolve per turn.",
+      "effects": [
+        {
+          "type": "resolve",
+          "values": [
+            3,
+            5,
+            8
+          ]
+        }
+      ]
+    }
+  },
+  {
+    "id": "minato",
+    "baseId": "minato",
+    "name": "Minato Namikaze",
+    "era": "Shippuden",
+    "cost": 7,
+    "natures": {
+      "primary": "wind",
+      "secondary": "yang"
+    },
+    "stats": {
+      "hp": 105,
+      "tai": 100,
+      "nin": 115,
+      "def": 90,
+      "spd": 140,
+      "chk": 140
+    },
+    "roles": [
+      "Striker",
+      "Infiltrator"
+    ],
+    "trait": {
+      "id": "ftg",
+      "name": "Flying Thunder God",
+      "desc": "His single-target jutsu gain +1 priority, and he dodges single-target attacks 15% more often."
+    },
+    "substitutions": [
+      "log",
+      "shadowClone"
+    ],
+    "catalogue": [
+      "rasengan",
+      "ftg_strike",
+      "ftg_rasengan",
+      "ftg_barrier",
+      "kurama_bomb_minato"
+    ],
+    "defaultLoadout": [
+      "ftg_strike",
+      "ftg_rasengan",
+      "ftg_barrier",
+      "kurama_bomb_minato"
+    ],
+    "transformation": {
+      "resolve": 60,
+      "cost": 0,
+      "turns": 3,
+      "mods": {
+        "nin": 1.3,
+        "spd": 1.3
+      },
+      "drawback": "exhausted",
+      "name": "Nine-Tails Chakra Mode",
+      "desc": "+30% NIN, +30% SPD and unlocks Yang Kurama: Tailed Beast Bomb. Exhausted afterwards."
+    },
+    "supportAura": {
+      "name": "Yellow Flash",
+      "desc": "Allies dodge single-target attacks {0} more often.",
+      "effects": [
+        {
+          "type": "dodge",
+          "values": [
+            0.04,
+            0.07,
+            0.1
+          ]
+        }
+      ]
+    }
+  },
+  {
+    "id": "tsunade",
+    "baseId": "tsunade",
+    "name": "Tsunade Senju",
+    "era": "Part 1",
+    "cost": 9,
+    "natures": {
+      "primary": "earth",
+      "secondary": "yang"
+    },
+    "stats": {
+      "hp": 125,
+      "tai": 130,
+      "nin": 90,
+      "def": 105,
+      "spd": 90,
+      "chk": 150
+    },
+    "roles": [
+      "Frontliner",
+      "Medic"
+    ],
+    "trait": {
+      "id": "legendaryMedic",
+      "name": "Legendary Medic",
+      "desc": "Her healing is 25% stronger."
+    },
+    "substitutions": [
+      "log",
+      "shadowClone"
+    ],
+    "catalogue": [
+      "tsunade_punch",
+      "heavenly_kick",
+      "mystical_palm",
+      "katsuyu",
+      "creation_rebirth"
+    ],
+    "defaultLoadout": [
+      "tsunade_punch",
+      "heavenly_kick",
+      "katsuyu",
+      "creation_rebirth"
+    ],
+    "transformation": {
+      "resolve": 60,
+      "cost": 0,
+      "turns": 3,
+      "mods": {
+        "tai": 1.3,
+        "def": 1.2
+      },
+      "regenHpPct": 0.1,
+      "drawback": "exhausted",
+      "name": "Strength of a Hundred Seal",
+      "desc": "+30% TAI, +20% DEF, regenerates 10% HP per turn and unlocks Creation Rebirth. Exhausted afterwards."
+    },
+    "supportAura": {
+      "name": "Slug Princess",
+      "desc": "Allies regenerate {0} max HP per turn.",
+      "effects": [
+        {
+          "type": "heal",
+          "values": [
+            0.03,
+            0.05,
+            0.08
+          ]
+        }
+      ]
+    }
+  },
+  {
+    "id": "jiraiya",
+    "baseId": "jiraiya",
+    "name": "Jiraiya",
+    "era": "Part 1",
+    "cost": 9,
+    "natures": {
+      "primary": "fire",
+      "secondary": "earth"
+    },
+    "stats": {
+      "hp": 120,
+      "tai": 95,
+      "nin": 120,
+      "def": 95,
+      "spd": 100,
+      "chk": 150
+    },
+    "roles": [
+      "Striker",
+      "Infiltrator",
+      "Controller"
+    ],
+    "trait": {
+      "id": "pervertSpy",
+      "name": "Super Pervert Spy",
+      "desc": "His Gather Intel gains +6."
+    },
+    "substitutions": [
+      "log",
+      "shadowClone"
+    ],
+    "catalogue": [
+      "rasengan",
+      "toad_oil_flame",
+      "needle_jizo",
+      "toad_mouth_trap",
+      "summon_gamabunta",
+      "frog_song"
+    ],
+    "defaultLoadout": [
+      "rasengan",
+      "toad_oil_flame",
+      "toad_mouth_trap",
+      "frog_song"
+    ],
+    "transformation": {
+      "resolve": 60,
+      "cost": 0,
+      "turns": 3,
+      "mods": {
+        "nin": 1.3,
+        "tai": 1.2
+      },
+      "drawback": "exhausted",
+      "name": "Sage Mode",
+      "desc": "+30% NIN, +20% TAI and unlocks Demonic Illusion: Gamarinsho. Exhausted afterwards."
+    },
+    "supportAura": {
+      "name": "Spy Network",
+      "desc": "Team gains {0} Secured Intel per turn.",
+      "effects": [
+        {
+          "type": "intel",
+          "values": [
+            1,
+            2,
+            3
+          ]
+        }
+      ]
+    }
+  },
+  {
+    "id": "raikage_a",
+    "baseId": "a",
+    "name": "A",
+    "era": "Shippuden",
+    "cost": 9,
+    "natures": {
+      "primary": "lightning",
+      "secondary": null
+    },
+    "stats": {
+      "hp": 125,
+      "tai": 130,
+      "nin": 80,
+      "def": 105,
+      "spd": 120,
+      "chk": 130
+    },
+    "roles": [
+      "Frontliner",
+      "Striker"
+    ],
+    "trait": {
+      "id": "lightningArmor",
+      "name": "Lightning Release Armor",
+      "desc": "Takes 10% less damage, and his taijutsu ignore 15% DEF."
+    },
+    "substitutions": [
+      "log"
+    ],
+    "catalogue": [
+      "liger_bomb",
+      "lariat",
+      "guillotine_drop",
+      "lightning_armor"
+    ],
+    "defaultLoadout": [
+      "liger_bomb",
+      "lariat",
+      "guillotine_drop",
+      "lightning_armor"
+    ],
+    "transformation": null,
+    "supportAura": {
+      "name": "Raikage's Command",
+      "desc": "Allies gain +{0} TAI.",
+      "effects": [
+        {
+          "type": "stat",
+          "values": [
+            0.1,
+            0.15,
+            0.25
+          ],
+          "stat": "tai"
+        }
+      ]
+    }
+  },
+  {
+    "id": "killer_bee",
+    "baseId": "killer",
+    "name": "Killer Bee",
+    "era": "Shippuden",
+    "cost": 9,
+    "natures": {
+      "primary": "lightning",
+      "secondary": null
+    },
+    "stats": {
+      "hp": 125,
+      "tai": 115,
+      "nin": 105,
+      "def": 100,
+      "spd": 105,
+      "chk": 160
+    },
+    "roles": [
+      "Frontliner",
+      "Tank"
+    ],
+    "trait": {
+      "id": "perfectJinchuriki",
+      "name": "Perfect Jinchuriki",
+      "desc": "Regenerates 6% HP per turn and Gyuki snaps him out of genjutsu (immune)."
+    },
+    "substitutions": [
+      "log",
+      "shadowClone"
+    ],
+    "catalogue": [
+      "seven_swords",
+      "lariat",
+      "ink_creation",
+      "octopus_clone",
+      "gyuki_bomb"
+    ],
+    "defaultLoadout": [
+      "seven_swords",
+      "lariat",
+      "ink_creation",
+      "gyuki_bomb"
+    ],
+    "transformation": {
+      "resolve": 60,
+      "cost": 0,
+      "turns": 3,
+      "mods": {
+        "tai": 1.4,
+        "def": 1.3
+      },
+      "drawback": "exhausted",
+      "name": "Eight-Tails Full Form",
+      "desc": "+40% TAI, +30% DEF and unlocks Gyuki: Tailed Beast Bomb. Exhausted afterwards."
+    },
+    "supportAura": {
+      "name": "Rap Flow",
+      "desc": "Allies shrug off genjutsu {0} of the time.",
+      "effects": [
+        {
+          "type": "genjutsuResist",
+          "values": [
+            0.2,
+            0.3,
+            0.5
+          ]
+        }
+      ]
+    }
+  },
+  {
+    "id": "darui",
+    "baseId": "darui",
+    "name": "Darui",
+    "era": "Shippuden",
+    "cost": 8,
+    "natures": {
+      "primary": "storm",
+      "secondary": "lightning"
+    },
+    "stats": {
+      "hp": 110,
+      "tai": 95,
+      "nin": 115,
+      "def": 95,
+      "spd": 95,
+      "chk": 130
+    },
+    "roles": [
+      "Striker"
+    ],
+    "trait": {
+      "id": "blackLightning",
+      "name": "Black Lightning",
+      "desc": "His Lightning and Storm jutsu that hit have a 20% chance to Paralyze."
+    },
+    "substitutions": [
+      "log",
+      "waterClone"
+    ],
+    "catalogue": [
+      "black_panther",
+      "laser_circus",
+      "cleaver_sword",
+      "lightning_armor"
+    ],
+    "defaultLoadout": [
+      "black_panther",
+      "laser_circus",
+      "cleaver_sword",
+      "lightning_armor"
+    ],
+    "transformation": null,
+    "supportAura": {
+      "name": "Calm Head",
+      "desc": "Allies take {0} less damage.",
+      "effects": [
+        {
+          "type": "dr",
+          "values": [
+            0.04,
+            0.07,
+            0.1
+          ]
+        }
+      ]
+    }
+  },
+  {
+    "id": "karui",
+    "baseId": "karui",
+    "name": "Karui",
+    "era": "Shippuden",
+    "cost": 5,
+    "natures": {
+      "primary": "lightning",
+      "secondary": null
+    },
+    "stats": {
+      "hp": 100,
+      "tai": 105,
+      "nin": 70,
+      "def": 85,
+      "spd": 95,
+      "chk": 100
+    },
+    "roles": [
+      "Frontliner"
+    ],
+    "trait": {
+      "id": "berserker",
+      "name": "Hot-Blooded",
+      "desc": "Deals +25% damage while below 50% HP."
+    },
+    "substitutions": [
+      "log"
+    ],
+    "catalogue": [
+      "karui_combo",
+      "karui_flurry",
+      "karui_lightning_blade",
+      "lariat"
+    ],
+    "defaultLoadout": [
+      "karui_combo",
+      "karui_flurry",
+      "karui_lightning_blade",
+      "lariat"
+    ],
+    "transformation": null,
+    "supportAura": {
+      "name": "Cloud Kunoichi",
+      "desc": "Allies deal +{0} damage to a target an ally already hit this turn.",
+      "effects": [
+        {
+          "type": "focus",
+          "values": [
+            0.05,
+            0.1,
+            0.15
+          ]
+        }
+      ]
+    }
+  },
+  {
+    "id": "mei",
+    "baseId": "mei",
+    "name": "Mei Terumi",
+    "era": "Shippuden",
+    "cost": 9,
+    "natures": {
+      "primary": "lava",
+      "secondary": "boil"
+    },
+    "stats": {
+      "hp": 110,
+      "tai": 80,
+      "nin": 125,
+      "def": 90,
+      "spd": 95,
+      "chk": 145
+    },
+    "roles": [
+      "Striker",
+      "Controller"
+    ],
+    "trait": {
+      "id": "twoKekkei",
+      "name": "Two Kekkei Genkai",
+      "desc": "Her Lava and Boil jutsu deal +10% damage."
+    },
+    "substitutions": [
+      "log",
+      "waterClone"
+    ],
+    "catalogue": [
+      "lava_monster",
+      "solid_fog",
+      "water_dragon_mist",
+      "lava_globs"
+    ],
+    "defaultLoadout": [
+      "lava_monster",
+      "solid_fog",
+      "water_dragon_mist",
+      "lava_globs"
+    ],
+    "transformation": null,
+    "supportAura": {
+      "name": "Fifth Mizukage",
+      "desc": "Allies' kekkei genkai jutsu deal +{0} damage.",
+      "effects": [
+        {
+          "type": "natureBoost",
+          "values": [
+            0.1,
+            0.15,
+            0.25
+          ],
+          "natures": [
+            "wood",
+            "ice",
+            "lava",
+            "storm",
+            "magnet",
+            "scorch",
+            "boil",
+            "explosion",
+            "dust"
+          ]
+        }
+      ]
+    }
+  },
+  {
+    "id": "chojuro",
+    "baseId": "chojuro",
+    "name": "Chojuro",
+    "era": "Shippuden",
+    "cost": 6,
+    "natures": {
+      "primary": "water",
+      "secondary": null
+    },
+    "stats": {
+      "hp": 95,
+      "tai": 100,
+      "nin": 75,
+      "def": 85,
+      "spd": 100,
+      "chk": 105
+    },
+    "roles": [
+      "Frontliner",
+      "Tank"
+    ],
+    "trait": {
+      "id": "twinBlades",
+      "name": "Twin Blades",
+      "desc": "His taijutsu hit a second time for 25% damage."
+    },
+    "substitutions": [
+      "log",
+      "waterClone"
+    ],
+    "catalogue": [
+      "hiramekarei_slash",
+      "hiramekarei_unleashed",
+      "hiramekarei_guard",
+      "water_gun"
+    ],
+    "defaultLoadout": [
+      "hiramekarei_slash",
+      "hiramekarei_unleashed",
+      "hiramekarei_guard",
+      "water_gun"
+    ],
+    "transformation": null,
+    "supportAura": {
+      "name": "Swordsmen Legacy",
+      "desc": "Allies gain {0} critical-hit chance.",
+      "effects": [
+        {
+          "type": "crit",
+          "values": [
+            0.05,
+            0.1,
+            0.15
+          ]
+        }
+      ]
+    }
+  },
+  {
+    "id": "ao",
+    "baseId": "ao",
+    "name": "Ao",
+    "era": "Shippuden",
+    "cost": 6,
+    "natures": {
+      "primary": "water",
+      "secondary": null
+    },
+    "stats": {
+      "hp": 100,
+      "tai": 80,
+      "nin": 100,
+      "def": 90,
+      "spd": 85,
+      "chk": 120
+    },
+    "roles": [
+      "Sensor",
+      "Controller"
+    ],
+    "trait": {
+      "id": "byakugan",
+      "name": "Byakugan",
+      "desc": "Sees through Decoys."
+    },
+    "substitutions": [
+      "log",
+      "waterClone"
+    ],
+    "catalogue": [
+      "raging_waves",
+      "water_dragon",
+      "ao_sensing",
+      "hidden_mist"
+    ],
+    "defaultLoadout": [
+      "raging_waves",
+      "water_dragon",
+      "ao_sensing",
+      "hidden_mist"
+    ],
+    "transformation": null,
+    "supportAura": {
+      "name": "Mist Sensor",
+      "desc": "Enemy Intel gains are reduced by {0}.",
+      "effects": [
+        {
+          "type": "enemyIntel",
+          "values": [
+            0.1,
+            0.15,
+            0.25
+          ]
+        }
+      ]
+    }
+  },
+  {
+    "id": "gengetsu",
+    "baseId": "gengetsu",
+    "name": "Gengetsu Hozuki",
+    "era": "Shippuden",
+    "cost": 7,
+    "natures": {
+      "primary": "boil",
+      "secondary": "water"
+    },
+    "stats": {
+      "hp": 105,
+      "tai": 80,
+      "nin": 115,
+      "def": 85,
+      "spd": 100,
+      "chk": 135
+    },
+    "roles": [
+      "Controller",
+      "Striker"
+    ],
+    "trait": {
+      "id": "hydrification",
+      "name": "Hydrification",
+      "desc": "Takes 20% less damage from taijutsu and Fire jutsu."
+    },
+    "substitutions": [
+      "log",
+      "waterClone"
+    ],
+    "catalogue": [
+      "steaming_tyrant",
+      "clam_mirage",
+      "water_gun",
+      "hydrification"
+    ],
+    "defaultLoadout": [
+      "steaming_tyrant",
+      "clam_mirage",
+      "water_gun",
+      "hydrification"
+    ],
+    "transformation": null,
+    "supportAura": {
+      "name": "Second Mizukage",
+      "desc": "Allies' substitutions cost {0} less Chakra.",
+      "effects": [
+        {
+          "type": "subDiscount",
+          "values": [
+            0.05,
+            0.1,
+            0.2
+          ]
+        }
+      ]
+    }
+  },
+  {
+    "id": "yagura",
+    "baseId": "yagura",
+    "name": "Yagura Karatachi",
+    "era": "Shippuden",
+    "cost": 9,
+    "natures": {
+      "primary": "water",
+      "secondary": null
+    },
+    "stats": {
+      "hp": 110,
+      "tai": 95,
+      "nin": 110,
+      "def": 105,
+      "spd": 100,
+      "chk": 140
+    },
+    "roles": [
+      "Tank",
+      "Controller"
+    ],
+    "trait": {
+      "id": "coralShell",
+      "name": "Coral Shell",
+      "desc": "The first damaging single-target hit he takes each turn is reduced by 35%."
+    },
+    "substitutions": [
+      "log",
+      "waterClone"
+    ],
+    "catalogue": [
+      "coral_palm",
+      "hook_staff",
+      "water_mirror",
+      "raging_waves",
+      "isobu_bomb"
+    ],
+    "defaultLoadout": [
+      "coral_palm",
+      "hook_staff",
+      "raging_waves",
+      "isobu_bomb"
+    ],
+    "transformation": {
+      "resolve": 60,
+      "cost": 0,
+      "turns": 3,
+      "mods": {
+        "def": 1.3,
+        "nin": 1.3
+      },
+      "drawback": "exhausted",
+      "name": "Three-Tails Chakra Cloak",
+      "desc": "+30% DEF, +30% NIN and unlocks Isobu: Tailed Beast Bomb. Exhausted afterwards."
+    },
+    "supportAura": {
+      "name": "Bloody Mist",
+      "desc": "Fielded enemies lose {0} max Chakra per turn.",
+      "effects": [
+        {
+          "type": "enemyDrain",
+          "values": [
+            0.02,
+            0.04,
+            0.06
+          ]
+        }
+      ]
+    }
+  },
+  {
+    "id": "onoki",
+    "baseId": "onoki",
+    "name": "Onoki",
+    "era": "Shippuden",
+    "cost": 9,
+    "natures": {
+      "primary": "dust",
+      "secondary": "earth"
+    },
+    "stats": {
+      "hp": 100,
+      "tai": 70,
+      "nin": 135,
+      "def": 95,
+      "spd": 100,
+      "chk": 155
+    },
+    "roles": [
+      "Striker",
+      "Controller"
+    ],
+    "trait": {
+      "id": "levitation",
+      "name": "Levitation",
+      "desc": "Takes 20% less damage from taijutsu (he fights from the air)."
+    },
+    "substitutions": [
+      "log"
+    ],
+    "catalogue": [
+      "particle_detachment",
+      "weighted_boulder",
+      "lightened_boulder",
+      "golem",
+      "dust_cone"
+    ],
+    "defaultLoadout": [
+      "particle_detachment",
+      "weighted_boulder",
+      "golem",
+      "dust_cone"
+    ],
+    "transformation": null,
+    "supportAura": {
+      "name": "Third Tsuchikage",
+      "desc": "Allies gain +{0} DEF.",
+      "effects": [
+        {
+          "type": "stat",
+          "values": [
+            0.1,
+            0.15,
+            0.25
+          ],
+          "stat": "def"
+        }
+      ]
+    }
+  },
+  {
+    "id": "kurotsuchi",
+    "baseId": "kurotsuchi",
+    "name": "Kurotsuchi",
+    "era": "Shippuden",
+    "cost": 7,
+    "natures": {
+      "primary": "lava",
+      "secondary": "earth"
+    },
+    "stats": {
+      "hp": 95,
+      "tai": 85,
+      "nin": 105,
+      "def": 85,
+      "spd": 95,
+      "chk": 120
+    },
+    "roles": [
+      "Controller",
+      "Striker"
+    ],
+    "trait": {
+      "id": "quicklime",
+      "name": "Quick-Setting Lime",
+      "desc": "Her Binds last 1 turn longer."
+    },
+    "substitutions": [
+      "log"
+    ],
+    "catalogue": [
+      "quicklime",
+      "lava_globs",
+      "rock_fist",
+      "stone_wall"
+    ],
+    "defaultLoadout": [
+      "quicklime",
+      "lava_globs",
+      "rock_fist",
+      "stone_wall"
+    ],
+    "transformation": null,
+    "supportAura": {
+      "name": "Stone Guard",
+      "desc": "Allies take {0} less damage from area attacks.",
+      "effects": [
+        {
+          "type": "aoeDR",
+          "values": [
+            0.1,
+            0.2,
+            0.3
+          ]
+        }
+      ]
+    }
+  },
+  {
+    "id": "akatsuchi",
+    "baseId": "akatsuchi",
+    "name": "Akatsuchi",
+    "era": "Shippuden",
+    "cost": 6,
+    "natures": {
+      "primary": "earth",
+      "secondary": null
+    },
+    "stats": {
+      "hp": 125,
+      "tai": 95,
+      "nin": 75,
+      "def": 115,
+      "spd": 70,
+      "chk": 110
+    },
+    "roles": [
+      "Tank"
+    ],
+    "trait": {
+      "id": "rockSolid",
+      "name": "Rock-Solid",
+      "desc": "Takes 15% less damage from single-target attacks."
+    },
+    "substitutions": [
+      "log"
+    ],
+    "catalogue": [
+      "golem",
+      "rock_fist",
+      "stone_wall",
+      "lightened_boulder"
+    ],
+    "defaultLoadout": [
+      "golem",
+      "rock_fist",
+      "stone_wall",
+      "lightened_boulder"
+    ],
+    "transformation": null,
+    "supportAura": {
+      "name": "Bodyguard Duty",
+      "desc": "The ally with the lowest HP takes {0} less damage.",
+      "effects": [
+        {
+          "type": "protectWeakest",
+          "values": [
+            0.1,
+            0.2,
+            0.3
+          ]
+        }
+      ]
+    }
+  },
+  {
+    "id": "mu",
+    "baseId": "mu",
+    "name": "Mu",
+    "era": "Shippuden",
+    "cost": 7,
+    "natures": {
+      "primary": "dust",
+      "secondary": "wind"
+    },
+    "stats": {
+      "hp": 95,
+      "tai": 65,
+      "nin": 120,
+      "def": 85,
+      "spd": 105,
+      "chk": 140
+    },
+    "roles": [
+      "Infiltrator",
+      "Striker"
+    ],
+    "trait": {
+      "id": "invisibility",
+      "name": "Invisibility",
+      "desc": "Dodges single-target attacks 15% more often."
+    },
+    "substitutions": [
+      "log"
+    ],
+    "catalogue": [
+      "particle_detachment",
+      "dust_cone",
+      "mu_split",
+      "mu_invisibility"
+    ],
+    "defaultLoadout": [
+      "particle_detachment",
+      "dust_cone",
+      "mu_split",
+      "mu_invisibility"
+    ],
+    "transformation": null,
+    "supportAura": {
+      "name": "Second Tsuchikage",
+      "desc": "Team gains {0} Secured Intel per turn.",
+      "effects": [
+        {
+          "type": "intel",
+          "values": [
+            1,
+            2,
+            3
           ]
         }
       ]

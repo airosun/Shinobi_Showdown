@@ -358,6 +358,94 @@
    "face": "battle/jugo-face.webp",
    "transform": "battle/jugo-sage-mode.webp",
    "transformFace": "battle/jugo-sage-mode-face.webp"
+  },
+  "hashirama": {
+   "front": "battle/hashirama.webp",
+   "face": "battle/hashirama-face.webp",
+   "transform": "battle/hashirama-sage-mode.webp",
+   "transformFace": "battle/hashirama-sage-mode-face.webp"
+  },
+  "tobirama": {
+   "front": "battle/tobirama.webp",
+   "face": "battle/tobirama-face.webp"
+  },
+  "hiruzen": {
+   "front": "battle/hiruzen.webp",
+   "face": "battle/hiruzen-face.webp"
+  },
+  "minato": {
+   "front": "battle/minato.webp",
+   "face": "battle/minato-face.webp",
+   "transform": "battle/minato-nine-tails-chakra.webp",
+   "transformFace": "battle/minato-nine-tails-chakra-face.webp"
+  },
+  "tsunade": {
+   "front": "battle/tsunade.webp",
+   "face": "battle/tsunade-face.webp",
+   "transform": "battle/tsunade-hundred-healings.webp",
+   "transformFace": "battle/tsunade-hundred-healings-face.webp"
+  },
+  "jiraiya": {
+   "front": "battle/jiraiya.webp",
+   "face": "battle/jiraiya-face.webp",
+   "transform": "battle/jiraiya-sage-mode.webp",
+   "transformFace": "battle/jiraiya-sage-mode-face.webp"
+  },
+  "raikage_a": {
+   "front": "battle/a.webp",
+   "face": "battle/a-face.webp"
+  },
+  "killer_bee": {
+   "front": "battle/killer-bee.webp",
+   "face": "battle/killer-bee-face.webp",
+   "transform": "battle/gyuki.webp",
+   "transformFace": "battle/gyuki-face.webp"
+  },
+  "darui": {
+   "front": "battle/darui.webp",
+   "face": "battle/darui-face.webp"
+  },
+  "karui": {
+   "front": "battle/karui.webp",
+   "face": "battle/karui-face.webp"
+  },
+  "mei": {
+   "front": "battle/mei-terumi.webp",
+   "face": "battle/mei-terumi-face.webp"
+  },
+  "chojuro": {
+   "front": "battle/chojuro.webp",
+   "face": "battle/chojuro-face.webp"
+  },
+  "ao": {
+   "front": "battle/ao.webp",
+   "face": "battle/ao-face.webp"
+  },
+  "gengetsu": {
+   "front": "battle/gengetsu.webp",
+   "face": "battle/gengetsu-face.webp"
+  },
+  "yagura": {
+   "front": "battle/yagura.webp",
+   "face": "battle/yagura-face.webp",
+   "transform": "battle/isobu.webp",
+   "transformFace": "battle/isobu-face.webp"
+  },
+  "onoki": {
+   "front": "battle/onoki.webp",
+   "face": "battle/onoki-face.webp"
+  },
+  "kurotsuchi": {
+   "front": "battle/kurotsuchi.webp",
+   "face": "battle/kurotsuchi-face.webp"
+  },
+  "akatsuchi": {
+   "front": "battle/akatsuchi.webp",
+   "face": "battle/akatsuchi-face.webp"
+  },
+  "mu": {
+   "front": "battle/mu.webp",
+   "face": "battle/mu-face.webp"
   }
  }
 }

@@ -55,6 +55,14 @@ MAP = {
     'kakuzu': [('kakuzu', 'front')], 'kakuzu-earth-grudge': [('kakuzu', 'transform')], 'sasori': [('sasori', 'front')], 'sasori-puppet-form': [('sasori', 'transform')],
     'konan': [('konan', 'front')], 'konan-paper-angel': [('konan', 'transform')], 'pain': [('nagato_pain', 'front')], 'nagato': [('nagato_reanimated', 'front')],
     'suigetsu': [('suigetsu', 'front')], 'karin': [('karin', 'front')], 'jugo': [('jugo', 'front')], 'jugo-sage-mode': [('jugo', 'transform')],
+    # batch 4
+    'hashirama': [('hashirama', 'front')], 'hashirama-sage-mode': [('hashirama', 'transform')], 'tobirama': [('tobirama', 'front')],
+    'hiruzen': [('hiruzen', 'front')], 'minato': [('minato', 'front')], 'minato-nine-tails-chakra': [('minato', 'transform')],
+    'tsunade': [('tsunade', 'front')], 'tsunade-hundred-healings': [('tsunade', 'transform')], 'jiraiya': [('jiraiya', 'front')],
+    'jiraiya-sage-mode': [('jiraiya', 'transform')], 'a': [('raikage_a', 'front')], 'killer-bee': [('killer_bee', 'front')], 'gyuki': [('killer_bee', 'transform')],
+    'darui': [('darui', 'front')], 'karui': [('karui', 'front')], 'mei-terumi': [('mei', 'front')], 'chojuro': [('chojuro', 'front')], 'ao': [('ao', 'front')],
+    'gengetsu': [('gengetsu', 'front')], 'yagura': [('yagura', 'front')], 'isobu': [('yagura', 'transform')], 'onoki': [('onoki', 'front')],
+    'kurotsuchi': [('kurotsuchi', 'front')], 'akatsuchi': [('akatsuchi', 'front')], 'mu': [('mu', 'front')],
 }
 # manual portrait boxes for poses the automatic crop gets wrong: (centre x, centre y, size) as fractions of the trimmed image width/height/width
 FACE = {
@@ -66,6 +74,7 @@ FACE = {
     'kimimaro-curse-mark': (0.6, 0.46, 0.22), 'naruto-four-tails-cloak': (0.22, 0.52, 0.22), 'orochimaru-eight-branches': (0.55, 0.41, 0.3),
     'rock-lee-shippuden-gates': (0.25, 0.25, 0.55), 'sakon-ukon-curse-mark': (0.15, 0.43, 0.3), 'sasuke-shippuden-curse-mark': (0.6, 0.29, 0.13),
     'sasuke-susanoo': (0.47, 0.29, 0.3),
+    'gyuki': (0.32, 0.47, 0.25), 'yagura': (0.35, 0.25, 0.25), 'isobu': (0.33, 0.43, 0.3), 'jiraiya-sage-mode': (0.52, 0.28, 0.2),
     'white-zetsu': (0.5, 0.36, 0.55), 'black-zetsu': (0.51, 0.32, 0.45), 'kisame-fused': (0.24, 0.43, 0.25), 'itachi-susanoo': (0.55, 0.4, 0.4),
     'kakuzu-earth-grudge': (0.42, 0.45, 0.3), 'konan-paper-angel': (0.48, 0.28, 0.17), 'jugo-sage-mode': (0.6, 0.22, 0.25), 'zabuza': (0.6, 0.37, 0.22), 'kakashi-perfect-susanoo': (0.56, 0.1, 0.3),
 }

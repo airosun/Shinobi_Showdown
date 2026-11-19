@@ -6,6 +6,7 @@ sys.path.insert(0, os.path.dirname(__file__))
 import konoha as K
 import batch2 as B2
 import batch3 as B3
+import batch4 as B4
 
 ROOT = os.path.join(os.path.dirname(__file__), '..')
 existing_j = json.load(open(os.path.join(os.path.dirname(__file__), 'base_jutsu.json')))
@@ -15,6 +16,7 @@ existing_s = {s['id']: s for s in json.load(open(os.path.join(os.path.dirname(__
 STAT_OVERRIDES = {
     'naruto_war': (125, 110, 125, 100, 120, 160),
     'sasuke_war': (115, 110, 135, 100, 120, 130),
+    'hashirama': (120, 100, 130, 110, 100, 170),  # balance pass 4: HP 130 -> 120
 }
 
 # ---- balance pass 1 (CPU sim, cost-adjusted win rates) ----
@@ -25,7 +27,9 @@ COST_OVERRIDES = {'kurenai': 5, 'sakura_war': 9, 'tenten_ship': 7, 'kakashi_p1':
                   'kakashi_dms': 9, 'sasuke_ship': 7,
                   # balance pass 3 (batch 3)
                   'nagato_reanimated': 10, 'kakuzu': 9, 'deidara': 8, 'sasori': 8, 'konan': 7, 'itachi': 8,
-                  'chiyo': 5, 'naruto_ship': 6, 'sasuke_ms': 8, 'guy': 8, 'obito_masked': 10, 'zetsu_white': 4}
+                  'chiyo': 5, 'naruto_ship': 6, 'sasuke_ms': 8, 'guy': 8, 'obito_masked': 10, 'zetsu_white': 4,
+                  # balance pass 4 (batch 4)
+                  'darui': 8, 'chojuro': 6, 'mei': 9, 'kurotsuchi': 7, 'yagura': 9, 'itachi': 7, 'gaara_p1': 7, 'kakashi_p1': 6, 'akatsuchi': 6, 'orochimaru_p1': 8, 'minato': 7, 'sasuke_war': 9, 'ao': 6}
 JUTSU_OVERRIDES = {
     'amaterasu': {'effects': [{'type': 'burn', 'chance': 1, 'turns': 3}], 'cost': 55, 'desc': 'Black flames wherever he looks. Always Burns (3 turns). Ignores Substitution.'},
     'katsuyu': {'effects': [{'type': 'heal', 'value': 0.15}, {'type': 'buff', 'stat': 'def', 'mult': 1.2, 'turns': 2}], 'desc': "Katsuyu's clones heal all allies 15% and give +20% DEF for 2 turns."},
@@ -56,9 +60,17 @@ JUTSU_OVERRIDES = {
     'c4_karura': {'power': 55, 'effects': [{'type': 'poison', 'chance': 0.4, 'turns': 3}], 'desc': 'Microscopic bombs inside every enemy. Ignores Substitution. 40% Poison.'},
     'kamui_absorb': {'power': 100},
     'tsukuyomi': {'power': 80},
+    # balance pass 4 (batch 4)
+    'deep_forest': {'power': 75},
+    'laser_circus': {'power': 75},
+    'guillotine_drop': {'power': 125},
+    'ftg_rasengan': {'power': 125},
+    'ftg_strike': {'power': 100},
+    'wood_golem': {'power': 100},
+    'thousand_hands': {'power': 150},
 }
 VITALITY = 'Regenerates 8% max HP each turn. +30% max Chakra.'
-TRAIT_DESC_OVERRIDES = {'Akimichi Appetite': 'Charge Chakra also heals 10% max HP.', 'Kikaichu Host': 'His attacks that hit drain 6% Chakra. Immune to Chakra drain.','Weapon Mistress': 'Her Kunai & Shuriken hit all enemies.', 'Gale Mastery': 'Her area Wind jutsu deal +15% damage.', 'Kamui Intangibility': 'Single-target attacks have a 20% chance to pass straight through him.', 'Reanimated Body': 'Regenerates 6% HP per turn and is immune to Poison. Rinnegan: sees through Log Substitution and Decoys.',
+TRAIT_DESC_OVERRIDES = {'Akimichi Appetite': 'Charge Chakra also heals 10% max HP.', 'Kikaichu Host': 'His attacks that hit drain 6% Chakra. Immune to Chakra drain.','Weapon Mistress': 'Her Kunai & Shuriken hit all enemies.', 'Gale Mastery': 'Her area Wind jutsu deal +15% damage.', 'Hashirama Cells': 'Regenerates 4% HP per turn.', 'Lightning Release Armor': 'Takes 10% less damage, and his taijutsu ignore 15% DEF.', 'Flying Thunder God': 'His single-target jutsu gain +1 priority, and he dodges single-target attacks 15% more often.', 'Kamui Intangibility': 'Single-target attacks have a 20% chance to pass straight through him.', 'Reanimated Body': 'Regenerates 6% HP per turn and is immune to Poison. Rinnegan: sees through Log Substitution and Decoys.',
                         'Mangekyō Sharingan': 'Sees through Log Substitution. 25% genjutsu reflect. His Burns last 1 extra turn.',
                         'Eternal Mangekyō Sharingan': 'Sees through Log Substitution. Immune to genjutsu. His Burns last 1 extra turn.'}
 LOADOUT_OVERRIDES = {'naruto_war': ['kurama_rasengan', 'thrown_rasenshuriken', 'chakra_arm', 'tailed_beast_bomb'],
@@ -82,7 +94,16 @@ LOADOUT_OVERRIDES = {'naruto_war': ['kurama_rasengan', 'thrown_rasenshuriken', '
                      'sasori': ['hiruko_tail', 'iron_sand_drizzle', 'puppet_switch', 'hundred_puppets'],
                      'konan': ['paper_shuriken', 'paper_spear', 'paper_butterflies', 'paper_ocean'],
                      'nagato_pain': ['shinra_tensei', 'almighty_push', 'universal_pull', 'preta_absorb'],
-                     'nagato_reanimated': ['shinra_tensei', 'universal_pull', 'preta_absorb', 'samsara_revival']}
+                     'nagato_reanimated': ['shinra_tensei', 'universal_pull', 'preta_absorb', 'samsara_revival'],
+                     # batch 4
+                     'hashirama': ['wood_dragon', 'deep_forest', 'wood_golem', 'thousand_hands'],
+                     'hiruzen': ['fire_dragon_flame', 'shuriken_shadow_clone', 'adamantine_staff', 'reaper_death_seal'],
+                     'minato': ['ftg_strike', 'ftg_rasengan', 'ftg_barrier', 'kurama_bomb_minato'],
+                     'tsunade': ['tsunade_punch', 'heavenly_kick', 'katsuyu', 'creation_rebirth'],
+                     'jiraiya': ['rasengan', 'toad_oil_flame', 'toad_mouth_trap', 'frog_song'],
+                     'killer_bee': ['seven_swords', 'lariat', 'ink_creation', 'gyuki_bomb'],
+                     'yagura': ['coral_palm', 'hook_staff', 'raging_waves', 'isobu_bomb'],
+                     'onoki': ['particle_detachment', 'weighted_boulder', 'golem', 'dust_cone']}
 CATALOGUE_SWAPS = {'naruto_war': ('rasenshuriken', 'thrown_rasenshuriken')}
 EXTRA_JUTSU = {
     'thrown_rasenshuriken': dict(name='Rasenshuriken (Thrown)', category='ninjutsu', nature='wind', power=95, cost=75, priority=-1,
@@ -125,6 +146,13 @@ TRANSFORMS = {
     'sasori': TF(50, 3, {'nin': 1.3, 'spd': 1.3}, drawback='exhausted'),
     'konan': TF(60, 3, {'nin': 1.3, 'spd': 1.2}, drawback='exhausted'),
     'jugo': TF(50, 3, {'tai': 1.4, 'def': 1.3}, upkeepHpPct=0.05, drawback='exhausted'),
+    # batch 4
+    'hashirama': TF(60, 3, {'nin': 1.3, 'def': 1.3}, drawback='exhausted'),
+    'minato': TF(60, 3, {'nin': 1.3, 'spd': 1.3}, drawback='exhausted'),
+    'tsunade': TF(60, 3, {'tai': 1.3, 'def': 1.2}, regenHpPct=0.10, drawback='exhausted'),
+    'jiraiya': TF(60, 3, {'nin': 1.3, 'tai': 1.2}, drawback='exhausted'),
+    'killer_bee': TF(60, 3, {'tai': 1.4, 'def': 1.3}, drawback='exhausted'),
+    'yagura': TF(60, 3, {'def': 1.3, 'nin': 1.3}, drawback='exhausted'),
 }
 
 # ---- traits: id per behaviour ----
@@ -146,6 +174,12 @@ TRAIT_IDS = {
     "Itachi's Genius": 'itachiGenius', 'Art Is an Explosion': 'artExplosion', 'Jashinist Immortality': 'jashin', 'Five Hearts': 'fiveHearts',
     'Human Puppet': 'humanPuppet', 'Paper Body': 'paperBody', 'Rinnegan': 'rinnegan', 'Reanimated Body': 'reanimated',
     'Hydrification': 'hydrification', 'Kagura Sensing': 'kaguraSensing', 'Berserker': 'berserker',
+    # batch 4
+    'Hashirama Cells': 'hashiramaCells', 'Sensory Genius': 'sensoryGenius', 'The Professor': 'professor', 'Flying Thunder God': 'ftg',
+    'Legendary Medic': 'legendaryMedic', 'Super Pervert Spy': 'pervertSpy', 'Lightning Release Armor': 'lightningArmor',
+    'Perfect Jinchuriki': 'perfectJinchuriki', 'Black Lightning': 'blackLightning', 'Hot-Blooded': 'berserker', 'Two Kekkei Genkai': 'twoKekkei',
+    'Twin Blades': 'twinBlades', 'Coral Shell': 'coralShell', 'Levitation': 'levitation', 'Quick-Setting Lime': 'quicklime',
+    'Rock-Solid': 'rockSolid', 'Invisibility': 'invisibility',
 }
 
 # ---- support passives: effects with stage values [3 standing, 2, 1] ----
@@ -226,6 +260,26 @@ AURAS = {
     'suigetsu': ("Allies' Water jutsu deal +{0} damage.", [E('natureBoost', [0.1, 0.15, 0.25], natures=['water'])]),
     'karin': ('Allies regenerate {0} max HP per turn.', [E('heal', [0.03, 0.05, 0.08])]),
     'jugo': ('Allies regenerate {0} max Chakra per turn.', [E('chakra', [0.03, 0.05, 0.08])]),
+    # batch 4
+    'hashirama': ('Allies take {0} less damage.', [E('dr', [0.05, 0.08, 0.12])]),
+    'tobirama': ('Allies gain +{0} SPD.', [E('stat', [0.1, 0.15, 0.25], stat='spd')]),
+    'hiruzen': ('Allies gain {0} Resolve per turn.', [E('resolve', [3, 5, 8])]),
+    'minato': ('Allies dodge single-target attacks {0} more often.', [E('dodge', [0.04, 0.07, 0.1])]),
+    'tsunade': ('Allies regenerate {0} max HP per turn.', [E('heal', [0.03, 0.05, 0.08])]),
+    'jiraiya': ('Team gains {0} Secured Intel per turn.', [E('intel', [1, 2, 3])]),
+    'raikage_a': ('Allies gain +{0} TAI.', [E('stat', [0.1, 0.15, 0.25], stat='tai')]),
+    'killer_bee': ('Allies shrug off genjutsu {0} of the time.', [E('genjutsuResist', [0.2, 0.3, 0.5])]),
+    'darui': ('Allies take {0} less damage.', [E('dr', [0.04, 0.07, 0.1])]),
+    'karui': ('Allies deal +{0} damage to a target an ally already hit this turn.', [E('focus', [0.05, 0.1, 0.15])]),
+    'mei': ("Allies' kekkei genkai jutsu deal +{0} damage.", [E('natureBoost', [0.1, 0.15, 0.25], natures=['wood', 'ice', 'lava', 'storm', 'magnet', 'scorch', 'boil', 'explosion', 'dust'])]),
+    'chojuro': ('Allies gain {0} critical-hit chance.', [E('crit', [0.05, 0.1, 0.15])]),
+    'ao': ('Enemy Intel gains are reduced by {0}.', [E('enemyIntel', [0.1, 0.15, 0.25])]),
+    'gengetsu': ("Allies' substitutions cost {0} less Chakra.", [E('subDiscount', [0.05, 0.1, 0.2])]),
+    'yagura': ('Fielded enemies lose {0} max Chakra per turn.', [E('enemyDrain', [0.02, 0.04, 0.06])]),
+    'onoki': ('Allies gain +{0} DEF.', [E('stat', [0.1, 0.15, 0.25], stat='def')]),
+    'kurotsuchi': ('Allies take {0} less damage from area attacks.', [E('aoeDR', [0.1, 0.2, 0.3])]),
+    'akatsuchi': ('The ally with the lowest HP takes {0} less damage.', [E('protectWeakest', [0.1, 0.2, 0.3])]),
+    'mu': ('Team gains {0} Secured Intel per turn.', [E('intel', [1, 2, 3])]),
 }
 
 def name_for(s):
@@ -235,7 +289,7 @@ def name_for(s):
     return f"{char} ({s['form']})"
 
 out = []
-for s in K.S + [x for x in B2.S if x['status'] != 'Existing'] + B3.S:
+for s in K.S + [x for x in B2.S if x['status'] != 'Existing'] + B3.S + B4.S:
     sid = s['id']
     ex = existing_s.get(sid)
     stats = STAT_OVERRIDES.get(sid, s['stats'])
@@ -270,10 +324,11 @@ for s in K.S + [x for x in B2.S if x['status'] != 'Existing'] + B3.S:
 # Gaara is not in this batch: keep him, migrating his passive
 g = existing_s['gaara_p1']
 g['supportAura'] = {'name': g['supportAura']['name'], 'desc': AURAS['gaara_p1'][0], 'effects': AURAS['gaara_p1'][1]}
+g['cost'] = COST_OVERRIDES.get('gaara_p1', g['cost'])
 out.insert(next(i for i, x in enumerate(out) if x['id'] == 'gaara_ship'), g)  # Part I before Shippuden
 
 jutsu = dict(existing_j)
-for jid, j in {**K.NEW_JUTSU, **B2.NEW_JUTSU, **B3.NEW_JUTSU}.items():
+for jid, j in {**K.NEW_JUTSU, **B2.NEW_JUTSU, **B3.NEW_JUTSU, **B4.NEW_JUTSU}.items():
     j = dict(j)
     j.pop('NEW', None)
     jutsu[jid] = j

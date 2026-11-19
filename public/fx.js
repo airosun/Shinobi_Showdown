@@ -3,7 +3,7 @@
 export const NATURE_COLOR = {
   fire: '#ee8130', wind: '#6fcf7f', lightning: '#e0c020', earth: '#b5894f', water: '#6390f0',
   yin: '#8a6cc4', yang: '#e6d39a', wood: '#5c9e4a', ice: '#9be3f0', lava: '#e0502a', storm: '#7fb0ff',
-  magnet: '#c8b48a', scorch: '#ff9a3c', boil: '#e8a0a0', explosion: '#ffe066',
+  magnet: '#c8b48a', scorch: '#ff9a3c', boil: '#e8a0a0', explosion: '#ffe066', dust: '#9fb3bf',
 };
 
 /** Accent color for a jutsu (left border of buttons, projectile color). */
