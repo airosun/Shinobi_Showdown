@@ -26,11 +26,38 @@ MAP = {
     'choji-part-1': [('choji_p1', 'front')], 'choji-shippuden': [('choji_ship', 'front')],
     'ino-part-1': [('ino_p1', 'front')], 'ino-shippuden': [('ino_ship', 'front')],
     'kurenai': [('kurenai', 'front')], 'asuma': [('asuma', 'front')],
+    # transformation art for batch 1
+    'naruto-four-tails-cloak': [('naruto_ship', 'transform')], 'sasuke-shippuden-curse-mark': [('sasuke_ship', 'transform')],
+    'sasuke-susanoo': [('sasuke_ms', 'transform')], 'sakura-strength-of-a-hundred': [('sakura_war', 'transform')],
+    'kakashi-mangekyo': [('kakashi_ship', 'transform')], 'kakashi-perfect-susanoo': [('kakashi_dms', 'transform')],
+    'hinata-twin-lion-fist': [('hinata_ship', 'transform')], 'rock-lee-gates': [('lee_p1', 'transform')],
+    'rock-lee-shippuden-gates': [('lee_ship', 'transform')], 'might-guy-gates': [('guy', 'transform')],
+    'kiba-part-1': [('kiba_p1', 'front')], 'kiba-shippuden': [('kiba_ship', 'front')], 'kiba-two-headed-wolf': [('kiba_ship', 'transform')],
+    'choji-butterfly': [('choji_p1', 'transform')], 'choji-shippuden-butterfly': [('choji_ship', 'transform')],
+    # batch 2
+    'gaara-part-1': [('gaara_p1', 'front')], 'gaara-partial-shukaku': [('gaara_p1', 'transform')], 'gaara-shippuden': [('gaara_ship', 'front')],
+    'temari-part-1': [('temari_p1', 'front')], 'temari-shippuden': [('temari_ship', 'front')],
+    'kankuro': [('kankuro_p1', 'front')], 'kankuro-shippuden': [('kankuro_ship', 'front')], 'chiyo': [('chiyo', 'front')],
+    'orochimaru': [('orochimaru_p1', 'front'), ('orochimaru_ship', 'front')],
+    'orochimaru-eight-branches': [('orochimaru_p1', 'transform')], 'orochimaru-snake-form': [('orochimaru_ship', 'transform')],
+    'kabuto-part-1': [('kabuto_p1', 'front')], 'kabuto-sage-mode': [('kabuto_sage', 'front')], 'kabuto-dragon-sage-mode': [('kabuto_sage', 'transform')],
+    'jirobo': [('jirobo', 'front')], 'jirobo-curse-mark': [('jirobo', 'transform')],
+    'kidomaru': [('kidomaru', 'front')], 'kidomaru-curse-mark': [('kidomaru', 'transform')],
+    'sakon-ukon': [('sakon_ukon', 'front')], 'sakon-ukon-curse-mark': [('sakon_ukon', 'transform')],
+    'tayuya': [('tayuya', 'front')], 'tayuya-curse-mark': [('tayuya', 'transform')],
+    'kimimaro': [('kimimaro', 'front')], 'kimimaro-curse-mark': [('kimimaro', 'transform')],
+    'zabuza': [('zabuza', 'front')], 'haku': [('haku', 'front')], 'anko': [('anko', 'front')], 'danzo': [('danzo', 'front')],
 }
 # manual portrait boxes for poses the automatic crop gets wrong: (centre x, centre y, size) as fractions of the trimmed image width/height/width
 FACE = {
     'kakashi-double-mangekyo': (0.40, 0.27, 0.42), 'rock-lee-part-1': (0.62, 0.10, 0.35),
     'sasuke-part-1-curse-mark': (0.38, 0.37, 0.32), 'naruto-part-1-nine-tails-cloak': (0.66, 0.28, 0.38),
+    'choji-butterfly': (0.485, 0.55, 0.14), 'choji-shippuden-butterfly': (0.39, 0.51, 0.2), 'gaara-part-1': (0.16, 0.23, 0.3),
+    'gaara-partial-shukaku': (0.45, 0.36, 0.18), 'kankuro-shippuden': (0.36, 0.36, 0.26), 'kiba-part-1': (0.12, 0.17, 0.3),
+    'kiba-two-headed-wolf': (0.16, 0.55, 0.3), 'kidomaru-curse-mark': (0.6, 0.38, 0.22), 'kidomaru': (0.5, 0.3, 0.22),
+    'kimimaro-curse-mark': (0.6, 0.46, 0.22), 'naruto-four-tails-cloak': (0.22, 0.52, 0.22), 'orochimaru-eight-branches': (0.55, 0.41, 0.3),
+    'rock-lee-shippuden-gates': (0.25, 0.25, 0.55), 'sakon-ukon-curse-mark': (0.15, 0.43, 0.3), 'sasuke-shippuden-curse-mark': (0.6, 0.29, 0.13),
+    'sasuke-susanoo': (0.47, 0.29, 0.3), 'zabuza': (0.6, 0.37, 0.22), 'kakashi-perfect-susanoo': (0.56, 0.1, 0.3),
 }
 BATTLE_H = 440   # battle sprite height (px)
 AVATAR = 128     # menu portrait size (px)

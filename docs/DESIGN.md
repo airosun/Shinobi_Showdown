@@ -65,10 +65,10 @@ Fire › Wind › Lightning › Earth › Water › Fire. Yin, Yang and non-elem
 ## Intel (win condition 2)
 | Source | Intel |
 |---|---|
-| Gather Intel | 8 (Sensor/Infiltrator 15). Fails if hit first. |
+| Gather Intel | 12 (Sensor/Infiltrator 22). Fails if hit first. |
 | Genjutsu lands | 4 (+ jutsu bonus) |
 | Revealing an enemy jutsu | 1 |
-| KO (interrogation) | 12 |
+| KO (interrogation) | 15 |
 
 - New Intel is **unsecured** on the carrier. It secures at the end of the *next* turn. If the carrier is KO'd first, it's lost.
 - **Guard** halves enemy Intel gains that turn (a Sensor on guard quarters them) and takes 25% less damage.

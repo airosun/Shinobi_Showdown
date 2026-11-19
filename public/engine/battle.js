@@ -36,9 +36,9 @@ export const BALANCE = {
   paralyzeFail: 0.25,
   genjutsuFail: 0.5,
   exhaustedMult: 0.85,
-  intelGather: 8,
-  intelGatherSpecialist: 15,
-  intelKO: 12,
+  intelGather: 12,
+  intelGatherSpecialist: 22,
+  intelKO: 15,
   intelGenjutsu: 4,
   intelReveal: 1,
   resolveFromDamage: 0.7, // resolve gained per 1% max HP lost

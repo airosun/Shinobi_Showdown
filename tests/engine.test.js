@@ -101,8 +101,8 @@ test('gathered Intel secures at the end of the next turn', () => {
   assert.equal(st.teams[1].securedIntel, 2); // only Ino's support relay
   assert.ok(st.units['1-2'].unsecured.length);
   resolveTurn(st, []);
-  // Shikamaru: Infiltrator 15 * 1.25 (200 IQ) = 19, plus two Ino relays (stage 1 = 2)
-  assert.equal(st.teams[1].securedIntel, 19 + 4);
+  // Shikamaru: Infiltrator gather * 1.25 (200 IQ), plus two Ino relays (stage 1 = 2)
+  assert.equal(st.teams[1].securedIntel, Math.round(BALANCE.intelGatherSpecialist * 1.25) + 4);
 });
 
 test('a spy KO\'d before securing loses their Intel', () => {
@@ -125,7 +125,7 @@ test('Gather Intel fails if hit first', () => {
 test('Guard halves enemy Intel gains', () => {
   const st = battle(T0, T1);
   resolveTurn(st, [{ actor: '1-2', type: 'gather' }, { actor: '0-1', type: 'guard' }]);
-  assert.equal(st.units['1-2'].unsecured[0].amount, Math.round(15 * 1.25 * 0.5));
+  assert.equal(st.units['1-2'].unsecured[0].amount, Math.round(BALANCE.intelGatherSpecialist * 1.25 * 0.5));
 });
 
 test('Jutsu Clash: Water overpowers Fire', () => {

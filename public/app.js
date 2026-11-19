@@ -558,7 +558,7 @@ function actionSections(st, u) {
   const SUB = {
     kunai: (o) => { const k = E.getJutsu(o.jutsuId); return `POW ${k.power} · free · +2${k.target === 'allEnemies' ? ' · all enemies' : ''}`; },
     charge: () => `+${Math.round(E.BALANCE.chargeChakra * 100)}% Chakra · −2 · vulnerable`,
-    gather: () => `+${(E.defOf(u).roles.some((r) => r === 'Sensor' || r === 'Infiltrator') ? 15 : 8) + E.auraVal(S.battle, u.side, 'gatherBonus')} Intel · −1 · fails if hit`,
+    gather: () => `+${(E.defOf(u).roles.some((r) => r === 'Sensor' || r === 'Infiltrator') ? E.BALANCE.intelGatherSpecialist : E.BALANCE.intelGather) + E.auraVal(S.battle, u.side, 'gatherBonus')} Intel · −1 · fails if hit`,
     substitute: (o) => `CK ${o.cost} · Stance${o.note ? ` · ${o.note}` : ''}`,
     guard: () => 'Stance · halve enemy Intel',
     release: () => 'Stance · break genjutsu',

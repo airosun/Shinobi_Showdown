@@ -1,10 +1,12 @@
 // AI-vs-AI balance sim: node scripts/sim.js [games]
-import { createBattle, resolveTurn, onField, availableActions } from '../public/engine/battle.js';
+import { createBattle, resolveTurn, onField, availableActions, BALANCE } from '../public/engine/battle.js';
 import { randomTeam } from '../public/engine/teams.js';
 import { chooseActions } from '../public/engine/ai.js';
 import { SHINOBI } from '../public/data/shinobi.js';
 import { makeRng } from '../public/engine/rng.js';
 
+// try balance tweaks without editing the engine: SIM_BALANCE='{"intelGather":10}' node scripts/sim.js
+if (process.env.SIM_BALANCE) Object.assign(BALANCE, JSON.parse(process.env.SIM_BALANCE));
 const games = Number(process.argv[2] || 2000);
 const rng = makeRng(12345);
 const stats = { Elimination: 0, Intel: 0, other: 0, draw: 0, turns: 0 };
