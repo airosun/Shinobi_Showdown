@@ -275,3 +275,9 @@ main { padding: 16px; max-width: 1320px; margin: 0 auto; }
   .arena .hud { width: 46%; } .hpcard { padding: 4px 6px; } .hpcard .nm .nat { display: none; }
   .moves, .opt-grid { grid-template-columns: 1fr; }
 }
+.support-panel .stage-row { display: grid; grid-template-columns: 44px 80px 1fr; gap: 8px; align-items: center; padding: 6px 8px; background: var(--panel2); border-radius: 8px; margin-bottom: 4px; font-size: 13.5px; }
+.support-panel .stg { color: var(--resolve); letter-spacing: 1px; }
+.chip.support-chip { background: #2c2416; color: #ffd9a0; cursor: help; }
+.chip.support-chip.st2 { background: #4a3214; color: #ffc83d; }
+.chip.support-chip.st3 { background: #5a2410; color: #ffb070; box-shadow: 0 0 8px #ff8c1a88; }
+.slot.support .nm::after { content: ' · passive only'; color: var(--muted); font-weight: 400; font-size: 11px; }

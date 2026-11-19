@@ -2,11 +2,13 @@
 // (only one version of a character per team).
 //
 // stats: hp, tai, nin, def, spd, chk  (base values; see engine for scaling)
-// roles: 'Sensor' and 'Infiltrator' gather +15 Intel instead of +8;
+// roles: 'Sensor' and 'Infiltrator' gather +12 Intel instead of +6;
 //        a 'Sensor' on Guard quarters enemy Intel instead of halving it.
 // trait.id is implemented in engine/battle.js (search TRAIT HOOKS)
 // transformation: Resolve-gated power-up (null = none)
-// supportAura: passive that applies while this shinobi sits in the support slot
+// supportAura: passive this shinobi gives the team from the support slot. The support never
+//   enters the battle. values = [3 allies standing, 2 standing, 1 standing]; {v} in desc
+//   is filled with the current value (unit '%' = shown as a percentage).
 
 export const COST_CAP = 30;
 
@@ -26,7 +28,7 @@ export const SHINOBI = [
       onActivate: { chakraPct: 0.4 }, upkeepHpPct: 0.04, drawback: 'exhausted',
       desc: 'Restore 40% Chakra. +30% TAI, +20% NIN, +15% SPD, +10% DEF for 3 turns. The cloak burns 4% HP per turn. Exhausted afterwards.',
     },
-    supportAura: { id: 'resolve', value: 5, name: 'Unbreakable Spirit', desc: 'Active allies gain +5 Resolve per turn.' },
+    supportAura: { id: 'resolve', values: [5, 10, 20], name: 'Unbreakable Spirit', desc: 'Allies gain {v} Resolve per turn.', unit: '' },
   },
   {
     id: 'naruto_sage', baseId: 'naruto', name: 'Naruto Uzumaki (Sage)', era: 'Shippuden', cost: 9,
@@ -42,7 +44,7 @@ export const SHINOBI = [
       mods: { tai: 1.35, nin: 1.35, def: 1.2, spd: 1.1 },
       desc: 'Takes a turn to gather natural energy (cancelled if hit). Then +35% TAI/NIN, +20% DEF, +10% SPD for 4 turns.',
     },
-    supportAura: { id: 'chakra', value: 0.05, name: 'Toad Sage Tutelage', desc: 'Active allies regenerate +5% Chakra per turn.' },
+    supportAura: { id: 'chakra', values: [0.05, 0.08, 0.12], name: 'Toad Sage Tutelage', desc: 'Allies regenerate +{v} Chakra per turn.', unit: '%' },
   },
   {
     id: 'sasuke_p1', baseId: 'sasuke', name: 'Sasuke Uchiha', era: 'Part 1', cost: 7,
@@ -59,7 +61,7 @@ export const SHINOBI = [
       upkeepHpPct: 0.05, drawback: 'exhausted',
       desc: '+30% NIN, +20% TAI, +20% SPD for 3 turns. Costs 5% HP per turn. Exhausted afterwards.',
     },
-    supportAura: { id: 'stat', stat: 'nin', mult: 1.1, name: 'Uchiha Pride', desc: 'Active allies gain +10% NIN.' },
+    supportAura: { id: 'stat', stat: 'nin', values: [0.1, 0.15, 0.25], name: 'Uchiha Pride', desc: 'Allies gain +{v} NIN.', unit: '%' },
   },
   {
     id: 'sakura_shippuden', baseId: 'sakura', name: 'Sakura Haruno', era: 'Shippuden', cost: 6,
@@ -75,7 +77,7 @@ export const SHINOBI = [
       mods: { tai: 1.3, def: 1.2 }, regenHpPct: 0.1,
       desc: '+30% TAI, +20% DEF and regenerate 10% HP per turn for 3 turns.',
     },
-    supportAura: { id: 'heal', value: 0.04, name: 'Field Medic', desc: 'Active allies heal 4% max HP per turn.' },
+    supportAura: { id: 'heal', values: [0.04, 0.06, 0.1], name: 'Field Medic', desc: 'Allies heal {v} max HP per turn.', unit: '%' },
   },
   {
     id: 'kakashi_p1', baseId: 'kakashi', name: 'Kakashi Hatake', era: 'Part 1', cost: 8,
@@ -87,7 +89,7 @@ export const SHINOBI = [
     catalogue: ['lightning_blade', 'water_dragon', 'headhunter', 'mud_wall', 'ninja_hounds', 'demonic_illusion'],
     defaultLoadout: ['lightning_blade', 'water_dragon', 'ninja_hounds', 'demonic_illusion'],
     transformation: null,
-    supportAura: { id: 'stat', stat: 'spd', mult: 1.1, name: 'Jonin Leadership', desc: 'Active allies gain +10% SPD.' },
+    supportAura: { id: 'stat', stat: 'spd', values: [0.1, 0.15, 0.25], name: 'Jonin Leadership', desc: 'Allies gain +{v} SPD.', unit: '%' },
   },
   {
     id: 'lee_p1', baseId: 'lee', name: 'Rock Lee', era: 'Part 1', cost: 6,
@@ -103,19 +105,19 @@ export const SHINOBI = [
       mods: { tai: 1.4, spd: 1.3 }, upkeepHpPct: 0.07, drawback: 'exhausted',
       desc: '+40% TAI, +30% SPD for 3 turns and unlocks Hidden Lotus. Costs 7% HP per turn. Exhausted afterwards.',
     },
-    supportAura: { id: 'stat', stat: 'tai', mult: 1.1, name: 'Power of Youth', desc: 'Active allies gain +10% TAI.' },
+    supportAura: { id: 'stat', stat: 'tai', values: [0.1, 0.15, 0.25], name: 'Power of Youth', desc: 'Allies gain +{v} TAI.', unit: '%' },
   },
   {
     id: 'shikamaru_p1', baseId: 'shikamaru', name: 'Shikamaru Nara', era: 'Part 1', cost: 6,
     natures: { primary: 'yin', secondary: 'fire' },
     stats: { hp: 85, tai: 65, nin: 90, def: 75, spd: 85, chk: 100 },
     roles: ['Controller', 'Infiltrator'],
-    trait: { id: 'strategist', name: '200 IQ', desc: 'Intel he gathers is +50%. His Binds last 1 extra turn.' },
+    trait: { id: 'strategist', name: '200 IQ', desc: 'Intel he gathers is +25%. His Binds last 1 extra turn.' },
     substitutions: ['log', 'explosiveTag'],
     catalogue: ['shadow_possession', 'shadow_neck_bind', 'explosive_tag_kunai', 'battle_analysis', 'flash_bomb'],
     defaultLoadout: ['shadow_possession', 'shadow_neck_bind', 'explosive_tag_kunai', 'battle_analysis'],
     transformation: null,
-    supportAura: { id: 'subDiscount', value: 0.25, name: 'Battle Plan', desc: 'Active allies\' Substitutions cost 25% less Chakra.' },
+    supportAura: { id: 'subDiscount', values: [0.25, 0.4, 0.6], name: 'Battle Plan', desc: 'Allies\' Substitutions cost {v} less Chakra.', unit: '%' },
   },
   {
     id: 'gaara_p1', baseId: 'gaara', name: 'Gaara', era: 'Part 1', cost: 8,
@@ -131,19 +133,19 @@ export const SHINOBI = [
       mods: { nin: 1.35, def: 1.2 }, berserk: 0.3,
       desc: '+35% NIN, +20% DEF for 3 turns. 30% chance each turn that his attack hits a random enemy.',
     },
-    supportAura: { id: 'stat', stat: 'def', mult: 1.1, name: 'Sand Barrier', desc: 'Active allies gain +10% DEF.' },
+    supportAura: { id: 'stat', stat: 'def', values: [0.1, 0.15, 0.25], name: 'Sand Barrier', desc: 'Allies gain +{v} DEF.', unit: '%' },
   },
   {
     id: 'ino_p1', baseId: 'ino', name: 'Ino Yamanaka', era: 'Part 1', cost: 4,
     natures: { primary: 'yin', secondary: null },
     stats: { hp: 80, tai: 65, nin: 85, def: 65, spd: 85, chk: 95 },
     roles: ['Infiltrator', 'Controller'],
-    trait: { id: 'yamanaka', name: 'Yamanaka Mind Clan', desc: 'Her genjutsu that land grant +5 extra Intel and are 15% more accurate.' },
+    trait: { id: 'yamanaka', name: 'Yamanaka Mind Clan', desc: 'Her genjutsu that land grant +3 extra Intel and are 15% more accurate.' },
     substitutions: ['log'],
     catalogue: ['mind_transfer', 'mind_body_disturbance', 'mind_clone_spy', 'senbon_volley'],
     defaultLoadout: ['mind_transfer', 'mind_body_disturbance', 'mind_clone_spy', 'senbon_volley'],
     transformation: null,
-    supportAura: { id: 'intel', value: 3, name: 'Sensory Relay', desc: 'Team gains +3 Secured Intel per turn.' },
+    supportAura: { id: 'intel', values: [2, 3, 4], name: 'Sensory Relay', desc: 'Team gains {v} Secured Intel per turn.', unit: '' },
   },
 ];
 

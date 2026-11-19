@@ -27,7 +27,7 @@ const S = {
   preview: null,
   view: null,               // snapshot shown during playback
   logShown: 0,
-  speed: 1,                 // 1 normal, 0.5 fast
+  speed: Number(localStorage.getItem('ss-speed')) || 1, // duration multiplier: 1 = 1×, 0.5 = 2×, 0.25 = 4×
   skip: false,
   showRules: false,
   sprites: {},
@@ -145,7 +145,7 @@ const SCREENS = {
             ${roster.map((s) => {
               const isTaken = taken.has(s.baseId) && s.baseId !== selBase;
               return `<button class="rcard" data-act="pick" data-arg="${s.id}" ${isTaken ? 'disabled' : ''}
-                  ${tipAttr(`<b>${esc(s.name)}</b> (${s.era})<div class="tip-s">${s.roles.join(' · ')}</div><b>${esc(s.trait.name)}:</b> ${esc(s.trait.desc)}${s.transformation ? `<br><b>${esc(s.transformation.name)}</b> (${s.transformation.resolve} Resolve)` : ''}<br><b>Support — ${esc(s.supportAura.name)}:</b> ${esc(s.supportAura.desc)}`)}>
+                  ${tipAttr(`<b>${esc(s.name)}</b> (${s.era})<div class="tip-s">${s.roles.join(' · ')}</div><b>${esc(s.trait.name)}:</b> ${esc(s.trait.desc)}${s.transformation ? `<br><b>${esc(s.transformation.name)}</b> (${s.transformation.resolve} Resolve)` : ''}<br><b>As support — ${esc(s.supportAura.name)}:</b> ${esc(s.supportAura.desc.replace('{v}', E.auraStages(s.supportAura)))}`)}>
                 ${badge(s)}
                 <div class="meta">
                   <div class="row" style="gap:6px"><span class="nm">${esc(s.name)}</span></div>
@@ -204,16 +204,17 @@ function rulesHtml() {
   return `<div class="card rules">
     <h3>How to play</h3>
     <ul>
-      <li><b>Team:</b> 3 active shinobi + 1 support, ${COST_CAP} cost points max, one version of each character. Each shinobi brings 4 jutsu.</li>
-      <li><b>Turns:</b> both players pick orders in secret, then actions play out one by one — Stances first, then by priority (+3 … −2), then by SPD.</li>
+      <li><b>Team:</b> 3 active shinobi + 1 support, ${COST_CAP} cost points max, one version of each character. Each active shinobi brings 4 jutsu.</li>
+      <li><b>Support:</b> never enters the battle — it's a 3v3. It gives the team a passive that grows as your cell falls (stage 1 with 3 standing, stage 2 with 2, stage 3 with 1).</li>
+      <li><b>Turns:</b> both players pick orders in secret, then actions play out one by one — Stances first, then by priority (+3 … −2), then by SPD. Click the text box to advance; change the speed (1× / 2× / 4×) or skip the turn.</li>
       <li><b>Natures:</b> Fire › Wind › Lightning › Earth › Water › Fire (×1.5 / ×0.75). Jutsu matching your primary nature get ×1.25, secondary ×1.1. Kekkei genkai count as both parent natures.</li>
       <li><b>Jutsu Clash:</b> two ninjutsu aimed at each other collide — the stronger nature breaks through at 70% power.</li>
       <li><b>Collaboration:</b> Wind then Fire (or Water then Lightning) on the same target in one turn = ×1.3.</li>
       <li><b>Substitution:</b> a Stance that negates the first single-target hit. Repeating it lowers the odds (100/50/25%). Area attacks are only halved; Sharingan sees through logs; genjutsu ignores it.</li>
       <li><b>Intel:</b> Gather Intel, land genjutsu, reveal enemy jutsu and score KOs. New Intel is <i>unsecured</i> until the carrier survives the end of the next turn — KO the spy and it's lost. Guard halves enemy Intel gains (sensors quarter it).</li>
-      <li><b>Milestones:</b> 25 Intel reveals an enemy loadout, 50 exposes their support and Chakra, 75 lets you see one enemy order before choosing.</li>
-      <li><b>Win:</b> KO all 4 enemies, <i>or</i> secure 100 Intel. After turn 20, the highest Mission Score (25 per KO + Intel) wins.</li>
-      <li><b>Resolve</b> builds as you take hits or lose allies and powers transformations. The support waits off-field granting an aura, can Swap in once, and auto-enters when an ally falls.</li>
+      <li><b>Milestones:</b> 25 Intel reveals an enemy loadout, 50 reveals another and makes enemy Chakra visible, 75 lets you see one enemy order before choosing.</li>
+      <li><b>Win:</b> KO all 3 enemy shinobi, <i>or</i> secure 100 Intel. After turn 20, the highest Mission Score (25 per KO + Intel) wins.</li>
+      <li><b>Resolve</b> builds as you take hits or lose allies and powers transformations.</li>
     </ul>
   </div>`;
 }
@@ -227,9 +228,9 @@ function memberEditor(m, slot) {
     <div class="statgrid">${Object.entries(s.stats).map(([k, v]) => `<span class="muted">${k.toUpperCase()}</span><div class="statbar"><i style="width:${pct(v, max[k])}%;background:${sc(v)}"></i></div><span class="mono">${v}</span>`).join('')}</div>
     <div class="small"><b>${esc(s.trait.name)}:</b> ${esc(s.trait.desc)}</div>
     ${s.transformation ? `<div class="small" style="margin-top:4px"><b>${esc(s.transformation.name)}</b> (${s.transformation.resolve} Resolve): ${esc(s.transformation.desc)}</div>` : '<div class="small muted" style="margin-top:4px">No transformation.</div>'}
-    <div class="small" style="margin-top:4px;${slot === 3 ? '' : 'opacity:.55'}"><b>Support aura — ${esc(s.supportAura.name)}:</b> ${esc(s.supportAura.desc)}</div>
-    <h2 style="margin-top:12px">Jutsu (${m.loadout.length}/4)</h2>
-    <div class="jlist">${s.catalogue.map((id) => {
+    ${slot === 3 ? supportPanel(s) : `<div class="small muted" style="margin-top:4px"><b>As support — ${esc(s.supportAura.name)}:</b> ${esc(s.supportAura.desc.replace('{v}', E.auraStages(s.supportAura)))}</div>`}
+    ${slot === 3 ? '' : `<h2 style="margin-top:12px">Jutsu (${m.loadout.length}/4)</h2>`}
+    ${slot === 3 ? '' : `<div class="jlist">${s.catalogue.map((id) => {
       const j = E.getJutsu(id);
       const on = m.loadout.includes(id);
       return `<button class="jopt ${on ? 'on' : ''}" style="--c:${FX.jutsuColor(j)}" data-act="toggleJutsu" data-arg="${id}" ${tipAttr(jutsuTip(j))}>
@@ -241,7 +242,16 @@ function memberEditor(m, slot) {
     <h2 style="margin-top:12px">Substitution</h2>
     <div class="jlist">${s.substitutions.map((k) => `<button class="jopt ${m.substitution === k ? 'on' : ''}" style="--c:#c9d0dd" data-act="setSub" data-arg="${k}">
       <span class="box">${m.substitution === k ? '✓' : ''}</span>
-      <div><div>${SUBSTITUTIONS[k].name}</div><div class="jm">${Math.round(SUBSTITUTIONS[k].cost * 100)}% max Chakra · ${esc(SUBSTITUTIONS[k].desc)}</div></div></button>`).join('')}</div>
+      <div><div>${SUBSTITUTIONS[k].name}</div><div class="jm">${Math.round(SUBSTITUTIONS[k].cost * 100)}% max Chakra · ${esc(SUBSTITUTIONS[k].desc)}</div></div></button>`).join('')}</div>`}
+  </div>`;
+}
+
+function supportPanel(s) {
+  const a = s.supportAura;
+  return `<div class="support-panel">
+    <h2 style="margin:10px 0 6px">Support passive — ${esc(a.name)}</h2>
+    <div class="small muted" style="margin-bottom:6px">The support never enters the battle. Its passive grows as your cell falls.</div>
+    ${[1, 2, 3].map((n) => `<div class="stage-row"><span class="stg">${'★'.repeat(n)}</span><span class="muted small">${4 - n} standing</span><span>${esc(E.auraDesc(a, n))}</span></div>`).join('')}
   </div>`;
 }
 
@@ -303,18 +313,26 @@ function unitTip(vs, u) {
 
 function sideHud(vs, side, isFoe, sel) {
   const team = vs.teams[side];
-  const pips = team.uids.map((uid) => {
+  const pips = team.slots.map((uid) => {
     const u = vs.units[uid];
-    return `<span class="pip ${u.ko ? 'fainted' : uid === team.reserve ? 'reserve' : ''}" title="${esc(u.name)}"></span>`;
+    return `<span class="pip ${u.ko ? 'fainted' : ''}" title="${esc(u.name)}"></span>`;
   }).join('');
-  const res = team.reserve ? vs.units[team.reserve] : null;
-  const aura = res && !res.ko && team.reserve === team.supportUid ? SHINOBI_BY_ID[res.id].supportAura : null;
-  const resChip = res ? `<span class="chip" ${tipAttr(`<b>${esc(res.name)}</b> waits in reserve${aura ? `<br><b>${esc(aura.name)}:</b> ${esc(aura.desc)}` : ''}<br>HP ${res.hp}/${res.maxHp}`)}>Reserve: ${esc(res.name.split(' ')[0])}</span>` : '';
+  const sup = vs.units[team.supportUid];
+  const aura = SHINOBI_BY_ID[sup.id].supportAura;
+  const alive = team.slots.filter((uid) => !vs.units[uid].ko).length;
+  const stage = alive >= 3 ? 1 : alive === 2 ? 2 : 3;
+  const resChip = `<span class="chip support-chip st${stage}" ${tipAttr(supportTip(sup, stage))}>Support: ${esc(sup.name.split(' ')[0])} · ${'★'.repeat(stage)}</span>`;
   const cards = team.slots.map((uid, pos) => (uid ? hpCard(vs, vs.units[uid], sel && sel.side === side, pos) : '<div class="hpcard empty">—</div>')).join('');
   return `<div class="hud ${isFoe ? 'foe' : 'you'}">
     <div class="sidelabel"><span class="who s${side}">${sideName(side)}</span><span class="pips">${pips}</span>${resChip}</div>
     ${cards}
   </div>`;
+}
+
+function supportTip(sup, stage) {
+  const aura = SHINOBI_BY_ID[sup.id].supportAura;
+  const lines = [1, 2, 3].map((n) => `<div style="${n === stage ? 'color:#ffc83d;font-weight:700' : 'opacity:.6'}">${n === stage ? '▶ ' : ''}Stage ${n} (${4 - n} standing): ${esc(E.auraDesc(aura, n))}</div>`).join('');
+  return `<b>${esc(sup.name)}</b> — support (never enters battle)<div class="tip-s">${esc(aura.name)}</div>${lines}`;
 }
 
 function hpCard(vs, u, pickableSide, pos) {
@@ -435,7 +453,7 @@ function controlsHtml() {
     const e = S.msg;
     return `<div class="textbox ${e && e.side !== null && e.side !== undefined ? `s${e.side}` : ''}" id="textbox" data-act="advance">
       <span id="tbtext">${esc(e ? e.text : '')}</span>
-      <div class="tools"><button class="small ${S.speed === 0.5 ? 'primary' : ''}" data-act="toggleSpeed">${S.speed === 0.5 ? 'Fast ✓' : 'Fast'}</button><button class="small" data-act="skipPlayback">Skip ⏭</button></div>
+      <div class="tools"><button class="small" data-act="toggleSpeed" title="Animation speed">Speed ${speedLabel()}</button><button class="small" data-act="skipPlayback">Skip turn ⏭</button></div>
       <span class="more">▼</span>
     </div>`;
   }
@@ -475,7 +493,7 @@ function commandHtml() {
 const GROUPS = {
   tactics: ['kunai', 'charge', 'gather'],
   defense: ['substitute', 'guard', 'release'],
-  special: ['transform', 'swap'],
+  special: ['transform'],
 };
 const KUNAI_TIP = 'Free, fast thrown weapons (priority +2). Good for baiting out a Substitution before your big jutsu lands.';
 
@@ -506,7 +524,6 @@ function actionSections(st, u) {
     guard: () => 'Stance · halve enemy Intel',
     release: () => 'Stance · break genjutsu',
     transform: (o) => o.disabled || `Stance · ${E.defOf(u).transformation.resolve} Resolve`,
-    swap: () => 'Stance · once per battle',
   };
   const TIPS = {
     kunai: KUNAI_TIP,
@@ -516,7 +533,6 @@ function actionSections(st, u) {
     guard: 'Stance. Enemy Intel gains are halved this turn (quartered if a Sensor guards), and you take 25% less damage.',
     release: 'Stance. Break free of genjutsu.',
     transform: E.defOf(u).transformation?.desc || '',
-    swap: 'Stance. Once per battle, switch this shinobi with your reserve. The incoming shinobi takes hits aimed at this slot.',
   };
   const optBtn = (o) => `<button class="opt-btn ${isOn(o) ? 'on' : ''}" data-act="chooseAction" data-arg="${idx(o)}" ${o.disabled ? 'disabled' : ''} ${tipAttr(`<b>${esc(o.label)}</b><br>${esc(TIPS[o.type] || '')}`)}>
       <span>${esc(o.label)}</span><span class="mi">${esc(SUB[o.type] ? SUB[o.type](o) : '')}</span></button>`;
@@ -554,13 +570,13 @@ function actionText(st, a) {
     case 'guard': return 'Guard';
     case 'release': return 'Release genjutsu';
     case 'transform': return E.defOf(u).transformation.name;
-    case 'swap': return 'Swap with reserve';
     case 'none': return 'Bound';
     default: return a.type;
   }
 }
 
 // ---------------------------------------------------------------- playback
+const speedLabel = () => `${Math.round(1 / S.speed)}×`;
 let advanceNow = null;
 function pause(ms) {
   if (S.skip) return Promise.resolve();
@@ -611,7 +627,16 @@ async function playEvent(ev, apply) {
   const arena = document.getElementById('arena');
   const sp = S.speed;
   appendLog(e);
-  if (e.kind === 'turn') { apply(); setText({ text: `Turn ${e.turn}`, side: null }); await pause(450); return; }
+  if (e.kind === 'turn') { apply(); setText({ text: `Turn ${e.turn}`, side: null }); await pause(700); return; }
+  // small bookkeeping events (intel from revealing a jutsu, regen, support relays) only pop up
+  if (e.minor) {
+    apply();
+    const el = monEl(e.u);
+    if (el && e.kind === 'intel' && e.amount) FX.pop(arena, el, `📜 +${e.amount}`, 'intel');
+    else if (el && e.kind === 'heal' && e.amount) { FX.pop(arena, el, `+${e.amount}`, 'heal'); }
+    await pause(380);
+    return;
+  }
   setText(e);
 
   // the attacker moves before the HP changes
@@ -635,12 +660,12 @@ async function playEvent(ev, apply) {
       }
     }
     apply();
-    await pause(e.collab ? 1000 : 850);
+    await pause(e.collab ? 1500 : 1300);
     return;
   }
   apply();
   const el = monEl(e.u);
-  let ms = 650;
+  let ms = 1000;
   switch (e.kind) {
     case 'damage': {
       if (el) {
@@ -651,23 +676,23 @@ async function playEvent(ev, apply) {
         else if (e.adv < 1) FX.pop(arena, el, 'Resisted', 'nve', false, -30);
         if (e.boom) FX.fx(arena, 'burst', FX.centerOf(el, arena)).style.background = '#ff9a3c';
       }
-      ms = 750;
+      ms = 1150;
       break;
     }
     case 'heal':
       if (el) { FX.ring(arena, el, 'heal'); if (e.amount) FX.pop(arena, el, `+${e.amount}`, 'heal'); }
-      ms = e.minor ? 400 : 650;
+      ms = 1000;
       break;
     case 'ko':
       if (el) FX.faint(el.parentElement);
-      ms = 950;
+      ms = 1400;
       break;
     case 'sub':
       if (el && e.negated) {
         FX.fx(arena, 'puff', FX.centerOf(el, arena));
         if (!e.decoy) FX.fx(arena, 'log', FX.centerOf(el, arena), '🪵');
         FX.pop(arena, el, e.decoy ? 'Decoy!' : 'Substitution!', 'sub', true);
-        ms = 900;
+        ms = 1300;
       } else if (el) { FX.ring(arena, el, '', '#c9d0dd'); }
       break;
     case 'status':
@@ -679,28 +704,26 @@ async function playEvent(ev, apply) {
         else if (e.amount) FX.pop(arena, el, `📜 +${e.amount}`, 'intel');
         else if (/lost/.test(e.text)) FX.pop(arena, el, '📜 Intel lost', 'dmg');
       }
-      ms = e.minor ? 380 : 650;
+      ms = 1000;
       break;
     case 'special':
-      if (e.clash) { FX.banner(arena, 'JUTSU CLASH!', '#ff5c5c'); ms = 1200; }
+      if (e.clash) { FX.banner(arena, 'JUTSU CLASH!', '#ff5c5c'); ms = 1700; }
       else if (e.transform) {
         if (el) { FX.ring(arena, el, 'aura'); FX.appear(el); }
-        FX.banner(arena, E.defOf(S.battle.units[e.u]).transformation.name.toUpperCase(), '#ffc83d'); ms = 1300;
-      } else if (e.weave) { if (el) FX.ring(arena, el, 'gen'); ms = 800; }
-      else if (e.copy) { if (el) FX.pop(arena, el, 'Copied!', 'se', true); ms = 900; }
-      else ms = 900;
-      break;
-    case 'action':
-      if (e.enter) { const n = monEl(e.enter); if (n) FX.appear(n); ms = 800; }
+        FX.banner(arena, E.defOf(S.battle.units[e.u]).transformation.name.toUpperCase(), '#ffc83d'); ms = 1800;
+      } else if (e.weave) { if (el) FX.ring(arena, el, 'gen'); ms = 1200; }
+      else if (e.copy) { if (el) FX.pop(arena, el, 'Copied!', 'se', true); ms = 1300; }
+      else if (e.auraStage) { FX.banner(arena, `SUPPORT STAGE ${e.auraStage}`, e.side === 0 ? '#4fa8ff' : '#ff6a4d'); ms = 1800; }
+      else ms = 1300;
       break;
     case 'milestone': {
       const m = e.text.match(/reached (\d+) Intel/);
-      if (m) { FX.banner(arena, `INTEL ${m[1]}`, '#b98cff'); ms = 1300; } else ms = 1000;
+      if (m) { FX.banner(arena, `INTEL ${m[1]}`, '#b98cff'); ms = 1800; } else ms = 1400;
       break;
     }
     case 'system':
       if (S.battle.winner !== null) FX.banner(arena, S.battle.winner === 'draw' ? 'DRAW' : `${S.names[S.battle.winner].toUpperCase()} WINS`, '#3ddc84');
-      ms = 1500;
+      ms = 2200;
       break;
     case 'info':
       if (e.dodge && el) FX.pop(arena, el, 'Dodged!', 'sub', true);
@@ -868,7 +891,12 @@ const ACTIONS = {
   cancelTarget() { S.pending = null; render(); syncField(); },
   confirm() { S.step += 1; nextStep(); },
   advance(_, el, e) { if (e.target.closest('button')) return; advanceNow?.(); },
-  toggleSpeed() { S.speed = S.speed === 1 ? 0.5 : 1; const b = document.querySelector('[data-act=toggleSpeed]'); if (b) { b.textContent = S.speed === 0.5 ? 'Fast ✓' : 'Fast'; b.classList.toggle('primary', S.speed === 0.5); } },
+  toggleSpeed() {
+    S.speed = S.speed === 1 ? 0.5 : S.speed === 0.5 ? 0.25 : 1;
+    try { localStorage.setItem('ss-speed', String(S.speed)); } catch {}
+    const b = document.querySelector('[data-act=toggleSpeed]');
+    if (b) b.textContent = `Speed ${speedLabel()}`;
+  },
   skipPlayback() { S.skip = true; advanceNow?.(); },
   rematch() { startBattle(); },
   newTeams() {

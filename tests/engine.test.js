@@ -4,6 +4,7 @@ import { advantage, affinity } from '../public/engine/natures.js';
 import {
   createBattle, resolveTurn, validateTeam, availableActions, BALANCE,
 } from '../public/engine/battle.js';
+import * as E from '../public/engine/battle.js';
 import { SHINOBI_BY_ID } from '../public/data/shinobi.js';
 
 const member = (id, substitution) => ({
@@ -97,11 +98,11 @@ test('consecutive substitutions lose reliability', () => {
 test('gathered Intel secures at the end of the next turn', () => {
   const st = battle(T0, T1);
   resolveTurn(st, [{ actor: '1-3', type: 'none' }, { actor: '1-2', type: 'gather' }]);
-  assert.equal(st.teams[1].securedIntel, 3); // only Ino's support relay
+  assert.equal(st.teams[1].securedIntel, 2); // only Ino's support relay
   assert.ok(st.units['1-2'].unsecured.length);
   resolveTurn(st, []);
-  // Shikamaru: Infiltrator 15 * 1.5 (200 IQ) = 23, plus two relays
-  assert.equal(st.teams[1].securedIntel, 23 + 6);
+  // Shikamaru: Infiltrator 15 * 1.25 (200 IQ) = 19, plus two Ino relays (stage 1 = 2)
+  assert.equal(st.teams[1].securedIntel, 19 + 4);
 });
 
 test('a spy KO\'d before securing loses their Intel', () => {
@@ -111,7 +112,8 @@ test('a spy KO\'d before securing loses their Intel', () => {
   resolveTurn(st, [{ actor: '0-0', type: 'kunai', target: { slot: 2 } }]);
   assert.ok(st.units['1-2'].ko);
   assert.ok(st.log.some((l) => l.text.includes('unsecured Intel was lost')));
-  assert.equal(st.teams[1].securedIntel, 6); // just relays
+  // just relays: 2 (3 standing) then 3 (2 standing after the KO)
+  assert.equal(st.teams[1].securedIntel, 5);
 });
 
 test('Gather Intel fails if hit first', () => {
@@ -123,7 +125,7 @@ test('Gather Intel fails if hit first', () => {
 test('Guard halves enemy Intel gains', () => {
   const st = battle(T0, T1);
   resolveTurn(st, [{ actor: '1-2', type: 'gather' }, { actor: '0-1', type: 'guard' }]);
-  assert.equal(st.units['1-2'].unsecured[0].amount, Math.round(15 * 1.5 * 0.5));
+  assert.equal(st.units['1-2'].unsecured[0].amount, Math.round(15 * 1.25 * 0.5));
 });
 
 test('Jutsu Clash: Water overpowers Fire', () => {
@@ -141,16 +143,14 @@ test('Jutsu Clash: Water overpowers Fire', () => {
 test('Intel win at 100', () => {
   const st = battle(T0, T1);
   st.teams[1].securedIntel = 98;
-  resolveTurn(st, []); // relay +3
+  resolveTurn(st, []); // relay +2
   assert.equal(st.winner, 1);
   assert.equal(st.winReason, 'Intel');
 });
 
-test('Elimination win when the whole cell and support fall', () => {
+test('Elimination when all 3 active shinobi fall (the support never fights)', () => {
   const st = battle(T0, T1);
-  for (const uid of ['1-0', '1-1', '1-2', '1-3']) st.units[uid].hp = 1;
-  st.teams[1].slots = ['1-0', '1-1', '1-2'];
-  st.units['1-3'].ko = true; st.teams[1].reserve = null;
+  for (const uid of ['1-0', '1-1', '1-2']) st.units[uid].hp = 1;
   resolveTurn(st, [
     { actor: '0-0', type: 'kunai', target: { slot: 0 } },
     { actor: '0-1', type: 'kunai', target: { slot: 1 } },
@@ -158,23 +158,24 @@ test('Elimination win when the whole cell and support fall', () => {
   ]);
   assert.equal(st.winner, 0);
   assert.equal(st.winReason, 'Elimination');
+  assert.equal(st.units['1-3'].ko, false);
 });
 
-test('support auto-enters when an active shinobi falls', () => {
+test('support does not enter when an ally falls, and its passive grows', () => {
   const st = battle(T0, T1);
+  assert.equal(E.activeAura(st, 1).stage, 1);
   st.units['1-1'].hp = 1;
   resolveTurn(st, [{ actor: '0-0', type: 'kunai', target: { slot: 1 } }]);
-  assert.equal(st.teams[1].slots[1], '1-3');
-  assert.equal(st.teams[1].reserve, null);
+  assert.equal(st.teams[1].slots[1], '1-1');
+  assert.ok(st.units['1-1'].ko);
+  assert.equal(E.onField(st, 1).length, 2);
+  assert.equal(E.activeAura(st, 1).stage, 2);
+  assert.ok(!availableActions(st, '1-0').some((a) => a.type === 'swap'));
 });
 
-test('swap is once per battle', () => {
-  const st = battle(T0, T1);
-  assert.ok(availableActions(st, '0-0').some((a) => a.type === 'swap'));
-  resolveTurn(st, [{ actor: '0-0', type: 'swap' }]);
-  assert.equal(st.teams[0].slots[0], '0-3');
-  assert.equal(st.teams[0].reserve, '0-0');
-  assert.ok(!availableActions(st, '0-3').some((a) => a.type === 'swap'));
+test('support does not need a loadout', () => {
+  const sup = { id: 'ino_p1', loadout: [] };
+  assert.deepEqual(validateTeam({ members: [member('naruto_p1'), member('sasuke_p1'), member('sakura_shippuden'), sup] }), []);
 });
 
 test('turn limit decides by Mission Score', () => {

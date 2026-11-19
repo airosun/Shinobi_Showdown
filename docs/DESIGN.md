@@ -4,9 +4,9 @@ All numbers live in `BALANCE` in `public/engine/battle.js` or in the data files.
 
 ## Teams
 - 3 active shinobi + 1 support. Cost cap **30**. Only one version of each character per team (e.g. Naruto Part 1 *or* Naruto Sage).
-- Each shinobi brings **4 jutsu** from their catalogue and picks one Substitution type.
-- Universal actions everyone has: Kunai & Shuriken, Substitution, Charge Chakra, Gather Intel, Guard, Release (when in genjutsu), Transform (if available), Swap (once per battle).
-- **Support** waits off-field and grants an aura while there. It can Swap in once per battle and auto-enters when an active ally falls.
+- Each active shinobi brings **4 jutsu** from their catalogue and picks one Substitution type.
+- Universal actions everyone has: Kunai & Shuriken, Substitution, Charge Chakra, Gather Intel, Guard, Release (when in genjutsu), Transform (if available).
+- **Support** never enters the battle (it's a 3v3). It gives the team a unique passive that grows as the cell falls: stage 1 with 3 allies standing, stage 2 with 2, stage 3 with 1 (`supportAura.values` in the data).
 
 ## Stats
 | Stat | Use |
@@ -58,16 +58,16 @@ Fire › Wind › Lightning › Earth › Water › Fire. Yin, Yang and non-elem
 | Source | Intel |
 |---|---|
 | Gather Intel | 8 (Sensor/Infiltrator 15). Fails if hit first. |
-| Genjutsu lands | 5 (+ jutsu bonus) |
-| Revealing an enemy jutsu | 3 |
-| KO (interrogation) | 15 |
+| Genjutsu lands | 4 (+ jutsu bonus) |
+| Revealing an enemy jutsu | 1 |
+| KO (interrogation) | 12 |
 
 - New Intel is **unsecured** on the carrier. It secures at the end of the *next* turn. If the carrier is KO'd first, it's lost.
 - **Guard** halves enemy Intel gains that turn (a Sensor on guard quarters them) and takes 25% less damage.
-- Milestones: **25** reveals one enemy loadout, **50** reveals the enemy support and makes enemy Chakra visible, **75** means you choose second and see one enemy order.
+- Milestones: **25** reveals one enemy loadout, **50** reveals another and makes enemy Chakra visible, **75** means you choose second and see one enemy order.
 
 ## Win conditions
-1. All 4 enemy shinobi KO'd.
+1. All 3 enemy active shinobi KO'd (the support doesn't count).
 2. 100 Secured Intel.
 3. After turn 20, or if both win on the same turn: highest **Mission Score** (25 per KO + Secured Intel).
 

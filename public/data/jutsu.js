@@ -24,8 +24,8 @@ export const JUTSU = {
   multi_shadow_clone: {
     name: 'Multi Shadow Clone Jutsu', category: 'support', nature: null,
     power: 0, cost: 35, priority: 0, target: 'self',
-    effects: [{ type: 'decoy' }, { type: 'intel', value: 6 }],
-    desc: 'Clones scatter: gain a Decoy that absorbs the next single-target hit, and +6 Intel.',
+    effects: [{ type: 'decoy' }, { type: 'intel', value: 5 }],
+    desc: 'Clones scatter: gain a Decoy that absorbs the next single-target hit, and +5 Intel.',
   },
   sexy_jutsu: {
     name: 'Sexy Jutsu', category: 'ninjutsu', nature: null,
@@ -58,8 +58,8 @@ export const JUTSU = {
   shadow_clone_scouts: {
     name: 'Shadow Clone Scouts', category: 'support', nature: null,
     power: 0, cost: 30, priority: 0, target: 'self',
-    effects: [{ type: 'decoy' }, { type: 'intel', value: 10 }],
-    desc: 'Clones scout ahead: gain a Decoy and +10 Intel.',
+    effects: [{ type: 'decoy' }, { type: 'intel', value: 8 }],
+    desc: 'Clones scout ahead: gain a Decoy and +8 Intel.',
   },
 
   // ---------------- Sasuke ----------------
@@ -149,8 +149,8 @@ export const JUTSU = {
   ninja_hounds: {
     name: 'Summoning: Ninja Hounds', category: 'ninjutsu', nature: null,
     power: 50, cost: 40, priority: 0, target: 'enemy',
-    effects: [{ type: 'bind', chance: 0.7, turns: 1 }, { type: 'intel', value: 6 }],
-    desc: 'Pakkun and pack pin the target. 70% Bind, +6 Intel.',
+    effects: [{ type: 'bind', chance: 0.7, turns: 1 }, { type: 'intel', value: 5 }],
+    desc: 'Pakkun and pack pin the target. 70% Bind, +5 Intel.',
   },
   demonic_illusion: {
     name: 'Sharingan: Demonic Illusion', category: 'genjutsu', nature: 'yin',
@@ -212,8 +212,8 @@ export const JUTSU = {
   battle_analysis: {
     name: 'Battle Analysis', category: 'support', nature: null,
     power: 0, cost: 20, priority: 0, target: 'enemy',
-    effects: [{ type: 'revealLoadout' }, { type: 'intel', value: 8 }],
-    desc: 'Reveal the target\'s full loadout and gain +8 Intel.',
+    effects: [{ type: 'revealLoadout' }, { type: 'intel', value: 6 }],
+    desc: 'Reveal the target\'s full loadout and gain +6 Intel.',
   },
   flash_bomb: {
     name: 'Flash Bomb', category: 'support', nature: null,
@@ -256,8 +256,8 @@ export const JUTSU = {
   mind_transfer: {
     name: 'Mind Transfer Jutsu', category: 'genjutsu', nature: 'yin',
     power: 0, cost: 35, priority: 0, target: 'enemy',
-    effects: [{ type: 'bind', chance: 1, turns: 1 }, { type: 'intel', value: 15 }, { type: 'selfVulnerable' }],
-    desc: 'Take over the target: Bind it and gain +15 Intel. Ino\'s body is left exposed (+25% damage taken this turn).',
+    effects: [{ type: 'bind', chance: 1, turns: 1 }, { type: 'intel', value: 10 }, { type: 'selfVulnerable' }],
+    desc: 'Take over the target: Bind it and gain +10 Intel. Ino\'s body is left exposed (+25% damage taken this turn).',
   },
   mind_body_disturbance: {
     name: 'Mind Body Disturbance', category: 'genjutsu', nature: 'yin',
@@ -268,8 +268,8 @@ export const JUTSU = {
   mind_clone_spy: {
     name: 'Mind Clone Spy', category: 'support', nature: 'yin',
     power: 0, cost: 25, priority: 0, target: 'self',
-    effects: [{ type: 'intel', value: 10 }],
-    desc: '+10 Intel.',
+    effects: [{ type: 'intel', value: 8 }],
+    desc: '+8 Intel.',
   },
   senbon_volley: {
     name: 'Senbon Volley', category: 'taijutsu', nature: null,

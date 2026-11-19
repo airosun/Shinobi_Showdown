@@ -35,9 +35,9 @@ export const BALANCE = {
   exhaustedMult: 0.85,
   intelGather: 8,
   intelGatherSpecialist: 15,
-  intelKO: 15,
-  intelGenjutsu: 5,
-  intelReveal: 3,
+  intelKO: 12,
+  intelGenjutsu: 4,
+  intelReveal: 1,
   resolveFromDamage: 0.7, // resolve gained per 1% max HP lost
   resolveAllyKO: 25,
   resolveSuperEffective: 8,
@@ -47,7 +47,7 @@ export const BALANCE = {
 export const MILESTONES = [25, 50, 75];
 
 // Action priorities
-const P_STANCE = 4; // substitute, guard, swap, transform, release, start weaving
+const P_STANCE = 4; // substitute, guard, transform, release, start weaving
 const P_KUNAI = 2;
 const P_GATHER = -1;
 const P_CHARGE = -2;
@@ -77,6 +77,7 @@ export function validateTeam(spec) {
     if (!s) { errors.push(`Unknown shinobi "${m.id}".`); continue; }
     if (bases.has(s.baseId)) errors.push(`Only one version of ${s.name.split(' (')[0]} per team.`);
     bases.add(s.baseId);
+    if (members.indexOf(m) === 3) continue; // the support never fights: no jutsu needed
     const lo = m.loadout || [];
     if (lo.length !== 4) errors.push(`${s.name} needs exactly 4 jutsu.`);
     if (new Set(lo).size !== lo.length) errors.push(`${s.name} has a duplicate jutsu.`);
@@ -104,7 +105,7 @@ function makeUnit(side, index, member) {
     maxHp, hp: maxHp,
     maxChakra, chakra: maxChakra,
     resolve: 0,
-    loadout: [...member.loadout],
+    loadout: [...(member.loadout || [])],
     copied: null,
     substitution: member.substitution || def.substitutions[0],
     statuses: {},   // name -> { turns }
@@ -140,7 +141,7 @@ export function createBattle(teamSpecs, { seed = Date.now(), names = ['Player 1'
         supportUid: uids[3],
         securedIntel: 0,
         kos: 0,
-        swapUsed: false,
+        auraStage: 1,
         milestones: [],
         revealed: Object.fromEntries(uids.map((u) => [u, []])), // what the OTHER team knows
         fullyRevealed: [],
@@ -198,13 +199,25 @@ export function slotOf(state, unit) {
   return state.teams[unit.side].slots.indexOf(unit.uid);
 }
 
-/** Support aura of a team, if its designated support is waiting in reserve. */
+/** Number of a team's active (on-field) shinobi still standing. */
+export function aliveCount(state, side) {
+  return onField(state, side).length;
+}
+
+/**
+ * The support's passive. It never enters the battle; it grows stronger as the
+ * cell falls: stage 1 with 3 allies standing, stage 2 with 2, stage 3 with 1.
+ * Returns { ...aura, stage, value } or null.
+ */
 export function activeAura(state, side) {
   const team = state.teams[side];
-  if (!team.reserve || team.reserve !== team.supportUid) return null;
   const sup = state.units[team.supportUid];
-  if (!sup || sup.ko) return null;
-  return defOf(sup).supportAura;
+  if (!sup) return null;
+  const alive = aliveCount(state, side);
+  if (!alive) return null;
+  const aura = defOf(sup).supportAura;
+  const stage = alive >= 3 ? 1 : alive === 2 ? 2 : 3;
+  return { ...aura, stage, value: aura.values[stage - 1] };
 }
 
 /** Effective stat including transformation, buffs, exhaustion and aura. */
@@ -215,7 +228,7 @@ export function stat(state, unit, key) {
   for (const b of unit.buffs) if (b.stat === key) v *= b.mult;
   if (unit.statuses.exhausted) v *= BALANCE.exhaustedMult;
   const aura = activeAura(state, unit.side);
-  if (aura?.id === 'stat' && aura.stat === key && slotOf(state, unit) !== -1) v *= aura.mult;
+  if (aura?.id === 'stat' && aura.stat === key && slotOf(state, unit) !== -1) v *= 1 + aura.value;
   return v;
 }
 
@@ -234,7 +247,7 @@ export function subCost(state, unit) {
 
 function actionPriority(state, unit, action) {
   switch (action.type) {
-    case 'substitute': case 'guard': case 'swap': case 'transform': case 'release':
+    case 'substitute': case 'guard': case 'transform': case 'release':
       return P_STANCE;
     case 'gather': return P_GATHER;
     case 'charge': return P_CHARGE;
@@ -294,10 +307,6 @@ export function availableActions(state, uid) {
       disabled: u.resolve < t.resolve ? `Needs ${t.resolve} Resolve` : null,
     });
   }
-  const res = team.reserve ? state.units[team.reserve] : null;
-  if (!team.swapUsed && res && !res.ko) {
-    acts.push({ type: 'swap', label: `Swap with ${res.name}`, targetType: 'none' });
-  }
   return acts;
 }
 
@@ -313,7 +322,7 @@ function enemyGuardFactor(state, side) {
 function awardIntel(state, unit, amount, reason) {
   if (!unit || unit.ko) return;
   let amt = amount;
-  if (traitOf(unit) === 'strategist') amt *= 1.5;
+  if (traitOf(unit) === 'strategist') amt *= 1.25;
   const f = enemyGuardFactor(state, unit.side);
   amt = Math.round(amt * f);
   if (amt <= 0) {
@@ -386,6 +395,9 @@ function knockOut(state, unit, source) {
   unit.ko = true;
   unit.weaving = null;
   unit.transform = null;
+  unit.statuses = {};
+  unit.buffs = [];
+  unit.decoy = 0;
   log(state, `${unit.name} has been defeated!`, 'ko', unit);
   const lost = unsecuredTotal(unit);
   if (lost) log(state, `${unit.name}'s ${lost} unsecured Intel was lost.`, 'intel', unit);
@@ -555,7 +567,7 @@ function performGenjutsu(state, actor, tgt, jutsu) {
   if (caster === actor) {
     const intelEff = jutsu.effects.find((e) => e.type === 'intel');
     let amt = BALANCE.intelGenjutsu + (intelEff?.value || 0);
-    if (traitOf(actor) === 'yamanaka') amt += 5;
+    if (traitOf(actor) === 'yamanaka') amt += 3;
     awardIntel(state, actor, amt, 'genjutsu');
   }
 }
@@ -781,19 +793,6 @@ function executeAction(state, u, a, clashes, cancelled, entries) {
       delete u.statuses.genjutsu;
       log(state, `${u.name}: "Release!" The genjutsu shatters.`, 'status', u);
       return;
-    case 'swap': {
-      const resUid = team.reserve;
-      const res = resUid && state.units[resUid];
-      if (team.swapUsed || !res || res.ko) return;
-      const slot = slotOf(state, u);
-      team.slots[slot] = resUid;
-      team.reserve = u.uid;
-      team.swapUsed = true;
-      res.flags.acted = true;
-      u.weaving = null;
-      log(state, `${u.name} swaps out — ${res.name} jumps in!`, 'action', u, { enter: resUid });
-      return;
-    }
     case 'transform': {
       const t = defOf(u).transformation;
       if (!t || u.transformUsed || u.transform || u.resolve < t.resolve) return;
@@ -894,7 +893,7 @@ function activateTransform(state, u) {
 function endOfTurn(state) {
   const B = BALANCE;
   for (const u of Object.values(state.units)) {
-    if (u.ko) continue;
+    if (u.ko || u.uid === state.teams[u.side].supportUid) continue;
     const fielded = slotOf(state, u) !== -1;
     const aura = activeAura(state, u.side);
     const d = defOf(u);
@@ -972,7 +971,7 @@ function endOfTurn(state) {
     const aura = activeAura(state, side);
     if (aura?.id === 'intel') {
       team.securedIntel += aura.value;
-      log(state, `${state.units[team.supportUid].name} relays ${aura.value} Intel from the rear.`, 'intel', state.units[team.supportUid], { secured: aura.value, minor: true });
+      log(state, `${state.units[team.supportUid].name} relays ${aura.value} Intel from the rear.`, 'intel', side, { secured: aura.value, minor: true, relay: true });
     }
     // milestones
     for (const m of MILESTONES) {
@@ -981,19 +980,13 @@ function endOfTurn(state) {
         applyMilestone(state, side, m);
       }
     }
-    // reinforcements
-    for (let i = 0; i < 3; i++) {
-      const uid = team.slots[i];
-      if (uid && !state.units[uid].ko) continue;
-      const res = team.reserve && state.units[team.reserve];
-      if (res && !res.ko) {
-        team.slots[i] = res.uid;
-        team.reserve = null;
-        log(state, `${res.name} enters the battle!`, 'action', res, { enter: res.uid });
-      } else if (uid) {
-        team.slots[i] = null;
-      }
+    // the support's passive grows as the cell falls
+    const stage = activeAura(state, side)?.stage || 1;
+    if (stage > (team.auraStage || 1)) {
+      const sup = state.units[team.supportUid];
+      log(state, `${sup.name}'s ${defOf(sup).supportAura.name} grows stronger (stage ${stage})!`, 'special', side, { auraStage: stage });
     }
+    team.auraStage = stage;
   }
 
   checkWin(state);
@@ -1005,16 +998,17 @@ function applyMilestone(state, side, m) {
   const enemy = state.teams[other(side)];
   log(state, `${team.name} reached ${m} Intel!`, 'milestone', side);
   if (m === 25) {
-    const candidates = enemy.slots.filter(Boolean).map((u) => state.units[u]).filter((u) => !u.ko && !enemy.fullyRevealed.includes(u.uid));
-    const pool = candidates.length ? candidates : enemy.uids.map((u) => state.units[u]).filter((u) => !enemy.fullyRevealed.includes(u.uid));
+    const candidates = enemy.slots.map((u) => state.units[u]).filter((u) => !u.ko && !enemy.fullyRevealed.includes(u.uid));
+    const pool = candidates.length ? candidates : enemy.slots.map((u) => state.units[u]).filter((u) => !enemy.fullyRevealed.includes(u.uid));
     const t = state.rng.pick(pool);
     if (t) { revealLoadout(state, t); log(state, `Intel report: ${t.name}'s full loadout is exposed.`, 'milestone', side); }
   } else if (m === 50) {
-    const sup = state.units[enemy.supportUid];
-    revealLoadout(state, sup);
+    const pool = enemy.slots.map((u) => state.units[u]).filter((u) => !enemy.fullyRevealed.includes(u.uid));
+    const t = state.rng.pick(pool);
+    if (t) revealLoadout(state, t);
     enemy.seesChakra = true;
     // (seesChakra on the ENEMY team object means: the other side can see this team's chakra)
-    log(state, `Intel report: enemy support exposed and enemy Chakra is now visible.`, 'milestone', side);
+    log(state, `Intel report: ${t ? `${t.name}'s loadout is exposed and ` : ''}enemy Chakra is now visible.`, 'milestone', side);
   } else if (m === 75) {
     team.preview = true;
     log(state, `Intel report: ${team.name} now sees one enemy action before choosing each turn.`, 'milestone', side);
@@ -1030,7 +1024,7 @@ function checkWin(state) {
   const wins = [false, false];
   const reasons = ['', ''];
   for (const side of [0, 1]) {
-    const enemyAlive = state.teams[other(side)].uids.some((u) => !state.units[u].ko);
+    const enemyAlive = aliveCount(state, other(side)) > 0;
     if (!enemyAlive) { wins[side] = true; reasons[side] = 'Elimination'; }
     if (state.teams[side].securedIntel >= BALANCE.intelToWin) { wins[side] = true; reasons[side] ||= 'Intel'; }
   }
@@ -1061,4 +1055,14 @@ export function knownJutsu(state, viewerSide, uid) {
 export function canSeeChakra(state, viewerSide, uid) {
   const u = state.units[uid];
   return u.side === viewerSide || state.teams[u.side].seesChakra;
+}
+
+/** Support passive description for a stage (1-3), with the value filled in. */
+export function auraDesc(aura, stage) {
+  const v = aura.values[stage - 1];
+  const txt = aura.unit === '%' ? `${Math.round(v * 100)}%` : `${v}`;
+  return aura.desc.replace('{v}', txt);
+}
+export function auraStages(aura) {
+  return aura.values.map((v) => (aura.unit === '%' ? `${Math.round(v * 100)}%` : `${v}`)).join(' / ');
 }
