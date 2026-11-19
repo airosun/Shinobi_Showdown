@@ -47,7 +47,7 @@ test('team validation: cost cap, one version per character, 4 jutsu', () => {
   assert.deepEqual(validateTeam({ members: T0.map((id) => member(id)) }), []);
   const dupe = validateTeam({ members: ['naruto_p1', 'naruto_sage', 'ino_p1', 'lee_p1'].map((id) => member(id)) });
   assert.ok(dupe.some((e) => e.includes('Only one version')));
-  const pricey = validateTeam({ members: ['naruto_sage', 'kakashi_p1', 'gaara_p1', 'sasuke_p1'].map((id) => member(id)) });
+  const pricey = validateTeam({ members: ['naruto_war', 'kakashi_dms', 'gaara_p1', 'sasuke_p1'].map((id) => member(id)) });
   assert.ok(pricey.some((e) => e.includes('over the cap')));
   const bad = member('lee_p1'); bad.loadout = bad.loadout.slice(0, 3);
   assert.ok(validateTeam({ members: [bad, member('ino_p1'), member('sakura_shippuden'), member('shikamaru_p1')] }).some((e) => e.includes('exactly 4')));
@@ -209,4 +209,80 @@ test('transformation needs Resolve', () => {
   resolveTurn(st, [{ actor: '0-0', type: 'transform' }]);
   assert.ok(st.units['0-0'].transform);
   assert.equal(st.units['0-0'].resolve, 0);
+});
+
+// ---------------- Konoha batch mechanics ----------------
+const T_HY = ['neji_p1', 'hinata_p1', 'kiba_p1', 'sakura_p1'];
+
+test('Palm Rotation blocks area attacks too', () => {
+  const st = battle(['sasuke_ship', 'ino_p1', 'sakura_p1', 'shino_p1'], T_HY);
+  const neji = st.units['1-0'];
+  resolveTurn(st, [
+    { actor: '1-0', type: 'jutsu', jutsuId: 'rotation' },
+    { actor: '0-0', type: 'jutsu', jutsuId: 'chidori_nagashi' },
+  ]);
+  assert.equal(neji.hp, neji.maxHp);
+  assert.ok(st.log.some((l) => l.rotation));
+});
+
+test('Byakugan ignores decoys; Akamaru follows up', () => {
+  const st = battle(T_HY, ['naruto_ship', 'ino_p1', 'sakura_p1', 'shino_p1']);
+  st.units['1-0'].decoy = 2;
+  const hp = st.units['1-0'].hp;
+  resolveTurn(st, [{ actor: '0-0', type: 'jutsu', jutsuId: 'gentle_fist', target: { slot: 0 } }]);
+  assert.ok(st.units['1-0'].hp < hp);
+  assert.equal(st.units['1-0'].decoy, 1); // untouched, just ticked down
+  const st2 = battle(T_HY, ['naruto_ship', 'ino_p1', 'sakura_p1', 'shino_p1']);
+  resolveTurn(st2, [{ actor: '0-2', type: 'jutsu', jutsuId: 'passing_fang', target: { slot: 0 } }]);
+  assert.ok(st2.log.some((l) => l.text.includes('Akamaru follows up')));
+});
+
+test('Kikaichu drains chakra on hit; Shino is immune to drain', () => {
+  const st = battle(['shino_p1', 'ino_p1', 'sakura_p1', 'kiba_p1'], ['hinata_p1', 'neji_p1', 'kiba_p1', 'sakura_p1']);
+  const target = st.units['1-0'];
+  resolveTurn(st, [{ actor: '0-0', type: 'jutsu', jutsuId: 'insect_swarm', target: { slot: 0 } }]);
+  assert.ok(st.log.some((l) => l.text.includes('Kikaichu drain')));
+  const st2 = battle(['shino_p1', 'ino_p1', 'sakura_p1', 'kiba_p1'], ['hinata_p1', 'neji_p1', 'kiba_p1', 'sakura_p1']);
+  resolveTurn(st2, [{ actor: '1-0', type: 'jutsu', jutsuId: 'gentle_fist', target: { slot: 0 } }]);
+  assert.ok(st2.log.some((l) => l.text.includes('insects protect')));
+  assert.ok(target);
+});
+
+test('genjutsu immunity (Great War Naruto)', () => {
+  const st = battle(['kurenai', 'ino_p1', 'sakura_p1', 'shino_p1'], ['naruto_war', 'ino_p1', 'sakura_p1', 'kiba_p1'], 0.01);
+  resolveTurn(st, [{ actor: '0-0', type: 'jutsu', jutsuId: 'sly_mind_affect', target: { slot: 0 } }]);
+  assert.ok(st.log.some((l) => l.text.includes('immune to genjutsu')));
+  assert.ok(!st.units['1-0'].statuses.genjutsu);
+});
+
+test("Tenten's kunai hit every enemy", () => {
+  const st = battle(['tenten_p1', 'ino_p1', 'sakura_p1', 'shino_p1'], T_HY);
+  const k = availableActions(st, '0-0').find((a) => a.type === 'kunai');
+  assert.equal(k.jutsuId, 'kunai_storm');
+  resolveTurn(st, [{ actor: '0-0', type: 'kunai', jutsuId: 'kunai_storm' }]);
+  for (const uid of ['1-0', '1-1', '1-2']) assert.ok(st.units[uid].hp < st.units[uid].maxHp, uid);
+});
+
+test('Yamato binds end transformations', () => {
+  const st = battle(['yamato', 'ino_p1', 'sakura_p1', 'shino_p1'], ['lee_p1', 'ino_p1', 'sakura_p1', 'kiba_p1'], 0.5);
+  st.units['1-0'].resolve = 60;
+  resolveTurn(st, [{ actor: '1-0', type: 'transform' }, { actor: '0-0', type: 'jutsu', jutsuId: 'wood_prison', target: { slot: 0 } }]);
+  assert.equal(st.units['1-0'].transform, null);
+  assert.ok(st.log.some((l) => l.text.includes('suppresses')));
+});
+
+test('Kurama Chakra Transfer restores an ally\'s chakra', () => {
+  const nw = { id: 'naruto_war', loadout: ['kurama_rasengan', 'kurama_transfer', 'chakra_arm', 'frog_kata'], substitution: 'log' };
+  const st = battle([nw, 'sakura_war', 'kiba_p1', 'shino_p1'], T_HY);
+  st.units['0-1'].chakra = 10;
+  resolveTurn(st, [{ actor: '0-0', type: 'jutsu', jutsuId: 'kurama_transfer', target: { slot: 1 } }]);
+  assert.ok(st.units['0-1'].chakra > 50);
+});
+
+test('support passives describe their stages', () => {
+  const st = battle(T0, T1);
+  const aura = E.activeAura(st, 1);
+  assert.equal(aura.stage, 1);
+  assert.match(E.auraDesc(SHINOBI_BY_ID.kurenai.supportAura, 3), /10%.*50%/);
+  assert.match(E.auraStages(SHINOBI_BY_ID.naruto_war.supportAura), /3% \/ 5% \/ 8%/);
 });

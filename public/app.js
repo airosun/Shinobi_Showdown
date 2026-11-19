@@ -92,6 +92,16 @@ document.addEventListener('click', (e) => {
   if (!el || el.disabled) return;
   ACTIONS[el.dataset.act]?.(el.dataset.arg, el, e);
 });
+app.addEventListener('input', (e) => {
+  const el = e.target.closest('[data-input]');
+  if (el && el.dataset.input === 'search') {
+    S.builder.query = el.value;
+    const pos = el.selectionStart;
+    render();
+    const n = document.getElementById('rosterSearch');
+    if (n) { n.focus(); n.setSelectionRange(pos, pos); }
+  }
+});
 app.addEventListener('change', (e) => {
   const el = e.target.closest('[data-change]');
   if (el) ACTIONS[el.dataset.change]?.(el.value, el, e);
@@ -130,7 +140,8 @@ const SCREENS = {
     const taken = new Set(members.filter(Boolean).map((m) => SHINOBI_BY_ID[m.id].baseId));
     const selMember = members[b.sel];
     const selBase = selMember && SHINOBI_BY_ID[selMember.id].baseId;
-    const roster = SHINOBI.filter((s) => b.era === 'all' || s.era === b.era);
+    const q = (b.query || '').toLowerCase();
+    const roster = SHINOBI.filter((s) => (b.era === 'all' || s.era === b.era) && (!q || s.name.toLowerCase().includes(q) || s.roles.join(' ').toLowerCase().includes(q)));
     return `<div class="row" style="margin-bottom:12px">
         <h3 style="margin:0;font-size:20px">${sideName(b.side)} — build your team</h3>
         <span class="grow"></span>
@@ -140,16 +151,18 @@ const SCREENS = {
         <div>
           <div class="tabs" style="margin-bottom:10px">
             ${['all', 'Part 1', 'Shippuden'].map((e) => `<button class="tab ${b.era === e ? 'active' : ''}" data-act="era" data-arg="${e}">${e === 'all' ? 'All eras' : e}</button>`).join('')}
+            <span class="grow"></span>
+            <input type="text" id="rosterSearch" placeholder="Search name or role…" value="${esc(b.query || '')}" data-input="search" style="min-width:200px">
           </div>
           <div class="roster">
             ${roster.map((s) => {
               const isTaken = taken.has(s.baseId) && s.baseId !== selBase;
               return `<button class="rcard" data-act="pick" data-arg="${s.id}" ${isTaken ? 'disabled' : ''}
-                  ${tipAttr(`<b>${esc(s.name)}</b> (${s.era})<div class="tip-s">${s.roles.join(' · ')}</div><b>${esc(s.trait.name)}:</b> ${esc(s.trait.desc)}${s.transformation ? `<br><b>${esc(s.transformation.name)}</b> (${s.transformation.resolve} Resolve)` : ''}<br><b>As support — ${esc(s.supportAura.name)}:</b> ${esc(s.supportAura.desc.replace('{v}', E.auraStages(s.supportAura)))}`)}>
+                  ${tipAttr(`<b>${esc(s.name)}</b> (${s.era})<div class="tip-s">${s.roles.join(' · ')}</div><b>${esc(s.trait.name)}:</b> ${esc(s.trait.desc)}${s.transformation ? `<br><b>${esc(s.transformation.name)}</b> (${s.transformation.resolve} Resolve)` : ''}<br><b>As support — ${esc(s.supportAura.name)}:</b> ${esc(E.auraStages(s.supportAura))}`)}>
                 ${badge(s)}
                 <div class="meta">
                   <div class="row" style="gap:6px"><span class="nm">${esc(s.name)}</span></div>
-                  <div class="chips">${natChip(s.natures.primary)}${natChip(s.natures.secondary)}${!s.natures.primary ? '<span class="nat" style="--c:#c94a3a">Taijutsu</span>' : ''}<span class="chip">${s.era}</span><span class="chip cost">${s.cost}</span></div>
+                  <div class="chips">${natChip(s.natures.primary)}${natChip(s.natures.secondary)}${!s.natures.primary ? '<span class="nat" style="--c:#8c93a8">Non-elemental</span>' : ''}<span class="chip">${s.era}</span><span class="chip cost">${s.cost}</span></div>
                   <div class="small muted">${s.roles.join(' · ')}</div>
                 </div>
               </button>`;
@@ -228,7 +241,7 @@ function memberEditor(m, slot) {
     <div class="statgrid">${Object.entries(s.stats).map(([k, v]) => `<span class="muted">${k.toUpperCase()}</span><div class="statbar"><i style="width:${pct(v, max[k])}%;background:${sc(v)}"></i></div><span class="mono">${v}</span>`).join('')}</div>
     <div class="small"><b>${esc(s.trait.name)}:</b> ${esc(s.trait.desc)}</div>
     ${s.transformation ? `<div class="small" style="margin-top:4px"><b>${esc(s.transformation.name)}</b> (${s.transformation.resolve} Resolve): ${esc(s.transformation.desc)}</div>` : '<div class="small muted" style="margin-top:4px">No transformation.</div>'}
-    ${slot === 3 ? supportPanel(s) : `<div class="small muted" style="margin-top:4px"><b>As support — ${esc(s.supportAura.name)}:</b> ${esc(s.supportAura.desc.replace('{v}', E.auraStages(s.supportAura)))}</div>`}
+    ${slot === 3 ? supportPanel(s) : `<div class="small muted" style="margin-top:4px"><b>As support — ${esc(s.supportAura.name)}:</b> ${esc(E.auraStages(s.supportAura))} <span style="opacity:.7">(3 / 2 / 1 standing)</span></div>`}
     ${slot === 3 ? '' : `<h2 style="margin-top:12px">Jutsu (${m.loadout.length}/4)</h2>`}
     ${slot === 3 ? '' : `<div class="jlist">${s.catalogue.map((id) => {
       const j = E.getJutsu(id);
@@ -517,7 +530,7 @@ function actionSections(st, u) {
     </button>`;
   };
   const SUB = {
-    kunai: () => 'POW 35 · free · +2',
+    kunai: (o) => { const k = E.getJutsu(o.jutsuId); return `POW ${k.power} · free · +2${k.target === 'allEnemies' ? ' · all enemies' : ''}`; },
     charge: () => '+35% Chakra · −2 · vulnerable',
     gather: () => `+${E.defOf(u).roles.some((r) => r === 'Sensor' || r === 'Infiltrator') ? 15 : 8} Intel · −1 · fails if hit`,
     substitute: (o) => `CK ${o.cost} · Stance${o.note ? ` · ${o.note}` : ''}`,
@@ -680,7 +693,7 @@ async function playEvent(ev, apply) {
       break;
     }
     case 'heal':
-      if (el) { FX.ring(arena, el, 'heal'); if (e.amount) FX.pop(arena, el, `+${e.amount}`, 'heal'); }
+      if (el) { FX.ring(arena, el, 'heal', e.chakra ? '#4fb3ff' : null); if (e.amount) FX.pop(arena, el, `+${e.amount}${e.chakra ? ' CK' : ''}`, 'heal'); }
       ms = 1000;
       break;
     case 'ko':
@@ -688,7 +701,11 @@ async function playEvent(ev, apply) {
       ms = 1400;
       break;
     case 'sub':
-      if (el && e.negated) {
+      if (el && e.rotation) {
+        FX.ring(arena, el, '', '#7fd8ff'); FX.ring(arena, el, 'aura', '#7fd8ff');
+        FX.pop(arena, el, 'Rotation!', 'sub', true);
+        ms = 1200;
+      } else if (el && e.negated) {
         FX.fx(arena, 'puff', FX.centerOf(el, arena));
         if (!e.decoy) FX.fx(arena, 'log', FX.centerOf(el, arena), '🪵');
         FX.pop(arena, el, e.decoy ? 'Decoy!' : 'Substitution!', 'sub', true);

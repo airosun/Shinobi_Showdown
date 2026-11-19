@@ -35,9 +35,12 @@ docs/DESIGN.md                    full rules reference
 
 The engine has no DOM code, so the same files will run on a Socket.IO server when online play is added.
 
-## Adding a shinobi
+## Roster data
 
-1. Add the jutsu to `public/data/jutsu.js`.
-2. Add an entry to `public/data/shinobi.js`. Give alternate forms the same `baseId` and a different `id`/`cost`.
-3. If the trait needs new behaviour, add it in `engine/battle.js` (search `traitOf(`).
-4. Run `npm test` and `npm run sim` to check balance.
+`public/data/shinobi.js` and `jutsu.js` are generated: kits are reviewed in the kit sheet, copied into
+`drafts/konoha.py` (one file per batch), and `python3 drafts/gen_data.py` writes the data files, applying the
+balance-pass overrides kept at the top of that script.
+
+1. Draft the batch (stats, natures, trait, transformation, support passive stages, jutsu).
+2. New trait behaviour goes in `TRAITS` / `traitOf(...)` in `engine/battle.js`; new support passive types in `auraVal(...)` call sites.
+3. Run `npm test` and `npm run sim` — the sim prints each shinobi's win rate against what its cost predicts.

@@ -56,7 +56,7 @@ export function chooseActions(state, side, rng = Math.random) {
         let s = 0;
         for (const e of enemies) s += j.power ? computeDamage(state, u, e, j, { noRandom: true }).damage : 15;
         if (j.charged) s *= 0.55;
-        scored.push({ s, action: { actor: u.uid, type: 'jutsu', jutsuId: o.jutsuId } });
+        scored.push({ s, action: { actor: u.uid, type: o.type, jutsuId: o.jutsuId } });
       } else {
         const s = j.effects.some((x) => x.type === 'intel') ? 30 : 25;
         scored.push({ s, action: { actor: u.uid, type: 'jutsu', jutsuId: o.jutsuId, target: { slot: slotOf(state, u) } } });
