@@ -2984,7 +2984,7 @@ export const SHINOBI = [
   {
     "id": "orochimaru_p1",
     "baseId": "orochimaru",
-    "name": "Orochimaru",
+    "name": "Orochimaru (Part I)",
     "era": "Part 1",
     "cost": 8,
     "natures": {

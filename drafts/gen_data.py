@@ -400,7 +400,7 @@ for jid, o in JUTSU_OVERRIDES.items():
     jutsu[jid] = dict(jutsu[jid], **o)
 
 # Part I versions of characters who also have a Shippuden version
-PART1_TAG = {'naruto_p1','sasuke_p1','sakura_p1','kakashi_p1','hinata_p1','neji_p1','lee_p1','tenten_p1','kiba_p1','shino_p1','shikamaru_p1','choji_p1','ino_p1','gaara_p1','temari_p1','kankuro_p1'}
+PART1_TAG = {'naruto_p1','sasuke_p1','sakura_p1','kakashi_p1','hinata_p1','neji_p1','lee_p1','tenten_p1','kiba_p1','shino_p1','shikamaru_p1','choji_p1','ino_p1','gaara_p1','temari_p1','kankuro_p1','orochimaru_p1'}
 for e in out:
     if e['id'] in PART1_TAG: e['name'] += ' (Part I)'
 
