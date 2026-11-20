@@ -51,7 +51,9 @@ const STATUS_NAME = { burn: 'Burned', poison: 'Poisoned', paralyze: 'Paralyzed',
 const STATUS_COLOR = { burn: '#e4572e', poison: '#9b5de5', paralyze: '#e0c020', bind: '#8a6cc4', genjutsu: '#c77dff' };
 const hpColor = (p) => (p > 50 ? '#3ddc84' : p > 20 ? '#ffcc4d' : '#ff5c5c');
 const natColor = (n) => (n ? FX.NATURE_COLOR[n] || '#8c93a8' : '#c94a3a');
-const natChip = (n) => (n ? `<span class="nat" style="--c:${natColor(n)}">${NATURE_LABELS[n] || n}</span>` : '');
+// light chip colours (Yang, Ice, Explosion, Dust…) get dark text so they stay readable
+const isLight = (hex) => { const v = parseInt(hex.slice(1), 16); return 0.299 * (v >> 16) + 0.587 * ((v >> 8) & 255) + 0.114 * (v & 255) > 170; };
+const natChip = (n) => (n ? `<span class="nat${isLight(natColor(n)) ? ' light' : ''}" style="--c:${natColor(n)}">${NATURE_LABELS[n] || n}</span>` : '');
 const sideName = (side) => esc(S.names[side]);
 
 function initials(name) {

@@ -446,6 +446,56 @@
   "mu": {
    "front": "battle/mu.webp",
    "face": "battle/mu-face.webp"
+  },
+  "obito_war": {
+   "front": "battle/obito.webp",
+   "face": "battle/obito-face.webp",
+   "transform": "battle/obito-ten-tails.webp",
+   "transformFace": "battle/obito-ten-tails-face.webp"
+  },
+  "madara_reanimated": {
+   "front": "battle/madara.webp",
+   "face": "battle/madara-face.webp",
+   "transform": "battle/madara-perfect-susanoo.webp",
+   "transformFace": "battle/madara-perfect-susanoo-face.webp"
+  },
+  "madara_six_paths": {
+   "front": "battle/madara-six-paths.webp",
+   "face": "battle/madara-six-paths-face.webp"
+  },
+  "kaguya": {
+   "front": "battle/kaguya.webp",
+   "face": "battle/kaguya-face.webp"
+  },
+  "fu": {
+   "front": "battle/fu.webp",
+   "face": "battle/fu-face.webp",
+   "transform": "battle/chomei.webp",
+   "transformFace": "battle/chomei-face.webp"
+  },
+  "utakata": {
+   "front": "battle/utakata.webp",
+   "face": "battle/utakata-face.webp",
+   "transform": "battle/saiken.webp",
+   "transformFace": "battle/saiken-face.webp"
+  },
+  "han": {
+   "front": "battle/han.webp",
+   "face": "battle/han-face.webp",
+   "transform": "battle/kokuo.webp",
+   "transformFace": "battle/kokuo-face.webp"
+  },
+  "roshi": {
+   "front": "battle/roshi.webp",
+   "face": "battle/roshi-face.webp",
+   "transform": "battle/son-goku.webp",
+   "transformFace": "battle/son-goku-face.webp"
+  },
+  "yugito": {
+   "front": "battle/yguito.webp",
+   "face": "battle/yguito-face.webp",
+   "transform": "battle/matatabi.webp",
+   "transformFace": "battle/matatabi-face.webp"
   }
  }
 }

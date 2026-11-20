@@ -65,7 +65,7 @@ Fire › Wind › Lightning › Earth › Water › Fire. Yin, Yang and non-elem
 ## Intel (win condition 2)
 | Source | Intel |
 |---|---|
-| Gather Intel | 16 (Sensor/Infiltrator 27). Fails if hit first. |
+| Gather Intel | 19 (Sensor/Infiltrator 32). Fails if hit first. |
 | Genjutsu lands | 4 (+ jutsu bonus) |
 | Revealing an enemy jutsu | 1 |
 | KO (interrogation) | 15 |

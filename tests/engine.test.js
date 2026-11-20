@@ -442,3 +442,16 @@ test("Yagura's coral shell softens the first single-target hit each turn", () =>
   resolveTurn(st, [{ actor: '0-0', type: 'kunai', target: { slot: 0 } }]);
   assert.ok(st.log.some((l) => /coral shell/.test(l.text)));
 });
+
+// ---------------- batch 5: Fourth War and Jinchuriki ----------------
+test('Roshi is immune to Burn; Madara (Six Paths Mode) shrugs off genjutsu', () => {
+  const st = battle(['roshi', 'madara_six_paths', 'fu', 'han'], ['yugito', 'itachi', 'kaguya', 'utakata'], 0.01);
+  resolveTurn(st, [{ actor: '1-0', type: 'jutsu', jutsuId: 'cat_fireballs' }]);
+  assert.ok(!st.units['0-0'].statuses.burn);
+  resolveTurn(st, [{ actor: '1-1', type: 'jutsu', jutsuId: 'tsukuyomi', target: { slot: 1 } }]);
+  assert.ok(!st.units['0-1'].statuses.genjutsu);
+});
+
+test('Costs above 10 count against the 30-point cap', () => {
+  assert.ok(E.validateTeam({ members: ['madara_six_paths', 'kaguya', 'fu', 'karin'].map(member) }).some((e) => /over the cap/.test(e)));
+});

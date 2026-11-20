@@ -4939,6 +4939,568 @@ export const JUTSU = {
     "effects": [],
     "desc": "A smaller detachment cone."
   },
+  "uchiha_gunbai": {
+    "name": "Uchiha Gunbai: Uchiwa",
+    "category": "support",
+    "nature": "yang",
+    "power": 0,
+    "cost": 35,
+    "priority": 4,
+    "target": "self",
+    "effects": [
+      {
+        "type": "rotation"
+      }
+    ],
+    "desc": "The war fan absorbs every incoming attack this turn (except genjutsu)."
+  },
+  "truth_seeking_balls": {
+    "name": "Truth-Seeking Balls",
+    "category": "ninjutsu",
+    "nature": "yin",
+    "power": 140,
+    "cost": 60,
+    "priority": 0,
+    "target": "allEnemies",
+    "effects": [],
+    "desc": "Only while transformed. Orbs of Yin-Yang Release that nullify ninjutsu. Ignores Substitution.",
+    "requiresTransform": true,
+    "ignoresSub": true
+  },
+  "ten_tails_bomb": {
+    "name": "Ten-Tails: Tailed Beast Bomb",
+    "category": "ninjutsu",
+    "nature": null,
+    "power": 190,
+    "cost": 90,
+    "priority": -1,
+    "target": "allEnemies",
+    "effects": [],
+    "desc": "Only while transformed. A bomb that can level a mountain range.",
+    "requiresTransform": true
+  },
+  "majestic_flame": {
+    "name": "Fire Release: Majestic Destroyer Flame",
+    "category": "ninjutsu",
+    "nature": "fire",
+    "power": 90,
+    "cost": 55,
+    "priority": 0,
+    "target": "allEnemies",
+    "effects": [
+      {
+        "type": "burn",
+        "chance": 0.3,
+        "turns": 3
+      }
+    ],
+    "desc": "A wall of fire over the whole field. 30% Burn."
+  },
+  "tengai_shinsei": {
+    "name": "Tengai Shinsei",
+    "category": "ninjutsu",
+    "nature": "earth",
+    "power": 160,
+    "cost": 95,
+    "priority": -1,
+    "target": "allEnemies",
+    "effects": [],
+    "desc": "Charged. He drops a meteor. Then a second one.",
+    "charged": true
+  },
+  "susanoo_sword": {
+    "name": "Perfect Susano'o: Sword Slash",
+    "category": "ninjutsu",
+    "nature": "fire",
+    "power": 170,
+    "cost": 75,
+    "priority": 0,
+    "target": "allEnemies",
+    "effects": [],
+    "desc": "Only while transformed. One swing of Perfect Susano'o splits the land.",
+    "requiresTransform": true
+  },
+  "madara_taijutsu": {
+    "name": "Uchiha Taijutsu",
+    "category": "taijutsu",
+    "nature": null,
+    "power": 95,
+    "cost": 15,
+    "priority": 1,
+    "target": "enemy",
+    "effects": [],
+    "desc": "Effortless hand-to-hand against a whole army."
+  },
+  "limbo_strike": {
+    "name": "Limbo: Border Jail",
+    "category": "taijutsu",
+    "nature": "yin",
+    "power": 110,
+    "cost": 30,
+    "priority": 1,
+    "target": "enemy",
+    "effects": [],
+    "desc": "Invisible shadows strike from the other world. Ignores Substitution.",
+    "ignoresSub": true
+  },
+  "madara_tsb": {
+    "name": "Truth-Seeking Ball Staff",
+    "category": "taijutsu",
+    "nature": "yin",
+    "power": 125,
+    "cost": 35,
+    "priority": 0,
+    "target": "enemy",
+    "effects": [
+      {
+        "type": "pierce",
+        "value": 0.3
+      }
+    ],
+    "desc": "A staff of Yin-Yang Release. Ignores 30% DEF."
+  },
+  "six_paths_chibaku": {
+    "name": "Six Paths: Chibaku Tensei",
+    "category": "ninjutsu",
+    "nature": "yin",
+    "power": 200,
+    "cost": 110,
+    "priority": -1,
+    "target": "allEnemies",
+    "effects": [
+      {
+        "type": "bind",
+        "chance": 0.5,
+        "turns": 2
+      }
+    ],
+    "desc": "Charged. A moon-sized prison: 50% Bind for 2 turns.",
+    "charged": true
+  },
+  "infinite_tsukuyomi": {
+    "name": "Infinite Tsukuyomi",
+    "category": "genjutsu",
+    "nature": "yin",
+    "power": 40,
+    "cost": 100,
+    "priority": -1,
+    "target": "allEnemies",
+    "effects": [
+      {
+        "type": "genjutsu",
+        "turns": 3
+      }
+    ],
+    "desc": "The moon lights up the world: damage and genjutsu for 3 turns on every enemy."
+  },
+  "ash_bones": {
+    "name": "All-Killing Ash Bones",
+    "category": "taijutsu",
+    "nature": "yang",
+    "power": 110,
+    "cost": 35,
+    "priority": 0,
+    "target": "enemy",
+    "effects": [
+      {
+        "type": "pierce",
+        "value": 0.3
+      }
+    ],
+    "desc": "Bones that crumble the target to ash. Ignores 30% DEF."
+  },
+  "expansive_tsb": {
+    "name": "Expansive Truth-Seeking Ball",
+    "category": "ninjutsu",
+    "nature": "yin",
+    "power": 115,
+    "cost": 80,
+    "priority": -1,
+    "target": "allEnemies",
+    "effects": [
+      {
+        "type": "drainChakra",
+        "value": 0.2,
+        "steal": true
+      }
+    ],
+    "desc": "Absorbs the chakra of everyone it touches: steals 20% Chakra from every enemy."
+  },
+  "yomotsu_hirasaka": {
+    "name": "Yomotsu Hirasaka",
+    "category": "ninjutsu",
+    "nature": "yin",
+    "power": 90,
+    "cost": 35,
+    "priority": 2,
+    "target": "enemy",
+    "effects": [],
+    "desc": "Opens a portal and strikes from behind."
+  },
+  "eighty_gods": {
+    "name": "Eighty Gods Vacuum Attack",
+    "category": "taijutsu",
+    "nature": "yang",
+    "power": 85,
+    "cost": 35,
+    "priority": 1,
+    "target": "allEnemies",
+    "effects": [],
+    "desc": "A barrage of air-shattering palms on everyone."
+  },
+  "hair_needles": {
+    "name": "Hair Needle Senbon",
+    "category": "ninjutsu",
+    "nature": "yang",
+    "power": 40,
+    "cost": 30,
+    "priority": 1,
+    "target": "enemy",
+    "effects": [
+      {
+        "type": "bind",
+        "chance": 0.6,
+        "turns": 1
+      }
+    ],
+    "desc": "Living hair wraps the target. 60% Bind."
+  },
+  "dimension_shift": {
+    "name": "Amenominaka",
+    "category": "support",
+    "nature": "yin",
+    "power": 0,
+    "cost": 50,
+    "priority": 4,
+    "target": "self",
+    "effects": [
+      {
+        "type": "rotation"
+      }
+    ],
+    "desc": "Shifts everyone to another dimension: every attack on her this turn misses (except genjutsu)."
+  },
+  "scale_powder": {
+    "name": "Secret Technique: Scale Powder",
+    "category": "ninjutsu",
+    "nature": "wind",
+    "power": 60,
+    "cost": 35,
+    "priority": 0,
+    "target": "allEnemies",
+    "effects": [
+      {
+        "type": "flinch",
+        "chance": 0.25
+      }
+    ],
+    "desc": "Blinding scale powder over the field. 25% Flinch."
+  },
+  "insect_tackle": {
+    "name": "Rinpun Tackle",
+    "category": "taijutsu",
+    "nature": "wind",
+    "power": 85,
+    "cost": 15,
+    "priority": 1,
+    "target": "enemy",
+    "effects": [],
+    "desc": "A diving charge on glowing wings."
+  },
+  "chomei_flight": {
+    "name": "Chomei Wings",
+    "category": "support",
+    "nature": "wind",
+    "power": 0,
+    "cost": 20,
+    "priority": 2,
+    "target": "self",
+    "effects": [
+      {
+        "type": "buff",
+        "stat": "spd",
+        "mult": 1.3,
+        "turns": 3
+      }
+    ],
+    "desc": "Takes to the air: +30% SPD for 3 turns."
+  },
+  "chomei_bomb": {
+    "name": "Chomei: Tailed Beast Bomb",
+    "category": "ninjutsu",
+    "nature": "wind",
+    "power": 150,
+    "cost": 75,
+    "priority": -1,
+    "target": "allEnemies",
+    "effects": [],
+    "desc": "Only while transformed. The Seven-Tails fires a Tailed Beast Bomb.",
+    "requiresTransform": true
+  },
+  "bubble_burst": {
+    "name": "Bubble Release: Exploding Bubbles",
+    "category": "ninjutsu",
+    "nature": "water",
+    "power": 70,
+    "cost": 35,
+    "priority": 0,
+    "target": "allEnemies",
+    "effects": [],
+    "desc": "A cloud of bubbles that explode on contact."
+  },
+  "acid_bubbles": {
+    "name": "Bubble Release: Acid Bubbles",
+    "category": "ninjutsu",
+    "nature": "boil",
+    "power": 90,
+    "cost": 40,
+    "priority": 0,
+    "target": "enemy",
+    "effects": [
+      {
+        "type": "debuff",
+        "stat": "def",
+        "mult": 0.85,
+        "turns": 2
+      }
+    ],
+    "desc": "Corrosive bubbles: −15% DEF for 2 turns."
+  },
+  "bubble_prison": {
+    "name": "Bubble Release: Bubble Prison",
+    "category": "ninjutsu",
+    "nature": "water",
+    "power": 0,
+    "cost": 35,
+    "priority": 1,
+    "target": "enemy",
+    "effects": [
+      {
+        "type": "bind",
+        "chance": 0.65,
+        "turns": 1
+      }
+    ],
+    "desc": "Traps the target in a bubble. 65% Bind."
+  },
+  "bubble_clone": {
+    "name": "Bubble Clone",
+    "category": "support",
+    "nature": "water",
+    "power": 0,
+    "cost": 20,
+    "priority": 2,
+    "target": "self",
+    "effects": [
+      {
+        "type": "decoy"
+      }
+    ],
+    "desc": "A bubble double takes the next hit."
+  },
+  "saiken_bomb": {
+    "name": "Saiken: Tailed Beast Bomb",
+    "category": "ninjutsu",
+    "nature": "boil",
+    "power": 150,
+    "cost": 75,
+    "priority": -1,
+    "target": "allEnemies",
+    "effects": [
+      {
+        "type": "poison",
+        "chance": 0.3,
+        "turns": 3
+      }
+    ],
+    "desc": "Only while transformed. The Six-Tails fires an acid Tailed Beast Bomb. 30% Poison.",
+    "requiresTransform": true
+  },
+  "steam_punch": {
+    "name": "Boil Release: Steam Punch",
+    "category": "taijutsu",
+    "nature": "boil",
+    "power": 105,
+    "cost": 25,
+    "priority": 0,
+    "target": "enemy",
+    "effects": [
+      {
+        "type": "burn",
+        "chance": 0.2,
+        "turns": 3
+      }
+    ],
+    "desc": "A steam-jet powered punch. 20% Burn."
+  },
+  "steam_kick": {
+    "name": "Boil Release: Steam Kick",
+    "category": "taijutsu",
+    "nature": "boil",
+    "power": 80,
+    "cost": 15,
+    "priority": 1,
+    "target": "enemy",
+    "effects": [],
+    "desc": "A fast kick riding a jet of steam."
+  },
+  "steam_armor": {
+    "name": "Boil Release: Steam Armor",
+    "category": "support",
+    "nature": "boil",
+    "power": 0,
+    "cost": 25,
+    "priority": 2,
+    "target": "self",
+    "effects": [
+      {
+        "type": "buff",
+        "stat": "def",
+        "mult": 1.4,
+        "turns": 2
+      }
+    ],
+    "desc": "Vents steam from his armor: +40% DEF for 2 turns."
+  },
+  "kokuo_bomb": {
+    "name": "Kokuo: Tailed Beast Bomb",
+    "category": "ninjutsu",
+    "nature": "boil",
+    "power": 150,
+    "cost": 75,
+    "priority": -1,
+    "target": "allEnemies",
+    "effects": [],
+    "desc": "Only while transformed. The Five-Tails fires a Tailed Beast Bomb.",
+    "requiresTransform": true
+  },
+  "lava_fist": {
+    "name": "Lava Release: Lava Fist",
+    "category": "taijutsu",
+    "nature": "lava",
+    "power": 90,
+    "cost": 25,
+    "priority": 0,
+    "target": "enemy",
+    "effects": [
+      {
+        "type": "burn",
+        "chance": 0.25,
+        "turns": 3
+      }
+    ],
+    "desc": "A fist coated in magma. 25% Burn."
+  },
+  "lava_shuriken": {
+    "name": "Lava Release: Rubber Ball Shuriken",
+    "category": "ninjutsu",
+    "nature": "lava",
+    "power": 60,
+    "cost": 40,
+    "priority": 1,
+    "target": "allEnemies",
+    "effects": [],
+    "desc": "Molten shuriken over the field."
+  },
+  "magma_wall": {
+    "name": "Lava Release: Magma Wall",
+    "category": "support",
+    "nature": "lava",
+    "power": 0,
+    "cost": 35,
+    "priority": 2,
+    "target": "allAllies",
+    "effects": [
+      {
+        "type": "buff",
+        "stat": "def",
+        "mult": 1.25,
+        "turns": 2
+      }
+    ],
+    "desc": "A cooling wall of magma: +25% DEF for 2 turns."
+  },
+  "son_goku_bomb": {
+    "name": "Son Goku: Tailed Beast Bomb",
+    "category": "ninjutsu",
+    "nature": "lava",
+    "power": 140,
+    "cost": 80,
+    "priority": -1,
+    "target": "allEnemies",
+    "effects": [
+      {
+        "type": "burn",
+        "chance": 0.3,
+        "turns": 3
+      }
+    ],
+    "desc": "Only while transformed. The Four-Tails fires a Tailed Beast Bomb. 30% Burn.",
+    "requiresTransform": true
+  },
+  "blue_fire_claw": {
+    "name": "Cat Claw of Blue Fire",
+    "category": "taijutsu",
+    "nature": "fire",
+    "power": 95,
+    "cost": 20,
+    "priority": 1,
+    "target": "enemy",
+    "effects": [
+      {
+        "type": "burn",
+        "chance": 0.3,
+        "turns": 3
+      }
+    ],
+    "desc": "Claws wreathed in Matatabi's blue flames. 30% Burn."
+  },
+  "cat_fireballs": {
+    "name": "Fire Release: Mouse Fireballs",
+    "category": "ninjutsu",
+    "nature": "fire",
+    "power": 70,
+    "cost": 35,
+    "priority": 0,
+    "target": "allEnemies",
+    "effects": [
+      {
+        "type": "burn",
+        "chance": 0.2,
+        "turns": 3
+      }
+    ],
+    "desc": "A spread of blue fireballs. 20% Burn."
+  },
+  "cat_pounce": {
+    "name": "Cat Pounce",
+    "category": "taijutsu",
+    "nature": null,
+    "power": 70,
+    "cost": 10,
+    "priority": 2,
+    "target": "enemy",
+    "effects": [],
+    "desc": "Pounces before anyone can react."
+  },
+  "matatabi_bomb": {
+    "name": "Matatabi: Tailed Beast Bomb",
+    "category": "ninjutsu",
+    "nature": "fire",
+    "power": 150,
+    "cost": 75,
+    "priority": -1,
+    "target": "allEnemies",
+    "effects": [
+      {
+        "type": "burn",
+        "chance": 0.4,
+        "turns": 3
+      }
+    ],
+    "desc": "Only while transformed. The Two-Tails fires a Tailed Beast Bomb. 40% Burn.",
+    "requiresTransform": true
+  },
   "thrown_rasenshuriken": {
     "name": "Rasenshuriken (Thrown)",
     "category": "ninjutsu",

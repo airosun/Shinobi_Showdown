@@ -465,7 +465,7 @@ export const SHINOBI = [
     "baseId": "sasuke",
     "name": "Sasuke Uchiha (Mangekyō)",
     "era": "Shippuden",
-    "cost": 8,
+    "cost": 7,
     "natures": {
       "primary": "fire",
       "secondary": "lightning"
@@ -964,7 +964,7 @@ export const SHINOBI = [
     "baseId": "kakashi",
     "name": "Kakashi Hatake (Double Eternal Mangekyō)",
     "era": "Shippuden",
-    "cost": 9,
+    "cost": 8,
     "natures": {
       "primary": "lightning",
       "secondary": "earth"
@@ -1829,7 +1829,7 @@ export const SHINOBI = [
     "baseId": "kiba",
     "name": "Kiba Inuzuka (Shippuden)",
     "era": "Shippuden",
-    "cost": 7,
+    "cost": 6,
     "natures": {
       "primary": null,
       "secondary": null
@@ -5053,7 +5053,7 @@ export const SHINOBI = [
     "baseId": "hiruzen",
     "name": "Hiruzen Sarutobi",
     "era": "Part 1",
-    "cost": 8,
+    "cost": 7,
     "natures": {
       "primary": "fire",
       "secondary": "earth"
@@ -5893,7 +5893,7 @@ export const SHINOBI = [
     "baseId": "onoki",
     "name": "Onoki",
     "era": "Shippuden",
-    "cost": 9,
+    "cost": 8,
     "natures": {
       "primary": "dust",
       "secondary": "earth"
@@ -6116,6 +6116,625 @@ export const SHINOBI = [
             1,
             2,
             3
+          ]
+        }
+      ]
+    }
+  },
+  {
+    "id": "obito_war",
+    "baseId": "obito",
+    "name": "Obito Uchiha (Great War)",
+    "era": "Shippuden",
+    "cost": 10,
+    "natures": {
+      "primary": "wood",
+      "secondary": "fire"
+    },
+    "stats": {
+      "hp": 120,
+      "tai": 105,
+      "nin": 125,
+      "def": 105,
+      "spd": 115,
+      "chk": 160
+    },
+    "roles": [
+      "Striker",
+      "Controller"
+    ],
+    "trait": {
+      "id": "kamuiPhase",
+      "name": "Kamui Intangibility",
+      "desc": "Single-target attacks have a 20% chance to pass straight through him."
+    },
+    "substitutions": [
+      "log",
+      "shadowClone"
+    ],
+    "catalogue": [
+      "kamui_absorb",
+      "fire_annihilation",
+      "gedo_chains",
+      "uchiha_gunbai",
+      "truth_seeking_balls",
+      "ten_tails_bomb"
+    ],
+    "defaultLoadout": [
+      "kamui_absorb",
+      "fire_annihilation",
+      "gedo_chains",
+      "truth_seeking_balls"
+    ],
+    "transformation": {
+      "resolve": 80,
+      "cost": 0,
+      "turns": 3,
+      "mods": {
+        "nin": 1.4,
+        "def": 1.3
+      },
+      "regenHpPct": 0.08,
+      "drawback": "exhausted",
+      "name": "Ten Tails Jinchuriki",
+      "desc": "+40% NIN, +30% DEF, regenerates 8% HP per turn and unlocks Truth-Seeking Balls and Ten-Tails: Tailed Beast Bomb. Exhausted afterwards."
+    },
+    "supportAura": {
+      "name": "Six Paths Power",
+      "desc": "Allies gain +{0} NIN.",
+      "effects": [
+        {
+          "type": "stat",
+          "values": [
+            0.1,
+            0.15,
+            0.25
+          ],
+          "stat": "nin"
+        }
+      ]
+    }
+  },
+  {
+    "id": "madara_reanimated",
+    "baseId": "madara",
+    "name": "Madara Uchiha (Full Reanimation)",
+    "era": "Shippuden",
+    "cost": 11,
+    "natures": {
+      "primary": "fire",
+      "secondary": "wood"
+    },
+    "stats": {
+      "hp": 120,
+      "tai": 115,
+      "nin": 125,
+      "def": 105,
+      "spd": 115,
+      "chk": 170
+    },
+    "roles": [
+      "Striker",
+      "Frontliner"
+    ],
+    "trait": {
+      "id": "endlessChakra",
+      "name": "Endless Chakra",
+      "desc": "Reanimated with the Rinnegan: regenerates 4% HP and 5% Chakra per turn and is immune to Poison."
+    },
+    "substitutions": [
+      "log",
+      "shadowClone"
+    ],
+    "catalogue": [
+      "majestic_flame",
+      "deep_forest",
+      "madara_taijutsu",
+      "uchiha_gunbai",
+      "tengai_shinsei",
+      "susanoo_sword"
+    ],
+    "defaultLoadout": [
+      "majestic_flame",
+      "madara_taijutsu",
+      "tengai_shinsei",
+      "susanoo_sword"
+    ],
+    "transformation": {
+      "resolve": 80,
+      "cost": 0,
+      "turns": 3,
+      "mods": {
+        "def": 1.4,
+        "nin": 1.3
+      },
+      "drawback": "exhausted",
+      "name": "Perfect Susano'o",
+      "desc": "+40% DEF, +30% NIN and unlocks Perfect Susano'o: Sword Slash. Exhausted afterwards."
+    },
+    "supportAura": {
+      "name": "Ghost of the Uchiha",
+      "desc": "Allies' attacks ignore {0} DEF.",
+      "effects": [
+        {
+          "type": "pierce",
+          "values": [
+            0.05,
+            0.1,
+            0.15
+          ]
+        }
+      ]
+    }
+  },
+  {
+    "id": "madara_six_paths",
+    "baseId": "madara",
+    "name": "Madara Uchiha (Six Paths Mode)",
+    "era": "Shippuden",
+    "cost": 12,
+    "natures": {
+      "primary": "yin",
+      "secondary": "yang"
+    },
+    "stats": {
+      "hp": 135,
+      "tai": 130,
+      "nin": 140,
+      "def": 115,
+      "spd": 125,
+      "chk": 180
+    },
+    "roles": [
+      "Striker",
+      "Controller"
+    ],
+    "trait": {
+      "id": "rinneMadara",
+      "name": "Rinne-Sharingan",
+      "desc": "Sees through Log Substitution and Decoys, immune to genjutsu. His taijutsu strike a second time for 25% damage (Limbo shadows)."
+    },
+    "substitutions": [
+      "log"
+    ],
+    "catalogue": [
+      "limbo_strike",
+      "madara_tsb",
+      "six_paths_chibaku",
+      "infinite_tsukuyomi",
+      "majestic_flame"
+    ],
+    "defaultLoadout": [
+      "limbo_strike",
+      "madara_tsb",
+      "six_paths_chibaku",
+      "infinite_tsukuyomi"
+    ],
+    "transformation": null,
+    "supportAura": {
+      "name": "Moon's Eye",
+      "desc": "Fielded enemies lose {0} max Chakra per turn.",
+      "effects": [
+        {
+          "type": "enemyDrain",
+          "values": [
+            0.02,
+            0.04,
+            0.06
+          ]
+        }
+      ]
+    }
+  },
+  {
+    "id": "kaguya",
+    "baseId": "kaguya",
+    "name": "Kaguya Otsutsuki",
+    "era": "Shippuden",
+    "cost": 12,
+    "natures": {
+      "primary": "yang",
+      "secondary": "yin"
+    },
+    "stats": {
+      "hp": 140,
+      "tai": 110,
+      "nin": 145,
+      "def": 120,
+      "spd": 120,
+      "chk": 190
+    },
+    "roles": [
+      "Striker",
+      "Controller",
+      "Tank"
+    ],
+    "trait": {
+      "id": "progenitor",
+      "name": "Progenitor of Chakra",
+      "desc": "Immune to genjutsu, and Chakra she drains is added to her own."
+    },
+    "substitutions": [
+      "log"
+    ],
+    "catalogue": [
+      "ash_bones",
+      "expansive_tsb",
+      "yomotsu_hirasaka",
+      "eighty_gods",
+      "hair_needles",
+      "dimension_shift"
+    ],
+    "defaultLoadout": [
+      "ash_bones",
+      "expansive_tsb",
+      "yomotsu_hirasaka",
+      "eighty_gods"
+    ],
+    "transformation": null,
+    "supportAura": {
+      "name": "Mother of Chakra",
+      "desc": "Allies regenerate {0} max Chakra per turn.",
+      "effects": [
+        {
+          "type": "chakra",
+          "values": [
+            0.03,
+            0.05,
+            0.08
+          ]
+        }
+      ]
+    }
+  },
+  {
+    "id": "fu",
+    "baseId": "fu",
+    "name": "Fu",
+    "era": "Shippuden",
+    "cost": 6,
+    "natures": {
+      "primary": "wind",
+      "secondary": null
+    },
+    "stats": {
+      "hp": 95,
+      "tai": 80,
+      "nin": 100,
+      "def": 80,
+      "spd": 120,
+      "chk": 120
+    },
+    "roles": [
+      "Striker",
+      "Infiltrator"
+    ],
+    "trait": {
+      "id": "luckySeven",
+      "name": "Lucky Seven",
+      "desc": "Dodges single-target attacks 10% more often."
+    },
+    "substitutions": [
+      "log",
+      "shadowClone"
+    ],
+    "catalogue": [
+      "scale_powder",
+      "insect_tackle",
+      "chomei_flight",
+      "chomei_bomb"
+    ],
+    "defaultLoadout": [
+      "scale_powder",
+      "insect_tackle",
+      "chomei_flight",
+      "chomei_bomb"
+    ],
+    "transformation": {
+      "resolve": 60,
+      "cost": 0,
+      "turns": 3,
+      "mods": {
+        "nin": 1.3,
+        "spd": 1.3
+      },
+      "drawback": "exhausted",
+      "name": "Seven-Tails Chomei",
+      "desc": "+30% NIN, +30% SPD and unlocks Chomei: Tailed Beast Bomb. Exhausted afterwards."
+    },
+    "supportAura": {
+      "name": "Takigakure Spirit",
+      "desc": "Allies dodge single-target attacks {0} more often.",
+      "effects": [
+        {
+          "type": "dodge",
+          "values": [
+            0.04,
+            0.07,
+            0.1
+          ]
+        }
+      ]
+    }
+  },
+  {
+    "id": "utakata",
+    "baseId": "utakata",
+    "name": "Utakata",
+    "era": "Shippuden",
+    "cost": 8,
+    "natures": {
+      "primary": "water",
+      "secondary": "boil"
+    },
+    "stats": {
+      "hp": 100,
+      "tai": 70,
+      "nin": 115,
+      "def": 90,
+      "spd": 95,
+      "chk": 130
+    },
+    "roles": [
+      "Controller",
+      "Striker"
+    ],
+    "trait": {
+      "id": "corrosiveBubbles",
+      "name": "Corrosive Bubbles",
+      "desc": "His Water and Boil jutsu that hit also lower the target's DEF by 10% for 2 turns."
+    },
+    "substitutions": [
+      "log",
+      "waterClone"
+    ],
+    "catalogue": [
+      "bubble_burst",
+      "acid_bubbles",
+      "bubble_prison",
+      "bubble_clone",
+      "saiken_bomb"
+    ],
+    "defaultLoadout": [
+      "bubble_burst",
+      "acid_bubbles",
+      "bubble_prison",
+      "saiken_bomb"
+    ],
+    "transformation": {
+      "resolve": 60,
+      "cost": 0,
+      "turns": 3,
+      "mods": {
+        "nin": 1.3,
+        "def": 1.3
+      },
+      "drawback": "exhausted",
+      "name": "Six-Tails Saiken",
+      "desc": "+30% NIN, +30% DEF and unlocks Saiken: Tailed Beast Bomb. Exhausted afterwards."
+    },
+    "supportAura": {
+      "name": "Bubble Barrier",
+      "desc": "Allies take {0} less damage from area attacks.",
+      "effects": [
+        {
+          "type": "aoeDR",
+          "values": [
+            0.1,
+            0.2,
+            0.3
+          ]
+        }
+      ]
+    }
+  },
+  {
+    "id": "han",
+    "baseId": "han",
+    "name": "Han",
+    "era": "Shippuden",
+    "cost": 8,
+    "natures": {
+      "primary": "boil",
+      "secondary": "water"
+    },
+    "stats": {
+      "hp": 125,
+      "tai": 115,
+      "nin": 80,
+      "def": 110,
+      "spd": 90,
+      "chk": 120
+    },
+    "roles": [
+      "Frontliner",
+      "Tank"
+    ],
+    "trait": {
+      "id": "steamArmor",
+      "name": "Steam Armor",
+      "desc": "Enemies that hit him with taijutsu have a 30% chance to be Burned."
+    },
+    "substitutions": [
+      "log"
+    ],
+    "catalogue": [
+      "steam_punch",
+      "steam_kick",
+      "steam_armor",
+      "kokuo_bomb"
+    ],
+    "defaultLoadout": [
+      "steam_punch",
+      "steam_kick",
+      "steam_armor",
+      "kokuo_bomb"
+    ],
+    "transformation": {
+      "resolve": 60,
+      "cost": 0,
+      "turns": 3,
+      "mods": {
+        "tai": 1.4,
+        "def": 1.3
+      },
+      "drawback": "exhausted",
+      "name": "Five-Tails Kokuo",
+      "desc": "+40% TAI, +30% DEF and unlocks Kokuo: Tailed Beast Bomb. Exhausted afterwards."
+    },
+    "supportAura": {
+      "name": "Steam Vents",
+      "desc": "Allies below 25% HP take {0} less damage.",
+      "effects": [
+        {
+          "type": "lowHpDR",
+          "values": [
+            0.1,
+            0.2,
+            0.3
+          ]
+        }
+      ]
+    }
+  },
+  {
+    "id": "roshi",
+    "baseId": "roshi",
+    "name": "Roshi",
+    "era": "Shippuden",
+    "cost": 9,
+    "natures": {
+      "primary": "lava",
+      "secondary": "earth"
+    },
+    "stats": {
+      "hp": 115,
+      "tai": 95,
+      "nin": 110,
+      "def": 105,
+      "spd": 85,
+      "chk": 130
+    },
+    "roles": [
+      "Tank",
+      "Striker"
+    ],
+    "trait": {
+      "id": "volcanicBody",
+      "name": "Volcanic Body",
+      "desc": "Immune to Burn. His Lava jutsu have +15% Burn chance."
+    },
+    "substitutions": [
+      "log"
+    ],
+    "catalogue": [
+      "lava_fist",
+      "lava_shuriken",
+      "magma_wall",
+      "lava_globs",
+      "son_goku_bomb"
+    ],
+    "defaultLoadout": [
+      "lava_fist",
+      "lava_shuriken",
+      "magma_wall",
+      "son_goku_bomb"
+    ],
+    "transformation": {
+      "resolve": 60,
+      "cost": 0,
+      "turns": 3,
+      "mods": {
+        "nin": 1.3,
+        "def": 1.3
+      },
+      "drawback": "exhausted",
+      "name": "Four-Tails Son Goku",
+      "desc": "+30% NIN, +30% DEF and unlocks Son Goku: Tailed Beast Bomb. Exhausted afterwards."
+    },
+    "supportAura": {
+      "name": "Old Monkey Wisdom",
+      "desc": "Allies gain {0} Resolve per turn.",
+      "effects": [
+        {
+          "type": "resolve",
+          "values": [
+            3,
+            5,
+            8
+          ]
+        }
+      ]
+    }
+  },
+  {
+    "id": "yugito",
+    "baseId": "yugito",
+    "name": "Yugito Nii",
+    "era": "Shippuden",
+    "cost": 7,
+    "natures": {
+      "primary": "fire",
+      "secondary": null
+    },
+    "stats": {
+      "hp": 95,
+      "tai": 95,
+      "nin": 105,
+      "def": 80,
+      "spd": 115,
+      "chk": 115
+    },
+    "roles": [
+      "Striker",
+      "Frontliner"
+    ],
+    "trait": {
+      "id": "catReflexes",
+      "name": "Cat Reflexes",
+      "desc": "Dodges single-target taijutsu 25% more often."
+    },
+    "substitutions": [
+      "log",
+      "shadowClone"
+    ],
+    "catalogue": [
+      "blue_fire_claw",
+      "cat_fireballs",
+      "cat_pounce",
+      "matatabi_bomb"
+    ],
+    "defaultLoadout": [
+      "blue_fire_claw",
+      "cat_fireballs",
+      "cat_pounce",
+      "matatabi_bomb"
+    ],
+    "transformation": {
+      "resolve": 60,
+      "cost": 0,
+      "turns": 3,
+      "mods": {
+        "nin": 1.3,
+        "spd": 1.3
+      },
+      "drawback": "exhausted",
+      "name": "Two-Tails Matatabi",
+      "desc": "+30% NIN, +30% SPD and unlocks Matatabi: Tailed Beast Bomb. Exhausted afterwards."
+    },
+    "supportAura": {
+      "name": "Blue Flames",
+      "desc": "Allies' Fire jutsu deal +{0} damage.",
+      "effects": [
+        {
+          "type": "natureBoost",
+          "values": [
+            0.1,
+            0.15,
+            0.25
+          ],
+          "natures": [
+            "fire"
           ]
         }
       ]

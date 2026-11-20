@@ -1,6 +1,6 @@
 # Batch 5 drafts: the Fourth Great Ninja War (Great War Obito, Madara, Kaguya) and the remaining Jinchuriki.
 # Same format as batch4.py. NEW=True / new=True / a True third trait element flag mechanics the engine doesn't have yet.
-# Costs above 10 are new: Madara (Ten Tails Jinchuriki) and Kaguya are "god tier" at 12, so a 30-point team must go cheap elsewhere.
+# Costs above 10 are new: Madara (Six Paths Mode) and Kaguya are "god tier" at 12, so a 30-point team must go cheap elsewhere.
 from konoha import J, burn, para, bind, gen, flinch, drain, intel, heal, buff, debuff, recoil, pierce, decoy, cleanse, reveal, vsBound, chakraGive, rotation
 from batch2 import poison
 from batch3 import steal
@@ -15,7 +15,7 @@ NEW_JUTSU = {
   'tengai_shinsei': J('Tengai Shinsei', 'ninjutsu', 'earth', 190, 95, -1, 'allEnemies', [], 'Charged. He drops a meteor. Then a second one.', charged=True),
   'susanoo_sword': J("Perfect Susano'o: Sword Slash", 'ninjutsu', 'fire', 170, 75, 0, 'allEnemies', [], "Only while transformed. One swing of Perfect Susano'o splits the land.", requiresTransform=True),
   'madara_taijutsu': J('Uchiha Taijutsu', 'taijutsu', None, 95, 15, 1, 'enemy', [], 'Effortless hand-to-hand against a whole army.'),
-  # Madara (Ten Tails Jinchuriki)
+  # Madara (Six Paths Mode)
   'limbo_strike': J('Limbo: Border Jail', 'taijutsu', 'yin', 110, 30, 1, 'enemy', [], 'Invisible shadows strike from the other world. Ignores Substitution.', ignoresSub=True),
   'madara_tsb': J('Truth-Seeking Ball Staff', 'taijutsu', 'yin', 125, 35, 0, 'enemy', [pierce(0.3)], 'A staff of Yin-Yang Release. Ignores 30% DEF.'),
   'six_paths_chibaku': J('Six Paths: Chibaku Tensei', 'ninjutsu', 'yin', 200, 110, -1, 'allEnemies', [bind(0.5, 2)], 'Charged. A moon-sized prison: 50% Bind for 2 turns.', charged=True),
@@ -75,7 +75,7 @@ add('madara_reanimated', 'Madara Uchiha', 'Full Reanimation', 'Shippuden', 10, '
     T("Perfect Susano'o", 80, 3, "+40% DEF, +30% NIN and unlocks Perfect Susano'o: Sword Slash. Exhausted afterwards."),
     A('Ghost of the Uchiha', 'pierce', '5% / 10% / 15%', "Allies' attacks ignore {v} DEF."),
     ['log', 'shadowClone'], ['majestic_flame', 'deep_forest', 'madara_taijutsu', 'uchiha_gunbai', 'tengai_shinsei', 'susanoo_sword'])
-add('madara_jinchuriki', 'Madara Uchiha', 'Ten Tails Jinchuriki', 'Shippuden', 12, 'yin', 'yang', ['Striker', 'Controller'], (135, 130, 140, 115, 125, 180),
+add('madara_six_paths', 'Madara Uchiha', 'Six Paths Mode', 'Shippuden', 12, 'yin', 'yang', ['Striker', 'Controller'], (135, 130, 140, 115, 125, 180),
     ('Rinne-Sharingan', 'Sees through Log Substitution and Decoys, immune to genjutsu. His taijutsu strike a second time for 40% damage (Limbo shadows).', True),
     None,
     A("Moon's Eye", 'enemyDrain', '2% / 4% / 6%', 'Fielded enemies lose {v} max Chakra per turn.'),

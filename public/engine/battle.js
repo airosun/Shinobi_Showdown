@@ -36,8 +36,8 @@ export const BALANCE = {
   paralyzeFail: 0.25,
   genjutsuFail: 0.5,
   exhaustedMult: 0.85,
-  intelGather: 16,
-  intelGatherSpecialist: 27,
+  intelGather: 19,
+  intelGatherSpecialist: 32,
   intelKO: 15,
   intelGenjutsu: 4,
   intelReveal: 1,
@@ -86,15 +86,21 @@ export const TRAITS = {
   kaguraSensing: ['seesDecoy'],
   sensoryGenius: ['seesDecoy', 'seesLog'],
   perfectJinchuriki: ['genjutsuImmune'],
+  endlessChakra: ['dojutsu', 'poisonImmune'],
+  rinneMadara: ['dojutsu', 'seesDecoy', 'seesLog', 'genjutsuImmune'],
+  progenitor: ['genjutsuImmune'],
+  volcanicBody: ['burnImmune'],
 };
+// extra Chakra regen per turn by trait
+const CHAKRA_REGEN = { endlessChakra: 0.05 };
 // passive dodge bonus against single-target attacks
-const DODGE = { iceMirrors: 0.1, paperBody: 0.15, kamuiPhase: 0.2, ftg: 0.15, invisibility: 0.15 };
+const DODGE = { iceMirrors: 0.1, paperBody: 0.15, kamuiPhase: 0.2, ftg: 0.15, invisibility: 0.15, luckySeven: 0.1 };
 // extra Gather Intel
 const GATHER = { sporeSpy: 6, kaguraSensing: 4, sensoryGenius: 4, pervertSpy: 6 };
 // once-per-battle KO survival: [charges, HP left]
 const SURVIVE = { bodyShedding: [1, 0.25], izanagi: [2, 0.2], jashin: [1, 0.3] };
 // passive HP regen per turn by trait
-const REGEN = { medicalSpy: 0.04, whiteSnakeSage: 0.06, reanimated: 0.06, hashiramaCells: 0.04, perfectJinchuriki: 0.06 };
+const REGEN = { medicalSpy: 0.04, whiteSnakeSage: 0.06, reanimated: 0.06, hashiramaCells: 0.04, perfectJinchuriki: 0.06, endlessChakra: 0.04 };
 export const hasFlag = (unit, flag) => (TRAITS[SHINOBI_BY_ID[unit.id].trait.id] || []).includes(flag);
 const PCT_AURAS = new Set(['stat', 'heal', 'chakra', 'subDiscount', 'decoyChance', 'crit', 'execute', 'dr', 'aoeDR', 'lowHpDR',
   'protectWeakest', 'genjutsuResist', 'dodge', 'pierce', 'kunai', 'taiDamage', 'focus', 'enemyIntel', 'enemyDrain', 'controlChance', 'natureBoost',
@@ -666,7 +672,8 @@ function performJutsu(state, actor, jutsu, target, ctx = {}) {
       // dodge (single-target attacks only)
       if (!aoe && jutsu.power > 0) {
         const dodge = Math.min(BALANCE.maxDodge, Math.max(0, (stat(state, tgt, 'spd') - stat(state, actor, 'spd')) / 500)) + auraVal(state, tgt.side, 'dodge')
-          + (DODGE[traitOf(tgt)] || 0);
+          + (DODGE[traitOf(tgt)] || 0)
+          + (traitOf(tgt) === 'catReflexes' && jutsu.category === 'taijutsu' ? 0.25 : 0);
         if (rng() < dodge) { log(state, traitOf(tgt) === 'kamuiPhase' ? `${jutsu.name} passes straight through ${tgt.name}!` : `${tgt.name} dodges!`, 'info', tgt, { dodge: true }); continue; }
       }
     }
@@ -711,10 +718,20 @@ function performJutsu(state, actor, jutsu, target, ctx = {}) {
         dealDamage(state, tgt, damage, actor, `A second volley from the other arms — ${tgt.name} takes ${damage} more damage.`, { hit: true });
       }
       // Sakon and Ukon / Chojuro: a second strike
-      const twin = { twinDemons: [0.35, 'Ukon strikes too'], twinBlades: [0.25, 'Hiramekarei cuts again'] }[traitOf(actor)];
+      const twin = { twinDemons: [0.35, 'Ukon strikes too'], twinBlades: [0.25, 'Hiramekarei cuts again'], rinneMadara: [0.25, 'A Limbo shadow strikes too'] }[traitOf(actor)];
       if (twin && jutsu.category === 'taijutsu' && !isKunai(jutsu) && !tgt.ko && !actor.ko) {
         const extra = Math.max(1, Math.round(damage * twin[0]));
         dealDamage(state, tgt, extra, actor, `${twin[1]} — ${tgt.name} takes ${extra} more damage.`, { hit: true });
+      }
+      // Utakata: corrosive bubbles eat DEF
+      if (traitOf(actor) === 'corrosiveBubbles' && (jutsu.nature === 'water' || jutsu.nature === 'boil') && !tgt.ko) {
+        tgt.buffs.push({ stat: 'def', mult: 0.9, turns: 2 + (tgt.flags.acted ? 1 : 0) });
+        log(state, `The bubbles corrode ${tgt.name}'s guard (−10% DEF).`, 'status', tgt, { minor: true });
+      }
+      // Han: hitting the steam armor scalds
+      if (traitOf(tgt) === 'steamArmor' && jutsu.category === 'taijutsu' && !actor.ko && !actor.statuses.burn && !hasFlag(actor, 'burnImmune') && rng() < 0.3) {
+        applyStatus(state, actor, 'burn', 3);
+        log(state, `${tgt.name}'s steam armor scalds ${actor.name} — Burned!`, 'status', actor, { status: 'burn' });
       }
       // Darui: black lightning paralyzes
       if (traitOf(actor) === 'blackLightning' && (jutsu.nature === 'lightning' || jutsu.nature === 'storm') && !tgt.ko && !tgt.statuses.paralyze && rng() < 0.2) {
@@ -803,7 +820,8 @@ function applyEffect(state, actor, tgt, eff, jutsu) {
   const ctl = (p) => (p === undefined ? undefined : Math.min(1, p + auraVal(state, actor.side, 'controlChance')));
   switch (eff.type) {
     case 'burn':
-      if (tgt.side !== actor.side && roll(eff.chance)) { applyStatus(state, tgt, 'burn', eff.turns + (hasFlag(actor, 'burnExtra') ? 1 : 0)); log(state, `${tgt.name} is Burned!`, 'status', tgt, { status: 'burn' }); }
+      if (tgt.side !== actor.side && hasFlag(tgt, 'burnImmune')) break;
+      if (tgt.side !== actor.side && roll(eff.chance + (traitOf(actor) === 'volcanicBody' && jutsu?.nature === 'lava' ? 0.15 : 0))) { applyStatus(state, tgt, 'burn', eff.turns + (hasFlag(actor, 'burnExtra') ? 1 : 0)); log(state, `${tgt.name} is Burned!`, 'status', tgt, { status: 'burn' }); }
       break;
     case 'poison':
       if (tgt.side !== actor.side && roll(eff.chance)) inflictPoison(state, tgt, eff.turns);
@@ -891,7 +909,7 @@ function applyEffect(state, actor, tgt, eff, jutsu) {
       const lost = Math.min(tgt.chakra, amt);
       tgt.chakra -= lost;
       log(state, `${tgt.name} loses ${amt} Chakra.`, 'status', tgt);
-      const stealer = eff.steal || traitOf(actor) === 'chakraEater' || (traitOf(actor) === 'samehada' && jutsu?.category === 'taijutsu');
+      const stealer = eff.steal || traitOf(actor) === 'chakraEater' || traitOf(actor) === 'progenitor' || (traitOf(actor) === 'samehada' && jutsu?.category === 'taijutsu');
       if (stealer && lost > 0 && !actor.ko) {
         const g = Math.min(actor.maxChakra - actor.chakra, lost);
         actor.chakra += g;
@@ -1285,7 +1303,7 @@ function endOfTurn(state) {
     }
 
     // chakra
-    const regen = B.chakraRegen + (fielded ? auraVal(state, u.side, 'chakra') : 0);
+    const regen = B.chakraRegen + (fielded ? auraVal(state, u.side, 'chakra') : 0) + (CHAKRA_REGEN[traitOf(u)] || 0);
     u.chakra = Math.min(u.maxChakra, u.chakra + Math.round(u.maxChakra * regen));
     if (u.chakra <= 0 && !hasFlag(u, 'noNinjutsu') && fielded) {
       const dmg = Math.round(u.maxHp * B.exhaustionDamage);
