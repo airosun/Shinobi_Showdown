@@ -579,7 +579,7 @@ function applyStatus(state, unit, name, turns) {
   // matter next turn
   const t = turns + (unit.flags.acted ? 1 : 0);
   const cur = unit.statuses[name];
-  unit.statuses[name] = { turns: Math.max(cur?.turns || 0, t) };
+  unit.statuses[name] = { ...(cur || {}), turns: Math.max(cur?.turns || 0, t) };
 }
 
 // ---------------------------------------------------------------------------
@@ -823,6 +823,8 @@ function performGenjutsu(state, actor, tgt, jutsu) {
     if (eff.type === 'intel') continue; // handled below for caster
     applyEffect(state, caster, victim, eff, jutsu);
   }
+  // Infinite Tsukuyomi: the red moon stays up while its genjutsu lasts
+  if (jutsu.id === 'infinite_tsukuyomi' && victim.statuses.genjutsu) victim.statuses.genjutsu.tsukuyomi = true;
   if (caster === actor) {
     const intelEff = jutsu.effects.find((e) => e.type === 'intel');
     let amt = BALANCE.intelGenjutsu + (intelEff?.value || 0);

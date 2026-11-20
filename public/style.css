@@ -472,3 +472,10 @@ button.linkish:hover:not(:disabled) { background: none; color: var(--accent); }
 .lab-info > div { background: var(--panel); border: 1px solid var(--line); border-radius: var(--radius); padding: 10px 14px; line-height: 1.45; }
 .lab-info .lbl { font-size: 10.5px; text-transform: uppercase; letter-spacing: .1em; color: var(--accent); font-weight: 800; margin-bottom: 4px; }
 .lab-link { align-self: center; color: var(--accent); font-weight: 700; text-decoration: none; border-bottom: 1px dotted var(--accent); margin-left: 10px; }
+
+/* Infinite Tsukuyomi: red sky + moon while its genjutsu lasts */
+.arena .tsu-sky { position: absolute; left: 0; right: 0; top: 0; height: 55%; z-index: 0; pointer-events: none; background: linear-gradient(#5a0008e0, #a0101ab0 60%, #a0101a00); animation: tsu-in .6s ease-out; }
+.arena .tsu-moon { position: absolute; left: 50%; top: 16%; transform: translate(-50%, -50%); z-index: 0; pointer-events: none; animation: tsu-in .6s ease-out; }
+.arena .tsu-eye { position: absolute; left: 50%; top: 14%; transform: translate(-50%, -50%); z-index: 4; pointer-events: none; filter: drop-shadow(0 0 6px #ff2a2a); animation: tsu-pulse 1.6s ease-in-out infinite; }
+@keyframes tsu-in { from { opacity: 0; } to { opacity: 1; } }
+@keyframes tsu-pulse { 50% { filter: drop-shadow(0 0 12px #ff2a2a); } }

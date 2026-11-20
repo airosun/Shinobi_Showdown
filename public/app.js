@@ -5,7 +5,7 @@ import * as E from './engine/battle.js';
 import { chooseActions } from './engine/ai.js';
 import { randomTeam } from './engine/teams.js';
 import * as FX from './fx.js';
-import { playJutsu, playDecoy } from './anim.js';
+import { playJutsu, playDecoy, SHARINGAN, TSUKUYOMI_MOON } from './anim.js';
 
 const app = document.getElementById('app');
 const tip = document.getElementById('tooltip');
@@ -596,7 +596,8 @@ function arenaInner() {
   const vs = vsNow();
   const me = bottomSide();
   const sel = selectionTargets();
-  return `<div class="plat foe"></div><div class="plat you"></div>
+  const tsu = Object.values(vs.units).some((u) => !u.ko && u.statuses?.genjutsu?.tsukuyomi);
+  return `${tsu ? `<div class="tsu-sky"></div><div class="tsu-moon">${TSUKUYOMI_MOON(130)}</div>` : ''}<div class="plat foe"></div><div class="plat you"></div>
     ${sideMons(vs, 1 - me, true, sel)}${sideMons(vs, me, false, sel)}
     ${sideHud(vs, 1 - me, true, sel)}${sideHud(vs, me, false, sel)}`;
 }
@@ -620,7 +621,7 @@ function sideMons(vs, side, isFoe, sel) {
     const ghost = u.decoy > 0 && !u.ko ? `<div class="ghost">${badge(d)}</div>` : '';
     const form = formTag(d.name);
     return `<div class="mon ${cls}" id="mon-${uid}" ${pickable ? `data-act="target" data-arg="${pos}"` : `data-tip="${esc(unitTip(vs, u))}"`}>
-      <div class="spr ${S.sprites[d.id]?.front ? 'has-art' : ''}">${ghost}${sprite(d, !isFoe, !!u.transform)}</div>
+      <div class="spr ${S.sprites[d.id]?.front ? 'has-art' : ''}">${ghost}${sprite(d, !isFoe, !!u.transform)}${!u.ko && u.statuses?.genjutsu?.tsukuyomi ? `<div class="tsu-eye">${SHARINGAN(26)}</div>` : ''}</div>
       <div class="tag">${esc(shortName(d.name))}${form ? ` · ${esc(form)}` : ''}</div>
       ${pickable ? '<span class="pick-hint">Target</span>' : ''}
     </div>`;
