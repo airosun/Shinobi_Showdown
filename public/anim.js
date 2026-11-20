@@ -2204,10 +2204,23 @@ async function swarm(ctx, to, shape) {
 }
 async function warpOut(ctx, el, at) {
   const { h } = sizeOf(el);
-  const s = spawn(ctx, swirl(h * 0.9), at, { life: 1800 });
+  const s = spawn(ctx, swirl(h * 0.9), at, { life: 4500 });
   await pop(ctx, s, 250);
   await el.animate([{ transform: 'scale(1) rotate(0deg)', opacity: 1 }, { transform: 'scale(.05) rotate(540deg)', opacity: 0 }], { duration: 520 * ctx.sp, easing: 'ease-in', fill: 'forwards' }).finished.catch(() => {});
   return s;
+}
+/** Grow a unit back out of a Kamui swirl (the reverse of warpOut), then close the swirl. */
+async function warpIn(ctx, el, swirlNode) {
+  el.getAnimations().forEach((a) => a.cancel());
+  await el.animate([{ transform: 'scale(.05) rotate(-540deg)', opacity: 0 }, { transform: 'scale(1) rotate(0deg)', opacity: 1 }], { duration: 480 * ctx.sp, easing: 'ease-out' }).finished.catch(() => {});
+  if (swirlNode) fade(ctx, swirlNode, 250);
+}
+/** The user's double at the far end spins back into its swirl, then the user reappears out of the swirl at home. */
+async function warpHome(ctx, ghost, farSwirl, homeSwirl) {
+  const img = ghost.firstElementChild;
+  await img.animate([{ transform: `${img.style.transform || ''} scale(1) rotate(0deg)`, opacity: 1 }, { transform: `${img.style.transform || ''} scale(.05) rotate(540deg)`, opacity: 0 }], { duration: 420 * ctx.sp, easing: 'ease-in', fill: 'forwards' }).finished.catch(() => {});
+  ghost.remove(); fade(ctx, farSwirl, 250);
+  await warpIn(ctx, ctx.userEl, homeSwirl);
 }
 const restore = (ctx, el, ms = 300) => { el.getAnimations().forEach((a) => a.cancel()); el.animate([{ opacity: 0, transform: 'scale(.6)' }, { opacity: 1, transform: 'scale(1)' }], { duration: ms * ctx.sp }); };
 
@@ -2456,8 +2469,8 @@ Object.assign(ANIMS, {
       boom(ctx, to, '#ffffff', 120); shake(ctx); jets.forEach((j) => fade(ctx, j, 200));
     },
   },
-  kamui: { desc: 'Space warps where the target stands, shrinking them into oblivion.', async play(ctx) { const el = ctx.targetEls[0]; const s = await warpOut(ctx, el, ctx.tos[0]); shake(ctx); await wait(250 * ctx.sp); restore(ctx, el); fade(ctx, s, 300); } },
-  kamui_absorb: { desc: 'Space warps where the target stands, shrinking them.', async play(ctx) { const el = ctx.targetEls[0]; const s = await warpOut(ctx, el, ctx.tos[0]); shake(ctx); await wait(250 * ctx.sp); restore(ctx, el); fade(ctx, s, 300); } },
+  kamui: { desc: 'Space warps where the target stands, shrinking them into oblivion.', async play(ctx) { const el = ctx.targetEls[0]; const s = await warpOut(ctx, el, ctx.tos[0]); shake(ctx); await wait(250 * ctx.sp); await warpIn(ctx, el, s); } },
+  kamui_absorb: { desc: 'Space warps where the target stands, shrinking them.', async play(ctx) { const el = ctx.targetEls[0]; const s = await warpOut(ctx, el, ctx.tos[0]); shake(ctx); await wait(250 * ctx.sp); await warpIn(ctx, el, s); } },
   kamui_raikiri: {
     desc: 'User charges blue crackling electricity, warps away, reappears in front of the target and strikes with it.',
     async play(ctx) {
@@ -2465,7 +2478,7 @@ Object.assign(ANIMS, {
       const sb = sparkBall(ctx, { x: ctx.from.x + (ctx.isFoe ? -22 : 22), y: ctx.from.y + 10 }, 44, 900);
       await pop(ctx, sb, 250); fade(ctx, sb, 200);
       const s1 = await warpOut(ctx, u, ctx.from);
-      const s2 = spawn(ctx, swirl(sizeOf(u).h * 0.8), near, { life: 1400 }); await pop(ctx, s2, 200);
+      const s2 = spawn(ctx, swirl(ctx.userSize.h * 0.8), near, { life: 4000 }); await pop(ctx, s2, 200);
       const g = ghostOf(ctx, near, 0.9);
       const handAt = { x: near.x + (ctx.isFoe ? -22 : 22), y: near.y + 10 };
       const b = sparkBall(ctx, handAt, 46, 1400); await pop(ctx, b, 160);
@@ -2474,7 +2487,7 @@ Object.assign(ANIMS, {
       await Promise.all([fly(ctx, g, near, hit, 200, { rotate: 0, ease: 'ease-in' }), fly(ctx, b, handAt, between(handAt, to, 0.85), 200, { rotate: 0, ease: 'ease-in' })]);
       boom(ctx, to, '#9fd8ff', 140); for (let i = 0; i < 4; i++) bolt(ctx, to, { x: to.x + rnd(-70, 70), y: to.y + rnd(-70, 70) }, { ms: 220 });
       shake(ctx); fade(ctx, b, 150);
-      setTimeout(() => { fade(ctx, g, 200); fade(ctx, s2, 200); fade(ctx, s1, 200); restore(ctx, u); }, 400 * ctx.sp);
+      await wait(250 * ctx.sp); void u; await warpHome(ctx, g, s2, s1);
     },
   },
   kamui_warp_strike: {
@@ -2483,11 +2496,11 @@ Object.assign(ANIMS, {
       const to = ctx.tos[0]; const u = ctx.userEl;
       const behind = { x: to.x + (to.x - ctx.from.x) * 0.18, y: to.y - 10 };
       const s1 = await warpOut(ctx, u, ctx.from);
-      const s2 = spawn(ctx, swirl(sizeOf(u).h * 0.8), behind, { life: 1400 }); await pop(ctx, s2, 200);
+      const s2 = spawn(ctx, swirl(ctx.userSize.h * 0.8), behind, { life: 4000 }); await pop(ctx, s2, 200);
       const g = ghostOf(ctx, behind, 0.9); if (!ctx.isFoe) g.firstElementChild.style.transform = 'none';
       await wait(120 * ctx.sp);
       boom(ctx, to, '#ffffff', 110); shake(ctx);
-      setTimeout(() => { fade(ctx, g, 200); fade(ctx, s2, 200); fade(ctx, s1, 200); restore(ctx, u); }, 400 * ctx.sp);
+      await wait(250 * ctx.sp); void u; await warpHome(ctx, g, s2, s1);
     },
   },
   kamui_phase: {
