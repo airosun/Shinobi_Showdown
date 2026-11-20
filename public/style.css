@@ -479,3 +479,9 @@ button.linkish:hover:not(:disabled) { background: none; color: var(--accent); }
 .arena .tsu-eye { position: absolute; left: 50%; top: 14%; transform: translate(-50%, -50%); z-index: 4; pointer-events: none; filter: drop-shadow(0 0 6px #ff2a2a); animation: tsu-pulse 1.6s ease-in-out infinite; }
 @keyframes tsu-in { from { opacity: 0; } to { opacity: 1; } }
 @keyframes tsu-pulse { 50% { filter: drop-shadow(0 0 12px #ff2a2a); } }
+
+/* Mind Transfer: Ino slumps while her chakra holds the target */
+.arena .mon.droop .spr { transform: translateY(22px) rotate(4deg); filter: saturate(.6) brightness(.85); }
+.arena .mon.foe.droop .spr { transform: translateY(22px) rotate(-4deg); }
+.arena .mind-orb { position: absolute; left: 50%; top: 22%; width: 28px; height: 28px; transform: translate(-50%, -50%); border-radius: 50%; z-index: 4; pointer-events: none;
+  background: radial-gradient(circle, #fff, #8fd3ff 40%, #4aa3ff88 65%, #4aa3ff00 72%); box-shadow: 0 0 16px #4aa3ff; animation: tsu-pulse 1.4s ease-in-out infinite; }

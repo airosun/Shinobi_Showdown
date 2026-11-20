@@ -5,7 +5,7 @@ import * as E from './engine/battle.js';
 import { chooseActions } from './engine/ai.js';
 import { randomTeam } from './engine/teams.js';
 import * as FX from './fx.js';
-import { playJutsu, playDecoy, SHARINGAN, TSUKUYOMI_MOON } from './anim.js';
+import { playJutsu, playDecoy, poof, logSubstitute, SHARINGAN, TSUKUYOMI_MOON } from './anim.js';
 
 const app = document.getElementById('app');
 const tip = document.getElementById('tooltip');
@@ -611,17 +611,18 @@ function selectionTargets() {
 
 function sideMons(vs, side, isFoe, sel) {
   const team = vs.teams[side];
+  const mindHeld = new Set(Object.values(vs.units).filter((x) => !x.ko && x.statuses?.bind?.mind).map((x) => x.statuses.bind.mind));
   return team.slots.map((uid, pos) => {
     if (!uid) return '';
     const u = vs.units[uid];
     const d = SHINOBI_BY_ID[u.id];
     const pickable = sel && sel.side === side && (sel.fallen ? u.ko : !u.ko);
     const acting = S.phase === 'select' && S.actor === uid;
-    const cls = [isFoe ? 'foe' : 'you', `p${pos}`, u.ko ? 'down' : '', u.transform ? 'transformed' : '', u.weaving ? 'weaving' : '', pickable ? 'pickable' : '', acting ? 'acting' : ''].join(' ');
+    const cls = [isFoe ? 'foe' : 'you', `p${pos}`, u.ko ? 'down' : '', u.transform ? 'transformed' : '', u.weaving ? 'weaving' : '', !u.ko && mindHeld.has(uid) ? 'droop' : '', pickable ? 'pickable' : '', acting ? 'acting' : ''].join(' ');
     const ghost = u.decoy > 0 && !u.ko ? `<div class="ghost">${badge(d)}</div>` : '';
     const form = formTag(d.name);
     return `<div class="mon ${cls}" id="mon-${uid}" ${pickable ? `data-act="target" data-arg="${pos}"` : `data-tip="${esc(unitTip(vs, u))}"`}>
-      <div class="spr ${S.sprites[d.id]?.front ? 'has-art' : ''}">${ghost}${sprite(d, !isFoe, !!u.transform)}${!u.ko && u.statuses?.genjutsu?.tsukuyomi ? `<div class="tsu-eye">${SHARINGAN(26)}</div>` : ''}</div>
+      <div class="spr ${S.sprites[d.id]?.front ? 'has-art' : ''}">${ghost}${sprite(d, !isFoe, !!u.transform)}${!u.ko && u.statuses?.genjutsu?.tsukuyomi ? `<div class="tsu-eye">${SHARINGAN(26)}</div>` : ''}${!u.ko && u.statuses?.bind?.mind ? '<div class="mind-orb"></div>' : ''}</div>
       <div class="tag">${esc(shortName(d.name))}${form ? ` · ${esc(form)}` : ''}</div>
       ${pickable ? '<span class="pick-hint">Target</span>' : ''}
     </div>`;
@@ -1030,8 +1031,8 @@ async function playEvent(ev, apply) {
         FX.pop(arena, el, 'Rotation!', 'sub', true);
         ms = 1200;
       } else if (el && e.negated) {
-        if (!(e.decoy && playDecoy(arena, e.decoyFrom, el, { sp }))) FX.fx(arena, 'puff', FX.centerOf(el, arena));
-        if (e.subType === 'log') FX.logSwap(el, 'sprites/substitution-log.png');
+        if (e.subType === 'log') logSubstitute(arena, el, { sp });
+        else if (!(e.decoy && playDecoy(arena, e.decoyFrom, el, { sp }))) poof(arena, el, { sp });
         FX.pop(arena, el, e.decoy ? 'Decoy!' : 'Substitution!', 'sub', true);
         ms = 1300;
       } else if (el) { FX.ring(arena, el, '', '#c9d0dd'); }

@@ -825,6 +825,8 @@ function performGenjutsu(state, actor, tgt, jutsu) {
   }
   // Infinite Tsukuyomi: the red moon stays up while its genjutsu lasts
   if (jutsu.id === 'infinite_tsukuyomi' && victim.statuses.genjutsu) victim.statuses.genjutsu.tsukuyomi = true;
+  // Mind Transfer: Ino's body slumps while she holds the target
+  if (jutsu.id === 'mind_transfer' && caster === actor && victim.statuses.bind) victim.statuses.bind.mind = actor.uid;
   if (caster === actor) {
     const intelEff = jutsu.effects.find((e) => e.type === 'intel');
     let amt = BALANCE.intelGenjutsu + (intelEff?.value || 0);

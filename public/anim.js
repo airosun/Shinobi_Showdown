@@ -2547,6 +2547,387 @@ async function iaiSlash(ctx, size) {
   boom(ctx, to, '#cfeeff', 70); shake(ctx);
 }
 
+// ---------------------------------------------------------------- batch 6 (sheet rows 191–229) + smoke / log substitution
+const ART6 = {
+  leaf: () => '<svg width="16" height="10" viewBox="0 0 16 10"><path d="M0 5C4 0 12 0 16 5 12 10 4 10 0 5Z" fill="#5fb84a" stroke="#2f6a24" stroke-width=".8"/><path d="M1 5H15" stroke="#2f6a24" stroke-width=".6"/></svg>',
+  hound: (s = 110) => `<svg width="${s}" height="${s * 0.55}" viewBox="0 0 110 60" style="filter:drop-shadow(0 0 10px #4aa3ff)"><path d="M6 34 22 28 30 30 42 22 66 22 80 14 90 4 94 14 108 18 98 26 104 30 90 32 84 40 92 52 82 52 74 42 52 42 46 52 38 52 40 40 26 44 14 44Z" fill="#cfeeff" stroke="#ffffff" stroke-width="2" stroke-linejoin="round"/><circle cx="96" cy="18" r="2" fill="#1f5fd6"/></svg>`,
+  lavaStar: (s = 34) => `<svg width="${s}" height="${s}" viewBox="-10 -10 20 20" class="ax-spin" style="filter:drop-shadow(0 0 6px #ff6a1a)"><path d="M0-10 2-2 10 0 2 2 0 10-2 2-10 0-2-2Z" fill="#ff7a1a" stroke="#ffd04a" stroke-width=".8"/><circle r="2.5" fill="#ffe9a0"/></svg>`,
+  lavaFist: (s = 64) => `<svg width="${s}" height="${s}" viewBox="0 0 64 64" style="filter:drop-shadow(0 0 10px #ff6a1a)"><path d="M6 20 18 6 40 4 58 16 60 40 48 58 22 60 6 46Z" fill="#ff7a1a" stroke="#7a2a0a" stroke-width="3"/><path d="M22 18V32M34 14V30M46 18V32M14 34 28 40 46 40" stroke="#ffd04a" stroke-width="3" stroke-linecap="round"/></svg>`,
+};
+const lavaBlob = (s) => `<div style="width:${s}px;height:${s}px;border-radius:50%;background:radial-gradient(circle at 35% 35%,#ffe9a0,#ff7a1a 45%,#b8300a);box-shadow:0 0 10px #ff6a1a"></div>`;
+
+/** A dense white smoke cloud (ninja 'poof'). */
+function smokeCloud(ctx, at, r) {
+  for (let i = 0; i < 9; i++) {
+    const t = (i / 9) * Math.PI * 2; const d = i === 0 ? 0 : r * rnd(0.35, 0.6);
+    const p = { x: at.x + Math.cos(t) * d, y: at.y + Math.sin(t) * d * 1.2 };
+    const s = r * rnd(0.8, 1.1);
+    const n = spawn(ctx, `<div style="width:${s}px;height:${s}px;border-radius:50%;background:radial-gradient(circle at 40% 40%,#ffffff 0%,#f1f1f1 50%,#e2e2e2f0 62%,#e2e2e200 72%)"></div>`, p, { life: 1100 });
+    n.style.zIndex = '8';
+    n.animate([{ transform: 'translate(-50%,-50%) scale(.2)', opacity: 1 }, { transform: 'translate(-50%,-50%) scale(1)', opacity: 1, offset: 0.3 }, { transform: `translate(calc(-50% + ${(p.x - at.x) * 0.3}px), calc(-50% + ${(p.y - at.y) * 0.3 - 14}px)) scale(1.15)`, opacity: 0 }], { duration: 850 * ctx.sp, easing: 'ease-out', fill: 'forwards' });
+  }
+}
+/** White smoke poof over a unit (generic clone / substitution vanish). */
+export function poof(arena, el, { sp = 1 } = {}) {
+  if (!el) return;
+  const ctx = { arena, sp };
+  const at = FX.centerOf(el, arena); const { h } = sizeOf(el);
+  smokeCloud(ctx, at, h * 0.5);
+  el.animate([{ opacity: 1 }, { opacity: 0, offset: 0.12 }, { opacity: 0, offset: 0.8 }, { opacity: 1 }], { duration: 1200 * sp });
+}
+/** Log Substitution: the shinobi vanishes in a poof of smoke and a log is left in their place, then they come back. */
+export function logSubstitute(arena, el, { sp = 1 } = {}) {
+  if (!el) return;
+  const ctx = { arena, sp };
+  const f = feetOf(ctx, el); const { h } = sizeOf(el);
+  const at = { x: f.x, y: f.y - h * 0.32 };
+  smokeCloud(ctx, at, h * 0.5);
+  el.animate([{ opacity: 1 }, { opacity: 0, offset: 0.08 }, { opacity: 0, offset: 0.86 }, { opacity: 1 }], { duration: 1500 * sp });
+  const lh = h * 0.62;
+  const log = spawn(ctx, `<svg width="${lh * 0.42}" height="${lh}" viewBox="0 0 42 100"><rect x="3" y="8" width="36" height="88" rx="6" fill="#8a5a32" stroke="#4a2c16" stroke-width="2.5"/><path d="M12 20 14 60M24 14 22 86M32 30 33 76" stroke="#6b4226" stroke-width="2.5" fill="none"/><ellipse cx="21" cy="8" rx="18" ry="6" fill="#c99a62" stroke="#4a2c16" stroke-width="2"/><ellipse cx="21" cy="8" rx="10" ry="3" fill="none" stroke="#8a5a32" stroke-width="1.5"/><ellipse cx="21" cy="8" rx="4" ry="1.3" fill="#8a5a32"/></svg>`, { x: f.x, y: f.y - lh / 2 }, { life: 1600 * sp + 200 });
+  log.animate([{ transform: 'translate(-50%,-50%) rotate(0deg)', opacity: 0 }, { transform: 'translate(-50%,-50%) rotate(-4deg)', opacity: 1, offset: 0.1 }, { transform: 'translate(-50%,-50%) rotate(5deg)', opacity: 1, offset: 0.25 }, { transform: 'translate(-50%,-50%) rotate(-2deg)', opacity: 1, offset: 0.4 }, { transform: 'translate(-50%,-50%) rotate(0deg)', opacity: 1, offset: 0.78 }, { transform: 'translate(-50%,-50%) rotate(0deg)', opacity: 0 }], { duration: 1500 * sp, fill: 'forwards' });
+  setTimeout(() => smokeCloud(ctx, at, h * 0.42), 1150 * sp);
+}
+
+async function flurryIn(ctx, n = 6, color = '#ffffff') {
+  const to = ctx.tos[0]; const g = ghostOf(ctx, ctx.from, 0.5);
+  fly(ctx, g, ctx.from, between(ctx.from, to, 0.8), 220, { rotate: 0 }).then(() => fade(ctx, g, 200));
+  const dx = (to.x - ctx.from.x) * 0.62; const dy = (to.y - ctx.from.y) * 0.62;
+  ctx.userEl.animate([{ transform: 'translate(0,0)' }, { transform: `translate(${dx}px,${dy}px)`, offset: 0.2 }, { transform: `translate(${dx}px,${dy}px)`, offset: 0.85 }, { transform: 'translate(0,0)' }], { duration: (300 + n * 90) * ctx.sp });
+  await wait(220 * ctx.sp);
+  for (let i = 0; i < n; i++) { boom(ctx, { x: to.x + rnd(-30, 30), y: to.y + rnd(-45, 30) }, color, 55); shake(ctx); await wait(80 * ctx.sp); }
+}
+async function spinKick(ctx) {
+  const to = ctx.tos[0];
+  const dx = (to.x - ctx.from.x) * 0.62; const dy = (to.y - ctx.from.y) * 0.62;
+  ctx.userEl.animate([{ transform: 'translate(0,0) rotate(0deg)' }, { transform: `translate(${dx}px,${dy}px) rotate(0deg)`, offset: 0.35 }, { transform: `translate(${dx}px,${dy}px) rotate(${ctx.isFoe ? -360 : 360}deg)`, offset: 0.7 }, { transform: 'translate(0,0) rotate(360deg)' }], { duration: 900 * ctx.sp, easing: 'ease-in-out' });
+  await wait(450 * ctx.sp);
+  boom(ctx, to, '#ffffff', 110);
+  scatter(ctx, { x: to.x, y: to.y + 30 }, ART6.leaf(), 16, 120, 1000);
+  shake(ctx);
+}
+function goldSand(ctx, a, b, n = 40, spread = 40, ms = 420) {
+  return Promise.all(Array.from({ length: n }, (_, i) => wait(i * 8 * ctx.sp).then(async () => {
+    const st = { x: a.x + rnd(-spread, spread) * 0.5, y: a.y + rnd(-spread, spread) * 0.5 };
+    const d = spawn(ctx, `<div style="width:${rnd(5, 10)}px;height:${rnd(5, 10)}px;border-radius:50%;background:#e6b422;box-shadow:0 0 4px #ffd65a"></div>`, st, { life: ms + 900 });
+    await fly(ctx, d, st, { x: b.x + rnd(-spread, spread), y: b.y + rnd(-spread, spread) }, ms, { rotate: 0, arc: rnd(-30, 50), ease: 'ease-in-out' });
+    setTimeout(() => fade(ctx, d, 300), 300 * ctx.sp);
+  })));
+}
+const blueOrb = (s = 30) => `<div style="width:${s}px;height:${s}px;border-radius:50%;background:radial-gradient(circle,#fff,#8fd3ff 40%,#4aa3ff88 65%,#4aa3ff00 72%);box-shadow:0 0 16px #4aa3ff"></div>`;
+
+Object.assign(ANIMS, {
+  kokuo_bomb: { desc: 'A black orb with a purple aura and tiny blue and red sparks grows in front of the user, then fires at the enemies.', play: (ctx) => ANIMS.chomei_bomb.play(ctx) },
+  matatabi_bomb: { desc: 'A black orb with a purple aura and tiny blue and red sparks grows in front of the user, then fires at the enemies.', play: (ctx) => ANIMS.chomei_bomb.play(ctx) },
+  konohamaru_combo: { desc: 'User flies in and strikes the target with a flurry of blows.', play: (ctx) => flurryIn(ctx) },
+  lion_combo: { desc: 'User hits the target with a flurry of blows.', play: (ctx) => flurryIn(ctx) },
+  connected_fist: { desc: 'User flies in and strikes the target with a flurry of blows.', play: (ctx) => flurryIn(ctx, 8) },
+  kotoamatsukami: {
+    desc: 'A Sharingan appears over the target.',
+    async play(ctx) {
+      const el = ctx.targetEls[0]; const at = FX.centerOf(el, ctx.arena); const { h } = sizeOf(el);
+      const e = spawn(ctx, SHARINGAN(Math.max(70, h * 0.4)), { x: at.x, y: at.y - h * 0.15 }, { life: 1800 });
+      await e.animate([{ transform: 'translate(-50%,-50%) scale(0) rotate(-270deg)', opacity: 0 }, { transform: 'translate(-50%,-50%) scale(1) rotate(0deg)', opacity: 0.92 }], { duration: 500 * ctx.sp, easing: 'ease-out', fill: 'forwards' }).finished.catch(() => {});
+      e.firstElementChild.style.filter = 'drop-shadow(0 0 14px #ff2a2a)';
+      FX.ring(ctx.arena, el, 'gen'); shake(ctx);
+      await wait(600 * ctx.sp); fade(ctx, e, 350);
+    },
+  },
+  kurama_transfer: { desc: 'The ally is covered in an orange aura.', async play(ctx) { glowAura(ctx, ctx.targetEls[0], '#ff9a2a', 1300); await wait(600 * ctx.sp); } },
+  mystical_palm: { desc: 'User moves over to the ally and applies a green healing aura to them.', play: (ctx) => ANIMS.antidote.play(ctx) },
+  lava_fist: {
+    desc: 'User strikes the target with a lava fist.',
+    async play(ctx) {
+      const to = ctx.tos[0]; const hand = { x: ctx.from.x + (ctx.isFoe ? -26 : 26), y: ctx.from.y };
+      const f = spawn(ctx, ART6.lavaFist(66), hand, { life: 1600 }); await pop(ctx, f, 260);
+      lunge(ctx, to, 0.72, 520);
+      await fly(ctx, f, hand, between(hand, to, 0.88), 240, { rotate: 0 });
+      boom(ctx, to, '#ff6a1a', 140); burnAt(ctx, ctx.targetEls[0]); shake(ctx); fade(ctx, f, 200);
+    },
+  },
+  lava_globs: {
+    desc: 'User spits globs of lava at every enemy.',
+    async play(ctx) {
+      const mouth = { x: ctx.from.x, y: ctx.from.y - sizeOf(ctx.userEl).h * 0.3 };
+      await Promise.all(ctx.tos.flatMap((t, i) => [0, 1, 2].map((k) => wait((k * 100 + i * 50) * ctx.sp).then(async () => {
+        const g = spawn(ctx, lavaBlob(rnd(18, 28)), mouth, { life: 1200 });
+        await fly(ctx, g, mouth, { x: t.x + rnd(-20, 20), y: t.y + rnd(-30, 20) }, 420, { rotate: 0, arc: 90 });
+        g.remove(); boom(ctx, t, '#ff6a1a', 70); shakeEl(ctx.targetEls[i]);
+      }))));
+      ctx.targetEls.forEach((el) => burnAt(ctx, el));
+    },
+  },
+  lava_monster: {
+    desc: 'User spits a stream of lava at the target.',
+    async play(ctx) {
+      const to = ctx.tos[0]; const mouth = { x: ctx.from.x, y: ctx.from.y - sizeOf(ctx.userEl).h * 0.3 };
+      for (let i = 0; i < 16; i++) {
+        const g = spawn(ctx, lavaBlob(rnd(14, 26)), mouth, { life: 1000 });
+        fly(ctx, g, mouth, { x: to.x + rnd(-14, 14), y: to.y + rnd(-20, 20) }, 340, { rotate: 0, arc: 40 }).then(() => { g.remove(); });
+        await wait(28 * ctx.sp);
+      }
+      await wait(340 * ctx.sp);
+      boom(ctx, to, '#ff6a1a', 150); burnAt(ctx, ctx.targetEls[0]); shake(ctx);
+    },
+  },
+  magma_wall: {
+    desc: 'A wall of lava forms in front of the user.',
+    async play(ctx) {
+      const { w, h } = sizeOf(ctx.userEl); const f = feetOf(ctx, ctx.userEl);
+      const wall = spawn(ctx, `<div style="width:${Math.max(80, w * 0.8)}px;height:${h * 0.85}px;border-radius:30px 30px 6px 6px;background:radial-gradient(ellipse at 50% 20%,#ffe9a0,#ff7a1a 40%,#b8300a 75%,#5a1a0a);box-shadow:0 0 22px #ff6a1a, inset 0 -12px 20px #3a0e04"></div>`, { x: f.x + (ctx.isFoe ? -30 : 30), y: f.y + 4 }, { life: 1900 });
+      await rise(ctx, wall, 450);
+      for (let i = 0; i < 4; i++) puff(ctx, { x: f.x + (ctx.isFoe ? -30 : 30) + rnd(-20, 20), y: f.y - h * 0.8 }, '#c9a9a0', 60);
+      await wait(700 * ctx.sp); fade(ctx, wall, 350);
+    },
+  },
+  quicklime: {
+    desc: 'User spits lava at the enemy, and it quickly hardens to stone.',
+    async play(ctx) {
+      const to = ctx.tos[0]; const el = ctx.targetEls[0]; const { w, h } = sizeOf(el);
+      const mouth = { x: ctx.from.x, y: ctx.from.y - sizeOf(ctx.userEl).h * 0.3 };
+      const g = spawn(ctx, lavaBlob(34), mouth, { life: 1200 });
+      await fly(ctx, g, mouth, to, 420, { rotate: 0, arc: 60 }); g.remove();
+      const shell = spawn(ctx, `<div style="width:${w * 0.85}px;height:${h * 0.7}px;border-radius:40%;background:radial-gradient(circle at 40% 35%,#ffe9a0,#ff7a1a 45%,#b8300a);box-shadow:0 0 16px #ff6a1a;opacity:.85"></div>`, to, { life: 2000 });
+      await grow(ctx, shell, 220, 'scale(.3)', 'scale(1)');
+      shake(ctx);
+      await wait(250 * ctx.sp);
+      shell.firstElementChild.style.transition = `background ${400 * ctx.sp}ms, box-shadow ${400 * ctx.sp}ms`;
+      shell.firstElementChild.style.background = 'radial-gradient(circle at 40% 35%,#d8d4cc,#a8a29a 50%,#6e6860)';
+      shell.firstElementChild.style.boxShadow = 'inset 0 -8px 14px #4e4840';
+      await wait(700 * ctx.sp); fade(ctx, shell, 300);
+    },
+  },
+  lava_shuriken: {
+    desc: 'User throws several lava shuriken at every enemy.',
+    async play(ctx) {
+      await Promise.all(ctx.tos.flatMap((t, i) => [0, 1].map((k) => wait((k * 110 + i * 50) * ctx.sp).then(async () => {
+        const s = spawn(ctx, ART6.lavaStar(34), ctx.from, { life: 1200 });
+        await fly(ctx, s, ctx.from, { x: t.x + rnd(-16, 16), y: t.y + rnd(-24, 16) }, 400, { rotate: 0, arc: rnd(-30, 50) });
+        s.remove(); boom(ctx, t, '#ff6a1a', 80); shakeEl(ctx.targetEls[i]);
+      }))));
+    },
+  },
+  leaf_whirlwind: { desc: 'User dashes to the target and spin-kicks them, kicking up leaves.', play: (ctx) => spinKick(ctx) },
+  leaf_hurricane: { desc: 'User dashes to the target and spin-kicks them, kicking up leaves.', play: (ctx) => spinKick(ctx) },
+  leaf_rising_wind: {
+    desc: 'User dashes over and kicks the target straight up into the air.',
+    async play(ctx) {
+      const to = await dash(ctx, 0.66, 520);
+      boom(ctx, { x: to.x, y: to.y + 30 }, '#ffffff', 90);
+      ctx.targetEls[0].animate([{ transform: 'translateY(0)' }, { transform: 'translateY(-90px) rotate(-8deg)', offset: 0.4, easing: 'ease-in' }, { transform: 'translateY(0)' }], { duration: 750 * ctx.sp, easing: 'ease-out' });
+      await wait(300 * ctx.sp);
+    },
+  },
+  lightning_hound: {
+    desc: 'User fires a hound made of crackling blue lightning at the target.',
+    async play(ctx) {
+      const to = ctx.tos[0];
+      const d = spawn(ctx, ART6.hound(120), ctx.from, { life: 1200 });
+      if (to.x < ctx.from.x) d.firstElementChild.style.transform = 'scaleX(-1)';
+      const iv = setInterval(() => { const r = d.getBoundingClientRect(); const a = ctx.arena.getBoundingClientRect(); const c = { x: r.left - a.left + r.width / 2, y: r.top - a.top + r.height / 2 }; bolt(ctx, c, { x: c.x + rnd(-50, 50), y: c.y + rnd(-30, 30) }, { ms: 90, width: 2 }); }, 50);
+      await fly(ctx, d, ctx.from, to, 420, { rotate: 0, ease: 'ease-in' });
+      clearInterval(iv); d.remove();
+      boom(ctx, to, '#9fd8ff', 140); for (let i = 0; i < 4; i++) bolt(ctx, to, { x: to.x + rnd(-70, 70), y: to.y + rnd(-70, 70) }, { ms: 220 });
+      shake(ctx);
+    },
+  },
+  lightning_blade: { desc: 'User produces blue crackling electricity and flies in to strike the target.', play: (ctx) => ANIMS.chidori.play(ctx) },
+  lightning_armor: {
+    desc: 'The user puts up a wall of crackling blue electricity.',
+    async play(ctx) {
+      const { h } = sizeOf(ctx.userEl); const f = feetOf(ctx, ctx.userEl); const x = f.x + (ctx.isFoe ? -44 : 44);
+      const glow = spawn(ctx, `<div style="width:46px;height:${h * 0.9}px;border-radius:20px;background:radial-gradient(ellipse,#bfe6ff66,#4aa3ff33 60%,#4aa3ff00 72%);box-shadow:0 0 20px #4aa3ff"></div>`, { x, y: f.y - h * 0.45 }, { life: 1500 });
+      pop(ctx, glow, 200);
+      for (let k = 0; k < 10; k++) { for (let i = 0; i < 3; i++) bolt(ctx, { x: x + rnd(-14, 14), y: f.y }, { x: x + rnd(-14, 14), y: f.y - h * 0.9 }, { ms: 120, width: 2.5 }); await wait(90 * ctx.sp); }
+      fade(ctx, glow, 250);
+    },
+  },
+  false_darkness: {
+    desc: 'User fires crackling purple electricity at the target.',
+    async play(ctx) {
+      const to = ctx.tos[0];
+      for (let i = 0; i < 4; i++) { bolt(ctx, ctx.from, to, { ms: 260, width: 5 - i, color: '#d9b3ff', glow: '#8a2be2' }); await wait(60 * ctx.sp); }
+      boom(ctx, to, '#b44bff', 130); shake(ctx);
+    },
+  },
+  guillotine_drop: {
+    desc: 'User flies up, then comes straight down on the target with crackling blue electricity.',
+    async play(ctx) {
+      const to = ctx.tos[0]; const top = { x: to.x, y: Math.max(30, to.y - 160) };
+      ctx.userEl.animate([{ opacity: 1 }, { opacity: 0, offset: 0.12 }, { opacity: 0, offset: 0.85 }, { opacity: 1 }], { duration: 1150 * ctx.sp });
+      const g = ghostOf(ctx, ctx.from, 0.85);
+      await fly(ctx, g, ctx.from, top, 380, { rotate: 0, arc: 40, ease: 'ease-out' });
+      const g2 = ghostOf(ctx, top, 0.85); g.remove();
+      g2.firstElementChild.style.filter = 'drop-shadow(0 0 12px #4aa3ff)';
+      const sp = sparkBall(ctx, { x: top.x, y: top.y + 40 }, 50, 600);
+      await wait(150 * ctx.sp);
+      fly(ctx, sp, { x: top.x, y: top.y + 40 }, { x: to.x, y: to.y + 20 }, 180, { rotate: 0, ease: 'ease-in' });
+      await fly(ctx, g2, top, { x: to.x, y: to.y - 20 }, 180, { rotate: 0, ease: 'ease-in' });
+      crackAt(ctx, ctx.targetEls[0]); boom(ctx, to, '#9fd8ff', 160);
+      for (let i = 0; i < 4; i++) bolt(ctx, to, { x: to.x + rnd(-80, 80), y: to.y + rnd(-60, 60) }, { ms: 240 });
+      shake(ctx); fade(ctx, g2, 250); fade(ctx, sp, 150);
+    },
+  },
+  lariat: {
+    desc: 'User charges crackling blue electricity into a sharp point, then lunges and pierces the target.',
+    async play(ctx) {
+      const to = ctx.tos[0]; const hand = { x: ctx.from.x + (ctx.isFoe ? -24 : 24), y: ctx.from.y };
+      const s = sparkBall(ctx, hand, 40, 1500); await pop(ctx, s, 250);
+      const tip = (len) => `<svg width="${len}" height="22" viewBox="0 0 ${len} 22" style="filter:drop-shadow(0 0 8px #4aa3ff)"><path d="M0 4 ${len} 11 0 18Z" fill="#cfeeff" stroke="#fff"/></svg>`;
+      const pt = await stretch(ctx, hand, { x: hand.x + (to.x > hand.x ? 60 : -60), y: hand.y + (to.y - hand.y) * 0.15 }, tip, 250, 1400);
+      await wait(150 * ctx.sp);
+      lunge(ctx, to, 0.75, 460);
+      await wait(200 * ctx.sp);
+      boom(ctx, to, '#9fd8ff', 140); bolt(ctx, ctx.from, to, { ms: 240 });
+      shake(ctx); fade(ctx, s, 150); fade(ctx, pt, 150);
+    },
+  },
+  liger_bomb: {
+    desc: 'User grabs the target, carries them up and slams them into the ground with crackling blue electricity.',
+    async play(ctx) { await lotus(ctx, false); const to = ctx.tos[0]; for (let i = 0; i < 6; i++) bolt(ctx, { x: to.x, y: to.y + 30 }, { x: to.x + rnd(-90, 90), y: to.y + rnd(-60, 40) }, { ms: 260 }); boom(ctx, to, '#9fd8ff', 150); },
+  },
+  karui_lightning_blade: {
+    desc: 'User charges their blade with crackling blue electricity, then slashes the target.',
+    async play(ctx) {
+      const to = ctx.tos[0]; const hand = { x: ctx.from.x + (ctx.isFoe ? -26 : 26), y: ctx.from.y - 10 };
+      for (let i = 0; i < 5; i++) { bolt(ctx, hand, { x: hand.x + rnd(-50, 50), y: hand.y - rnd(20, 60) }, { ms: 110, width: 2 }); await wait(70 * ctx.sp); }
+      await dash(ctx, 0.64, 500);
+      slashArc(ctx, to, { color: '#cfeeff', glow: '#4aa3ff', size: 140, rot: 60 });
+      for (let i = 0; i < 3; i++) bolt(ctx, to, { x: to.x + rnd(-60, 60), y: to.y + rnd(-60, 60) }, { ms: 200 });
+      shake(ctx);
+    },
+  },
+  limbo_strike: {
+    desc: 'The user sends four white, transparent copies of themselves to surround the target and strike it with a flurry of blows.',
+    async play(ctx) {
+      const to = ctx.tos[0]; const { h } = sizeOf(ctx.targetEls[0]);
+      const spots = [[-0.42, -0.05], [0.42, -0.05], [-0.25, 0.12], [0.25, 0.12]].map(([dx, dy]) => ({ x: to.x + dx * h, y: to.y + dy * h }));
+      const gs = await Promise.all(spots.map((p, i) => wait(i * 70 * ctx.sp).then(async () => {
+        const g = ghostOf(ctx, ctx.from, 0.45); g.firstElementChild.style.filter = 'brightness(3) saturate(0) drop-shadow(0 0 8px #fff)';
+        await fly(ctx, g, ctx.from, p, 300, { rotate: 0 }); return g;
+      })));
+      for (let i = 0; i < 10; i++) { boom(ctx, { x: to.x + rnd(-36, 36), y: to.y + rnd(-50, 30) }, '#ffffff', 60); shake(ctx); await wait(70 * ctx.sp); }
+      gs.forEach((g) => fade(ctx, g, 250));
+    },
+  },
+  gold_avalanche: {
+    desc: 'User sends a wave of gold sand that crashes into the target.',
+    async play(ctx) {
+      const to = ctx.tos[0];
+      const wv = spawn(ctx, '<div style="width:140px;height:110px;border-radius:50% 50% 20% 20%;background:radial-gradient(ellipse at 50% 30%,#fff3b0,#e6b422 50%,#9a7410);box-shadow:0 0 18px #ffd65a"></div>', ctx.from, { life: 1500 });
+      goldSand(ctx, ctx.from, to, 30, 50, 460);
+      await fly(ctx, wv, ctx.from, to, 460, { rotate: 0, scale: [0.3, 1.4], ease: 'ease-in' });
+      boom(ctx, to, '#ffd65a', 170); shake(ctx); fade(ctx, wv, 250);
+    },
+  },
+  gold_dust_coffin: {
+    desc: 'Gold sand gathers around the target and binds them.',
+    async play(ctx) {
+      const to = ctx.tos[0]; const el = ctx.targetEls[0]; const { w, h } = sizeOf(el);
+      await goldSand(ctx, { x: to.x, y: to.y + h * 0.4 }, to, 50, h * 0.45, 400);
+      const c = spawn(ctx, `<div style="width:${w * 0.85}px;height:${h * 0.9}px;border-radius:30% 30% 12% 12%;background:repeating-linear-gradient(170deg,#0000 0 12px,#9a741066 12px 14px),radial-gradient(ellipse at 50% 30%,#fff3b0,#e6b422 55%,#9a7410);box-shadow:0 0 16px #ffd65a;opacity:.9"></div>`, to, { life: 1800 });
+      await grow(ctx, c, 260, 'scaleY(.2)', 'scaleY(1)');
+      shake(ctx); await wait(650 * ctx.sp); fade(ctx, c, 300);
+    },
+  },
+  gold_dust_wall: {
+    desc: 'Walls of gold sand rise in front of every ally.',
+    async play(ctx) {
+      const ws = ctx.targetEls.map((el) => {
+        const { w, h } = sizeOf(el); const f = feetOf(ctx, el);
+        const n = spawn(ctx, `<div style="width:${Math.max(60, w * 0.6)}px;height:${h * 0.8}px;border-radius:40% 40% 6px 6px;background:radial-gradient(circle at 30% 30%,#fff3b0,#e6b422 60%,#9a7410);box-shadow:inset 0 -10px 18px #7a5a0a, 0 0 14px #ffd65a88;opacity:.92"></div>`, { x: f.x + (ctx.isFoe ? -24 : 24), y: f.y + 4 }, { life: 1900, z: 7 });
+        rise(ctx, n, 420); return n;
+      });
+      await wait(1100 * ctx.sp); ws.forEach((n) => fade(ctx, n, 350));
+    },
+  },
+  gold_dust_wave: {
+    desc: 'User sends a massive wave of gold sand that crashes into every enemy.',
+    async play(ctx) {
+      const box = sideBox(ctx);
+      const wv = spawn(ctx, `<div style="width:${box.w + 120}px;height:${box.h * 0.9}px;border-radius:50% 50% 20% 20%;background:radial-gradient(ellipse at 50% 30%,#fff3b0,#e6b422 50%,#9a7410);box-shadow:0 0 22px #ffd65a"></div>`, ctx.from, { life: 1800 });
+      goldSand(ctx, ctx.from, box.c, 60, box.w * 0.5, 560);
+      await fly(ctx, wv, ctx.from, box.c, 560, { rotate: 0, scale: [0.1, 1], ease: 'ease-in' });
+      ctx.tos.forEach((t) => boom(ctx, t, '#ffd65a', 120)); shake(ctx); fade(ctx, wv, 300);
+    },
+  },
+  chain_bind: {
+    desc: 'User sends several chains at the target.',
+    async play(ctx) {
+      const to = ctx.tos[0];
+      const ns = await Promise.all([-22, -8, 8, 22].map((dy, i) => wait(i * 60 * ctx.sp).then(() => stretch(ctx, { x: ctx.from.x, y: ctx.from.y + dy }, { x: to.x + rnd(-10, 10), y: to.y + dy * 0.8 }, greyChain, 320))));
+      wrapRing(ctx, ctx.targetEls[0], 'border:5px dashed #b9c0c8;box-shadow:0 0 6px #000', 700);
+      shake(ctx); ns.forEach((n) => setTimeout(() => fade(ctx, n), 450 * ctx.sp)); await wait(300 * ctx.sp);
+    },
+  },
+  mayfly: {
+    desc: 'The user disappears into the ground.',
+    async play(ctx) {
+      const f = feetOf(ctx, ctx.userEl);
+      for (let i = 0; i < 3; i++) puff(ctx, { x: f.x + rnd(-30, 30), y: f.y - 10 }, '#a8916e', 70);
+      await ctx.userEl.animate([{ clipPath: 'inset(0 0 0 0)', transform: 'translateY(0)' }, { clipPath: 'inset(0 0 100% 0)', transform: 'translateY(70px)', offset: 0.3 }, { clipPath: 'inset(0 0 100% 0)', transform: 'translateY(70px)', offset: 0.75 }, { clipPath: 'inset(0 0 0 0)', transform: 'translateY(0)' }], { duration: 1500 * ctx.sp }).finished.catch(() => {});
+    },
+  },
+  mind_body_disturbance: {
+    desc: 'User sends an orb of blue chakra to the target.',
+    async play(ctx) { const o = spawn(ctx, blueOrb(30), ctx.from, { life: 1200 }); await fly(ctx, o, ctx.from, ctx.tos[0], 460, { rotate: 0, arc: 30, ease: 'ease-in-out' }); o.remove(); glowAura(ctx, ctx.targetEls[0], '#8fd3ff', 800); FX.ring(ctx.arena, ctx.targetEls[0], 'gen'); shake(ctx); },
+  },
+  mind_destruction: {
+    desc: 'User sends an orb of blue chakra to the target that explodes.',
+    async play(ctx) { const o = spawn(ctx, blueOrb(36), ctx.from, { life: 1200 }); await fly(ctx, o, ctx.from, ctx.tos[0], 460, { rotate: 0, arc: 30, ease: 'ease-in-out' }); o.remove(); boom(ctx, ctx.tos[0], '#6cc4ff', 170); FX.ring(ctx.arena, ctx.targetEls[0], 'gen'); shake(ctx); },
+  },
+  mind_transfer: {
+    desc: 'User sends a blue chakra orb that stays on the target; the user slumps for as long as the effect lasts.',
+    async play(ctx) {
+      const el = ctx.targetEls[0]; const { h } = sizeOf(el);
+      const o = spawn(ctx, blueOrb(30), ctx.from, { life: 1600 });
+      await fly(ctx, o, ctx.from, { x: ctx.tos[0].x, y: ctx.tos[0].y - h * 0.3 }, 480, { rotate: 0, arc: 30, ease: 'ease-in-out' });
+      ctx.userEl.animate([{ transform: 'translateY(0) rotate(0deg)' }, { transform: `translateY(22px) rotate(${ctx.isFoe ? -5 : 5}deg)` }], { duration: 400 * ctx.sp, fill: 'forwards' });
+      FX.ring(ctx.arena, el, 'gen'); shake(ctx);
+      await wait(500 * ctx.sp);
+      fade(ctx, o, 200);
+      setTimeout(() => ctx.userEl.getAnimations().forEach((a) => a.cancel()), 300 * ctx.sp);
+    },
+  },
+  mind_clone_spy: {
+    desc: 'User creates a clone of themselves that then dissolves into blue chakra.',
+    async play(ctx) {
+      const at = { x: ctx.from.x + (ctx.isFoe ? -55 : 55), y: ctx.from.y };
+      puff(ctx, at, '#ffffff', 90);
+      const g = ghostOf(ctx, at, 0.85); g.firstElementChild.style.filter = 'none';
+      await pop(ctx, g, 200); await wait(450 * ctx.sp);
+      g.firstElementChild.style.transition = `filter ${250 * ctx.sp}ms`; g.firstElementChild.style.filter = 'brightness(2) sepia(1) hue-rotate(170deg) saturate(4)';
+      await wait(250 * ctx.sp);
+      scatter(ctx, at, '<div style="width:7px;height:7px;border-radius:50%;background:#8fd3ff;box-shadow:0 0 6px #4aa3ff"></div>', 26, 90, 900);
+      fade(ctx, g, 200);
+    },
+  },
+  mind_eye_sensing: { desc: 'The target is highlighted with a blue glow.', async play(ctx) { glowAura(ctx, ctx.targetEls[0], '#4aa3ff', 1300); await wait(700 * ctx.sp); } },
+  morning_peacock: {
+    desc: 'User flies in and strikes the target many times; every punch sends off a flaming fist.',
+    async play(ctx) {
+      const to = ctx.tos[0]; const g = ghostOf(ctx, ctx.from, 0.5);
+      fly(ctx, g, ctx.from, between(ctx.from, to, 0.6), 220, { rotate: 0 }).then(() => fade(ctx, g, 200));
+      const dx = (to.x - ctx.from.x) * 0.5; const dy = (to.y - ctx.from.y) * 0.5;
+      ctx.userEl.animate([{ transform: 'translate(0,0)', filter: 'none' }, { transform: `translate(${dx}px,${dy}px)`, filter: 'drop-shadow(0 0 12px #ff7a1a)', offset: 0.15 }, { transform: `translate(${dx}px,${dy}px)`, filter: 'drop-shadow(0 0 12px #ff7a1a)', offset: 0.88 }, { transform: 'translate(0,0)', filter: 'none' }], { duration: 1500 * ctx.sp });
+      await wait(240 * ctx.sp);
+      const src = { x: ctx.from.x + dx, y: ctx.from.y + dy };
+      for (let i = 0; i < 14; i++) { fireball(ctx, { x: src.x + rnd(-20, 20), y: src.y + rnd(-40, 20) }, { x: to.x + rnd(-30, 30), y: to.y + rnd(-45, 30) }, { size: 30, ms: 200, trail: false }).then(() => shake(ctx)); await wait(60 * ctx.sp); }
+      await wait(220 * ctx.sp); burnAt(ctx, ctx.targetEls[0]);
+    },
+  },
+  multi_shadow_clone: {
+    desc: 'User makes about five clones of themselves in front of them.',
+    async play(ctx) {
+      const { h } = sizeOf(ctx.userEl); const dir = ctx.isFoe ? -1 : 1;
+      const spots = [[0.35, -0.05], [0.6, 0.06], [0.85, -0.02], [0.5, -0.18], [0.75, -0.2]].map(([dx, dy]) => ({ x: ctx.from.x + dir * dx * h, y: ctx.from.y + dy * h }));
+      const gs = spots.map((p, i) => { puff(ctx, p, '#ffffff', 90); const g = ghostOf(ctx, p, 0.95); g.firstElementChild.style.filter = 'none'; g.style.opacity = '0'; setTimeout(() => pop(ctx, g, 180), i * 60 * ctx.sp); return g; });
+      await wait(1000 * ctx.sp);
+      gs.forEach((g, i) => { puff(ctx, spots[i], '#ffffff', 80); fade(ctx, g, 150); });
+    },
+  },
+});
+
 // ---------------------------------------------------------------- generic fallback (what every other jutsu does)
 export function genericPlay(ctx) {
   const { j, arena, userEl, targetEls, from, sp } = ctx;

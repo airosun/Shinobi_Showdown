@@ -1,7 +1,7 @@
 // Jutsu Animation Lab: browse every jutsu and play its battle animation on a practice field.
 import { SHINOBI, SHINOBI_BY_ID } from './data/shinobi.js';
 import { JUTSU } from './data/jutsu.js';
-import { ANIMS, playJutsu, playDecoy } from './anim.js';
+import { ANIMS, playJutsu, playDecoy, poof, logSubstitute } from './anim.js';
 
 const KUNAI = { id: 'kunai', name: 'Kunai & Shuriken', category: 'taijutsu', nature: null, power: 25, cost: 0, priority: 2, target: 'enemy', effects: [], desc: 'The basic thrown attack every shinobi has.' };
 const USERS = {};
@@ -63,6 +63,9 @@ function render() {
       <button class="primary" data-act="play">▶ Play</button>
     </div>
     <div class="arena lab-arena" id="arena">${arenaHtml(j)}</div>
+    <div class="row small muted" style="margin:8px 0;gap:8px;align-items:center">When the caster is hit:
+      <button class="small ghost" data-act="poof" title="What any clone or substitution without its own effect does when hit">Clone poof (smoke)</button>
+      <button class="small ghost" data-act="logsub" title="Log Substitution being hit">Log Substitution</button></div>
     <div class="lab-info">
       <div><div class="lbl">${a ? 'Your animation request' : 'Animation'}</div>${a ? esc(a.desc) : 'Generic animation for its category (no custom request yet).'}</div>
       <div><div class="lbl">What it does</div>${esc(j.desc || '')}</div>
@@ -108,6 +111,7 @@ app.addEventListener('click', (ev) => {
   if (act === 'filter') { S.filter = arg; render(); }
   if (act === 'play') play();
   if (act === 'decoy') decoy();
+  if (act === 'poof' || act === 'logsub') { const { arena, user } = targetsFor(BY_ID[S.id]); (act === 'poof' ? poof : logSubstitute)(arena, user, { sp: S.speed }); }
   if (act === 'nextUser') { S.userIdx += 1; render(); play(); }
 });
 app.addEventListener('input', (ev) => {
