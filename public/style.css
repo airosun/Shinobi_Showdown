@@ -488,3 +488,46 @@ button.linkish:hover:not(:disabled) { background: none; color: var(--accent); }
 
 /* Hidan's curse: the ritual mark stays under Hidan and his linked target */
 .arena .curse-mark { position: absolute; left: 50%; bottom: -14px; transform: translateX(-50%); z-index: -1; pointer-events: none; animation: tsu-in .5s ease-out; }
+
+/* ================= responsive fit (any window size) ================= */
+/* battle dialogue box: the Speed / Skip buttons sit in the text flow instead of on top of it */
+.textbox .tools { position: static; float: right; margin: -6px -8px 6px 12px; }
+.cmd-head { flex-wrap: wrap; row-gap: 8px; }
+.cmd-head .who-tabs { flex-wrap: wrap; }
+.dex-head .tabs, .dex-head .mode-tabs { flex-wrap: wrap; }
+/* the arena scales its sprites and HP cards to its own width */
+.arena { container-type: inline-size; }
+@container (max-width: 860px) {
+  .arena .spr img.art { height: 140px; max-width: 160px; }
+  .arena .mon.you .spr img.art { height: 185px; max-width: 200px; }
+  .arena .hud { width: min(310px, 45%); }
+  .arena .mon.you.p0 { left: 10%; } .arena .mon.you.p1 { left: 26%; } .arena .mon.you.p2 { left: 42%; }
+  .hpcard .nm .nat { display: none; }
+}
+@container (max-width: 640px) {
+  .arena .spr img.art { height: 100px; max-width: 115px; }
+  .arena .mon.you .spr img.art { height: 130px; max-width: 140px; }
+  .arena .hud { width: 49%; }
+  .arena .mon.you.p0 { left: 9%; } .arena .mon.you.p1 { left: 24%; } .arena .mon.you.p2 { left: 39%; }
+  .arena .mon.foe.p0 { left: 62%; } .arena .mon.foe.p1 { left: 76%; } .arena .mon.foe.p2 { left: 90%; }
+}
+/* the Dex detail column shrinks with the window */
+.dex-main { container-type: inline-size; min-width: 0; }
+.dex-card { grid-template-columns: minmax(180px, 380px) minmax(0, 1fr); }
+.dex-info { min-width: 0; }
+@container (max-width: 860px) { .dex-cols { grid-template-columns: 1fr; } }
+@container (max-width: 600px) { .dex-card { grid-template-columns: 1fr; } .dex-card .dex-art, .dex-card > :first-child { max-width: 380px; margin: 0 auto; width: 100%; } .jstats { grid-template-columns: 1fr 1fr; } }
+@media (max-width: 1120px) and (min-width: 901px) { .dex { grid-template-columns: 280px minmax(0, 1fr); } }
+@media (max-width: 520px) { .topbar .brand { font-size: 18px; } .page, main { padding-left: 10px; padding-right: 10px; } }
+@container (max-width: 640px) {
+  .arena .hud { gap: 3px; }
+  .hpcard { padding: 3px 7px; } .hpcard .nm { font-size: 12px; } .hpcard .hptext, .hpcard .nm .hptext { font-size: 10px; }
+  .arena .hud.foe { top: 6px; left: 6px; } .arena .hud.you { bottom: 6px; right: 6px; }
+  .arena .mon .tag { font-size: 9.5px; max-width: 120px; overflow: hidden; text-overflow: ellipsis; }
+}
+.arena .sidelabel .who { white-space: nowrap; }
+#topinfo { white-space: nowrap; }
+@media (max-width: 520px) { #topinfo { display: none; } }
+@container (max-width: 640px) { .arena .sidelabel { font-size: 11px; gap: 4px; } .arena .sidelabel .chip { font-size: 10px; padding: 1px 6px; } }
+@media (max-width: 520px) { .dex-head .tabs .tab { font-size: 15px; padding: 4px 9px; } .dex-head { gap: 6px; } }
+.dex-side { min-width: 0; } .dex-side .row { flex-wrap: wrap; }
