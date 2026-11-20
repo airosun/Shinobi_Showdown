@@ -672,7 +672,7 @@ function performJutsu(state, actor, jutsu, target, ctx = {}) {
         continue;
       } else if (blockable && !aoe && tgt.decoy > 0 && !hasFlag(actor, 'seesDecoy')) {
         tgt.decoy = 0;
-        log(state, `${tgt.name}'s decoy clone absorbs the hit and pops!`, 'sub', tgt, { negated: true, decoy: true });
+        log(state, `${tgt.name}'s decoy clone absorbs the hit and pops!`, 'sub', tgt, { negated: true, decoy: true, decoyFrom: tgt.decoyFrom || null });
         puppetPoison(state, tgt, actor);
         if (tgt.decoyGen && !actor.ko && !hasFlag(actor, 'genjutsuImmune')) {
           applyStatus(state, actor, 'genjutsu', tgt.decoyGen);
@@ -897,6 +897,7 @@ function applyEffect(state, actor, tgt, eff, jutsu) {
     }
     case 'decoy':
       tgt.decoy = 2;
+      tgt.decoyFrom = jutsu?.id || null;
       tgt.decoyGen = eff.genjutsu || 0;
       log(state, `${tgt.name} has a decoy clone ready.`, 'sub', tgt);
       break;

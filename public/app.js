@@ -5,6 +5,7 @@ import * as E from './engine/battle.js';
 import { chooseActions } from './engine/ai.js';
 import { randomTeam } from './engine/teams.js';
 import * as FX from './fx.js';
+import { playJutsu, playDecoy } from './anim.js';
 
 const app = document.getElementById('app');
 const tip = document.getElementById('tooltip');
@@ -170,7 +171,7 @@ const SCREENS = {
         <button class="primary big" data-act="startHotseat">Hot-Seat Battle</button>
         <button class="big" data-act="startCpu">Vs CPU</button>
       </div>
-      <div class="row" style="margin-top:12px"><button class="big scroll-btn" data-act="openDex">📜 Shinobi Dex</button></div>
+      <div class="row" style="margin-top:12px"><button class="big scroll-btn" data-act="openDex">📜 Shinobi Dex</button><a class="lab-link" href="lab.html">🎬 Jutsu Animation Lab</a></div>
       <div class="row" style="margin-top:14px"><button class="ghost" data-act="toggleRules">${S.showRules ? 'Hide rules' : 'How to play'}</button></div>
       ${S.showRules ? rulesHtml() : ''}
     </div>`;
@@ -969,19 +970,13 @@ async function playEvent(ev, apply) {
     const user = monEl(e.u);
     const targets = (e.targets || []).map(monEl).filter(Boolean);
     if (user) {
-      const from = FX.centerOf(user, arena);
-      const color = FX.jutsuColor(j);
-      if (j.category === 'taijutsu' && targets.length && j.id !== 'kunai') {
-        FX.lunge(user, from, FX.centerOf(targets[0], arena), sp);
-        setTimeout(() => targets.forEach((t) => { FX.fx(arena, 'slash', FX.centerOf(t, arena)); }), 230 * sp);
-      } else if (j.category === 'genjutsu') {
-        FX.ring(arena, user, 'gen');
-        targets.forEach((t) => setTimeout(() => FX.ring(arena, t, 'gen'), 250 * sp));
-      } else if (j.target === 'self' || j.target === 'ally' || j.target === 'allAllies') {
-        targets.forEach((t) => FX.ring(arena, t, j.category === 'medical' ? 'heal' : 'aura'));
-      } else {
-        targets.forEach((t) => FX.orb(arena, from, FX.centerOf(t, arena), color, { small: j.id === 'kunai', sp }));
-      }
+      const tMon = targets[0]?.closest('.mon');
+      const sideCls = tMon?.classList.contains('foe') ? 'foe' : 'you';
+      const sideEls = [...arena.querySelectorAll(`.mon.${sideCls}:not(.down) .spr`)];
+      const custom = await playJutsu(arena, j, user, targets, { sp, sideEls, isFoe: !!user.closest('.mon')?.classList.contains('foe') });
+      apply();
+      await pause(custom ? (e.collab ? 900 : 650) : (e.collab ? 1050 : 850));
+      return;
     }
     apply();
     await pause(e.collab ? 1500 : 1300);
@@ -1022,7 +1017,7 @@ async function playEvent(ev, apply) {
         FX.pop(arena, el, 'Rotation!', 'sub', true);
         ms = 1200;
       } else if (el && e.negated) {
-        FX.fx(arena, 'puff', FX.centerOf(el, arena));
+        if (!(e.decoy && playDecoy(arena, e.decoyFrom, el, { sp }))) FX.fx(arena, 'puff', FX.centerOf(el, arena));
         if (e.subType === 'log') FX.logSwap(el, 'sprites/substitution-log.png');
         FX.pop(arena, el, e.decoy ? 'Decoy!' : 'Substitution!', 'sub', true);
         ms = 1300;
