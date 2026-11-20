@@ -607,7 +607,15 @@ const ART2 = {
 };
 const greyChain = (len) => `<svg width="${len}" height="12" viewBox="0 0 ${len} 12"><line x1="0" y1="6" x2="${len}" y2="6" stroke="#b9c0c8" stroke-width="4" stroke-dasharray="9 4" stroke-linecap="round" style="filter:drop-shadow(0 0 2px #000)"/></svg>`;
 const thread = (len) => `<svg width="${len}" height="10" viewBox="0 0 ${len} 10"><path d="M0 3H${len}M0 7H${len}" stroke="#8fd3ff" stroke-width="1.4" style="filter:drop-shadow(0 0 3px #4aa3ff)"/></svg>`;
-const armSvg = (len) => `<svg width="${len + 30}" height="34" viewBox="0 0 ${len + 30} 34" style="filter:drop-shadow(0 0 10px #ff8a1f)"><path d="M0 11H${len}V23H0Z" fill="#ffae3c" opacity=".9"/><path d="M${len - 4} 4C${len + 14} 0 ${len + 30} 6 ${len + 28} 17S${len + 14} 34 ${len - 4} 30Z" fill="#ffc35c" stroke="#fff1c2" stroke-width="2"/></svg>`;
+const armSvg = (len) => {
+  const L = (x1, y1, x2, y2) => `<path d="M${x1} ${y1}L${x2} ${y2}" stroke="#fff1c2" stroke-width="12" stroke-linecap="round"/><path d="M${x1} ${y1}L${x2} ${y2}" stroke="#ffc35c" stroke-width="8" stroke-linecap="round"/>`;
+  const C = (x, y) => `<path d="M${x} ${y}q14 0 12 9" stroke="#fff1c2" stroke-width="12" stroke-linecap="round" fill="none"/><path d="M${x} ${y}q14 0 12 9" stroke="#ffc35c" stroke-width="8" stroke-linecap="round" fill="none"/>`;
+  const x = len;
+  return `<svg width="${len + 120}" height="80" viewBox="0 0 ${len + 120} 80" style="overflow:visible;filter:drop-shadow(0 0 10px #ff8a1f)"><path d="M0 34Q${len * 0.5} 32 ${x} 32V48Q${len * 0.5} 48 0 46Z" fill="#ffae3c" opacity=".9"/>`
+    + `<g transform="translate(${x} 40) scale(1.9) translate(${-x} -40)"><g class="open">${L(x + 18, 29, x + 50, 18)}${L(x + 20, 36, x + 56, 32)}${L(x + 20, 44, x + 55, 47)}${L(x + 18, 51, x + 48, 60)}${L(x + 6, 29, x + 20, 8)}</g>`
+    + `<g class="shut" style="display:none">${C(x + 20, 29)}${C(x + 22, 36)}${C(x + 22, 44)}${C(x + 20, 51)}${L(x + 6, 30, x + 24, 24)}</g>`
+    + `<rect x="${x - 4}" y="25" width="30" height="31" rx="11" fill="#ffc35c" stroke="#fff1c2" stroke-width="2"/></g></svg>`;
+};
 
 /** Stretch an SVG strip (made by mk(len)) from a to b. */
 async function stretch(ctx, a, b, mk, ms = 380, life = 2600) {
@@ -710,12 +718,13 @@ Object.assign(ANIMS, {
     },
   },
   chakra_arm: {
-    desc: 'An orange chakra arm extends from the user to strike and grab the target.',
+    desc: 'An orange chakra arm reaches out from the user; its open hand strikes the target and closes around them.',
     async play(ctx) {
       const to = ctx.tos[0];
-      const end = between(ctx.from, to, 0.92);
+      const end = between(ctx.from, to, 0.78);
       const n = await stretch(ctx, ctx.from, end, armSvg, 330);
-      wrapRing(ctx, ctx.targetEls[0], 'border:7px solid #ffae3c;box-shadow:0 0 14px #ff8a1f', 650);
+      n.querySelector('.open').style.display = 'none'; n.querySelector('.shut').style.display = '';
+      ctx.targetEls[0].animate([{ filter: 'none' }, { filter: 'drop-shadow(0 0 10px #ff8a1f)' }, { filter: 'none' }], { duration: 700 * ctx.sp });
       shake(ctx);
       setTimeout(() => n.animate([{ opacity: 1 }, { opacity: 0 }], { duration: 300 * ctx.sp, fill: 'forwards' }), 500 * ctx.sp);
       await wait(300 * ctx.sp);
