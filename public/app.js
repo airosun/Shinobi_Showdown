@@ -5,7 +5,7 @@ import * as E from './engine/battle.js';
 import { chooseActions } from './engine/ai.js';
 import { randomTeam } from './engine/teams.js';
 import * as FX from './fx.js';
-import { playJutsu, playDecoy, poof, logSubstitute, SHARINGAN, TSUKUYOMI_MOON } from './anim.js';
+import { playJutsu, playDecoy, poof, logSubstitute, poisonBubbles, CURSE_MARK, SHARINGAN, TSUKUYOMI_MOON } from './anim.js';
 
 const app = document.getElementById('app');
 const tip = document.getElementById('tooltip');
@@ -611,6 +611,7 @@ function selectionTargets() {
 
 function sideMons(vs, side, isFoe, sel) {
   const team = vs.teams[side];
+  const cursed = new Set(Object.values(vs.units).filter((x) => !x.ko && x.link).flatMap((x) => [x.uid, x.link.uid]));
   const mindHeld = new Set(Object.values(vs.units).filter((x) => !x.ko && x.statuses?.bind?.mind).map((x) => x.statuses.bind.mind));
   return team.slots.map((uid, pos) => {
     if (!uid) return '';
@@ -622,7 +623,7 @@ function sideMons(vs, side, isFoe, sel) {
     const ghost = u.decoy > 0 && !u.ko ? `<div class="ghost">${badge(d)}</div>` : '';
     const form = formTag(d.name);
     return `<div class="mon ${cls}" id="mon-${uid}" ${pickable ? `data-act="target" data-arg="${pos}"` : `data-tip="${esc(unitTip(vs, u))}"`}>
-      <div class="spr ${S.sprites[d.id]?.front ? 'has-art' : ''}">${ghost}${sprite(d, !isFoe, !!u.transform)}${!u.ko && u.statuses?.genjutsu?.tsukuyomi ? `<div class="tsu-eye">${SHARINGAN(26)}</div>` : ''}${!u.ko && u.statuses?.bind?.mind ? '<div class="mind-orb"></div>' : ''}</div>
+      <div class="spr ${S.sprites[d.id]?.front ? 'has-art' : ''}">${ghost}${sprite(d, !isFoe, !!u.transform)}${!u.ko && u.statuses?.genjutsu?.tsukuyomi ? `<div class="tsu-eye">${SHARINGAN(26)}</div>` : ''}${!u.ko && u.statuses?.bind?.mind ? '<div class="mind-orb"></div>' : ''}${!u.ko && cursed.has(uid) ? `<div class="curse-mark">${CURSE_MARK(120, true)}</div>` : ''}</div>
       <div class="tag">${esc(shortName(d.name))}${form ? ` · ${esc(form)}` : ''}</div>
       ${pickable ? '<span class="pick-hint">Target</span>' : ''}
     </div>`;
@@ -1004,6 +1005,7 @@ async function playEvent(ev, apply) {
       if (el) {
         FX.shake(el);
         FX.pop(arena, el, `-${e.amount}`, e.burn || e.poison ? 'status' : 'dmg', true);
+        if (e.poison) poisonBubbles(arena, el, { sp });
         if (e.crit) FX.pop(arena, el, 'Critical!', 'crit', false, -30);
         else if (e.adv > 1) FX.pop(arena, el, 'Super effective!', 'se', false, -30);
         else if (e.adv < 1) FX.pop(arena, el, 'Resisted', 'nve', false, -30);
@@ -1039,6 +1041,7 @@ async function playEvent(ev, apply) {
       break;
     case 'status':
       if (el) { FX.ring(arena, el, '', STATUS_COLOR[e.status] || '#ffcf9e'); if (e.status) FX.pop(arena, el, STATUS_NAME[e.status], 'status'); }
+      if (el && e.status === 'poison') poisonBubbles(arena, el, { sp });
       break;
     case 'intel':
       if (el) {

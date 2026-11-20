@@ -977,7 +977,7 @@ Object.assign(ANIMS, {
     },
   },
   curse_ritual: {
-    desc: 'A black circle with an upside-down triangle draws itself under the user, then appears on the target and glows purple.',
+    desc: 'A black circle with an upside-down triangle draws itself under the user, then appears under the target and glows purple. Both marks stay for as long as the curse lasts.',
     async play(ctx) {
       const f = feetOf(ctx, ctx.userEl);
       const mk = (at) => {
@@ -2926,6 +2926,342 @@ Object.assign(ANIMS, {
       gs.forEach((g, i) => { puff(ctx, spots[i], '#ffffff', 80); fade(ctx, g, 150); });
     },
   },
+});
+
+// ---------------------------------------------------------------- batch 7 (sheet rows 230–267) + poison bubbles + curse marks
+/** Purple poison bubbles rising off the top of a unit (shown whenever poison lands). */
+export function poisonBubbles(arena, el, { sp = 1 } = {}) {
+  if (!el) return;
+  const ctx = { arena, sp };
+  const r = el.getBoundingClientRect(); const a = arena.getBoundingClientRect();
+  const top = { x: r.left - a.left + r.width / 2, y: r.top - a.top + r.height * 0.12 };
+  for (let i = 0; i < 12; i++) {
+    setTimeout(() => {
+      const s = rnd(10, 22);
+      const b = spawn(ctx, `<svg width="${s}" height="${s}" viewBox="0 0 20 20"><circle cx="10" cy="10" r="8.5" fill="#a64bff88" stroke="#e2b8ff" stroke-width="1.4"/><circle cx="7" cy="6.5" r="2" fill="#fff" opacity=".7"/></svg>`, { x: top.x + rnd(-r.width * 0.22, r.width * 0.22), y: top.y + rnd(-6, 14) }, { life: 1300 });
+      b.animate([{ transform: 'translate(-50%,-50%) scale(.3)', opacity: 1 }, { transform: `translate(calc(-50% + ${rnd(-14, 14)}px), calc(-50% - ${rnd(40, 70)}px)) scale(1.05)`, opacity: 0.9, offset: 0.85 }, { transform: `translate(calc(-50% + ${rnd(-14, 14)}px), calc(-50% - ${rnd(60, 80)}px)) scale(1.3)`, opacity: 0 }], { duration: rnd(800, 1100) * sp, easing: 'ease-out', fill: 'forwards' });
+    }, i * 55 * sp);
+  }
+}
+/** Hidan's ritual mark (circle with an inverted triangle), drawn flat on the ground. */
+export const CURSE_MARK = (s = 110, glow = false) => `<svg width="${s}" height="${s * 0.38}" viewBox="0 0 100 38"><g transform="scale(1 .38)" fill="none" stroke="${glow ? '#7a2bd6' : '#111'}" stroke-width="5" stroke-linejoin="round" style="${glow ? 'filter:drop-shadow(0 0 6px #b44bff)' : ''}"><circle cx="50" cy="50" r="44"/><path d="M12 30H88L50 94Z"/></g></svg>`;
+
+const ART7 = {
+  tentacle: (h = 110) => `<svg width="${h * 0.5}" height="${h}" viewBox="0 0 50 100"><path d="M18 100C10 80 14 60 22 44 30 28 26 14 34 4 40 0 46 6 42 12 36 22 40 36 36 52 32 68 36 84 40 100Z" fill="#d97a8a" stroke="#8a3a4a" stroke-width="2.5"/>${[20, 34, 48, 62, 76, 90].map((y, i) => `<circle cx="${36 - i * 1.2}" cy="${y}" r="3.4" fill="#f7c2cb" stroke="#8a3a4a"/>`).join('')}</svg>`,
+  paperStar: (s = 46) => `<svg width="${s}" height="${s}" viewBox="-10 -10 20 20" class="ax-spin"><path d="M0-10 3-3 10 0 3 3 0 10-3 3-10 0-3-3Z" fill="#fbfbf7" stroke="#bdbdb2" stroke-width=".6"/><path d="M0-10 0 10M-10 0 10 0" stroke="#d8d8cf" stroke-width=".5"/></svg>`,
+  shinigami: (s = 70) => `<svg width="${s}" height="${s * 1.1}" viewBox="0 0 60 66" style="filter:drop-shadow(0 0 10px #7a2bd6)"><path d="M8 18C8 6 52 6 52 18L54 44C50 60 10 60 6 44Z" fill="#e8e2f2" stroke="#3a2a4a" stroke-width="2.5"/><path d="M4 18 14 2 22 14M56 18 46 2 38 14" fill="#e8e2f2" stroke="#3a2a4a" stroke-width="2"/><path d="M16 26 26 30 16 32ZM44 26 34 30 44 32Z" fill="#1a0a2a"/><path d="M18 44Q30 52 42 44" stroke="#1a0a2a" stroke-width="2.5" fill="none"/><path d="M22 44v5M27 46v5M32 46v5M37 44v5" stroke="#1a0a2a" stroke-width="1.6"/></svg>`,
+  fourSymbols: (s = 90) => `<svg width="${s}" height="${s}" viewBox="0 0 100 100" style="filter:drop-shadow(0 0 6px #000)"><circle cx="50" cy="50" r="44" fill="none" stroke="#111" stroke-width="3"/><circle cx="50" cy="50" r="12" fill="none" stroke="#111" stroke-width="3"/>${[0, 90, 180, 270].map((a) => `<g transform="rotate(${a} 50 50)"><path d="M50 6V38" stroke="#111" stroke-width="2.5"/><path d="M42 18H58M44 26H56" stroke="#111" stroke-width="2"/></g>`).join('')}<path d="M50 38 42 50 50 62 58 50Z" fill="#111"/></svg>`,
+  puppetRed: (h = 90) => `<svg width="${h * 0.6}" height="${h}" viewBox="0 0 60 100"><circle cx="30" cy="14" r="10" fill="#e3c39a" stroke="#6b4a2a" stroke-width="2"/><path d="M24 8Q30 2 36 8" stroke="#3a2614" stroke-width="3" fill="none"/><path d="M14 28H46L52 86 42 98H18L8 86Z" fill="#b8202a" stroke="#5a0a10" stroke-width="2"/><path d="M14 30 4 56M46 30 56 56" stroke="#e3c39a" stroke-width="6" stroke-linecap="round"/><path d="M30 28V96" stroke="#7a1018" stroke-width="2"/></svg>`,
+  salamander: (w = 220) => `<svg width="${w}" height="${w * 0.55}" viewBox="0 0 200 110"><path d="M20 70C10 50 30 30 60 32 90 20 130 22 160 36 184 44 196 60 190 74 186 90 160 96 130 92L70 94C40 96 26 88 20 70Z" fill="#8c8278" stroke="#4e463e" stroke-width="3"/><path d="M40 92 30 108M70 94 66 110M140 92 146 108M168 88 178 104" stroke="#6e6660" stroke-width="10" stroke-linecap="round"/><ellipse cx="170" cy="56" rx="22" ry="16" fill="#9a9086" stroke="#4e463e" stroke-width="3"/><circle cx="176" cy="50" r="4" fill="#e6b422" stroke="#222"/><path d="M152 66Q168 74 186 64" stroke="#3a322a" stroke-width="2.5" fill="none"/>${[60, 80, 100, 120, 140].map((x) => `<circle cx="${x}" cy="${48 + (x % 40) / 4}" r="5" fill="#6e6660"/>`).join('')}<path d="M24 66C8 70 0 60 4 52" stroke="#8c8278" stroke-width="10" fill="none" stroke-linecap="round"/></svg>`,
+  samehada: (l = 150) => `<svg width="${l}" height="${l * 0.3}" viewBox="0 0 150 46"><rect x="0" y="19" width="26" height="8" rx="3" fill="#3a3a5a"/><path d="M24 10H140Q150 23 140 36H24Z" fill="#5a6ea8" stroke="#2a3460" stroke-width="2"/>${Array.from({ length: 10 }, (_, i) => `<path d="M${30 + i * 11} 10l5-9 5 9M${30 + i * 11} 36l5 9 5-9" fill="#7a8ed0" stroke="#2a3460"/>`).join('')}</svg>`,
+  buddha: (w = 300) => `<svg width="${w}" height="${w * 0.9}" viewBox="0 0 300 270"><g fill="#9b6b3e" stroke="#5a3a1e" stroke-width="3">${Array.from({ length: 12 }, (_, i) => { const a = -170 + i * 14; const r = (a * Math.PI) / 180; return `<path d="M150 120L${150 + Math.cos(r) * 140} ${130 + Math.sin(r) * 120}" stroke-width="12" stroke-linecap="round"/><circle cx="${150 + Math.cos(r) * 140}" cy="${130 + Math.sin(r) * 120}" r="11"/>`; }).join('')}<path d="M90 110C90 70 210 70 210 110L220 260H80Z"/><circle cx="150" cy="70" r="38"/><path d="M120 50Q150 30 180 50" fill="none"/></g><path d="M134 66H144M156 66H166M140 86Q150 92 160 86" stroke="#3a2614" stroke-width="3" fill="none"/><circle cx="150" cy="50" r="5" fill="#3a2614"/></svg>`,
+  redDragon: (w = 200) => `<svg width="${w}" height="${w * 0.4}" viewBox="0 0 200 80" style="filter:drop-shadow(0 0 10px #ff2a2a)"><path d="M0 44C20 20 40 64 64 40S104 18 128 38 160 50 172 36" stroke="#ff3a3a99" stroke-width="16" fill="none" stroke-linecap="round"/><path d="M168 24 196 34 176 44 196 50 168 54Z" fill="#ff5a5a99" stroke="#ffb3b3" stroke-width="2"/><path d="M168 24 160 10M176 26 176 12" stroke="#ffb3b3" stroke-width="2.5"/><circle cx="178" cy="34" r="2.5" fill="#fff"/></svg>`,
+};
+
+async function reviveAnim(ctx, { samsara = false } = {}) {
+  const el = ctx.targetEls[0]; const f = feetOf(ctx, el); const { h } = ctx.userSize;
+  const inLab = !el.closest('.mon')?.classList.contains('down');
+  if (inLab) el.animate([{ opacity: 1, filter: 'none' }, { opacity: 0.2, filter: 'grayscale(1)' }], { duration: 300 * ctx.sp, fill: 'forwards' });
+  let head = null;
+  if (samsara) {
+    head = spawn(ctx, `<img src="sprites/battle/samsara.webp" style="height:${h * 0.8}px">`, { x: f.x, y: f.y - h * 0.4 }, { life: 3600 });
+    await rise(ctx, head, 450);
+    head.style.transform = 'translate(-50%,-100%)';
+    glowAura(ctx, head, '#5dff8f', 1100); await wait(800 * ctx.sp);
+    ctx.userEl.animate([{ filter: 'none' }, { filter: 'drop-shadow(0 0 8px #5dff8f)' }, { filter: 'none' }], { duration: 600 * ctx.sp });
+  } else {
+    lunge(ctx, ctx.tos[0], 0.8, 900); await wait(380 * ctx.sp);
+  }
+  glowAura(ctx, el, '#5dff8f', 1100);
+  await wait(500 * ctx.sp);
+  el.getAnimations().forEach((a) => a.cancel());
+  FX.appear(el);
+  if (head) { head.style.transformOrigin = '50% 100%'; head.animate([{ transform: 'translate(-50%,-100%) scaleY(1)', opacity: 1 }, { transform: 'translate(-50%,-100%) scaleY(0)', opacity: 0 }], { duration: 400 * ctx.sp, fill: 'forwards' }); }
+  await wait(250 * ctx.sp);
+  shakeEl(ctx.userEl);
+}
+async function lunging(ctx, k = 0.66, ms = 500) { const to = ctx.tos[0]; const g = ghostOf(ctx, ctx.from, 0.5); fly(ctx, g, ctx.from, between(ctx.from, to, 0.82), ms * 0.45, { rotate: 0 }).then(() => fade(ctx, g, 200)); lunge(ctx, to, k, ms); await wait(ms * 0.45 * ctx.sp); return to; }
+async function rasenganStrike(ctx, size) {
+  const to = ctx.tos[0]; const hand = { x: ctx.from.x + (ctx.isFoe ? -24 : 24), y: ctx.from.y };
+  const r = spawn(ctx, ART.rasengan(size), hand, { life: 2000 }); await pop(ctx, r, 320);
+  lunge(ctx, to, 0.75, 580);
+  await fly(ctx, r, hand, between(hand, to, 0.9), 260, { rotate: 0 });
+  boom(ctx, to, '#6cb8ff', size * 2.2); shake(ctx); fade(ctx, r, 200);
+}
+function purpleCloud(ctx, at, w, h) {
+  return spawn(ctx, `<div style="width:${w}px;height:${h}px;border-radius:50%;background:radial-gradient(ellipse,#9a3bdccc 0%,#7a2bd699 45%,#7a2bd600 72%);filter:blur(4px)"></div>`, at, { life: 2400 });
+}
+
+Object.assign(ANIMS, {
+  cell_share: {
+    desc: 'User moves over to the ally and applies a light-green healing aura, then flinches as if taking damage.',
+    async play(ctx) { if (ctx.targetEls[0] !== ctx.userEl) { lunge(ctx, ctx.tos[0], 0.75, 700); await wait(300 * ctx.sp); } glowAura(ctx, ctx.targetEls[0], '#b8ffc4'); await wait(600 * ctx.sp); shakeEl(ctx.userEl); },
+  },
+  night_guy: {
+    desc: 'User flies in with a kick wrapped in a red dragon-shaped aura.',
+    async play(ctx) {
+      const to = ctx.tos[0];
+      ctx.userEl.animate([{ filter: 'none' }, { filter: 'drop-shadow(0 0 16px #ff1a1a) drop-shadow(0 0 6px #ff6a6a)', offset: 0.3 }, { filter: 'drop-shadow(0 0 16px #ff1a1a)', offset: 0.85 }, { filter: 'none' }], { duration: 1200 * ctx.sp });
+      await wait(300 * ctx.sp);
+      const d = spawn(ctx, ART7.redDragon(Math.hypot(to.x - ctx.from.x, to.y - ctx.from.y) * 0.9), ctx.from, { life: 1400 });
+      d.style.transformOrigin = '0 50%'; d.style.transform = `translate(0,-50%) rotate(${ang(ctx.from, to)}deg)`;
+      d.animate([{ clipPath: 'inset(0 100% 0 0)' }, { clipPath: 'inset(0 0 0 0)' }], { duration: 300 * ctx.sp, fill: 'forwards' });
+      lunge(ctx, to, 0.8, 520); await wait(260 * ctx.sp);
+      boom(ctx, to, '#ff3a3a', 200); crackAt(ctx, ctx.targetEls[0]); shake(ctx); fade(ctx, d, 300);
+    },
+  },
+  octopus_clone: {
+    desc: 'When the user is struck, they vanish in a puff of smoke and leave an octopus tentacle behind.',
+    async play(ctx) { FX.ring(ctx.arena, ctx.userEl, 'aura'); await wait(400 * ctx.sp); },
+    decoy(ctx, el) {
+      poof(ctx.arena, el, ctx);
+      const f = feetOf({ arena: ctx.arena }, el); const { h } = sizeOf(el);
+      const t = spawn(ctx, ART7.tentacle(h * 0.65), { x: f.x, y: f.y - h * 0.32 }, { life: 1600 });
+      t.animate([{ opacity: 0 }, { opacity: 1, offset: 0.15 }, { opacity: 1, offset: 0.75 }, { opacity: 0 }], { duration: 1300 * ctx.sp, fill: 'forwards' });
+    },
+  },
+  reincarnation: { desc: "User goes to the fallen ally's spot and glows green to bring them back, then flinches as if taking damage.", play: (ctx) => reviveAnim(ctx) },
+  samsara_revival: { desc: "The Samsara head rises where the ally fell and glows green; the ally returns and the head sinks away. The user then flinches as if taking damage.", play: (ctx) => reviveAnim(ctx, { samsara: true }) },
+  paper_clone: {
+    desc: 'When the user is struck, they burst into paper butterflies that scatter.',
+    async play(ctx) { FX.ring(ctx.arena, ctx.userEl, 'aura'); await wait(400 * ctx.sp); },
+    decoy(ctx, el) {
+      const at = FX.centerOf(el, ctx.arena); const { h } = sizeOf(el);
+      el.animate([{ opacity: 1 }, { opacity: 0, offset: 0.1 }, { opacity: 0, offset: 0.85 }, { opacity: 1 }], { duration: 1400 * ctx.sp });
+      for (let i = 0; i < 18; i++) {
+        const st = { x: at.x + rnd(-h * 0.2, h * 0.2), y: at.y + rnd(-h * 0.4, h * 0.4) };
+        const b = spawn(ctx, ART2.butterfly(rnd(20, 30)), st, { life: 1400 });
+        const t = rnd(-Math.PI, 0);
+        fly(ctx, b, st, { x: st.x + Math.cos(t) * rnd(80, 200), y: st.y + Math.sin(t) * rnd(60, 160) }, rnd(700, 1100), { rotate: 0, ease: 'ease-out' }).then(() => b.remove());
+      }
+    },
+  },
+  paper_shuriken: {
+    desc: 'User throws a shuriken made of paper at the target.',
+    async play(ctx) { const s = spawn(ctx, ART7.paperStar(46), ctx.from, { life: 1100 }); await fly(ctx, s, ctx.from, ctx.tos[0], 380, { rotate: 0, arc: 20 }); s.remove(); FX.fx(ctx.arena, 'slash', ctx.tos[0]); shake(ctx); },
+  },
+  paper_spear: {
+    desc: 'User fires a spear made of sheets of paper at the target.',
+    async play(ctx) {
+      const spear = (len) => `<svg width="${len}" height="20" viewBox="0 0 ${len} 20"><path d="M0 7H${len - 26}V13H0Z" fill="#fbfbf7" stroke="#bdbdb2"/>${Array.from({ length: Math.floor(len / 18) }, (_, i) => `<path d="M${i * 18} 7l8-4 0 14-8-4" fill="#efefe6" stroke="#cfcfc4"/>`).join('')}<path d="M${len - 28} 2 ${len} 10 ${len - 28} 18Z" fill="#fbfbf7" stroke="#9a9a90"/></svg>`;
+      const n = await stretch(ctx, ctx.from, ctx.tos[0], spear, 240, 1300);
+      boom(ctx, ctx.tos[0], '#ffffff', 90); shake(ctx); setTimeout(() => fade(ctx, n, 250), 250 * ctx.sp);
+    },
+  },
+  parasitic_demon: {
+    desc: 'User flies over and merges into the target, who is then hit by a purple aura.',
+    async play(ctx) {
+      const to = ctx.tos[0]; const g = ghostOf(ctx, ctx.from, 0.7);
+      ctx.userEl.animate([{ opacity: 1 }, { opacity: 0, offset: 0.15 }, { opacity: 0, offset: 0.85 }, { opacity: 1 }], { duration: 1400 * ctx.sp });
+      await fly(ctx, g, ctx.from, to, 380, { rotate: 0, scale: [1, 0.6] });
+      await g.animate([{ opacity: 0.7 }, { opacity: 0 }], { duration: 250 * ctx.sp, fill: 'forwards' }).finished.catch(() => {}); g.remove();
+      glowAura(ctx, ctx.targetEls[0], '#b44bff', 900); boom(ctx, to, '#b44bff', 120); shake(ctx); await wait(300 * ctx.sp);
+    },
+  },
+  insect_swarm: {
+    desc: 'User sends a swarm of small black insects that engulfs the target.',
+    async play(ctx) { const bugs = await swarm(ctx, ctx.tos[0], 'ball'); shake(ctx); await wait(700 * ctx.sp); bugs.forEach((b) => fade(ctx, b, 300)); },
+  },
+  partial_expansion: {
+    desc: 'User grows a giant arm and strikes the enemies with it.',
+    async play(ctx) {
+      const box = sideBox(ctx); const tgt = { x: box.c.x, y: box.c.y };
+      const arm = (len) => `<svg width="${len + 70}" height="90" viewBox="0 0 ${len + 70} 90"><path d="M0 32Q${len / 2} 20 ${len} 22V68Q${len / 2} 70 0 58Z" fill="#e8b98e" stroke="#7a4a2a" stroke-width="3"/><path d="M${len - 6} 10C${len + 40} 4 ${len + 70} 24 ${len + 66} 46S${len + 40} 88 ${len - 6} 80Z" fill="#f0c49a" stroke="#7a4a2a" stroke-width="3"/><path d="M${len + 30} 22V36M${len + 44} 24V38M${len + 56} 30V42" stroke="#7a4a2a" stroke-width="3"/></svg>`;
+      const n = await stretch(ctx, ctx.from, between(ctx.from, tgt, 0.8), arm, 380, 1500);
+      n.animate([{ transform: `translate(0,-50%) rotate(${ang(ctx.from, tgt) - 14}deg)` }, { transform: `translate(0,-50%) rotate(${ang(ctx.from, tgt) + 14}deg)` }], { duration: 300 * ctx.sp, fill: 'forwards' });
+      await wait(200 * ctx.sp);
+      ctx.tos.forEach((t) => boom(ctx, t, '#ffffff', 100)); shake(ctx);
+      setTimeout(() => fade(ctx, n, 300), 250 * ctx.sp);
+    },
+  },
+  passing_fang: {
+    desc: 'User flies at high speed and bites the target.',
+    async play(ctx) {
+      const to = await lunging(ctx, 0.78, 380);
+      const bite = spawn(ctx, '<svg width="60" height="44" viewBox="0 0 40 30"><path d="M4 8Q20 0 36 8M4 22Q20 30 36 22" stroke="#fff" stroke-width="3" fill="none"/><path d="M10 7v6M16 5v7M22 5v7M28 6v6M10 23v-6M16 25v-7M22 25v-7M28 24v-6" stroke="#fff" stroke-width="2.4" stroke-linecap="round"/></svg>', to, { life: 800 });
+      bite.animate([{ transform: 'translate(-50%,-50%) scaleY(1.6)', opacity: 0 }, { transform: 'translate(-50%,-50%) scaleY(.6)', opacity: 1, offset: 0.4 }, { transform: 'translate(-50%,-50%) scaleY(.6)', opacity: 0 }], { duration: 500 * ctx.sp, fill: 'forwards' });
+      shake(ctx);
+    },
+  },
+  susanoo_sword: {
+    desc: 'User swings a giant sword that strikes every enemy at once, with a blue aura on the strike.',
+    async play(ctx) {
+      const box = sideBox(ctx); const len = Math.hypot(box.c.x - ctx.from.x, box.c.y - ctx.from.y) + box.w * 0.3;
+      const sword = `<svg width="${len}" height="34" viewBox="0 0 ${len} 34" style="filter:drop-shadow(0 0 14px #4aa3ff)"><rect x="0" y="12" width="60" height="10" rx="4" fill="#3a5aa8"/><path d="M60 4H${len - 40}L${len} 17 ${len - 40} 30H60Z" fill="#9fd8ffcc" stroke="#e6f6ff" stroke-width="2"/></svg>`;
+      const s = spawn(ctx, sword, ctx.from, { life: 1400 }); s.style.transformOrigin = '0 50%';
+      const a = ang(ctx.from, box.c); const sw = ctx.isFoe ? 60 : -60;
+      await s.animate([{ transform: `translate(0,-50%) rotate(${a + sw}deg)`, opacity: 0 }, { transform: `translate(0,-50%) rotate(${a + sw}deg)`, opacity: 1, offset: 0.35 }, { transform: `translate(0,-50%) rotate(${a - sw * 0.3}deg)`, opacity: 1 }], { duration: 650 * ctx.sp, easing: 'ease-in', fill: 'forwards' }).finished.catch(() => {});
+      ctx.tos.forEach((t) => { slashArc(ctx, t, { size: 140, rot: 30 }); boom(ctx, t, '#6cc4ff', 130); }); shake(ctx); fade(ctx, s, 300);
+    },
+  },
+  poison_extraction: { desc: 'User moves over to the ally and applies a green healing aura to them.', play: (ctx) => ANIMS.antidote.play(ctx) },
+  hanzo_kusarigama: {
+    desc: 'User strikes the target with their sickle; the hit has a purple aura.',
+    async play(ctx) {
+      const to = ctx.tos[0];
+      const sickle = (len) => `<svg width="${len + 30}" height="40" viewBox="0 0 ${len + 30} 40"><path d="M0 20H${len}" stroke="#b9c0c8" stroke-width="3" stroke-dasharray="6 3"/><path d="M${len} 20V8" stroke="#6b4a2a" stroke-width="4"/><path d="M${len} 8C${len + 20} 6 ${len + 30} 18 ${len + 26} 30 ${len + 20} 18 ${len + 12} 12 ${len} 12Z" fill="#c9ced6" stroke="#444" stroke-width="1.5"/></svg>`;
+      const n = await stretch(ctx, ctx.from, between(ctx.from, to, 0.9), sickle, 300, 1300);
+      slashArc(ctx, to, { color: '#d9b3ff', glow: '#7a2bd6', size: 110, rot: 60 }); boom(ctx, to, '#b44bff', 90); shake(ctx);
+      setTimeout(() => fade(ctx, n, 250), 250 * ctx.sp);
+    },
+  },
+  poison_mist: {
+    desc: 'User sprays a purple poison cloud over every enemy.',
+    async play(ctx) { for (let i = 0; i < 3; i++) puff(ctx, { x: ctx.from.x + (ctx.isFoe ? -30 : 30), y: ctx.from.y - 30 }, '#9a3bdc', 70); const { fog, go } = mistOver(ctx, '#9a3bdc'); await go; shake(ctx); setTimeout(() => fade(ctx, fog, 600), 700 * ctx.sp); },
+  },
+  poison_bomb: {
+    desc: 'User throws a round smoke bomb at the enemies that bursts into a purple poison cloud.',
+    async play(ctx) {
+      const box = sideBox(ctx);
+      const b = spawn(ctx, '<div style="width:24px;height:24px;border-radius:50%;background:radial-gradient(circle at 35% 35%,#8a8f99,#2a2d33);border:1.5px solid #111"></div>', ctx.from, { life: 1200 });
+      await fly(ctx, b, ctx.from, box.c, 480, { rotate: 0, arc: 90, ease: 'ease-in-out' }); b.remove();
+      const c = purpleCloud(ctx, box.c, box.w + 140, box.h + 60);
+      await grow(ctx, c, 380, 'scale(.1)', 'scale(1)'); shake(ctx); setTimeout(() => fade(ctx, c, 600), 600 * ctx.sp);
+    },
+  },
+  preta_absorb: {
+    desc: 'A transparent red ring of aura spreads around the user.',
+    async play(ctx) {
+      const { h } = ctx.userSize;
+      const r = spawn(ctx, `<div style="width:${h * 0.9}px;height:${h * 0.9}px;border-radius:50%;background:radial-gradient(circle,#ff2a2a00 40%,#ff2a2a44 62%,#ff2a2a00 72%);border:3px solid #ff5a5a88;box-shadow:0 0 18px #ff2a2a88"></div>`, ctx.from, { life: 1800 });
+      await grow(ctx, r, 450, 'scale(.3)', 'scale(1)');
+      for (let i = 0; i < 10; i++) { const st = { x: ctx.tos[0].x + rnd(-30, 30), y: ctx.tos[0].y + rnd(-40, 40) }; const d = spawn(ctx, '<div style="width:8px;height:8px;border-radius:50%;background:#ff8a8a;box-shadow:0 0 6px #ff2a2a"></div>', st, { life: 900 }); fly(ctx, d, st, ctx.from, 500, { rotate: 0, ease: 'ease-in' }).then(() => d.remove()); }
+      shake(ctx); await wait(600 * ctx.sp); fade(ctx, r, 300);
+    },
+  },
+  puppet_switch: {
+    desc: 'When the user is struck, they turn into a puppet (the grey-brown, four-armed Crow puppet).',
+    async play(ctx) { FX.ring(ctx.arena, ctx.userEl, 'aura'); await wait(400 * ctx.sp); },
+    decoy(ctx, el) {
+      const f = feetOf({ arena: ctx.arena }, el); const { h } = sizeOf(el);
+      el.animate([{ opacity: 1 }, { opacity: 0, offset: 0.08 }, { opacity: 0, offset: 0.85 }, { opacity: 1 }], { duration: 1500 * ctx.sp });
+      const p = spawn(ctx, ART2.puppet().replace('width="125" height="150"', `width="${h * 0.6}" height="${h * 0.72}"`), { x: f.x, y: f.y - h * 0.36 }, { life: 1700 });
+      p.animate([{ transform: 'translate(-50%,-50%) rotate(0deg)', opacity: 1 }, { transform: 'translate(-50%,-50%) rotate(-10deg)', opacity: 1, offset: 0.2 }, { transform: 'translate(-50%,-50%) rotate(6deg)', opacity: 1, offset: 0.4 }, { transform: 'translate(-50%,-50%) rotate(0deg)', opacity: 1, offset: 0.8 }, { transform: 'translate(-50%,-50%)', opacity: 0 }], { duration: 1400 * ctx.sp, fill: 'forwards' });
+    },
+  },
+  rasengan: { desc: 'User forms a small blue spiraling orb, dashes in and strikes the target with it.', play: (ctx) => rasenganStrike(ctx, 44) },
+  massive_rasengan: { desc: 'User forms a massive blue spiraling orb, dashes in and strikes the target with it.', play: (ctx) => rasenganStrike(ctx, 110) },
+  thrown_rasenshuriken: {
+    desc: "User forms a large blue spiraling orb with four spinning fins and throws it at the enemies' side, where it bursts into an expanding blue dome that hits every enemy.",
+    async play(ctx) {
+      const box = sideBox(ctx); const hand = { x: ctx.from.x, y: ctx.from.y - ctx.userSize.h * 0.45 };
+      const rs = spawn(ctx, `<div style="position:relative;width:140px;height:140px"><div class="ax-spin" style="position:absolute;inset:0;animation-duration:.25s;background:conic-gradient(#e8f6ff 0 8deg,#0000 8deg 90deg,#e8f6ff 90deg 98deg,#0000 98deg 180deg,#e8f6ff 180deg 188deg,#0000 188deg 270deg,#e8f6ff 270deg 278deg,#0000 278deg);-webkit-mask:radial-gradient(circle,#0000 30%,#000 32%,#000 70%,#0000 71%);mask:radial-gradient(circle,#0000 30%,#000 32%,#000 70%,#0000 71%);filter:drop-shadow(0 0 8px #9fd8ff)"></div><div style="position:absolute;left:35px;top:35px">${ART.rasengan(70)}</div></div>`, hand, { life: 2400 });
+      await pop(ctx, rs, 400); await wait(200 * ctx.sp);
+      await fly(ctx, rs, hand, box.c, 480, { rotate: 0, arc: 40, ease: 'ease-in' }); rs.remove();
+      const d = box.w + 160;
+      const dome = spawn(ctx, `<div style="width:${d}px;height:${d * 0.7}px;border-radius:50%;background:radial-gradient(ellipse,#ffffff 0%,#cfeeffcc 30%,#6cb8ff88 55%,#6cb8ff00 72%);box-shadow:0 0 30px #6cb8ff"></div>`, box.c, { life: 1600 });
+      await grow(ctx, dome, 420, 'scale(.05)', 'scale(1)'); shake(ctx); fade(ctx, dome, 500);
+    },
+  },
+  reaper_death_seal: {
+    desc: 'User flies in and strikes the target; a Shinigami mask appears over both of them and both take damage.',
+    async play(ctx) {
+      const to = await lunging(ctx, 0.7, 500); boom(ctx, to, '#b44bff', 100);
+      const masks = [ctx.userEl, ctx.targetEls[0]].map((el) => { const r = el.getBoundingClientRect(); const a = ctx.arena.getBoundingClientRect(); const m = spawn(ctx, ART7.shinigami(Math.max(60, r.height * 0.32)), { x: r.left - a.left + r.width / 2, y: r.top - a.top + r.height * 0.18 }, { life: 1800 }); pop(ctx, m, 300); return m; });
+      await wait(650 * ctx.sp); shake(ctx); shakeEl(ctx.userEl); await wait(300 * ctx.sp); masks.forEach((m) => fade(ctx, m, 300));
+    },
+  },
+  hundred_puppets: {
+    desc: 'A host of human-shaped puppets in red robes, tied to the user by blue chakra threads, appear above the user and fly in one by one to strike every enemy.',
+    async play(ctx) {
+      const { h } = ctx.userSize; const top = { x: ctx.from.x, y: Math.max(30, ctx.from.y - h * 0.75) };
+      const ps = Array.from({ length: 9 }, (_, i) => { const at = { x: top.x + (i - 4) * 26, y: top.y + (i % 2) * 18 }; const p = spawn(ctx, ART7.puppetRed(h * 0.3), at, { life: 4200 }); p.style.opacity = '0'; setTimeout(() => pop(ctx, p, 150), i * 40 * ctx.sp); return [p, at]; });
+      await wait(500 * ctx.sp);
+      const hands = { x: ctx.from.x, y: ctx.from.y - h * 0.1 };
+      for (const [i, [p, at]] of ps.entries()) {
+        const ti = i % ctx.tos.length; const t = ctx.tos[ti];
+        const th = await stretch(ctx, hands, at, (len) => `<svg width="${len}" height="4" viewBox="0 0 ${len} 4"><path d="M0 2H${len}" stroke="#8fd3ff" stroke-width="1.2" style="filter:drop-shadow(0 0 2px #4aa3ff)"/></svg>`, 60, 1400);
+        fly(ctx, p, at, { x: t.x + rnd(-20, 20), y: t.y + rnd(-30, 10) }, 260, { rotate: 0, ease: 'ease-in' }).then(() => { boom(ctx, t, '#ffffff', 60); shakeEl(ctx.targetEls[ti]); fade(ctx, p, 250); fade(ctx, th, 250); });
+        await wait(110 * ctx.sp);
+      }
+      await wait(300 * ctx.sp);
+    },
+  },
+  habanero_fury: {
+    desc: 'User flies in and strikes the target with a flurry of red-glowing blows.',
+    async play(ctx) { ctx.userEl.animate([{ filter: 'none' }, { filter: 'drop-shadow(0 0 12px #ff2a2a)', offset: 0.2 }, { filter: 'drop-shadow(0 0 12px #ff2a2a)', offset: 0.85 }, { filter: 'none' }], { duration: 1100 * ctx.sp }); await flurryIn(ctx, 7, '#ff4a4a'); },
+  },
+  reverse_tetragram: {
+    desc: 'The Four Symbols Seal appears on the target, then a spray of black aura shoots at them and engulfs them in a semi-transparent black orb.',
+    async play(ctx) {
+      const to = ctx.tos[0]; const { h } = sizeOf(ctx.targetEls[0]);
+      const s = spawn(ctx, ART7.fourSymbols(Math.max(80, h * 0.42)), to, { life: 2400 });
+      await s.animate([{ transform: 'translate(-50%,-50%) scale(1.8) rotate(-90deg)', opacity: 0 }, { transform: 'translate(-50%,-50%) scale(1) rotate(0deg)', opacity: 1 }], { duration: 400 * ctx.sp, fill: 'forwards' }).finished.catch(() => {});
+      for (let i = 0; i < 18; i++) { const d = spawn(ctx, `<div style="width:${rnd(10, 20)}px;height:${rnd(10, 20)}px;border-radius:50%;background:#050505;box-shadow:0 0 8px #000"></div>`, ctx.from, { life: 900 }); fly(ctx, d, ctx.from, { x: to.x + rnd(-30, 30), y: to.y + rnd(-40, 40) }, 340, { rotate: 0, arc: rnd(-30, 30) }).then(() => d.remove()); await wait(18 * ctx.sp); }
+      await wait(300 * ctx.sp);
+      const orb = spawn(ctx, `<div style="width:${h * 0.95}px;height:${h * 0.95}px;border-radius:50%;background:radial-gradient(circle,#00000055,#000000aa 65%,#000000cc);box-shadow:0 0 20px #000"></div>`, to, { life: 1800 });
+      await grow(ctx, orb, 300, 'scale(.2)', 'scale(1)'); shake(ctx); await wait(450 * ctx.sp); fade(ctx, orb, 300); fade(ctx, s, 300);
+    },
+  },
+  insect_tackle: {
+    desc: 'User flies in and strikes the target with their bug wings.',
+    async play(ctx) {
+      const { h } = ctx.userSize; const ws = [-1, 1].map((side) => { const w = spawn(ctx, `<div class="ax-flap" style="animation-duration:.12s">${ART2.wing(h * 0.42)}</div>`, ctx.from, { life: 1300, z: 5 }); w.style.transformOrigin = '0 50%'; w.style.transform = `translate(0,-50%) rotate(${side < 0 ? 200 : -20}deg)`; return w; });
+      await wait(250 * ctx.sp); ws.forEach((w) => fade(ctx, w, 200));
+      const to = await lunging(ctx, 0.72, 460); slashArc(ctx, to, { color: '#ffe9a8', glow: '#ffcf5a', size: 120, rot: 20 }); shake(ctx);
+    },
+  },
+  ritual_stab: {
+    desc: 'User stabs themself with a black spike.',
+    async play(ctx) {
+      const { h } = ctx.userSize; const at = { x: ctx.from.x, y: ctx.from.y };
+      const s = spawn(ctx, ART.spike(70, '#0d0d0d'), { x: at.x + (ctx.isFoe ? 60 : -60), y: at.y - h * 0.2 }, { life: 1200 });
+      await fly(ctx, s, { x: at.x + (ctx.isFoe ? 60 : -60), y: at.y - h * 0.2 }, at, 260, { ease: 'ease-in' });
+      boom(ctx, at, '#8a1020', 90); shakeEl(ctx.userEl); await wait(400 * ctx.sp); fade(ctx, s, 250);
+    },
+  },
+  sage_arm_cannon: {
+    desc: 'User fires a high-speed volley of blue chakra at the target.',
+    async play(ctx) { for (let i = 0; i < 9; i++) { const b = spawn(ctx, '<div style="width:22px;height:22px;border-radius:50%;background:radial-gradient(circle,#fff,#8fd3ff 45%,#4aa3ff00 72%);box-shadow:0 0 12px #4aa3ff"></div>', ctx.from, { life: 600 }); fly(ctx, b, ctx.from, { x: ctx.tos[0].x + rnd(-14, 14), y: ctx.tos[0].y + rnd(-20, 20) }, 180, { rotate: 0, ease: 'linear' }).then(() => { b.remove(); boom(ctx, ctx.tos[0], '#6cc4ff', 60); shake(ctx); }); await wait(55 * ctx.sp); } await wait(200 * ctx.sp); },
+  },
+  inorganic_animation: {
+    desc: 'The ground under the enemies turns into chaotic earth spikes that hit each of them.',
+    async play(ctx) {
+      ctx.targetEls.forEach((el) => { const f = feetOf(ctx, el); const { h } = sizeOf(el); for (let i = 0; i < 6; i++) { const n = spawn(ctx, `<svg width="22" height="${h * rnd(0.4, 0.8)}" viewBox="0 0 22 100" preserveAspectRatio="none"><path d="M11 0 22 100H0Z" fill="#8a7f72" stroke="#4e463e" stroke-width="1.5" vector-effect="non-scaling-stroke"/></svg>`, { x: f.x + rnd(-50, 50), y: f.y + rnd(-4, 8) }, { life: 1500 }); n.style.transform = `translate(-50%,-100%) rotate(${rnd(-25, 25)}deg) scaleY(0)`; n.style.transformOrigin = '50% 100%'; n.animate([{ transform: `translate(-50%,-100%) rotate(${rnd(-25, 25)}deg) scaleY(0)` }, { transform: `translate(-50%,-100%) rotate(${rnd(-25, 25)}deg) scaleY(1)` }], { duration: 200 * ctx.sp, delay: rnd(0, 200) * ctx.sp, fill: 'both' }); setTimeout(() => fade(ctx, n, 300), 900 * ctx.sp); } });
+      await wait(350 * ctx.sp); shake(ctx);
+    },
+  },
+  snake_dragon: {
+    desc: 'User fires a red, semi-transparent, wingless long-bodied chakra dragon at the target.',
+    async play(ctx) {
+      const to = ctx.tos[0]; const d = spawn(ctx, ART7.redDragon(180), ctx.from, { life: 1300 });
+      if (to.x < ctx.from.x) d.firstElementChild.style.transform = 'scaleX(-1)';
+      d.firstElementChild.animate([{ translate: '0 0' }, { translate: '0 -8px' }, { translate: '0 6px' }, { translate: '0 0' }], { duration: 300 * ctx.sp, iterations: 3 });
+      await fly(ctx, d, ctx.from, to, 520, { rotate: 0, ease: 'ease-in' }); d.remove();
+      boom(ctx, to, '#ff3a3a', 150); shake(ctx);
+    },
+  },
+  thousand_hands: {
+    desc: 'A giant wooden Buddha with many hands appears behind the enemies and strikes each of them many times.',
+    async play(ctx) {
+      const box = sideBox(ctx);
+      const bw = Math.min(box.w * 1.05, (box.y2 - 10) / 0.9 * 1.0); const b = spawn(ctx, ART7.buddha(bw), { x: box.c.x, y: Math.max(bw * 0.45, box.y1 + box.h * 0.2) }, { life: 3200, z: 1 });
+      await b.animate([{ transform: 'translate(-50%,-50%) translateY(60px)', opacity: 0 }, { transform: 'translate(-50%,-50%) translateY(0)', opacity: 0.95 }], { duration: 500 * ctx.sp, easing: 'ease-out', fill: 'forwards' }).finished.catch(() => {});
+      for (let i = 0; i < 15; i++) { const ti = i % ctx.tos.length; const t = ctx.tos[ti]; const st = { x: box.c.x + rnd(-box.w * 0.5, box.w * 0.5), y: box.y1 - 20 }; const fist = spawn(ctx, ART3.rockFist(44).replaceAll('#8a7f72', '#9b6b3e').replaceAll('#4e463e', '#5a3a1e').replaceAll('#5f564c', '#6b4626'), st, { life: 700, z: 7 }); fly(ctx, fist, st, { x: t.x + rnd(-20, 20), y: t.y + rnd(-30, 20) }, 180, { rotate: 0, ease: 'ease-in' }).then(() => { fist.remove(); boom(ctx, t, '#d9b38a', 60); shakeEl(ctx.targetEls[ti]); }); await wait(60 * ctx.sp); }
+      await wait(250 * ctx.sp); fade(ctx, b, 400);
+    },
+  },
+  white_rage: {
+    desc: 'User sends out a sound wave that strikes each enemy.',
+    async play(ctx) {
+      for (let k = 0; k < 4; k++) { const r = spawn(ctx, '<div style="width:80px;height:80px;border-radius:50%;border:4px solid #ffffffcc;box-shadow:0 0 12px #fff"></div>', ctx.from, { life: 900 }); const far = Math.max(...ctx.tos.map((t) => Math.hypot(t.x - ctx.from.x, t.y - ctx.from.y))) * 2.2 / 80; r.animate([{ transform: 'translate(-50%,-50%) scale(.3)', opacity: 1 }, { transform: `translate(-50%,-50%) scale(${far})`, opacity: 0 }], { duration: 600 * ctx.sp, easing: 'ease-out', fill: 'forwards' }); await wait(110 * ctx.sp); }
+      await wait(200 * ctx.sp); shake(ctx);
+    },
+  },
+  saiken_bomb: { desc: 'A black orb with a purple aura and tiny blue and red sparks grows in front of the user, then fires at the enemies.', play: (ctx) => ANIMS.chomei_bomb.play(ctx) },
+  salamander_guard: {
+    desc: 'A large grey-brown salamander drops down in front of the user.',
+    async play(ctx) { const f = feetOf(ctx, ctx.userEl); const at = { x: f.x + (ctx.isFoe ? -60 : 60), y: f.y - 50 }; const s = spawn(ctx, ART7.salamander(200), { x: at.x, y: at.y - 200 }, { life: 2000, z: 7 }); if (ctx.isFoe) s.firstElementChild.style.transform = 'scaleX(-1)'; await fly(ctx, s, { x: at.x, y: at.y - 200 }, at, 300, { rotate: 0, ease: 'ease-in' }); puff(ctx, { x: at.x, y: f.y }, '#b9a689', 120); await wait(800 * ctx.sp); fade(ctx, s, 350); },
+  },
+  salamander_shield: {
+    desc: 'A larger grey-brown salamander drops down in front of the whole ally team.',
+    async play(ctx) { const box = sideBox(ctx); const at = { x: box.c.x + (ctx.isFoe ? -30 : 30), y: box.y2 - box.h * 0.45 }; const s = spawn(ctx, ART7.salamander(Math.min(520, box.w * 0.85)), { x: at.x, y: at.y - 260 }, { life: 2200, z: 7 }); if (ctx.isFoe) s.firstElementChild.style.transform = 'scaleX(-1)'; await fly(ctx, s, { x: at.x, y: at.y - 260 }, at, 340, { rotate: 0, ease: 'ease-in' }); for (let i = 0; i < 4; i++) puff(ctx, { x: at.x + rnd(-box.w / 2, box.w / 2), y: box.y2 }, '#b9a689', 120); await wait(900 * ctx.sp); fade(ctx, s, 350); },
+  },
+  samehada_shred: {
+    desc: 'User dashes in and slashes the target with Samehada.',
+    async play(ctx) { const to = ctx.tos[0]; const hit = lunge(ctx, to, 0.62, 560); const b = spawn(ctx, ART7.samehada(160), ctx.from, { life: 1100 }); if (ctx.isFoe) b.firstElementChild.style.transform = 'scaleX(-1)'; await fly(ctx, b, ctx.from, hit, 260, { rotate: ctx.isFoe ? 30 : -30, ease: 'ease-in-out' }); slashArc(ctx, to, { color: '#9fb4ff', glow: '#3a5aa8', size: 150, rot: 40 }); shake(ctx); fade(ctx, b, 250); },
+  },
+  samurai_stance: { desc: 'The user glows with a silver aura.', async play(ctx) { glowAura(ctx, ctx.userEl, '#dfe6ef', 1200); await wait(600 * ctx.sp); } },
 });
 
 // ---------------------------------------------------------------- generic fallback (what every other jutsu does)

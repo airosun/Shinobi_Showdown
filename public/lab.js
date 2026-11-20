@@ -1,7 +1,7 @@
 // Jutsu Animation Lab: browse every jutsu and play its battle animation on a practice field.
 import { SHINOBI, SHINOBI_BY_ID } from './data/shinobi.js';
 import { JUTSU } from './data/jutsu.js';
-import { ANIMS, playJutsu, playDecoy, poof, logSubstitute } from './anim.js';
+import { ANIMS, playJutsu, playDecoy, poof, logSubstitute, poisonBubbles } from './anim.js';
 
 const KUNAI = { id: 'kunai', name: 'Kunai & Shuriken', category: 'taijutsu', nature: null, power: 25, cost: 0, priority: 2, target: 'enemy', effects: [], desc: 'The basic thrown attack every shinobi has.' };
 const USERS = {};
@@ -93,6 +93,7 @@ async function play() {
   const j = BY_ID[S.id];
   const { arena, user, targets, sideEls } = targetsFor(j);
   await playJutsu(arena, j, user, targets, { sp: S.speed, sideEls, isFoe: S.fromFoe });
+  if (j.effects?.some((e) => e.type === 'poison')) targets.forEach((t) => poisonBubbles(arena, t, { sp: S.speed }));
   await new Promise((r) => setTimeout(r, 400));
   playing = false;
   if (S.again) play();

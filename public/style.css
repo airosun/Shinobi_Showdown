@@ -485,3 +485,6 @@ button.linkish:hover:not(:disabled) { background: none; color: var(--accent); }
 .arena .mon.foe.droop .spr { transform: translateY(22px) rotate(-4deg); }
 .arena .mind-orb { position: absolute; left: 50%; top: 22%; width: 28px; height: 28px; transform: translate(-50%, -50%); border-radius: 50%; z-index: 4; pointer-events: none;
   background: radial-gradient(circle, #fff, #8fd3ff 40%, #4aa3ff88 65%, #4aa3ff00 72%); box-shadow: 0 0 16px #4aa3ff; animation: tsu-pulse 1.4s ease-in-out infinite; }
+
+/* Hidan's curse: the ritual mark stays under Hidan and his linked target */
+.arena .curse-mark { position: absolute; left: 50%; bottom: -14px; transform: translateX(-50%); z-index: -1; pointer-events: none; animation: tsu-in .5s ease-out; }
