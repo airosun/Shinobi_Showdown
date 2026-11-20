@@ -2448,7 +2448,7 @@ Object.assign(ANIMS, {
     desc: "Blue flame jet boosters appear on the user and blast them at the target for a high-speed punch.",
     async play(ctx) {
       const to = ctx.tos[0]; const back = ctx.isFoe ? 1 : -1;
-      const jets = [-14, 14].map((dy) => { const n = spawn(ctx, `<div style="transform:rotate(${back > 0 ? -90 : 90}deg)">${ART.flame(30, '#2f7bff', '#bfe0ff')}</div>`, { x: ctx.from.x + back * 30, y: ctx.from.y + dy }, { life: 1200 }); pop(ctx, n, 150); return n; });
+      const jets = [-14, 14].map((dy) => { const n = spawn(ctx, `<div style="transform:rotate(${back > 0 ? 90 : -90}deg)">${ART.flame(30, '#2f7bff', '#bfe0ff')}</div>`, { x: ctx.from.x + back * 30, y: ctx.from.y + dy }, { life: 1200 }); pop(ctx, n, 150); return n; });
       await wait(250 * ctx.sp);
       const k = 0.72; lunge(ctx, to, k, 420);
       jets.forEach((j, i) => fly(ctx, j, { x: ctx.from.x + back * 30, y: ctx.from.y + (i ? 14 : -14) }, { x: ctx.from.x + (to.x - ctx.from.x) * k * 0.9 + back * 30, y: ctx.from.y + (to.y - ctx.from.y) * k * 0.9 }, 190, { rotate: 0 }));
