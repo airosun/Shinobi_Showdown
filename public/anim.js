@@ -3273,7 +3273,7 @@ Object.assign(ANIMS, {
 // ---------------------------------------------------------------- batch 8 (sheet rows 268–305)
 const ART8 = {
   sandStar: (s = 34) => `<svg width="${s}" height="${s}" viewBox="-10 -10 20 20" class="ax-spin"><path d="M0-10 2-2 10 0 2 2 0 10-2 2-10 0-2-2Z" fill="#d9b56a" stroke="#8a6a3a" stroke-width=".8"/><circle r="2" fill="#a8864e"/></svg>`,
-  scythe: (s = 90) => `<svg width="${s}" height="${s}" viewBox="0 0 100 100" class="ax-spin" style="animation-duration:.3s"><path d="M50 50V96" stroke="#3a3a3a" stroke-width="5"/>${[0, 120, 240].map((a) => `<path transform="rotate(${a} 50 50)" d="M50 50C50 30 62 14 84 8 72 22 66 34 64 50Z" fill="#c8202a" stroke="#5a0a10" stroke-width="2"/>`).join('')}<circle cx="50" cy="50" r="5" fill="#222"/></svg>`,
+  scythe: (s = 90) => `<svg width="${s}" height="${s}" viewBox="0 0 100 100" class="ax-spin" style="animation-duration:.3s"><path d="M50 8V96" stroke="#3a3a3a" stroke-width="5" stroke-linecap="round"/>${[8, 26, 44].map((y, k) => `<path d="M50 ${y}C${66 + k * 2} ${y - 4} ${86 - k * 4} ${y + 4} ${94 - k * 6} ${y + 20 - k * 2} ${80 - k * 4} ${y + 12} ${66} ${y + 10} 50 ${y + 12}Z" fill="#c8202a" stroke="#5a0a10" stroke-width="2"/>`).join('')}</svg>`,
   heart: (s = 34) => `<svg width="${s}" height="${s}" viewBox="0 0 20 20" style="filter:drop-shadow(0 0 6px #ff6fb5)"><path d="M10 18C2 12 0 8 2 4 4 0 9 1 10 5 11 1 16 0 18 4 20 8 18 12 10 18Z" fill="#ff7ec0" stroke="#fff" stroke-width="1"/></svg>`,
   web: (s = 120, c = '#ffd65a') => `<svg width="${s}" height="${s}" viewBox="0 0 100 100" style="filter:drop-shadow(0 0 6px ${c})"><g stroke="${c}" stroke-width="2" fill="none">${Array.from({ length: 8 }, (_, i) => { const a = (i / 8) * Math.PI * 2; return `<path d="M50 50L${50 + Math.cos(a) * 48} ${50 + Math.sin(a) * 48}"/>`; }).join('')}${[12, 24, 36, 47].map((r) => `<path d="${Array.from({ length: 9 }, (_, i) => { const a = (i / 8) * Math.PI * 2; return `${i ? 'L' : 'M'}${50 + Math.cos(a) * r} ${50 + Math.sin(a) * r}`; }).join('')}"/>`).join('')}</g></svg>`,
   goldBow: (s = 110) => `<svg width="${s * 0.5}" height="${s}" viewBox="0 0 50 100" style="filter:drop-shadow(0 0 8px #ffd65a)"><path d="M8 4C44 30 44 70 8 96" stroke="#e6b422" stroke-width="6" fill="none" stroke-linecap="round"/><path d="M8 4V96" stroke="#fff3b0" stroke-width="1.4"/></svg>`,
@@ -3305,17 +3305,21 @@ Object.assign(ANIMS, {
   human_boulder: { desc: 'User turns into a round brown ball and rolls into the target.', play: (ctx) => boulderRoll(ctx, false) },
   spiked_boulder: { desc: 'User turns into a spiky brown ball and rolls into the target.', play: (ctx) => boulderRoll(ctx, true) },
   sand_burial: {
-    desc: 'Sand gathers beneath the target and they sink into it.',
+    desc: 'Sand gathers beneath the target and they sink into it, staying buried until the animation ends.',
     async play(ctx) {
       const el = ctx.targetEls[0]; const f = feetOf(ctx, el); const { h } = sizeOf(el);
-      const pool = spawn(ctx, '<div style="width:170px;height:44px;border-radius:50%;background:radial-gradient(ellipse,#e8cf96,#c9a86b 55%,#c9a86b00 72%)"></div>', f, { life: 2400, z: 1 });
+      const total = 2100;
+      const pool = spawn(ctx, '<div style="width:170px;height:44px;border-radius:50%;background:radial-gradient(ellipse,#e8cf96,#c9a86b 55%,#c9a86b00 72%)"></div>', f, { life: total + 600, z: 1 });
       await pop(ctx, pool, 300);
-      const mound = spawn(ctx, `<div style="width:130px;height:${h * 0.5}px;border-radius:50% 50% 10% 10%;background:radial-gradient(ellipse at 50% 30%,#f2deb0,#d9b56a 55%,#a8864e)"></div>`, { x: f.x, y: f.y + 6 }, { life: 2400, z: 4 });
-      rise(ctx, mound, 700);
-      el.animate([{ clipPath: 'inset(0 0 0 0)', transform: 'translateY(0)' }, { clipPath: 'inset(0 0 55% 0)', transform: `translateY(${h * 0.5}px)`, offset: 0.5 }, { clipPath: 'inset(0 0 55% 0)', transform: `translateY(${h * 0.5}px)`, offset: 0.75 }, { clipPath: 'inset(0 0 0 0)', transform: 'translateY(0)' }], { duration: 1500 * ctx.sp, easing: 'ease-in-out' });
-      await wait(800 * ctx.sp);
-      boom(ctx, ctx.tos[0], '#d9b56a', 130); shake(ctx);
-      await wait(300 * ctx.sp); fade(ctx, mound, 300); fade(ctx, pool, 300);
+      const mound = spawn(ctx, `<div style="width:130px;height:${h * 0.42}px;border-radius:50% 50% 10% 10%;background:radial-gradient(ellipse at 50% 30%,#f2deb0,#d9b56a 55%,#a8864e)"></div>`, { x: f.x, y: f.y + 6 }, { life: total + 600, z: 4 });
+      rise(ctx, mound, 600);
+      el.animate([{ clipPath: 'inset(0 0 0 0)', transform: 'translateY(0)' }, { clipPath: 'inset(0 0 100% 0)', transform: `translateY(${h}px)`, offset: 0.3 }, { clipPath: 'inset(0 0 100% 0)', transform: `translateY(${h}px)`, offset: 0.88 }, { clipPath: 'inset(0 0 0 0)', transform: 'translateY(0)' }], { duration: total * ctx.sp, easing: 'ease-in-out' });
+      await wait(total * 0.4 * ctx.sp);
+      for (let i = 0; i < 3; i++) { boom(ctx, { x: f.x + rnd(-30, 30), y: f.y - h * 0.15 }, '#d9b56a', 120); await wait(120 * ctx.sp); }
+      shake(ctx); mound.animate([{ translate: '0 0' }, { translate: '0 6px' }, { translate: '0 0' }], { duration: 220 * ctx.sp, iterations: 2 });
+      await wait(total * 0.3 * ctx.sp);
+      fade(ctx, mound, 300); fade(ctx, pool, 300);
+      await wait(total * 0.12 * ctx.sp);
     },
   },
   sand_coffin: {
