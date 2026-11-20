@@ -85,13 +85,14 @@ function targetsFor(j) {
 
 let playing = false;
 async function play() {
-  if (playing) return;
-  playing = true;
+  if (playing) { S.again = true; return; }
+  playing = true; S.again = false;
   const j = BY_ID[S.id];
   const { arena, user, targets, sideEls } = targetsFor(j);
   await playJutsu(arena, j, user, targets, { sp: S.speed, sideEls, isFoe: S.fromFoe });
   await new Promise((r) => setTimeout(r, 400));
   playing = false;
+  if (S.again) play();
 }
 function decoy() {
   const j = BY_ID[S.id];
