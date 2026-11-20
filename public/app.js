@@ -12,7 +12,7 @@ const topinfo = document.getElementById('topinfo');
 
 const S = {
   screen: 'title',          // title | builder | pass | battle | dex
-  dex: { mode: 'shinobi', id: null, era: 'all', query: '', sort: 'roster', tf: false, from: 'title', jid: null, jquery: '', jcat: 'all', jsort: 'roster' },
+  dex: { mode: 'shinobi', id: null, era: 'all', query: '', sort: 'roster', tf: false, from: 'title', jid: null, jquery: '', jcat: 'all', jsort: 'name' },
   phase: null,              // select | play | over
   mode: null,               // hotseat | cpu
   names: ['Player 1', 'Player 2'],
@@ -386,7 +386,7 @@ function jdexHtml() {
       <div class="tabs">${['all', 'ninjutsu', 'taijutsu', 'genjutsu', 'medical', 'support'].map((c) => `<button class="tab ${d.jcat === c ? 'active' : ''}" data-act="jdexCat" data-arg="${c}">${c === 'all' ? 'All' : CAT_LABEL[c]}</button>`).join('')}</div>
       <div class="row" style="margin:8px 0">
         <input type="text" id="dexSearch" placeholder="Name, effect, nature, user…" value="${esc(d.jquery)}" data-input="dexSearch" style="flex:1;min-width:0">
-        <select data-change="jdexSort" title="Sort">${[['roster', 'Roster order'], ['name', 'Name'], ['power', 'Power'], ['cost', 'Chakra'], ['priority', 'Priority']].map(([k, l]) => `<option value="${k}" ${d.jsort === k ? 'selected' : ''}>${l}</option>`).join('')}</select>
+        <select data-change="jdexSort" title="Sort">${[['name', 'Name'], ['roster', 'Roster order'], ['power', 'Power'], ['cost', 'Chakra'], ['priority', 'Priority']].map(([k, l]) => `<option value="${k}" ${d.jsort === k ? 'selected' : ''}>${l}</option>`).join('')}</select>
       </div>
       <div class="dex-list" data-keep-scroll="jutsu">${list.map((x) => `<button class="dex-item jitem ${x.id === j.id ? 'sel' : ''}" data-act="jdexSel" data-arg="${x.id}" style="--c:${FX.jutsuColor(x)}">
         <span class="nm">${esc(x.name)}</span><span class="small muted">${x.power ? x.power : '—'}</span></button>`).join('') || '<div class="muted small" style="padding:8px">No jutsu match.</div>'}</div>
