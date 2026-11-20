@@ -3187,10 +3187,10 @@ Object.assign(ANIMS, {
     async play(ctx) { ctx.userEl.animate([{ filter: 'none' }, { filter: 'drop-shadow(0 0 12px #ff2a2a)', offset: 0.2 }, { filter: 'drop-shadow(0 0 12px #ff2a2a)', offset: 0.85 }, { filter: 'none' }], { duration: 1100 * ctx.sp }); await flurryIn(ctx, 7, '#ff4a4a'); },
   },
   reverse_tetragram: {
-    desc: 'The Four Symbols Seal appears on the target, then a spray of black aura shoots at them and engulfs them in a semi-transparent black orb.',
+    desc: 'The Four Symbols Seal appears on the user, then a spray of black aura shoots from it at the target and engulfs them in a semi-transparent black orb.',
     async play(ctx) {
       const to = ctx.tos[0]; const { h } = sizeOf(ctx.targetEls[0]);
-      const s = spawn(ctx, ART7.fourSymbols(Math.max(80, h * 0.42)), to, { life: 2400 });
+      const s = spawn(ctx, ART7.fourSymbols(Math.max(80, ctx.userSize.h * 0.42)), ctx.from, { life: 2600 });
       await s.animate([{ transform: 'translate(-50%,-50%) scale(1.8) rotate(-90deg)', opacity: 0 }, { transform: 'translate(-50%,-50%) scale(1) rotate(0deg)', opacity: 1 }], { duration: 400 * ctx.sp, fill: 'forwards' }).finished.catch(() => {});
       for (let i = 0; i < 18; i++) { const d = spawn(ctx, `<div style="width:${rnd(10, 20)}px;height:${rnd(10, 20)}px;border-radius:50%;background:#050505;box-shadow:0 0 8px #000"></div>`, ctx.from, { life: 900 }); fly(ctx, d, ctx.from, { x: to.x + rnd(-30, 30), y: to.y + rnd(-40, 40) }, 340, { rotate: 0, arc: rnd(-30, 30) }).then(() => d.remove()); await wait(18 * ctx.sp); }
       await wait(300 * ctx.sp);
