@@ -36,7 +36,7 @@ export const BALANCE = {
   paralyzeFail: 0.25,
   genjutsuFail: 0.5,
   exhaustedMult: 0.85,
-  intelGather: 21,
+  intelGather: 20,
   intelGatherSpecialist: 35,
   intelKO: 15,
   intelGenjutsu: 4,

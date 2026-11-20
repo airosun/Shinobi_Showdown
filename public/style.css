@@ -443,3 +443,5 @@ button.linkish:hover:not(:disabled) { background: none; color: var(--accent); }
 .mu-table td.mu.even { color: #6e5d48; }
 .mu-table td.mu.good { background: color-mix(in srgb, #3fa34d calc(var(--a) * 85%), var(--panel2)); color: #eaffe4; font-weight: 700; }
 .mu-table td.mu.bad { background: color-mix(in srgb, #c0392b calc(var(--a) * 85%), var(--panel2)); color: #ffe7e3; font-weight: 700; }
+.roles-list { margin: 4px 0 0; padding-left: 18px; } .roles-list li { margin: 2px 0; }
+.role-note { flex-basis: 100%; color: var(--text); background: var(--panel2); border-left: 3px solid var(--accent); padding: 4px 8px; border-radius: 6px; }

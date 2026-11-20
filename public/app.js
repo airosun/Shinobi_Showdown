@@ -203,6 +203,7 @@ const SCREENS = {
             <label class="small muted">Affinity <select data-change="bNature"><option value="">All natures</option>${AFFINITIES.map((n) => `<option value="${n}" ${b.nature === n ? 'selected' : ''}>${NATURE_LABELS[n] || n}</option>`).join('')}<option value="none" ${b.nature === 'none' ? 'selected' : ''}>Non-elemental</option></select></label>
             <label class="small muted">Sort <select data-change="bSort">${[['roster', 'Roster order'], ['role', 'Role'], ['nature', 'Chakra affinity'], ['cost', 'Cost'], ['name', 'Name']].map(([k, l]) => `<option value="${k}" ${(b.sort || 'roster') === k ? 'selected' : ''}>${l}</option>`).join('')}</select></label>
             <span class="small muted">${roster.length} shown</span>
+            ${b.role ? `<span class="small role-note">${b.role}: ${ROLE_INFO[b.role] || ''}</span>` : ''}
           </div>
           <div class="roster">
             ${roster.map((s) => {
@@ -213,7 +214,7 @@ const SCREENS = {
                 <div class="meta">
                   <div class="row" style="gap:6px"><span class="nm">${esc(s.name)}</span></div>
                   <div class="chips">${natChip(s.natures.primary)}${natChip(s.natures.secondary)}${!s.natures.primary ? '<span class="nat" style="--c:#8c93a8">Non-elemental</span>' : ''}<span class="chip">${s.era}</span><span class="chip cost">${s.cost}</span></div>
-                  <div class="small muted">${s.roles.join(' · ')}</div>
+                  <div class="small muted">${s.roles.map((r) => `<span title="${esc(ROLE_INFO[r] || '')}">${r}</span>`).join(' · ')}</div>
                 </div>
               </button>`;
             }).join('')}
@@ -269,6 +270,20 @@ const SCREENS = {
 const STAT_LABEL = { hp: 'HP', tai: 'TAI', nin: 'NIN', def: 'DEF', spd: 'SPD', chk: 'CHK' };
 const CAT_LABEL = { ninjutsu: 'Ninjutsu', taijutsu: 'Taijutsu', genjutsu: 'Genjutsu', medical: 'Medical', support: 'Support' };
 const bst = (s, chk = true) => Object.entries(s.stats).reduce((t, [k, v]) => t + (chk || k !== 'chk' ? v : 0), 0);
+// What each role means. Sensor and Infiltrator change the rules; the others describe how a shinobi plays.
+const ROLE_INFO = {
+  Sensor: `Gathers Intel faster (+${E.BALANCE.intelGatherSpecialist} instead of +${E.BALANCE.intelGather}), and on Guard cuts enemy Intel gains to a quarter instead of half.`,
+  Infiltrator: `Gathers Intel faster (+${E.BALANCE.intelGatherSpecialist} instead of +${E.BALANCE.intelGather}). Built to steal the Intel win.`,
+  Striker: 'Damage dealer: big ninjutsu or taijutsu, often area attacks.',
+  Frontliner: 'Close-range brawler with strong taijutsu who trades hits up front.',
+  Tank: 'High HP and DEF; soaks hits, shields or protects allies.',
+  Controller: 'Disrupts the enemy with Bind, Paralyze, genjutsu, Chakra drain and debuffs.',
+  Medic: 'Heals and cleanses allies.',
+  Support: 'Buffs, shields or covers the team; often strong as the support slot.',
+};
+const ROLE_ORDER = ['Striker', 'Frontliner', 'Tank', 'Controller', 'Medic', 'Support', 'Sensor', 'Infiltrator'];
+const roleChip = (r) => `<span class="chip" title="${esc(ROLE_INFO[r] || '')}">${r}</span>`;
+
 // builder filters: roles and chakra affinities present in the roster
 const ROLES = [...new Set(SHINOBI.flatMap((s) => s.roles))].sort();
 const BASIC_NATURES = ['fire', 'wind', 'lightning', 'earth', 'water', 'yin', 'yang'];
@@ -481,7 +496,7 @@ function dexEntry(s, list, idx) {
     </div>
     <div class="dex-info">
       <div class="dex-name">${esc(s.name)}</div>
-      <div class="chips" style="margin:6px 0 10px">${natChip(s.natures.primary)}${natChip(s.natures.secondary)}${!s.natures.primary ? '<span class="nat" style="--c:#8c93a8">Non-elemental</span>' : ''}<span class="chip">${s.era}</span><span class="chip cost">Cost ${s.cost}</span>${s.roles.map((r) => `<span class="chip">${r}</span>`).join('')}</div>
+      <div class="chips" style="margin:6px 0 10px">${natChip(s.natures.primary)}${natChip(s.natures.secondary)}${!s.natures.primary ? '<span class="nat" style="--c:#8c93a8">Non-elemental</span>' : ''}<span class="chip">${s.era}</span><span class="chip cost">Cost ${s.cost}</span>${s.roles.map(roleChip).join('')}</div>
       <div class="dex-stats">${Object.entries(s.stats).map(([k, v]) => `<span class="muted">${STAT_LABEL[k]}</span><div class="statbar"><i style="width:${pct(v, max)}%;background:${sc(v)}"></i></div><span class="mono">${v}</span>`).join('')}
         <span class="muted">BST</span><span class="small muted">without CHK: <b class="mono" style="color:var(--text)">${bst(s, false)}</b></span><span class="mono"><b>${bst(s)}</b></span></div>
       <div class="dex-block"><div class="lbl">Trait</div><b>${esc(s.trait.name)}</b> — ${esc(s.trait.desc)}</div>
@@ -505,11 +520,12 @@ function rulesHtml() {
       <li><b>Team:</b> 3 active shinobi + 1 support, ${COST_CAP} cost points max, one version of each character. Each active shinobi brings 4 jutsu.</li>
       <li><b>Support:</b> never enters the battle — it's a 3v3. It gives the team a passive that grows as your cell falls (stage 1 with 3 standing, stage 2 with 2, stage 3 with 1).</li>
       <li><b>Turns:</b> both players pick orders in secret, then actions play out one by one — Stances first, then by priority (+3 … −2), then by SPD. Click the text box to advance; change the speed (1× / 2× / 4×) or skip the turn.</li>
-      <li><b>Natures:</b> Fire › Wind › Lightning › Earth › Water › Fire (×1.5 / ×0.75). Jutsu matching your primary nature get ×1.25, secondary ×1.1. Kekkei genkai count as both parent natures.</li>
+      <li><b>Natures:</b> Fire › Wind › Lightning › Earth › Water › Fire (×1.5 / ×0.75). Jutsu matching your primary nature get ×1.25, secondary ×1.1. Kekkei genkai count as all of their parent natures (see the Natures tab in the Dex).</li>
       <li><b>Jutsu Clash:</b> two ninjutsu aimed at each other collide — the stronger nature breaks through at 70% power.</li>
       <li><b>Collaboration:</b> Wind then Fire (or Water then Lightning) on the same target in one turn = ×1.3.</li>
       <li><b>Substitution:</b> a Stance that negates the first single-target hit. Repeating it lowers the odds (100/50/25%). Area attacks are only halved; Sharingan sees through logs; genjutsu ignores it.</li>
-      <li><b>Intel:</b> Gather Intel, land genjutsu, reveal enemy jutsu and score KOs. New Intel is <i>unsecured</i> until the carrier survives the end of the next turn — KO the spy and it's lost. Guard halves enemy Intel gains (sensors quarter it).</li>
+      <li><b>Intel:</b> Gather Intel (+${E.BALANCE.intelGather}, or +${E.BALANCE.intelGatherSpecialist} for Sensors and Infiltrators), land genjutsu, reveal enemy jutsu and score KOs (+${E.BALANCE.intelKO}). New Intel is <i>unsecured</i> until the carrier survives the end of the next turn — KO the spy and it's lost. Guard halves enemy Intel gains (a Sensor on guard quarters them).</li>
+      <li><b>Roles:</b><ul class="roles-list">${ROLE_ORDER.map((r) => `<li><b>${r}</b> — ${ROLE_INFO[r]}</li>`).join('')}</ul></li>
       <li><b>Milestones:</b> 25 Intel reveals an enemy loadout, 50 reveals another and makes enemy Chakra visible, 75 lets you see one enemy order before choosing.</li>
       <li><b>Win:</b> KO all 3 enemy shinobi, <i>or</i> secure 100 Intel. After turn 20, the highest Mission Score (25 per KO + Intel) wins.</li>
       <li><b>Chakra</b> is scarce: pools are small and only ~4% comes back each turn. <b>Charge Chakra</b> restores half your pool (but you take +25% damage that turn). Out of Chakra? Throw kunai, Charge, or <b>overexert</b> — force the jutsu out anyway by paying the shortfall in HP and becoming Exhausted. Ending a turn at 0 Chakra also costs HP.</li>
@@ -523,7 +539,7 @@ function memberEditor(m, slot) {
   const max = { hp: 130, tai: 130, nin: 130, def: 130, spd: 130, chk: 150 };
   const sc = (v) => (v >= 110 ? '#3ddc84' : v >= 85 ? '#ffcc4d' : v >= 60 ? '#ff9a3c' : '#ff5c5c');
   return `<div>
-    <div class="row">${badge(s)}<div><h3 style="margin:0">${esc(s.name)}</h3><div class="chips" style="margin-top:3px">${natChip(s.natures.primary)}${natChip(s.natures.secondary)}${s.roles.map((r) => `<span class="chip">${r}</span>`).join('')}</div></div><span class="grow"></span><button class="small ghost" data-act="dexOf" data-arg="${s.id}">📜 Dex</button><button class="small ghost" data-act="removeMember">Remove</button></div>
+    <div class="row">${badge(s)}<div><h3 style="margin:0">${esc(s.name)}</h3><div class="chips" style="margin-top:3px">${natChip(s.natures.primary)}${natChip(s.natures.secondary)}${s.roles.map(roleChip).join('')}</div></div><span class="grow"></span><button class="small ghost" data-act="dexOf" data-arg="${s.id}">📜 Dex</button><button class="small ghost" data-act="removeMember">Remove</button></div>
     <div class="statgrid">${Object.entries(s.stats).map(([k, v]) => `<span class="muted">${k.toUpperCase()}</span><div class="statbar"><i style="width:${pct(v, max[k])}%;background:${sc(v)}"></i></div><span class="mono">${v}</span>`).join('')}</div>
     <div class="small"><b>${esc(s.trait.name)}:</b> ${esc(s.trait.desc)}</div>
     ${s.transformation ? `<div class="small" style="margin-top:4px"><b>${esc(s.transformation.name)}</b> (${s.transformation.resolve} Resolve): ${esc(s.transformation.desc)}</div>` : '<div class="small muted" style="margin-top:4px">No transformation.</div>'}
@@ -836,7 +852,7 @@ function actionSections(st, u) {
   const TIPS = {
     kunai: KUNAI_TIP,
     charge: 'Restore half of your max Chakra (it resolves last). You take +25% damage this turn. Passive regen is small, so this is how you refill.',
-    gather: 'Priority −1. Gain Intel (Sensors and Infiltrators gain more). Fails if you were hit earlier this turn. The Intel is unsecured until you survive the end of next turn.',
+    gather: `Priority −1. Gain ${E.BALANCE.intelGather} Intel (${E.BALANCE.intelGatherSpecialist} for Sensors and Infiltrators). Fails if you were hit earlier this turn. The Intel is unsecured until you survive the end of next turn.`,
     substitute: `${SUBSTITUTIONS[u.substitution].desc} Success drops to 50% / 25% if used on consecutive turns. Area attacks are only halved.`,
     guard: 'Stance. Enemy Intel gains are halved this turn (quartered if a Sensor guards), and you take 25% less damage.',
     release: 'Stance. Break free of genjutsu.',
