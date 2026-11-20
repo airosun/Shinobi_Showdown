@@ -69,6 +69,10 @@ MAP = {
     'fu': [('fu', 'front')], 'chomei': [('fu', 'transform')], 'utakata': [('utakata', 'front')], 'saiken': [('utakata', 'transform')],
     'han': [('han', 'front')], 'kokuo': [('han', 'transform')], 'roshi': [('roshi', 'front')], 'son-goku': [('roshi', 'transform')],
     'yguito': [('yugito', 'front')], 'matatabi': [('yugito', 'transform')],
+    # batch 6
+    'hanzo': [('hanzo', 'front')], 'iruka': [('iruka', 'front')], 'konohamaru': [('konohamaru', 'front')], 'kushina': [('kushina', 'front')],
+    'mifune': [('mifune', 'front')], 'rasa': [('rasa', 'front')], 'shisui': [('shisui', 'front')], 'shisui-susanoo': [('shisui', 'transform')],
+    'shizune': [('shizune', 'front')],
 }
 # manual portrait boxes for poses the automatic crop gets wrong: (centre x, centre y, size) as fractions of the trimmed image width/height/width
 FACE = {

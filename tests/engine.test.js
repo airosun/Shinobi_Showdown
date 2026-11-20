@@ -455,3 +455,19 @@ test('Roshi is immune to Burn; Madara (Six Paths Mode) shrugs off genjutsu', () 
 test('Costs above 10 count against the 30-point cap', () => {
   assert.ok(E.validateTeam({ members: ['madara_six_paths', 'kaguya', 'fu', 'karin'].map(member) }).some((e) => /over the cap/.test(e)));
 });
+
+// ---------------- batch 6 ----------------
+test("Konohamaru's Will of Fire flares when an ally falls; Shisui's jutsu gain priority", () => {
+  const st = battle(['konohamaru', 'shisui', 'mifune', 'shizune'], ['hanzo', 'rasa', 'kushina', 'iruka']);
+  const k = st.units['0-0']; const r = k.resolve;
+  st.units['0-2'].hp = 1;
+  resolveTurn(st, [{ actor: '1-0', type: 'kunai', target: { slot: 2 } }]);
+  assert.ok(st.units['0-2'].ko);
+  assert.ok(k.resolve >= r + 15);
+  resolveTurn(st, [
+    { actor: '1-1', type: 'jutsu', jutsuId: 'gold_avalanche', target: { slot: 1 } },
+    { actor: '0-1', type: 'jutsu', jutsuId: 'great_fireball', target: { slot: 0 } },
+  ].filter(Boolean));
+  const order = st.log.filter((l) => / uses /.test(l.text)).map((l) => l.u);
+  assert.equal(order.indexOf('0-1') < order.indexOf('1-1'), true);
+});

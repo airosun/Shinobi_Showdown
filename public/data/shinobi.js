@@ -11,7 +11,7 @@ export const SHINOBI = [
     "baseId": "naruto",
     "name": "Naruto Uzumaki",
     "era": "Part 1",
-    "cost": 6,
+    "cost": 5,
     "natures": {
       "primary": "wind",
       "secondary": "yang"
@@ -163,7 +163,7 @@ export const SHINOBI = [
     "baseId": "naruto",
     "name": "Naruto Uzumaki (Sage Mode)",
     "era": "Shippuden",
-    "cost": 8,
+    "cost": 7,
     "natures": {
       "primary": "wind",
       "secondary": "yang"
@@ -737,7 +737,7 @@ export const SHINOBI = [
     "baseId": "sakura",
     "name": "Sakura Haruno (Great War)",
     "era": "Shippuden",
-    "cost": 9,
+    "cost": 8,
     "natures": {
       "primary": "earth",
       "secondary": "yang"
@@ -2215,7 +2215,7 @@ export const SHINOBI = [
     "baseId": "choji",
     "name": "Choji Akimichi (Shippuden)",
     "era": "Shippuden",
-    "cost": 8,
+    "cost": 7,
     "natures": {
       "primary": "yang",
       "secondary": "earth"
@@ -5870,7 +5870,7 @@ export const SHINOBI = [
         "nin": 1.3
       },
       "drawback": "exhausted",
-      "name": "Three-Tails Chakra Cloak",
+      "name": "Three-Tails Isobu",
       "desc": "+30% DEF, +30% NIN and unlocks Isobu: Tailed Beast Bomb. Exhausted afterwards."
     },
     "supportAura": {
@@ -6200,7 +6200,7 @@ export const SHINOBI = [
     "baseId": "madara",
     "name": "Madara Uchiha (Full Reanimation)",
     "era": "Shippuden",
-    "cost": 11,
+    "cost": 12,
     "natures": {
       "primary": "fire",
       "secondary": "wood"
@@ -6735,6 +6735,487 @@ export const SHINOBI = [
           ],
           "natures": [
             "fire"
+          ]
+        }
+      ]
+    }
+  },
+  {
+    "id": "hanzo",
+    "baseId": "hanzo",
+    "name": "Hanzo",
+    "era": "Shippuden",
+    "cost": 8,
+    "natures": {
+      "primary": "wind",
+      "secondary": null
+    },
+    "stats": {
+      "hp": 115,
+      "tai": 110,
+      "nin": 95,
+      "def": 105,
+      "spd": 100,
+      "chk": 130
+    },
+    "roles": [
+      "Frontliner",
+      "Controller"
+    ],
+    "trait": {
+      "id": "poisonSac",
+      "name": "Poison Sac",
+      "desc": "Immune to Poison, and his attacks that hit have a 20% chance to Poison."
+    },
+    "substitutions": [
+      "log"
+    ],
+    "catalogue": [
+      "hanzo_kusarigama",
+      "summon_ibuse",
+      "hanzo_chain_bind",
+      "salamander_guard"
+    ],
+    "defaultLoadout": [
+      "hanzo_kusarigama",
+      "summon_ibuse",
+      "hanzo_chain_bind",
+      "salamander_guard"
+    ],
+    "transformation": null,
+    "supportAura": {
+      "name": "Demigod of the Hidden Rain",
+      "desc": "Allies' attacks have a {0} chance to Poison.",
+      "effects": [
+        {
+          "type": "poisonChance",
+          "values": [
+            0.05,
+            0.1,
+            0.15
+          ]
+        }
+      ]
+    }
+  },
+  {
+    "id": "iruka",
+    "baseId": "iruka",
+    "name": "Iruka Umino",
+    "era": "Part 1",
+    "cost": 4,
+    "natures": {
+      "primary": "fire",
+      "secondary": null
+    },
+    "stats": {
+      "hp": 90,
+      "tai": 70,
+      "nin": 70,
+      "def": 85,
+      "spd": 80,
+      "chk": 95
+    },
+    "roles": [
+      "Support",
+      "Tank"
+    ],
+    "trait": {
+      "id": "protectiveInstinct",
+      "name": "Protective Instinct",
+      "desc": "Takes 20% less damage while an ally is below 50% HP."
+    },
+    "substitutions": [
+      "log",
+      "shadowClone"
+    ],
+    "catalogue": [
+      "shuriken_volley",
+      "great_fireball",
+      "iruka_cover",
+      "trap_tags"
+    ],
+    "defaultLoadout": [
+      "shuriken_volley",
+      "great_fireball",
+      "iruka_cover",
+      "trap_tags"
+    ],
+    "transformation": null,
+    "supportAura": {
+      "name": "Academy Lessons",
+      "desc": "Allies' Gather Intel gains +{0}.",
+      "effects": [
+        {
+          "type": "gatherBonus",
+          "values": [
+            2,
+            4,
+            6
+          ]
+        }
+      ]
+    }
+  },
+  {
+    "id": "konohamaru",
+    "baseId": "konohamaru",
+    "name": "Konohamaru Sarutobi",
+    "era": "Shippuden",
+    "cost": 5,
+    "natures": {
+      "primary": "wind",
+      "secondary": "fire"
+    },
+    "stats": {
+      "hp": 90,
+      "tai": 85,
+      "nin": 95,
+      "def": 80,
+      "spd": 100,
+      "chk": 110
+    },
+    "roles": [
+      "Striker"
+    ],
+    "trait": {
+      "id": "willOfFire",
+      "name": "Will of Fire",
+      "desc": "Gains 15 Resolve whenever an ally is knocked out."
+    },
+    "substitutions": [
+      "log",
+      "shadowClone"
+    ],
+    "catalogue": [
+      "rasengan",
+      "fire_ash",
+      "konohamaru_combo",
+      "harem_jutsu"
+    ],
+    "defaultLoadout": [
+      "rasengan",
+      "fire_ash",
+      "konohamaru_combo",
+      "harem_jutsu"
+    ],
+    "transformation": null,
+    "supportAura": {
+      "name": "Honorable Grandson",
+      "desc": "Allies deal +{0} damage to a target an ally already hit this turn.",
+      "effects": [
+        {
+          "type": "focus",
+          "values": [
+            0.05,
+            0.1,
+            0.15
+          ]
+        }
+      ]
+    }
+  },
+  {
+    "id": "kushina",
+    "baseId": "kushina",
+    "name": "Kushina Uzumaki",
+    "era": "Shippuden",
+    "cost": 8,
+    "natures": {
+      "primary": "water",
+      "secondary": "yang"
+    },
+    "stats": {
+      "hp": 115,
+      "tai": 100,
+      "nin": 105,
+      "def": 95,
+      "spd": 100,
+      "chk": 170
+    },
+    "roles": [
+      "Controller",
+      "Frontliner"
+    ],
+    "trait": {
+      "id": "suppression",
+      "name": "Sealing Chains",
+      "desc": "Her Binds end the target's transformation, and she deals +30% damage to transformed enemies."
+    },
+    "substitutions": [
+      "log",
+      "shadowClone"
+    ],
+    "catalogue": [
+      "adamantine_chains",
+      "chain_lash",
+      "habanero_fury",
+      "kushina_blade",
+      "chain_barrier"
+    ],
+    "defaultLoadout": [
+      "adamantine_chains",
+      "chain_lash",
+      "habanero_fury",
+      "kushina_blade"
+    ],
+    "transformation": null,
+    "supportAura": {
+      "name": "Red-Hot Habanero",
+      "desc": "Allies gain +{0} TAI.",
+      "effects": [
+        {
+          "type": "stat",
+          "values": [
+            0.1,
+            0.15,
+            0.25
+          ],
+          "stat": "tai"
+        }
+      ]
+    }
+  },
+  {
+    "id": "mifune",
+    "baseId": "mifune",
+    "name": "Mifune",
+    "era": "Shippuden",
+    "cost": 7,
+    "natures": {
+      "primary": null,
+      "secondary": null
+    },
+    "stats": {
+      "hp": 105,
+      "tai": 125,
+      "nin": 60,
+      "def": 100,
+      "spd": 115,
+      "chk": 100
+    },
+    "roles": [
+      "Frontliner",
+      "Striker"
+    ],
+    "trait": {
+      "id": "iaiMaster",
+      "name": "Iai Master",
+      "desc": "His taijutsu have +15% critical-hit chance."
+    },
+    "substitutions": [
+      "log"
+    ],
+    "catalogue": [
+      "iai_draw",
+      "iai_flash",
+      "chakra_blade_wave",
+      "samurai_stance"
+    ],
+    "defaultLoadout": [
+      "iai_draw",
+      "iai_flash",
+      "chakra_blade_wave",
+      "samurai_stance"
+    ],
+    "transformation": null,
+    "supportAura": {
+      "name": "Samurai Code",
+      "desc": "Allies gain {0} critical-hit chance.",
+      "effects": [
+        {
+          "type": "crit",
+          "values": [
+            0.05,
+            0.1,
+            0.15
+          ]
+        }
+      ]
+    }
+  },
+  {
+    "id": "rasa",
+    "baseId": "rasa",
+    "name": "Rasa (Fourth Kazekage)",
+    "era": "Shippuden",
+    "cost": 8,
+    "natures": {
+      "primary": "magnet",
+      "secondary": "wind"
+    },
+    "stats": {
+      "hp": 110,
+      "tai": 75,
+      "nin": 115,
+      "def": 105,
+      "spd": 90,
+      "chk": 140
+    },
+    "roles": [
+      "Controller",
+      "Tank"
+    ],
+    "trait": {
+      "id": "goldDust",
+      "name": "Gold Dust",
+      "desc": "His Magnet jutsu that hit lower the target's SPD by 15% for 2 turns."
+    },
+    "substitutions": [
+      "log"
+    ],
+    "catalogue": [
+      "gold_dust_wave",
+      "gold_avalanche",
+      "gold_dust_coffin",
+      "gold_dust_wall"
+    ],
+    "defaultLoadout": [
+      "gold_dust_wave",
+      "gold_avalanche",
+      "gold_dust_coffin",
+      "gold_dust_wall"
+    ],
+    "transformation": null,
+    "supportAura": {
+      "name": "Fourth Kazekage",
+      "desc": "Allies take {0} less damage.",
+      "effects": [
+        {
+          "type": "dr",
+          "values": [
+            0.04,
+            0.07,
+            0.1
+          ]
+        }
+      ]
+    }
+  },
+  {
+    "id": "shisui",
+    "baseId": "shisui",
+    "name": "Shisui Uchiha",
+    "era": "Part 1",
+    "cost": 8,
+    "natures": {
+      "primary": "fire",
+      "secondary": "yin"
+    },
+    "stats": {
+      "hp": 100,
+      "tai": 105,
+      "nin": 120,
+      "def": 90,
+      "spd": 135,
+      "chk": 140
+    },
+    "roles": [
+      "Striker",
+      "Controller"
+    ],
+    "trait": {
+      "id": "bodyFlicker",
+      "name": "Shisui of the Body Flicker",
+      "desc": "Sharingan (sees through Log Substitution). All his jutsu gain +1 priority."
+    },
+    "substitutions": [
+      "log",
+      "shadowClone"
+    ],
+    "catalogue": [
+      "flicker_strike",
+      "flicker_slashes",
+      "kotoamatsukami",
+      "great_fireball",
+      "shisui_arrows"
+    ],
+    "defaultLoadout": [
+      "flicker_strike",
+      "flicker_slashes",
+      "kotoamatsukami",
+      "shisui_arrows"
+    ],
+    "transformation": {
+      "resolve": 60,
+      "cost": 0,
+      "turns": 3,
+      "mods": {
+        "def": 1.4,
+        "nin": 1.3
+      },
+      "drawback": "exhausted",
+      "name": "Perfect Susano'o",
+      "desc": "+40% DEF, +30% NIN and unlocks Susano'o: Divine Arrows. Exhausted afterwards."
+    },
+    "supportAura": {
+      "name": "Shisui's Crow",
+      "desc": "Enemy Intel gains are reduced by {0}.",
+      "effects": [
+        {
+          "type": "enemyIntel",
+          "values": [
+            0.1,
+            0.15,
+            0.25
+          ]
+        }
+      ]
+    }
+  },
+  {
+    "id": "shizune",
+    "baseId": "shizune",
+    "name": "Shizune",
+    "era": "Part 1",
+    "cost": 5,
+    "natures": {
+      "primary": "water",
+      "secondary": "yang"
+    },
+    "stats": {
+      "hp": 85,
+      "tai": 60,
+      "nin": 90,
+      "def": 80,
+      "spd": 95,
+      "chk": 120
+    },
+    "roles": [
+      "Medic",
+      "Controller"
+    ],
+    "trait": {
+      "id": "legendaryMedic",
+      "name": "Tsunade's Apprentice",
+      "desc": "Her healing is 25% stronger."
+    },
+    "substitutions": [
+      "log"
+    ],
+    "catalogue": [
+      "poison_mist",
+      "poison_needles",
+      "mystical_palm",
+      "antidote"
+    ],
+    "defaultLoadout": [
+      "poison_mist",
+      "poison_needles",
+      "mystical_palm",
+      "antidote"
+    ],
+    "transformation": null,
+    "supportAura": {
+      "name": "Assistant's Care",
+      "desc": "Allies regenerate {0} max HP per turn.",
+      "effects": [
+        {
+          "type": "heal",
+          "values": [
+            0.03,
+            0.05,
+            0.08
           ]
         }
       ]

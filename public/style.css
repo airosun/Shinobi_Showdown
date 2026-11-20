@@ -421,3 +421,25 @@ button.linkish:hover:not(:disabled) { background: none; color: var(--accent); }
 .roster-filters { gap: 10px; margin: -2px 0 10px; flex-wrap: wrap; }
 .roster-filters label { display: flex; align-items: center; gap: 6px; }
 .nat.light { color: #1b130b; text-shadow: none; }
+
+/* Dex: Natures tab */
+.natures { display: flex; flex-direction: column; gap: 16px; max-width: 1180px; margin: 0 auto; }
+.natures .card { margin: 0; }
+.cycle { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; margin: 4px 0 10px; }
+.cycle .nat { font-size: 15px; padding: 4px 12px; }
+.cycle .arrow { font-size: 22px; color: var(--accent); font-weight: 800; }
+.rules-list { margin: 0; padding-left: 20px; line-height: 1.6; }
+.kg-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 8px; }
+.kg { background: var(--panel2); border-radius: 8px; padding: 8px 10px; }
+.kg-top { display: flex; align-items: center; gap: 6px; flex-wrap: wrap; margin-bottom: 4px; }
+.kg-users { font-size: 13px; line-height: 1.5; }
+.kg-users .linkish { font-weight: 600; font-size: 13px; }
+.mu-wrap { overflow-x: auto; }
+.mu-table { border-collapse: separate; border-spacing: 2px; font-size: 12px; }
+.mu-table th { font-weight: 600; padding: 2px; text-align: center; white-space: nowrap; }
+.mu-table th.corner { font-size: 10px; color: var(--muted); }
+.mu-table tbody th { text-align: right; }
+.mu-table td.mu { min-width: 44px; text-align: center; padding: 5px 4px; border-radius: 4px; font-family: var(--mono); background: var(--panel2); }
+.mu-table td.mu.even { color: #6e5d48; }
+.mu-table td.mu.good { background: color-mix(in srgb, #3fa34d calc(var(--a) * 85%), var(--panel2)); color: #eaffe4; font-weight: 700; }
+.mu-table td.mu.bad { background: color-mix(in srgb, #c0392b calc(var(--a) * 85%), var(--panel2)); color: #ffe7e3; font-weight: 700; }

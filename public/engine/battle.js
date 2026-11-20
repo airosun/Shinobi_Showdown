@@ -36,8 +36,8 @@ export const BALANCE = {
   paralyzeFail: 0.25,
   genjutsuFail: 0.5,
   exhaustedMult: 0.85,
-  intelGather: 19,
-  intelGatherSpecialist: 32,
+  intelGather: 21,
+  intelGatherSpecialist: 35,
   intelKO: 15,
   intelGenjutsu: 4,
   intelReveal: 1,
@@ -90,6 +90,8 @@ export const TRAITS = {
   rinneMadara: ['dojutsu', 'seesDecoy', 'seesLog', 'genjutsuImmune'],
   progenitor: ['genjutsuImmune'],
   volcanicBody: ['burnImmune'],
+  poisonSac: ['poisonImmune'],
+  bodyFlicker: ['seesLog'],
 };
 // extra Chakra regen per turn by trait
 const CHAKRA_REGEN = { endlessChakra: 0.05 };
@@ -333,6 +335,7 @@ function actionPriority(state, unit, action) {
       let p = j.priority;
       if (j.category === 'taijutsu' && hasFlag(unit, 'noNinjutsu')) p += 1;
       if (traitOf(unit) === 'ftg' && j.target === 'enemy') p += 1; // Flying Thunder God
+      if (traitOf(unit) === 'bodyFlicker') p += 1; // Shisui of the Body Flicker
       return p;
     }
     default: return 0;
@@ -477,6 +480,7 @@ export function computeDamage(state, att, def, jutsu, ctx = {}) {
   if (traitOf(def) === 'lightningArmor') dmg *= 0.9;
   if (traitOf(def) === 'levitation' && jutsu.category === 'taijutsu') dmg *= 0.8;
   if (traitOf(def) === 'rockSolid' && !ctx.aoe) dmg *= 0.85;
+  if (traitOf(def) === 'protectiveInstinct' && onField(state, def.side).some((a) => a !== def && a.hp < a.maxHp * 0.5)) dmg *= 0.8;
   if (traitOf(att) === 'twoKekkei' && (jutsu.nature === 'lava' || jutsu.nature === 'boil')) dmg *= 1.1;
   // defender-side reductions
   dmg *= 1 - Math.min(0.6, auraVal(state, def.side, 'dr'));
@@ -493,7 +497,8 @@ export function computeDamage(state, att, def, jutsu, ctx = {}) {
   if (ctx.clashWinner) dmg *= BALANCE.clashWinnerMult;
   if (def.flags.vulnerable) dmg *= BALANCE.vulnerableMult;
   if (def.flags.guarding) dmg *= BALANCE.guardDamageMult;
-  const critC = BALANCE.critChance + auraVal(state, att.side, 'crit') + (traitOf(att) === 'silentKilling' && !ctx.aoe ? 0.12 : 0);
+  const critC = BALANCE.critChance + auraVal(state, att.side, 'crit') + (traitOf(att) === 'silentKilling' && !ctx.aoe ? 0.12 : 0)
+    + (traitOf(att) === 'iaiMaster' && jutsu.category === 'taijutsu' ? 0.15 : 0);
   const crit = ctx.noRandom ? false : rng() < critC;
   if (crit) dmg *= BALANCE.critMult;
   if (!ctx.noRandom) dmg *= BALANCE.randomMin + rng() * (1 - BALANCE.randomMin);
@@ -549,6 +554,13 @@ function knockOut(state, unit, source) {
   }
   unit.link = null;
   for (const u of Object.values(state.units)) if (u.link?.uid === unit.uid) u.link = null;
+  // Konohamaru: the Will of Fire burns hotter when a comrade falls
+  for (const a of onField(state, unit.side)) {
+    if (traitOf(a) === 'willOfFire' && a !== unit) {
+      a.resolve = Math.min(100, a.resolve + 15);
+      log(state, `${a.name}'s Will of Fire flares (+15 Resolve).`, 'special', a);
+    }
+  }
 }
 
 function heal(state, unit, pct, healer) {
@@ -723,6 +735,11 @@ function performJutsu(state, actor, jutsu, target, ctx = {}) {
         const extra = Math.max(1, Math.round(damage * twin[0]));
         dealDamage(state, tgt, extra, actor, `${twin[1]} — ${tgt.name} takes ${extra} more damage.`, { hit: true });
       }
+      // Rasa: gold dust weighs the target down
+      if (traitOf(actor) === 'goldDust' && jutsu.nature === 'magnet' && !tgt.ko) {
+        tgt.buffs.push({ stat: 'spd', mult: 0.85, turns: 2 + (tgt.flags.acted ? 1 : 0) });
+        log(state, `Gold dust weighs ${tgt.name} down (−15% SPD).`, 'status', tgt, { minor: true });
+      }
       // Utakata: corrosive bubbles eat DEF
       if (traitOf(actor) === 'corrosiveBubbles' && (jutsu.nature === 'water' || jutsu.nature === 'boil') && !tgt.ko) {
         tgt.buffs.push({ stat: 'def', mult: 0.9, turns: 2 + (tgt.flags.acted ? 1 : 0) });
@@ -740,7 +757,7 @@ function performJutsu(state, actor, jutsu, target, ctx = {}) {
       }
       // poison on hit (Anko's trait, Kankuro's support passive)
       if (!tgt.ko && !tgt.statuses.poison) {
-        const pc = auraVal(state, actor.side, 'poisonChance') + (traitOf(actor) === 'snakeMistress' ? 0.25 : 0);
+        const pc = auraVal(state, actor.side, 'poisonChance') + (traitOf(actor) === 'snakeMistress' ? 0.25 : traitOf(actor) === 'poisonSac' ? 0.2 : 0);
         if (pc && rng() < pc) inflictPoison(state, tgt, 3);
       }
       // Shino: chakra-eating insects on every hit

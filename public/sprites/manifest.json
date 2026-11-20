@@ -496,6 +496,40 @@
    "face": "battle/yguito-face.webp",
    "transform": "battle/matatabi.webp",
    "transformFace": "battle/matatabi-face.webp"
+  },
+  "hanzo": {
+   "front": "battle/hanzo.webp",
+   "face": "battle/hanzo-face.webp"
+  },
+  "iruka": {
+   "front": "battle/iruka.webp",
+   "face": "battle/iruka-face.webp"
+  },
+  "konohamaru": {
+   "front": "battle/konohamaru.webp",
+   "face": "battle/konohamaru-face.webp"
+  },
+  "kushina": {
+   "front": "battle/kushina.webp",
+   "face": "battle/kushina-face.webp"
+  },
+  "mifune": {
+   "front": "battle/mifune.webp",
+   "face": "battle/mifune-face.webp"
+  },
+  "rasa": {
+   "front": "battle/rasa.webp",
+   "face": "battle/rasa-face.webp"
+  },
+  "shisui": {
+   "front": "battle/shisui.webp",
+   "face": "battle/shisui-face.webp",
+   "transform": "battle/shisui-susanoo.webp",
+   "transformFace": "battle/shisui-susanoo-face.webp"
+  },
+  "shizune": {
+   "front": "battle/shizune.webp",
+   "face": "battle/shizune-face.webp"
   }
  }
 }

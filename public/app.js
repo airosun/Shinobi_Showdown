@@ -1,6 +1,6 @@
 // Shinobi Showdown — local hot-seat / vs CPU client.
 import { SHINOBI, SHINOBI_BY_ID, SUBSTITUTIONS, COST_CAP } from './data/shinobi.js';
-import { NATURE_LABELS, KEKKEI_GENKAI } from './engine/natures.js';
+import { NATURE_LABELS, KEKKEI_GENKAI, BASIC_NATURES as CYCLE_NATURES, AMPLIFIED_BY, advantage } from './engine/natures.js';
 import * as E from './engine/battle.js';
 import { chooseActions } from './engine/ai.js';
 import { randomTeam } from './engine/teams.js';
@@ -310,7 +310,7 @@ const JUTSU_ORDER = Object.keys(USED_BY);
 
 function dexModeTabs() {
   const d = S.dex;
-  return `<div class="dex-modes">${[['shinobi', 'Shinobi'], ['jutsu', 'Jutsu']].map(([k, l]) => `<button class="${d.mode === k ? 'active' : ''}" data-act="dexMode" data-arg="${k}">${l}</button>`).join('')}</div>`;
+  return `<div class="dex-modes">${[['shinobi', 'Shinobi'], ['jutsu', 'Jutsu'], ['natures', 'Natures']].map(([k, l]) => `<button class="${d.mode === k ? 'active' : ''}" data-act="dexMode" data-arg="${k}">${l}</button>`).join('')}</div>`;
 }
 
 function jdexList() {
@@ -394,8 +394,46 @@ function jdexHtml() {
   </div>`;
 }
 
+// ---- Natures: the advantage cycle, a full match-up chart and what each kekkei genkai is made of
+function naturesHtml() {
+  const all = [...CYCLE_NATURES, 'yin', 'yang', ...Object.keys(KEKKEI_GENKAI)];
+  const users = (n) => SHINOBI.filter((s) => s.natures.primary === n || s.natures.secondary === n);
+  const cell = (m) => {
+    if (m === 1) return '<td class="mu even">—</td>';
+    const txt = `×${+m.toFixed(3)}`;
+    return `<td class="mu ${m > 1 ? 'good' : 'bad'}" style="--a:${Math.min(1, Math.abs(Math.log(m)) / Math.log(2.25)).toFixed(2)}">${txt}</td>`;
+  };
+  const cycle = [...CYCLE_NATURES, CYCLE_NATURES[0]].map((n, i) => (i ? '<span class="arrow">›</span>' : '') + natChip(n)).join('');
+  return `<div class="natures">
+    <div class="dex-head">${dexModeTabs()}<span class="grow"></span><button class="small ghost" data-act="closeDex">Back</button></div>
+    <div class="card"><h2>The cycle</h2>
+      <div class="cycle">${cycle}</div>
+      <ul class="rules-list">
+        <li>Each basic nature beats the next one: a jutsu does <b>×1.5</b> damage against a target whose <b>primary</b> nature it beats, and <b>×0.75</b> against one that beats it.</li>
+        <li><b>Yin</b> and <b>Yang</b> are neutral: no advantage either way. Non-elemental jutsu are neutral too.</li>
+        <li>Kekkei genkai count as every nature they are made of, and the multipliers multiply: Ice against Fire is ×1.5 (Water beats Fire) × 0.75 (Fire beats Wind) = <b>×1.125</b>.</li>
+        <li>Affinity: a jutsu of the user's primary nature deals <b>×1.25</b>, secondary <b>×1.1</b>; a kekkei genkai user also gets ×1.1 with each basic nature it is made of.</li>
+        <li>Collaboration: ${Object.entries(AMPLIFIED_BY).map(([a, bs]) => `${natChip(a)} is amplified when an ally already hit the same target with ${bs.map(natChip).join(' ')}`).join('; ')}.</li>
+        <li>Jutsu Clash: when two jutsu collide, the nature with the advantage wins.</li>
+      </ul>
+    </div>
+    <div class="card"><h2>Kekkei genkai</h2>
+      <div class="kg-grid">${Object.entries(KEKKEI_GENKAI).map(([k, parts]) => `<div class="kg">
+        <div class="kg-top">${natChip(k)}<span class="muted small">=</span>${parts.map(natChip).join('<span class="muted small">+</span>')}</div>
+        <div class="kg-users">${users(k).map((s) => `<button class="linkish small" data-act="dexSel" data-arg="${s.id}">${esc(s.name)}</button>`).join(', ') || '<span class="muted small">No users yet</span>'}</div>
+      </div>`).join('')}</div>
+    </div>
+    <div class="card"><h2>Match-up chart</h2>
+      <div class="small muted" style="margin-bottom:8px">Rows: the attacking jutsu's nature. Columns: the target's primary nature.</div>
+      <div class="mu-wrap"><table class="mu-table"><thead><tr><th class="corner">ATK ↓ / DEF →</th>${all.map((n) => `<th>${natChip(n)}</th>`).join('')}</tr></thead>
+        <tbody>${all.map((a) => `<tr><th>${natChip(a)}</th>${all.map((d) => cell(advantage(a, d))).join('')}</tr>`).join('')}</tbody></table></div>
+    </div>
+  </div>`;
+}
+
 function dexHtml() {
   const d = S.dex;
+  if (d.mode === 'natures') return naturesHtml();
   if (d.mode === 'jutsu') return jdexHtml();
   const list = dexList();
   if (!d.id || !SHINOBI_BY_ID[d.id]) d.id = (list[0] || SHINOBI[0]).id;

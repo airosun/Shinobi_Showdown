@@ -5047,7 +5047,7 @@ export const JUTSU = {
     "name": "Truth-Seeking Ball Staff",
     "category": "taijutsu",
     "nature": "yin",
-    "power": 125,
+    "power": 115,
     "cost": 35,
     "priority": 0,
     "target": "enemy",
@@ -5063,7 +5063,7 @@ export const JUTSU = {
     "name": "Six Paths: Chibaku Tensei",
     "category": "ninjutsu",
     "nature": "yin",
-    "power": 200,
+    "power": 180,
     "cost": 110,
     "priority": -1,
     "target": "allEnemies",
@@ -5500,6 +5500,393 @@ export const JUTSU = {
     ],
     "desc": "Only while transformed. The Two-Tails fires a Tailed Beast Bomb. 40% Burn.",
     "requiresTransform": true
+  },
+  "hanzo_kusarigama": {
+    "name": "Poison Kusarigama",
+    "category": "taijutsu",
+    "nature": null,
+    "power": 95,
+    "cost": 20,
+    "priority": 0,
+    "target": "enemy",
+    "effects": [
+      {
+        "type": "poison",
+        "chance": 0.3,
+        "turns": 3
+      }
+    ],
+    "desc": "A chain-sickle coated in salamander venom. 30% Poison."
+  },
+  "summon_ibuse": {
+    "name": "Summoning: Ibuse",
+    "category": "ninjutsu",
+    "nature": null,
+    "power": 70,
+    "cost": 60,
+    "priority": -1,
+    "target": "allEnemies",
+    "effects": [
+      {
+        "type": "poison",
+        "chance": 0.5,
+        "turns": 3
+      }
+    ],
+    "desc": "The giant salamander breathes poison fog over every enemy. 50% Poison."
+  },
+  "hanzo_chain_bind": {
+    "name": "Chain Bind",
+    "category": "taijutsu",
+    "nature": null,
+    "power": 50,
+    "cost": 25,
+    "priority": 1,
+    "target": "enemy",
+    "effects": [
+      {
+        "type": "bind",
+        "chance": 0.5,
+        "turns": 1
+      }
+    ],
+    "desc": "The kusarigama chain wraps the target. 50% Bind."
+  },
+  "salamander_guard": {
+    "name": "Salamander Guard",
+    "category": "support",
+    "nature": null,
+    "power": 0,
+    "cost": 25,
+    "priority": 2,
+    "target": "self",
+    "effects": [
+      {
+        "type": "buff",
+        "stat": "def",
+        "mult": 1.4,
+        "turns": 2
+      }
+    ],
+    "desc": "Takes cover behind Ibuse: +40% DEF for 2 turns."
+  },
+  "iruka_cover": {
+    "name": "Teacher's Shield",
+    "category": "support",
+    "nature": null,
+    "power": 0,
+    "cost": 15,
+    "priority": 3,
+    "target": "ally",
+    "effects": [
+      {
+        "type": "bodyguard"
+      }
+    ],
+    "desc": "Throws himself in front of a student: the next single-target hit on that ally this turn hits Iruka instead."
+  },
+  "trap_tags": {
+    "name": "Explosive Trap Tags",
+    "category": "ninjutsu",
+    "nature": "fire",
+    "power": 50,
+    "cost": 25,
+    "priority": 0,
+    "target": "allEnemies",
+    "effects": [
+      {
+        "type": "flinch",
+        "chance": 0.2
+      }
+    ],
+    "desc": "Hidden tags go off under the enemy. 20% Flinch."
+  },
+  "fire_ash": {
+    "name": "Fire Release: Ash Accumulation Burning",
+    "category": "ninjutsu",
+    "nature": "fire",
+    "power": 70,
+    "cost": 35,
+    "priority": 0,
+    "target": "allEnemies",
+    "effects": [
+      {
+        "type": "burn",
+        "chance": 0.2,
+        "turns": 3
+      }
+    ],
+    "desc": "A cloud of burning ash. 20% Burn."
+  },
+  "konohamaru_combo": {
+    "name": "Konohamaru Combo",
+    "category": "taijutsu",
+    "nature": null,
+    "power": 75,
+    "cost": 10,
+    "priority": 1,
+    "target": "enemy",
+    "effects": [],
+    "desc": "A flurry of punches and kicks."
+  },
+  "harem_jutsu": {
+    "name": "Sexy Jutsu: Harem",
+    "category": "genjutsu",
+    "nature": "yin",
+    "power": 0,
+    "cost": 25,
+    "priority": 1,
+    "target": "enemy",
+    "effects": [
+      {
+        "type": "flinch",
+        "chance": 0.6
+      }
+    ],
+    "desc": "A distraction no one is ready for. 60% Flinch."
+  },
+  "chain_barrier": {
+    "name": "Adamantine Chain Barrier",
+    "category": "support",
+    "nature": "yang",
+    "power": 0,
+    "cost": 40,
+    "priority": 2,
+    "target": "allAllies",
+    "effects": [
+      {
+        "type": "buff",
+        "stat": "def",
+        "mult": 1.3,
+        "turns": 2
+      }
+    ],
+    "desc": "A cage of chakra chains around the team: +30% DEF for 2 turns."
+  },
+  "kushina_blade": {
+    "name": "Uzumaki Kenjutsu",
+    "category": "taijutsu",
+    "nature": null,
+    "power": 95,
+    "cost": 20,
+    "priority": 0,
+    "target": "enemy",
+    "effects": [],
+    "desc": "A swift cut from the Red-Hot Habanero."
+  },
+  "habanero_fury": {
+    "name": "Red-Hot Habanero Fury",
+    "category": "taijutsu",
+    "nature": null,
+    "power": 110,
+    "cost": 25,
+    "priority": 0,
+    "target": "enemy",
+    "effects": [
+      {
+        "type": "flinch",
+        "chance": 0.2
+      }
+    ],
+    "desc": "Her temper hits as hard as her fists. 20% Flinch."
+  },
+  "chain_lash": {
+    "name": "Adamantine Chain Lash",
+    "category": "ninjutsu",
+    "nature": "yang",
+    "power": 75,
+    "cost": 40,
+    "priority": 0,
+    "target": "allEnemies",
+    "effects": [
+      {
+        "type": "bind",
+        "chance": 0.25,
+        "turns": 1
+      }
+    ],
+    "desc": "Chains whip across the field. 25% Bind."
+  },
+  "iai_draw": {
+    "name": "Iai Draw",
+    "category": "taijutsu",
+    "nature": null,
+    "power": 105,
+    "cost": 20,
+    "priority": 2,
+    "target": "enemy",
+    "effects": [],
+    "desc": "The blade is drawn and sheathed before the enemy moves."
+  },
+  "iai_flash": {
+    "name": "Iai: Flash",
+    "category": "taijutsu",
+    "nature": null,
+    "power": 130,
+    "cost": 35,
+    "priority": -1,
+    "target": "enemy",
+    "effects": [
+      {
+        "type": "pierce",
+        "value": 0.2
+      }
+    ],
+    "desc": "A single perfect cut. Ignores 20% DEF."
+  },
+  "samurai_stance": {
+    "name": "Samurai Stance",
+    "category": "support",
+    "nature": null,
+    "power": 0,
+    "cost": 20,
+    "priority": 2,
+    "target": "self",
+    "effects": [
+      {
+        "type": "buff",
+        "stat": "def",
+        "mult": 1.4,
+        "turns": 2
+      }
+    ],
+    "desc": "Steadies his guard: +40% DEF for 2 turns."
+  },
+  "chakra_blade_wave": {
+    "name": "Chakra Blade Wave",
+    "category": "taijutsu",
+    "nature": null,
+    "power": 70,
+    "cost": 30,
+    "priority": 0,
+    "target": "allEnemies",
+    "effects": [],
+    "desc": "A sweeping arc of chakra from the blade."
+  },
+  "gold_dust_wave": {
+    "name": "Magnet Release: Gold Dust Wave",
+    "category": "ninjutsu",
+    "nature": "magnet",
+    "power": 85,
+    "cost": 50,
+    "priority": 0,
+    "target": "allEnemies",
+    "effects": [],
+    "desc": "A tide of gold dust over the field."
+  },
+  "gold_dust_wall": {
+    "name": "Magnet Release: Gold Dust Wall",
+    "category": "support",
+    "nature": "magnet",
+    "power": 0,
+    "cost": 40,
+    "priority": 2,
+    "target": "allAllies",
+    "effects": [
+      {
+        "type": "buff",
+        "stat": "def",
+        "mult": 1.3,
+        "turns": 2
+      }
+    ],
+    "desc": "Walls of gold rise in front of the team: +30% DEF for 2 turns."
+  },
+  "gold_dust_coffin": {
+    "name": "Magnet Release: Gold Dust Coffin",
+    "category": "ninjutsu",
+    "nature": "magnet",
+    "power": 0,
+    "cost": 40,
+    "priority": 0,
+    "target": "enemy",
+    "effects": [
+      {
+        "type": "bind",
+        "chance": 0.7,
+        "turns": 2
+      }
+    ],
+    "desc": "Heavy gold pins the target: 70% Bind for 2 turns."
+  },
+  "gold_avalanche": {
+    "name": "Magnet Release: Gold Avalanche",
+    "category": "ninjutsu",
+    "nature": "magnet",
+    "power": 125,
+    "cost": 60,
+    "priority": -1,
+    "target": "enemy",
+    "effects": [],
+    "desc": "Tons of gold crash down on one target."
+  },
+  "flicker_strike": {
+    "name": "Body Flicker Strike",
+    "category": "taijutsu",
+    "nature": null,
+    "power": 100,
+    "cost": 15,
+    "priority": 2,
+    "target": "enemy",
+    "effects": [],
+    "desc": "Gone and back before anyone sees the hit."
+  },
+  "flicker_slashes": {
+    "name": "Body Flicker Slashes",
+    "category": "taijutsu",
+    "nature": null,
+    "power": 70,
+    "cost": 30,
+    "priority": 1,
+    "target": "allEnemies",
+    "effects": [],
+    "desc": "Afterimages cut every enemy at once."
+  },
+  "shisui_arrows": {
+    "name": "Susano'o: Divine Arrows",
+    "category": "ninjutsu",
+    "nature": "fire",
+    "power": 165,
+    "cost": 70,
+    "priority": 0,
+    "target": "enemy",
+    "effects": [],
+    "desc": "Only while transformed. Perfect Susano'o looses its arrows.",
+    "requiresTransform": true
+  },
+  "poison_mist": {
+    "name": "Poison Mist",
+    "category": "ninjutsu",
+    "nature": "water",
+    "power": 40,
+    "cost": 35,
+    "priority": 0,
+    "target": "allEnemies",
+    "effects": [
+      {
+        "type": "poison",
+        "chance": 0.4,
+        "turns": 3
+      }
+    ],
+    "desc": "Breathes a cloud of poison. 40% Poison."
+  },
+  "poison_needles": {
+    "name": "Hidden Needle Shot",
+    "category": "taijutsu",
+    "nature": null,
+    "power": 55,
+    "cost": 10,
+    "priority": 2,
+    "target": "enemy",
+    "effects": [
+      {
+        "type": "poison",
+        "chance": 0.3,
+        "turns": 3
+      }
+    ],
+    "desc": "A spring-loaded needle from her sleeve. 30% Poison."
   },
   "thrown_rasenshuriken": {
     "name": "Rasenshuriken (Thrown)",

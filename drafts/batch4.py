@@ -163,7 +163,7 @@ add('gengetsu', 'Gengetsu Hozuki', '—', 'Shippuden', 7, 'boil', 'water', ['Con
     ['log', 'waterClone'], ['steaming_tyrant', 'clam_mirage', 'water_gun', 'hydrification'])
 add('yagura', 'Yagura Karatachi', '—', 'Shippuden', 8, 'water', None, ['Tank', 'Controller'], (110, 95, 110, 105, 100, 140),
     ('Coral Shell', 'The first damaging single-target hit he takes each turn is reduced by 35%.', True),
-    T('Three-Tails Chakra Cloak', 60, 3, '+30% DEF, +30% NIN and unlocks Isobu: Tailed Beast Bomb. Exhausted afterwards.'),
+    T('Three-Tails Isobu', 60, 3, '+30% DEF, +30% NIN and unlocks Isobu: Tailed Beast Bomb. Exhausted afterwards.'),
     A('Bloody Mist', 'enemyDrain', '2% / 4% / 6%', 'Fielded enemies lose {v} max Chakra per turn.'),
     ['log', 'waterClone'], ['coral_palm', 'hook_staff', 'water_mirror', 'raging_waves', 'isobu_bomb'])
 # ---- Stone
