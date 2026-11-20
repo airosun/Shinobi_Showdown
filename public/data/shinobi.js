@@ -86,7 +86,7 @@ export const SHINOBI = [
   {
     "id": "naruto_ship",
     "baseId": "naruto",
-    "name": "Naruto Uzumaki (Shippuden)",
+    "name": "Naruto Uzumaki",
     "era": "Shippuden",
     "cost": 6,
     "natures": {
@@ -390,7 +390,7 @@ export const SHINOBI = [
   {
     "id": "sasuke_ship",
     "baseId": "sasuke",
-    "name": "Sasuke Uchiha (Shippuden)",
+    "name": "Sasuke Uchiha",
     "era": "Shippuden",
     "cost": 7,
     "natures": {
@@ -675,7 +675,7 @@ export const SHINOBI = [
   {
     "id": "sakura_shippuden",
     "baseId": "sakura",
-    "name": "Sakura Haruno (Shippuden)",
+    "name": "Sakura Haruno",
     "era": "Shippuden",
     "cost": 6,
     "natures": {
@@ -878,7 +878,7 @@ export const SHINOBI = [
   {
     "id": "kakashi_ship",
     "baseId": "kakashi",
-    "name": "Kakashi Hatake (Shippuden)",
+    "name": "Kakashi Hatake",
     "era": "Shippuden",
     "cost": 7,
     "natures": {
@@ -1231,7 +1231,7 @@ export const SHINOBI = [
   {
     "id": "hinata_ship",
     "baseId": "hinata",
-    "name": "Hinata Hyuga (Shippuden)",
+    "name": "Hinata Hyuga",
     "era": "Shippuden",
     "cost": 7,
     "natures": {
@@ -1359,7 +1359,7 @@ export const SHINOBI = [
   {
     "id": "neji_ship",
     "baseId": "neji",
-    "name": "Neji Hyuga (Shippuden)",
+    "name": "Neji Hyuga",
     "era": "Shippuden",
     "cost": 8,
     "natures": {
@@ -1499,7 +1499,7 @@ export const SHINOBI = [
   {
     "id": "lee_ship",
     "baseId": "lee",
-    "name": "Rock Lee (Shippuden)",
+    "name": "Rock Lee",
     "era": "Shippuden",
     "cost": 7,
     "natures": {
@@ -1628,7 +1628,7 @@ export const SHINOBI = [
   {
     "id": "tenten_ship",
     "baseId": "tenten",
-    "name": "Tenten (Shippuden)",
+    "name": "Tenten",
     "era": "Shippuden",
     "cost": 7,
     "natures": {
@@ -1827,7 +1827,7 @@ export const SHINOBI = [
   {
     "id": "kiba_ship",
     "baseId": "kiba",
-    "name": "Kiba Inuzuka (Shippuden)",
+    "name": "Kiba Inuzuka",
     "era": "Shippuden",
     "cost": 6,
     "natures": {
@@ -1955,7 +1955,7 @@ export const SHINOBI = [
   {
     "id": "shino_ship",
     "baseId": "shino",
-    "name": "Shino Aburame (Shippuden)",
+    "name": "Shino Aburame",
     "era": "Shippuden",
     "cost": 7,
     "natures": {
@@ -2075,7 +2075,7 @@ export const SHINOBI = [
   {
     "id": "shikamaru_ship",
     "baseId": "shikamaru",
-    "name": "Shikamaru Nara (Shippuden)",
+    "name": "Shikamaru Nara",
     "era": "Shippuden",
     "cost": 7,
     "natures": {
@@ -2213,7 +2213,7 @@ export const SHINOBI = [
   {
     "id": "choji_ship",
     "baseId": "choji",
-    "name": "Choji Akimichi (Shippuden)",
+    "name": "Choji Akimichi",
     "era": "Shippuden",
     "cost": 7,
     "natures": {
@@ -2342,7 +2342,7 @@ export const SHINOBI = [
   {
     "id": "ino_ship",
     "baseId": "ino",
-    "name": "Ino Yamanaka (Shippuden)",
+    "name": "Ino Yamanaka",
     "era": "Shippuden",
     "cost": 5,
     "natures": {
@@ -2611,7 +2611,7 @@ export const SHINOBI = [
   {
     "id": "gaara_ship",
     "baseId": "gaara",
-    "name": "Gaara (Shippuden)",
+    "name": "Gaara",
     "era": "Shippuden",
     "cost": 10,
     "natures": {
@@ -2740,7 +2740,7 @@ export const SHINOBI = [
   {
     "id": "temari_ship",
     "baseId": "temari",
-    "name": "Temari (Shippuden)",
+    "name": "Temari",
     "era": "Shippuden",
     "cost": 7,
     "natures": {
@@ -2862,7 +2862,7 @@ export const SHINOBI = [
   {
     "id": "kankuro_ship",
     "baseId": "kankuro",
-    "name": "Kankuro (Shippuden)",
+    "name": "Kankuro",
     "era": "Shippuden",
     "cost": 6,
     "natures": {
@@ -3056,7 +3056,7 @@ export const SHINOBI = [
   {
     "id": "orochimaru_ship",
     "baseId": "orochimaru",
-    "name": "Orochimaru (Shippuden)",
+    "name": "Orochimaru",
     "era": "Shippuden",
     "cost": 10,
     "natures": {

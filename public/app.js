@@ -158,8 +158,20 @@ function render() {
   const kept = [...app.querySelectorAll('[data-keep-scroll]')].map((el) => [el.dataset.keepScroll, el.scrollTop]);
   app.innerHTML = SCREENS[S.screen]();
   for (const [k, top] of kept) { const el = app.querySelector(`[data-keep-scroll="${k}"]`); if (el) el.scrollTop = top; }
+  fitNames(app);
   if (S.screen === 'battle') { const lg = document.getElementById('blog'); if (lg) lg.scrollTop = lg.scrollHeight; }
 }
+
+// shrink long names (Dex lists + headers) so they stay on one line
+function fitNames(root) {
+  for (const el of root.querySelectorAll('.dex-item .nm, .dex-name')) {
+    el.style.fontSize = '';
+    let fs = parseFloat(getComputedStyle(el).fontSize); const min = fs * 0.55;
+    while (el.scrollWidth > el.clientWidth + 1 && fs > min) { fs -= 0.5; el.style.fontSize = `${fs}px`; }
+  }
+}
+let fitT; addEventListener('resize', () => { clearTimeout(fitT); fitT = setTimeout(() => fitNames(app), 120); });
+document.fonts?.ready.then(() => fitNames(app));
 
 // ---------------------------------------------------------------- screens
 const SCREENS = {

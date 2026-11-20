@@ -347,7 +347,7 @@ AURAS = {
 
 def name_for(s):
     char = s['character'].replace(' (with Akamaru)', '')
-    if s['form'] in ('—', 'Part I'):
+    if s['form'] in ('—', 'Part I', 'Shippuden'):
         return char
     return f"{char} ({s['form']})"
 

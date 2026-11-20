@@ -2,11 +2,16 @@
    night-ink panels, Naruto orange, Konoha leaf green, Uchiha/Akatsuki red, scroll parchment,
    brush-stroke display type (Potta One) over a rounded Japanese sans (M PLUS Rounded 1c). */
 /* fonts are self-hosted (SIL Open Font License) */
-@font-face { font-family: 'Potta One'; font-style: normal; font-weight: 400; font-display: swap; src: url(fonts/potta-one-latin-400-normal.woff2) format('woff2'); }
-@font-face { font-family: 'M PLUS Rounded 1c'; font-style: normal; font-weight: 400; font-display: swap; src: url(fonts/m-plus-rounded-1c-latin-400-normal.woff2) format('woff2'); }
-@font-face { font-family: 'M PLUS Rounded 1c'; font-style: normal; font-weight: 500; font-display: swap; src: url(fonts/m-plus-rounded-1c-latin-500-normal.woff2) format('woff2'); }
-@font-face { font-family: 'M PLUS Rounded 1c'; font-style: normal; font-weight: 700; font-display: swap; src: url(fonts/m-plus-rounded-1c-latin-700-normal.woff2) format('woff2'); }
-@font-face { font-family: 'M PLUS Rounded 1c'; font-style: normal; font-weight: 800; font-display: swap; src: url(fonts/m-plus-rounded-1c-latin-800-normal.woff2) format('woff2'); }
+@font-face { font-family: 'Potta One'; font-style: normal; font-weight: 400; font-display: swap; src: url(fonts/potta-one-latin-400-normal.woff2) format('woff2'); unicode-range: U+0000-00FF,U+0131,U+0152-0153,U+02BB-02BC,U+02C6,U+02DA,U+02DC,U+0304,U+0308,U+0329,U+2000-206F,U+20AC,U+2122,U+2191,U+2193,U+2212,U+2215,U+FEFF,U+FFFD; }
+@font-face { font-family: 'Potta One'; font-style: normal; font-weight: 400; font-display: swap; src: url(fonts/potta-one-latin-ext-400-normal.woff2) format('woff2'); unicode-range: U+0100-02BA,U+02BD-02C5,U+02C7-02CC,U+02CE-02D7,U+02DD-02FF,U+1D00-1DBF,U+1E00-1E9F,U+1EF2-1EFF,U+2020,U+20A0-20AB,U+20AD-20C0,U+2113,U+2C60-2C7F,U+A720-A7FF; }
+@font-face { font-family: 'M PLUS Rounded 1c'; font-style: normal; font-weight: 400; font-display: swap; src: url(fonts/m-plus-rounded-1c-latin-400-normal.woff2) format('woff2'); unicode-range: U+0000-00FF,U+0131,U+0152-0153,U+02BB-02BC,U+02C6,U+02DA,U+02DC,U+0304,U+0308,U+0329,U+2000-206F,U+20AC,U+2122,U+2191,U+2193,U+2212,U+2215,U+FEFF,U+FFFD; }
+@font-face { font-family: 'M PLUS Rounded 1c'; font-style: normal; font-weight: 400; font-display: swap; src: url(fonts/m-plus-rounded-1c-latin-ext-400-normal.woff2) format('woff2'); unicode-range: U+0100-02BA,U+02BD-02C5,U+02C7-02CC,U+02CE-02D7,U+02DD-02FF,U+1D00-1DBF,U+1E00-1E9F,U+1EF2-1EFF,U+2020,U+20A0-20AB,U+20AD-20C0,U+2113,U+2C60-2C7F,U+A720-A7FF; }
+@font-face { font-family: 'M PLUS Rounded 1c'; font-style: normal; font-weight: 500; font-display: swap; src: url(fonts/m-plus-rounded-1c-latin-500-normal.woff2) format('woff2'); unicode-range: U+0000-00FF,U+0131,U+0152-0153,U+02BB-02BC,U+02C6,U+02DA,U+02DC,U+0304,U+0308,U+0329,U+2000-206F,U+20AC,U+2122,U+2191,U+2193,U+2212,U+2215,U+FEFF,U+FFFD; }
+@font-face { font-family: 'M PLUS Rounded 1c'; font-style: normal; font-weight: 500; font-display: swap; src: url(fonts/m-plus-rounded-1c-latin-ext-500-normal.woff2) format('woff2'); unicode-range: U+0100-02BA,U+02BD-02C5,U+02C7-02CC,U+02CE-02D7,U+02DD-02FF,U+1D00-1DBF,U+1E00-1E9F,U+1EF2-1EFF,U+2020,U+20A0-20AB,U+20AD-20C0,U+2113,U+2C60-2C7F,U+A720-A7FF; }
+@font-face { font-family: 'M PLUS Rounded 1c'; font-style: normal; font-weight: 700; font-display: swap; src: url(fonts/m-plus-rounded-1c-latin-700-normal.woff2) format('woff2'); unicode-range: U+0000-00FF,U+0131,U+0152-0153,U+02BB-02BC,U+02C6,U+02DA,U+02DC,U+0304,U+0308,U+0329,U+2000-206F,U+20AC,U+2122,U+2191,U+2193,U+2212,U+2215,U+FEFF,U+FFFD; }
+@font-face { font-family: 'M PLUS Rounded 1c'; font-style: normal; font-weight: 700; font-display: swap; src: url(fonts/m-plus-rounded-1c-latin-ext-700-normal.woff2) format('woff2'); unicode-range: U+0100-02BA,U+02BD-02C5,U+02C7-02CC,U+02CE-02D7,U+02DD-02FF,U+1D00-1DBF,U+1E00-1E9F,U+1EF2-1EFF,U+2020,U+20A0-20AB,U+20AD-20C0,U+2113,U+2C60-2C7F,U+A720-A7FF; }
+@font-face { font-family: 'M PLUS Rounded 1c'; font-style: normal; font-weight: 800; font-display: swap; src: url(fonts/m-plus-rounded-1c-latin-800-normal.woff2) format('woff2'); unicode-range: U+0000-00FF,U+0131,U+0152-0153,U+02BB-02BC,U+02C6,U+02DA,U+02DC,U+0304,U+0308,U+0329,U+2000-206F,U+20AC,U+2122,U+2191,U+2193,U+2212,U+2215,U+FEFF,U+FFFD; }
+@font-face { font-family: 'M PLUS Rounded 1c'; font-style: normal; font-weight: 800; font-display: swap; src: url(fonts/m-plus-rounded-1c-latin-ext-800-normal.woff2) format('woff2'); unicode-range: U+0100-02BA,U+02BD-02C5,U+02C7-02CC,U+02CE-02D7,U+02DD-02FF,U+1D00-1DBF,U+1E00-1E9F,U+1EF2-1EFF,U+2020,U+20A0-20AB,U+20AD-20C0,U+2113,U+2C60-2C7F,U+A720-A7FF; }
 :root {
   --bg: #110c08; --panel: #1c1510; --panel2: #271d15; --line: #3e2e20; --text: #f8eedb; --muted: #b5a385;
   --accent: #f57c1f; --accent2: #d23a2a; --good: #6cc24a; --warn: #ffc845; --bad: #ff5a4d;
@@ -359,7 +364,7 @@ input:focus, select:focus { outline: 2px solid #f57c1f55; border-color: var(--ac
 .fx.banner { -webkit-text-stroke: 1px #000; paint-order: stroke fill; }
 
 /* ================= Shinobi Dex ================= */
-.dex { display: grid; grid-template-columns: 300px 1fr; gap: 16px; align-items: start; }
+.dex { display: grid; grid-template-columns: 340px minmax(0, 1fr); gap: 16px; align-items: start; }
 @media (max-width: 900px) { .dex { grid-template-columns: 1fr; } }
 .dex-side { position: sticky; top: 70px; background: var(--panel); border: 1px solid var(--line); border-top: 3px solid var(--accent); border-radius: var(--radius); padding: 12px; }
 @media (max-width: 900px) { .dex-side { position: static; } }
@@ -369,7 +374,7 @@ input:focus, select:focus { outline: 2px solid #f57c1f55; border-color: var(--ac
 .dex-list { display: flex; flex-direction: column; gap: 3px; max-height: calc(100vh - 250px); min-height: 200px; overflow-y: auto; padding-right: 4px; }
 @media (max-width: 900px) { .dex-list { max-height: 260px; } }
 .dex-item { display: flex; align-items: center; gap: 8px; text-align: left; padding: 4px 8px 4px 4px; border-color: transparent; background: transparent; font-size: 13.5px; }
-.dex-item .nm { flex: 1; min-width: 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; font-weight: 600; }
+.dex-item .nm { flex: 1; min-width: 0; white-space: nowrap; overflow: hidden; font-weight: 600; }
 .dex-item.sel { background: #3a2614; border-color: var(--accent); }
 .dex-nav { display: flex; align-items: center; gap: 8px; margin-bottom: 10px; }
 .dex-card { display: grid; grid-template-columns: minmax(240px, 380px) 1fr; gap: 18px; background: var(--panel); border: 1px solid var(--line); border-top: 3px solid var(--accent); border-radius: var(--radius); padding: 16px; box-shadow: 0 6px 18px #0006; }
@@ -379,7 +384,7 @@ input:focus, select:focus { outline: 2px solid #f57c1f55; border-color: var(--ac
   background: radial-gradient(ellipse 70% 14% at 50% 94%, #0007, transparent 70%), radial-gradient(circle at 50% 35%, #f57c1f30, transparent 65%), linear-gradient(180deg, #2a1d13, #18110b); border: 1px solid var(--line); }
 .dex-stage img { max-width: 100%; max-height: 100%; object-fit: contain; filter: drop-shadow(0 8px 6px #000a); }
 .dex-stage .badge.lg { margin: auto; }
-.dex-name { font-family: var(--display); font-size: 30px; line-height: 1.15; }
+.dex-name { font-family: var(--display); font-size: 30px; line-height: 1.15; white-space: nowrap; overflow: hidden; }
 .dex-stats { display: grid; grid-template-columns: 44px 1fr 40px; gap: 4px 10px; align-items: center; font-size: 13px; margin-bottom: 12px; max-width: 460px; }
 .dex-stats .statbar { height: 8px; }
 .dex-block { margin-top: 8px; padding: 8px 10px; background: var(--panel2); border-radius: 8px; font-size: 14px; line-height: 1.45; }
