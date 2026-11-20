@@ -104,7 +104,9 @@ const ART = {
   palm: () => `<svg width="48" height="48" viewBox="0 0 48 48"><circle cx="24" cy="24" r="20" fill="#fff6" stroke="#fff" stroke-width="3"/><path d="M16 30V18m6 12V14m6 16V15m6 15V19" stroke="#fff" stroke-width="3" stroke-linecap="round"/></svg>`,
   eye: () => `<svg width="64" height="34" viewBox="0 0 64 34"><path d="M2 17C14 2 50 2 62 17 50 32 14 32 2 17Z" fill="#f4f2ff" stroke="#c9c2e8" stroke-width="2"/><circle cx="32" cy="17" r="9" fill="#e9e4ff" stroke="#b9b0dd"/><path d="M2 17c8-3 12-8 14-12M62 17c-8-3-12-8-14-12M10 26c6-2 9-3 12-6M54 26c-6-2-9-3-12-6" stroke="#b89bd8" stroke-width="1.5" fill="none"/></svg>`,
   rasengan: (s = 54) => `<div class="ax-spin" style="width:${s}px;height:${s}px;border-radius:50%;background:conic-gradient(from 0deg,#e8f6ff,#4aa3ff,#cfeaff,#1f6fd6,#e8f6ff);box-shadow:0 0 22px 8px #6cb8ffaa"></div>`,
-  ant: () => `<svg width="140" height="124" viewBox="0 0 90 80"><g stroke="#3a2a22" stroke-width="2"><path d="M20 30 4 18M20 40 2 40M20 50 4 62M70 30 86 18M70 40 88 40M70 50 86 62" stroke="#5e4a3e" stroke-width="5" stroke-linecap="round"/><ellipse cx="45" cy="42" rx="26" ry="30" fill="#7a6a5c"/><ellipse cx="45" cy="18" rx="13" ry="11" fill="#8c7b6c"/></g><path d="M37 9 31-2M53 9 59-2" stroke="#c8202a" stroke-width="4" stroke-linecap="round"/><circle cx="40" cy="18" r="2" fill="#111"/><circle cx="50" cy="18" r="2" fill="#111"/><path d="M33 40h24M33 50h24" stroke="#4a3a30" stroke-width="2"/></svg>`,
+  ant: () => `<svg width="140" height="150" viewBox="0 0 90 96"><g stroke="#3a2a22" stroke-width="2"><path d="M20 30 4 18M20 40 2 40M20 50 4 62M70 30 86 18M70 40 88 40M70 50 86 62" stroke="#5e4a3e" stroke-width="5" stroke-linecap="round"/><path d="M36 68 32 94M54 68 58 94" stroke="#3a2a22" stroke-width="9" stroke-linecap="round"/><path d="M36 68 32 94M54 68 58 94" stroke="#8c7b6c" stroke-width="6" stroke-linecap="round"/><ellipse cx="45" cy="42" rx="26" ry="30" fill="#7a6a5c"/><ellipse cx="45" cy="18" rx="13" ry="11" fill="#8c7b6c"/></g><path d="M37 9 31-2M53 9 59-2" stroke="#c8202a" stroke-width="4" stroke-linecap="round"/><circle cx="40" cy="18" r="2" fill="#111"/><circle cx="50" cy="18" r="2" fill="#111"/><path d="M33 40h24M33 50h24" stroke="#4a3a30" stroke-width="2"/></svg>`,
+  antBody: (h = 160) => `<svg width="${h * 0.72}" height="${h}" viewBox="0 0 72 100"><g stroke="#3a2a22" stroke-width="2.5"><ellipse cx="36" cy="58" rx="32" ry="40" fill="#7a6a5c"/><ellipse cx="36" cy="18" rx="16" ry="14" fill="#8c7b6c"/></g><path d="M27 7 20-6M45 7 52-6" stroke="#c8202a" stroke-width="5" stroke-linecap="round"/><circle cx="30" cy="18" r="2.5" fill="#111"/><circle cx="42" cy="18" r="2.5" fill="#111"/><path d="M14 52h44M14 66h44" stroke="#4a3a30" stroke-width="2.5"/><path d="M20 28c10 6 22 6 32 0" stroke="#5e4a3e" stroke-width="2" fill="none"/></svg>`,
+  antLimb: () => `<svg width="64" height="14" viewBox="0 0 64 14"><path d="M0 7H42" stroke="#5e4a3e" stroke-width="7" stroke-linecap="round"/><circle cx="22" cy="7" r="4.5" fill="#7a6a5c" stroke="#3a2a22"/><path d="M40 2 64 7 40 12Z" fill="#c9ced6" stroke="#444"/></svg>`,
   crowBody: (s = 120) => `<svg width="${s}" height="${s}" viewBox="0 0 120 120"><path d="M60 6C88 6 108 28 110 56 112 86 90 112 60 114 30 112 8 86 10 56 12 28 32 6 60 6Z" fill="#1d1d24" stroke="#5a5a6e" stroke-width="3"/><path d="M42 40h36M42 70h36" stroke="#5a5a6e" stroke-width="3"/></svg>`,
   blade: (l = 40) => `<svg width="${l}" height="10" viewBox="0 0 40 10"><path d="M0 5 40 1v8Z" fill="#c9ced6" stroke="#444"/></svg>`,
   spider: () => `<svg width="34" height="28" viewBox="0 0 22 18"><g stroke="#f4f4f4" stroke-width="1.6" fill="none"><path d="M6 7 0 2M6 9 0 9M6 11 0 16M16 7 22 2M16 9 22 9M16 11 22 16"/></g><ellipse cx="11" cy="9" rx="6" ry="5" fill="#fafafa" stroke="#bbb"/></svg>`,
@@ -289,7 +291,7 @@ export const ANIMS = {
     },
   },
   iron_maiden: {
-    desc: "Kankuro's Black Ant puppet (six-armed, gray-brown, red horns) flies to the target and grabs them.",
+    desc: "Kankuro's Black Ant puppet (six arms, two legs, gray-brown, red horns) flies to the target and grabs them.",
     async play(ctx) {
       const to = ctx.tos[0];
       const ant = spawn(ctx, ART.ant(), ctx.from, { life: 1800 });
@@ -312,17 +314,17 @@ export const ANIMS = {
     },
   },
   crow_embrace: {
-    desc: 'The puppet body engulfs the target, then its limbs fly in and stab them.',
+    desc: "The Black Ant's body (no limbs) engulfs the target, then its limbs fly in and stab them.",
     async play(ctx) {
       const el = ctx.targetEls[0]; const to = ctx.tos[0];
       const { h } = sizeOf(el);
-      const body = spawn(ctx, ART.crowBody(h * 0.95), to, { life: 2200 });
+      const body = spawn(ctx, ART.antBody(h * 1.05), to, { life: 2200 });
       await body.animate([{ transform: 'translate(-50%,-50%) scale(1.8)', opacity: 0 }, { transform: 'translate(-50%,-50%) scale(1)', opacity: 0.92 }], { duration: 380 * ctx.sp, easing: 'ease-in', fill: 'forwards' }).finished.catch(() => {});
       const dirs = [0, 60, 120, 180, 240, 300];
       await Promise.all(dirs.map((d, i) => {
         const rad = (d * Math.PI) / 180;
         const start = { x: to.x + Math.cos(rad) * 110, y: to.y + Math.sin(rad) * 80 };
-        const bl = spawn(ctx, ART.blade(46), start, { life: 900 });
+        const bl = spawn(ctx, ART.antLimb(), start, { life: 900 });
         return wait(i * 40 * ctx.sp).then(() => fly(ctx, bl, start, to, 220)).then(() => bl.remove());
       }));
       shake(ctx);
