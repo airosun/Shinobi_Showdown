@@ -9,7 +9,7 @@ export const SHINOBI = [
   {
     "id": "naruto_p1",
     "baseId": "naruto",
-    "name": "Naruto Uzumaki",
+    "name": "Naruto Uzumaki (Part I)",
     "era": "Part 1",
     "cost": 5,
     "natures": {
@@ -317,7 +317,7 @@ export const SHINOBI = [
   {
     "id": "sasuke_p1",
     "baseId": "sasuke",
-    "name": "Sasuke Uchiha",
+    "name": "Sasuke Uchiha (Part I)",
     "era": "Part 1",
     "cost": 6,
     "natures": {
@@ -617,7 +617,7 @@ export const SHINOBI = [
   {
     "id": "sakura_p1",
     "baseId": "sakura",
-    "name": "Sakura Haruno",
+    "name": "Sakura Haruno (Part I)",
     "era": "Part 1",
     "cost": 3,
     "natures": {
@@ -815,7 +815,7 @@ export const SHINOBI = [
   {
     "id": "kakashi_p1",
     "baseId": "kakashi",
-    "name": "Kakashi Hatake",
+    "name": "Kakashi Hatake (Part I)",
     "era": "Part 1",
     "cost": 6,
     "natures": {
@@ -1163,7 +1163,7 @@ export const SHINOBI = [
   {
     "id": "hinata_p1",
     "baseId": "hinata",
-    "name": "Hinata Hyuga",
+    "name": "Hinata Hyuga (Part I)",
     "era": "Part 1",
     "cost": 4,
     "natures": {
@@ -1300,7 +1300,7 @@ export const SHINOBI = [
   {
     "id": "neji_p1",
     "baseId": "neji",
-    "name": "Neji Hyuga",
+    "name": "Neji Hyuga (Part I)",
     "era": "Part 1",
     "cost": 6,
     "natures": {
@@ -1428,7 +1428,7 @@ export const SHINOBI = [
   {
     "id": "lee_p1",
     "baseId": "lee",
-    "name": "Rock Lee",
+    "name": "Rock Lee (Part I)",
     "era": "Part 1",
     "cost": 6,
     "natures": {
@@ -1570,7 +1570,7 @@ export const SHINOBI = [
   {
     "id": "tenten_p1",
     "baseId": "tenten",
-    "name": "Tenten",
+    "name": "Tenten (Part I)",
     "era": "Part 1",
     "cost": 4,
     "natures": {
@@ -1768,7 +1768,7 @@ export const SHINOBI = [
   {
     "id": "kiba_p1",
     "baseId": "kiba",
-    "name": "Kiba Inuzuka",
+    "name": "Kiba Inuzuka (Part I)",
     "era": "Part 1",
     "cost": 5,
     "natures": {
@@ -1896,7 +1896,7 @@ export const SHINOBI = [
   {
     "id": "shino_p1",
     "baseId": "shino",
-    "name": "Shino Aburame",
+    "name": "Shino Aburame (Part I)",
     "era": "Part 1",
     "cost": 4,
     "natures": {
@@ -2015,7 +2015,7 @@ export const SHINOBI = [
   {
     "id": "shikamaru_p1",
     "baseId": "shikamaru",
-    "name": "Shikamaru Nara",
+    "name": "Shikamaru Nara (Part I)",
     "era": "Part 1",
     "cost": 5,
     "natures": {
@@ -2136,7 +2136,7 @@ export const SHINOBI = [
   {
     "id": "choji_p1",
     "baseId": "choji",
-    "name": "Choji Akimichi",
+    "name": "Choji Akimichi (Part I)",
     "era": "Part 1",
     "cost": 6,
     "natures": {
@@ -2284,7 +2284,7 @@ export const SHINOBI = [
   {
     "id": "ino_p1",
     "baseId": "ino",
-    "name": "Ino Yamanaka",
+    "name": "Ino Yamanaka (Part I)",
     "era": "Part 1",
     "cost": 4,
     "natures": {
@@ -2539,7 +2539,7 @@ export const SHINOBI = [
   {
     "id": "gaara_p1",
     "baseId": "gaara",
-    "name": "Gaara",
+    "name": "Gaara (Part I)",
     "era": "Part 1",
     "cost": 7,
     "natures": {
@@ -2682,7 +2682,7 @@ export const SHINOBI = [
   {
     "id": "temari_p1",
     "baseId": "temari",
-    "name": "Temari",
+    "name": "Temari (Part I)",
     "era": "Part 1",
     "cost": 6,
     "natures": {
@@ -2803,7 +2803,7 @@ export const SHINOBI = [
   {
     "id": "kankuro_p1",
     "baseId": "kankuro",
-    "name": "Kankuro",
+    "name": "Kankuro (Part I)",
     "era": "Part 1",
     "cost": 5,
     "natures": {
