@@ -3157,7 +3157,12 @@ Object.assign(ANIMS, {
     desc: 'User flies in and strikes the target; a Shinigami mask appears over both of them and both take damage.',
     async play(ctx) {
       const to = await lunging(ctx, 0.7, 500); boom(ctx, to, '#b44bff', 100);
-      const masks = [ctx.userEl, ctx.targetEls[0]].map((el) => { const r = el.getBoundingClientRect(); const a = ctx.arena.getBoundingClientRect(); const m = spawn(ctx, ART7.shinigami(Math.max(60, r.height * 0.32)), { x: r.left - a.left + r.width / 2, y: r.top - a.top + r.height * 0.18 }, { life: 1800 }); pop(ctx, m, 300); return m; });
+      await wait(300 * ctx.sp); // let the user finish the lunge and settle back
+      const masks = [[ctx.userEl, ctx.from, ctx.userSize], [ctx.targetEls[0], ctx.tos[0], sizeOf(ctx.targetEls[0])]].map(([el, c, sz]) => {
+        const img = el.querySelector('img'); const ir = img?.getBoundingClientRect(); const a = ctx.arena.getBoundingClientRect();
+        const headY = ir && ir.height > 10 ? ir.top - a.top + ir.height * 0.15 : c.y - sz.h * 0.4;
+        const m = spawn(ctx, ART7.shinigami(Math.max(56, sz.h * 0.22)), { x: c.x, y: headY }, { life: 1800 }); pop(ctx, m, 300); return m;
+      });
       await wait(650 * ctx.sp); shake(ctx); shakeEl(ctx.userEl); await wait(300 * ctx.sp); masks.forEach((m) => fade(ctx, m, 300));
     },
   },
