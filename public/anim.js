@@ -77,7 +77,7 @@ const sizeOf = (el) => { const r = el.getBoundingClientRect(); return { w: r.wid
 const userImg = (ctx) => ctx.userEl.querySelector('img.art, img');
 const ghostOf = (ctx, at, opacity = 0.55) => {
   const img = userImg(ctx);
-  const { w, h } = sizeOf(ctx.userEl);
+  const { w, h } = ctx.userSize || sizeOf(ctx.userEl);
   const html = img ? `<img src="${img.getAttribute('src')}" style="height:${h}px;${img.style.transform ? `transform:${img.style.transform};` : ''}opacity:${opacity};filter:drop-shadow(0 0 6px #fff)">`
     : `<div style="width:${w}px;height:${h}px;border-radius:50%;background:#fff;opacity:${opacity}"></div>`;
   return spawn(ctx, html, at, { life: 1500 });
@@ -2466,9 +2466,13 @@ Object.assign(ANIMS, {
       await pop(ctx, sb, 250); fade(ctx, sb, 200);
       const s1 = await warpOut(ctx, u, ctx.from);
       const s2 = spawn(ctx, swirl(sizeOf(u).h * 0.8), near, { life: 1400 }); await pop(ctx, s2, 200);
-      const g = ghostOf(ctx, near, 0.9); const b = sparkBall(ctx, between(near, to, 0.4), 50, 700);
-      await wait(120 * ctx.sp);
-      boom(ctx, to, '#9fd8ff', 130); for (let i = 0; i < 4; i++) bolt(ctx, to, { x: to.x + rnd(-70, 70), y: to.y + rnd(-70, 70) }, { ms: 220 });
+      const g = ghostOf(ctx, near, 0.9);
+      const handAt = { x: near.x + (ctx.isFoe ? -22 : 22), y: near.y + 10 };
+      const b = sparkBall(ctx, handAt, 46, 1400); await pop(ctx, b, 160);
+      await wait(300 * ctx.sp);
+      const hit = between(near, to, 0.55);
+      await Promise.all([fly(ctx, g, near, hit, 200, { rotate: 0, ease: 'ease-in' }), fly(ctx, b, handAt, between(handAt, to, 0.85), 200, { rotate: 0, ease: 'ease-in' })]);
+      boom(ctx, to, '#9fd8ff', 140); for (let i = 0; i < 4; i++) bolt(ctx, to, { x: to.x + rnd(-70, 70), y: to.y + rnd(-70, 70) }, { ms: 220 });
       shake(ctx); fade(ctx, b, 150);
       setTimeout(() => { fade(ctx, g, 200); fade(ctx, s2, 200); fade(ctx, s1, 200); restore(ctx, u); }, 400 * ctx.sp);
     },
@@ -2554,6 +2558,7 @@ export function genericPlay(ctx) {
  */
 export async function playJutsu(arena, j, userEl, targetEls, { sp = 1, sideEls = [], isFoe = false } = {}) {
   const ctx = { arena, j, userEl, targetEls, sideEls, sp, isFoe, from: FX.centerOf(userEl, arena), tos: targetEls.map((t) => FX.centerOf(t, arena)) };
+  ctx.userSize = sizeOf(userEl);
   const a = ANIMS[j.id];
   if (a && targetEls.length) {
     try { await a.play(ctx); return true; } catch (err) { console.error('anim', j.id, err); }
