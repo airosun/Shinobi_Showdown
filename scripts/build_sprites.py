@@ -76,16 +76,16 @@ MAP = {
 }
 # manual portrait boxes for poses the automatic crop gets wrong: (centre x, centre y, size) as fractions of the trimmed image width/height/width
 FACE = {
-    'chomei': (0.43, 0.39, 0.2), 'saiken': (0.52, 0.14, 0.28), 'kokuo': (0.14, 0.48, 0.25), 'son-goku': (0.23, 0.52, 0.25), 'matatabi': (0.38, 0.52, 0.25),
+    'chomei': (0.45, 0.28, 0.22), 'saiken': (0.52, 0.14, 0.28), 'kokuo': (0.14, 0.48, 0.25), 'son-goku': (0.23, 0.52, 0.25), 'matatabi': (0.38, 0.52, 0.25),
     'kakashi-double-mangekyo': (0.40, 0.27, 0.42), 'rock-lee-part-1': (0.62, 0.10, 0.35),
     'sasuke-part-1-curse-mark': (0.38, 0.37, 0.32), 'naruto-part-1-nine-tails-cloak': (0.66, 0.28, 0.38),
     'choji-butterfly': (0.485, 0.55, 0.14), 'choji-shippuden-butterfly': (0.39, 0.51, 0.2), 'gaara-part-1': (0.16, 0.23, 0.3),
-    'gaara-partial-shukaku': (0.45, 0.36, 0.18), 'kankuro-shippuden': (0.36, 0.36, 0.26), 'kiba-part-1': (0.12, 0.17, 0.3),
+    'gaara-partial-shukaku': (0.33, 0.63, 0.3), 'kankuro-shippuden': (0.36, 0.36, 0.26), 'kiba-part-1': (0.12, 0.17, 0.3),
     'kiba-two-headed-wolf': (0.16, 0.55, 0.3), 'kidomaru-curse-mark': (0.6, 0.38, 0.22), 'kidomaru': (0.5, 0.3, 0.22),
-    'kimimaro-curse-mark': (0.6, 0.46, 0.22), 'naruto-four-tails-cloak': (0.22, 0.52, 0.22), 'orochimaru-eight-branches': (0.55, 0.41, 0.3),
-    'rock-lee-shippuden-gates': (0.25, 0.25, 0.55), 'sakon-ukon-curse-mark': (0.15, 0.43, 0.3), 'sasuke-shippuden-curse-mark': (0.6, 0.29, 0.13),
+    'kimimaro-curse-mark': (0.6, 0.46, 0.22), 'naruto-four-tails-cloak': (0.24, 0.66, 0.22), 'orochimaru-eight-branches': (0.55, 0.41, 0.3),
+    'rock-lee-shippuden-gates': (0.46, 0.09, 0.35), 'sakon-ukon-curse-mark': (0.15, 0.43, 0.3), 'sasuke-shippuden-curse-mark': (0.6, 0.29, 0.13),
     'sasuke-susanoo': (0.47, 0.29, 0.3),
-    'gyuki': (0.32, 0.47, 0.25), 'yagura': (0.35, 0.25, 0.25), 'isobu': (0.33, 0.43, 0.3), 'jiraiya-sage-mode': (0.52, 0.28, 0.2),
+    'gyuki': (0.55, 0.6, 0.2), 'yagura': (0.35, 0.25, 0.25), 'isobu': (0.33, 0.43, 0.3), 'jiraiya-sage-mode': (0.52, 0.28, 0.2),
     'white-zetsu': (0.5, 0.36, 0.55), 'black-zetsu': (0.51, 0.32, 0.45), 'kisame-fused': (0.24, 0.43, 0.25), 'itachi-susanoo': (0.55, 0.4, 0.4),
     'kakuzu-earth-grudge': (0.42, 0.45, 0.3), 'konan-paper-angel': (0.48, 0.28, 0.17), 'jugo-sage-mode': (0.6, 0.22, 0.25), 'zabuza': (0.6, 0.37, 0.22), 'kakashi-perfect-susanoo': (0.56, 0.1, 0.3),
 }
