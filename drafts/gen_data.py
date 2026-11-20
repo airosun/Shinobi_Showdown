@@ -370,7 +370,7 @@ for s in K.S + [x for x in B2.S if x['status'] != 'Existing'] + B3.S + B4.S + B5
         a, b = CATALOGUE_SWAPS[sid]
         cat = [b if x == a else x for x in cat]
     entry = {
-        'id': sid, 'baseId': {'rock': 'lee', 'might': 'guy'}.get(s['character'].split(' ')[0].lower(), s['character'].split(' ')[0].lower()), 'name': name_for(s), 'era': s['era'], 'cost': COST_OVERRIDES.get(sid, s['cost']),
+        'id': sid, 'baseId': {'rock': 'lee', 'might': 'guy'}.get(s['character'].split(' ')[0].lower(), s['character'].split(' ')[0].lower()), 'name': name_for(s), 'era': s['era'].replace('Part 1', 'Part I'), 'cost': COST_OVERRIDES.get(sid, s['cost']),
         'natures': {'primary': s['primary'], 'secondary': s['secondary']},
         'stats': dict(zip(['hp', 'tai', 'nin', 'def', 'spd', 'chk'], stats)),
         'roles': s['roles'],
@@ -402,6 +402,7 @@ for jid, o in JUTSU_OVERRIDES.items():
 # Part I versions of characters who also have a Shippuden version
 PART1_TAG = {'naruto_p1','sasuke_p1','sakura_p1','kakashi_p1','hinata_p1','neji_p1','lee_p1','tenten_p1','kiba_p1','shino_p1','shikamaru_p1','choji_p1','ino_p1','gaara_p1','temari_p1','kankuro_p1','orochimaru_p1'}
 for e in out:
+    if e['era'] == 'Part 1': e['era'] = 'Part I'
     if e['id'] in PART1_TAG: e['name'] += ' (Part I)'
 
 def js(o): return json.dumps(o, ensure_ascii=False, indent=2)

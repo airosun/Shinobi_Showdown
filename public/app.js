@@ -207,7 +207,7 @@ const SCREENS = {
       <div class="builder">
         <div>
           <div class="tabs" style="margin-bottom:10px">
-            ${['all', 'Part 1', 'Shippuden'].map((e) => `<button class="tab ${b.era === e ? 'active' : ''}" data-act="era" data-arg="${e}">${e === 'all' ? 'All eras' : e}</button>`).join('')}
+            ${['all', 'Part I', 'Shippuden'].map((e) => `<button class="tab ${b.era === e ? 'active' : ''}" data-act="era" data-arg="${e}">${e === 'all' ? 'All eras' : e}</button>`).join('')}
             <span class="grow"></span>
             <input type="text" id="rosterSearch" placeholder="Search name or role…" value="${esc(b.query || '')}" data-input="search" style="min-width:200px">
           </div>
@@ -470,7 +470,7 @@ function dexHtml() {
   return `<div class="dex">
     <div class="dex-side">
       <div class="dex-head">${dexModeTabs()}<span class="muted small">${SHINOBI.length} shinobi</span><span class="grow"></span><button class="small ghost" data-act="closeDex">Back</button></div>
-      <div class="tabs">${['all', 'Part 1', 'Shippuden'].map((e) => `<button class="tab ${d.era === e ? 'active' : ''}" data-act="dexEra" data-arg="${e}">${e === 'all' ? 'All' : e}</button>`).join('')}</div>
+      <div class="tabs">${['all', 'Part I', 'Shippuden'].map((e) => `<button class="tab ${d.era === e ? 'active' : ''}" data-act="dexEra" data-arg="${e}">${e === 'all' ? 'All' : e}</button>`).join('')}</div>
       <div class="row" style="margin:8px 0">
         <input type="text" id="dexSearch" placeholder="Name, role, trait, nature…" value="${esc(d.query)}" data-input="dexSearch" style="flex:1;min-width:0">
         <select data-change="dexSort" title="Sort">${[['roster', 'Roster order'], ['name', 'Name'], ['cost', 'Cost'], ['bst', 'Stat total']].map(([k, l]) => `<option value="${k}" ${d.sort === k ? 'selected' : ''}>${l}</option>`).join('')}</select>
