@@ -1,0 +1,438 @@
+{
+ "naruto_p1": {
+  "jutsu": "multi_shadow_clone",
+  "cooldown": 3
+ },
+ "naruto_ship": {
+  "jutsu": "multi_shadow_clone",
+  "cooldown": 3
+ },
+ "naruto_sage": {
+  "jutsu": "shadow_clone_scouts",
+  "cooldown": 2
+ },
+ "naruto_war": {
+  "jutsu": "kurama_transfer",
+  "cooldown": 3
+ },
+ "sasuke_p1": {
+  "jutsu": "chidori",
+  "cooldown": 5
+ },
+ "sasuke_ship": {
+  "jutsu": "chidori_nagashi",
+  "cooldown": 4
+ },
+ "sasuke_ms": {
+  "jutsu": "sharingan_genjutsu",
+  "cooldown": 2
+ },
+ "sasuke_war": {
+  "jutsu": "blaze_kagutsuchi",
+  "cooldown": 5
+ },
+ "sakura_p1": {
+  "jutsu": "genjutsu_dispel",
+  "cooldown": 2
+ },
+ "sakura_shippuden": {
+  "jutsu": "poison_extraction",
+  "cooldown": 2
+ },
+ "sakura_war": {
+  "jutsu": "katsuyu",
+  "cooldown": 4
+ },
+ "kakashi_p1": {
+  "jutsu": "ninja_hounds",
+  "cooldown": 3
+ },
+ "kakashi_ship": {
+  "jutsu": "ninja_hounds",
+  "cooldown": 3
+ },
+ "kakashi_dms": {
+  "jutsu": "kamui_raikiri",
+  "cooldown": 5
+ },
+ "sai": {
+  "jutsu": "ink_snakes",
+  "cooldown": 2
+ },
+ "yamato": {
+  "jutsu": "wood_wall",
+  "cooldown": 3
+ },
+ "hinata_p1": {
+  "jutsu": "byakugan_scan",
+  "cooldown": 2
+ },
+ "hinata_ship": {
+  "jutsu": "byakugan_scan",
+  "cooldown": 2
+ },
+ "neji_p1": {
+  "jutsu": "byakugan_scan",
+  "cooldown": 2
+ },
+ "neji_ship": {
+  "jutsu": "byakugan_scan",
+  "cooldown": 2
+ },
+ "lee_p1": {
+  "jutsu": "leaf_rising_wind",
+  "cooldown": 2
+ },
+ "lee_ship": {
+  "jutsu": "drunken_fist",
+  "cooldown": 2
+ },
+ "tenten_p1": {
+  "jutsu": "smoke_bomb",
+  "cooldown": 2
+ },
+ "tenten_ship": {
+  "jutsu": "smoke_bomb",
+  "cooldown": 2
+ },
+ "guy": {
+  "jutsu": "dynamic_entry",
+  "cooldown": 2
+ },
+ "kiba_p1": {
+  "jutsu": "dynamic_marking",
+  "cooldown": 2
+ },
+ "kiba_ship": {
+  "jutsu": "dynamic_marking",
+  "cooldown": 2
+ },
+ "shino_p1": {
+  "jutsu": "insect_sphere",
+  "cooldown": 2
+ },
+ "shino_ship": {
+  "jutsu": "insect_tornado",
+  "cooldown": 4
+ },
+ "shikamaru_p1": {
+  "jutsu": "battle_analysis",
+  "cooldown": 2
+ },
+ "shikamaru_ship": {
+  "jutsu": "shadow_stitching",
+  "cooldown": 4
+ },
+ "choji_p1": {
+  "jutsu": "partial_expansion",
+  "cooldown": 2
+ },
+ "choji_ship": {
+  "jutsu": "partial_expansion",
+  "cooldown": 2
+ },
+ "ino_p1": {
+  "jutsu": "mind_body_disturbance",
+  "cooldown": 2
+ },
+ "ino_ship": {
+  "jutsu": "mind_destruction",
+  "cooldown": 3
+ },
+ "kurenai": {
+  "jutsu": "tree_binding",
+  "cooldown": 3
+ },
+ "asuma": {
+  "jutsu": "wind_blade_dust",
+  "cooldown": 3
+ },
+ "gaara_p1": {
+  "jutsu": "sand_coffin",
+  "cooldown": 2
+ },
+ "gaara_ship": {
+  "jutsu": "kazekage_shield",
+  "cooldown": 3
+ },
+ "temari_p1": {
+  "jutsu": "wind_barrier",
+  "cooldown": 2
+ },
+ "temari_ship": {
+  "jutsu": "wind_barrier",
+  "cooldown": 2
+ },
+ "kankuro_p1": {
+  "jutsu": "crow_embrace",
+  "cooldown": 2
+ },
+ "kankuro_ship": {
+  "jutsu": "salamander_shield",
+  "cooldown": 3
+ },
+ "chiyo": {
+  "jutsu": "antidote",
+  "cooldown": 2
+ },
+ "orochimaru_p1": {
+  "jutsu": "five_pronged_seal",
+  "cooldown": 3
+ },
+ "orochimaru_ship": {
+  "jutsu": "hidden_snake_hands",
+  "cooldown": 3
+ },
+ "kabuto_p1": {
+  "jutsu": "mystical_palm",
+  "cooldown": 3
+ },
+ "kabuto_sage": {
+  "jutsu": "white_rage",
+  "cooldown": 4
+ },
+ "jirobo": {
+  "jutsu": "earth_dome",
+  "cooldown": 3
+ },
+ "kidomaru": {
+  "jutsu": "summon_spider",
+  "cooldown": 4
+ },
+ "sakon_ukon": {
+  "jutsu": "rashomon",
+  "cooldown": 3
+ },
+ "tayuya": {
+  "jutsu": "phantom_sound_chains",
+  "cooldown": 4
+ },
+ "kimimaro": {
+  "jutsu": "larch_dance",
+  "cooldown": 2
+ },
+ "zabuza": {
+  "jutsu": "hidden_mist",
+  "cooldown": 3
+ },
+ "haku": {
+  "jutsu": "ice_mirrors",
+  "cooldown": 4
+ },
+ "anko": {
+  "jutsu": "hidden_snake_hands",
+  "cooldown": 3
+ },
+ "danzo": {
+  "jutsu": "summon_baku",
+  "cooldown": 4
+ },
+ "obito_tobi": {
+  "jutsu": "tobi_antics",
+  "cooldown": 2
+ },
+ "obito_masked": {
+  "jutsu": "gedo_chains",
+  "cooldown": 3
+ },
+ "zetsu_white": {
+  "jutsu": "spore_grab",
+  "cooldown": 2
+ },
+ "zetsu_black": {
+  "jutsu": "spore_clone",
+  "cooldown": 2
+ },
+ "kisame": {
+  "jutsu": "shark_dance",
+  "cooldown": 4
+ },
+ "itachi": {
+  "jutsu": "tsukuyomi",
+  "cooldown": 4
+ },
+ "deidara": {
+  "jutsu": "c4_karura",
+  "cooldown": 5
+ },
+ "hidan": {
+  "jutsu": "triple_scythe",
+  "cooldown": 2
+ },
+ "kakuzu": {
+  "jutsu": "searing_migraine",
+  "cooldown": 5
+ },
+ "sasori": {
+  "jutsu": "iron_sand_world_order",
+  "cooldown": 4
+ },
+ "konan": {
+  "jutsu": "paper_butterflies",
+  "cooldown": 3
+ },
+ "nagato_pain": {
+  "jutsu": "shinra_tensei",
+  "cooldown": 6
+ },
+ "nagato_reanimated": {
+  "jutsu": "samsara_revival",
+  "cooldown": "Once"
+ },
+ "suigetsu": {
+  "jutsu": "great_water_arm",
+  "cooldown": 2
+ },
+ "karin": {
+  "jutsu": "adamantine_chains",
+  "cooldown": 3
+ },
+ "jugo": {
+  "jutsu": "cell_share",
+  "cooldown": 2
+ },
+ "hashirama": {
+  "jutsu": "deep_forest",
+  "cooldown": 5
+ },
+ "tobirama": {
+  "jutsu": "water_formation_wall",
+  "cooldown": 3
+ },
+ "hiruzen": {
+  "jutsu": "mud_wall",
+  "cooldown": 3
+ },
+ "minato": {
+  "jutsu": "ftg_rasengan",
+  "cooldown": 4
+ },
+ "tsunade": {
+  "jutsu": "katsuyu",
+  "cooldown": 4
+ },
+ "jiraiya": {
+  "jutsu": "toad_oil_flame",
+  "cooldown": 5
+ },
+ "raikage_a": {
+  "jutsu": "guillotine_drop",
+  "cooldown": 4
+ },
+ "killer_bee": {
+  "jutsu": "ink_creation",
+  "cooldown": 2
+ },
+ "darui": {
+  "jutsu": "black_panther",
+  "cooldown": 4
+ },
+ "karui": {
+  "jutsu": "karui_flurry",
+  "cooldown": 2
+ },
+ "mei": {
+  "jutsu": "solid_fog",
+  "cooldown": 4
+ },
+ "chojuro": {
+  "jutsu": "hiramekarei_guard",
+  "cooldown": 2
+ },
+ "ao": {
+  "jutsu": "ao_sensing",
+  "cooldown": 2
+ },
+ "gengetsu": {
+  "jutsu": "clam_mirage",
+  "cooldown": 4
+ },
+ "yagura": {
+  "jutsu": "coral_palm",
+  "cooldown": 3
+ },
+ "onoki": {
+  "jutsu": "lightened_boulder",
+  "cooldown": 2
+ },
+ "kurotsuchi": {
+  "jutsu": "stone_wall",
+  "cooldown": 3
+ },
+ "akatsuchi": {
+  "jutsu": "stone_wall",
+  "cooldown": 3
+ },
+ "mu": {
+  "jutsu": "mu_invisibility",
+  "cooldown": 2
+ },
+ "obito_war": {
+  "jutsu": "gedo_chains",
+  "cooldown": 3
+ },
+ "madara_reanimated": {
+  "jutsu": "deep_forest",
+  "cooldown": 5
+ },
+ "madara_six_paths": {
+  "jutsu": "infinite_tsukuyomi",
+  "cooldown": 6
+ },
+ "kaguya": {
+  "jutsu": "expansive_tsb",
+  "cooldown": 6
+ },
+ "fu": {
+  "jutsu": "scale_powder",
+  "cooldown": 3
+ },
+ "utakata": {
+  "jutsu": "acid_bubbles",
+  "cooldown": 3
+ },
+ "han": {
+  "jutsu": "steam_punch",
+  "cooldown": 2
+ },
+ "roshi": {
+  "jutsu": "magma_wall",
+  "cooldown": 3
+ },
+ "yugito": {
+  "jutsu": "cat_fireballs",
+  "cooldown": 4
+ },
+ "hanzo": {
+  "jutsu": "summon_ibuse",
+  "cooldown": 5
+ },
+ "iruka": {
+  "jutsu": "trap_tags",
+  "cooldown": 2
+ },
+ "konohamaru": {
+  "jutsu": "fire_ash",
+  "cooldown": 4
+ },
+ "kushina": {
+  "jutsu": "chain_lash",
+  "cooldown": 4
+ },
+ "mifune": {
+  "jutsu": "iai_flash",
+  "cooldown": 4
+ },
+ "rasa": {
+  "jutsu": "gold_dust_wall",
+  "cooldown": 3
+ },
+ "shisui": {
+  "jutsu": "kotoamatsukami",
+  "cooldown": 5
+ },
+ "shizune": {
+  "jutsu": "antidote",
+  "cooldown": 2
+ }
+}

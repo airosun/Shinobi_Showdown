@@ -46,6 +46,8 @@ export const BALANCE = {
   resolveSuperEffective: 8,
   maxDodge: 0.12,
   kunaiPower: 45,
+  intelDropOnHit: 0.5,    // share of unsecured Intel lost when an enemy hit lands
+  intelDropAllAt: 0.25,   // a hit for this share of max HP (or a critical) drops all of it
 };
 
 export const MILESTONES = [25, 50, 75];
@@ -518,6 +520,8 @@ function dealDamage(state, target, amount, source, msg = null, extra = {}) {
   }
   if (msg) log(state, msg, 'damage', target, { amount, src: source?.uid, ...extra });
   target.flags.tookDamage = true;
+  // carrying unsecured Intel is risky: an enemy hit knocks some (or all) of it loose
+  if (extra.hit && source && source.side !== target.side && target.hp > 0 && target.unsecured.length) dropIntel(state, target, amount, extra.crit);
   target.resolve = Math.min(100, target.resolve + Math.round((amount / target.maxHp) * 100 * BALANCE.resolveFromDamage));
   // Hidan's curse: damage he takes is also dealt to the linked enemy
   if (target.link && !extra.mirrored) {
@@ -529,6 +533,17 @@ function dealDamage(state, target, amount, source, msg = null, extra = {}) {
     log(state, `${t.name}! ${target.name} cheats death and is left at ${target.hp} HP.`, 'special', target, { survive: true });
   }
   if (target.hp === 0) knockOut(state, target, source);
+}
+
+function dropIntel(state, unit, amount, crit) {
+  const had = unsecuredTotal(unit);
+  const all = crit || amount >= unit.maxHp * BALANCE.intelDropAllAt;
+  const keep = all ? 0 : Math.floor(had * (1 - BALANCE.intelDropOnHit));
+  if (keep >= had) return;
+  // keep the oldest Intel first (it is closest to being secured)
+  let left = keep;
+  unit.unsecured = unit.unsecured.map((e) => { const k = Math.min(e.amount, left); left -= k; return { ...e, amount: k }; }).filter((e) => e.amount > 0);
+  log(state, `${unit.name} drops ${had - keep} unsecured Intel${keep ? ` (${keep} left)` : ''}!`, 'intel', unit, { dropped: had - keep });
 }
 
 function knockOut(state, unit, source) {
