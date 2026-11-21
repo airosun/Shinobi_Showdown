@@ -17,8 +17,10 @@
 .ly-arena .mon .spr { position: relative; }
 .ly-faces { background: var(--panel); border: 1px solid var(--line); border-radius: var(--radius); padding: 12px 14px; display: flex; gap: 24px; align-items: center; flex-wrap: wrap; }
 .ly-faces .lbl, .ly-panel h3 { font-size: 11px; text-transform: uppercase; letter-spacing: .1em; color: var(--accent); font-weight: 800; margin: 0 0 8px; }
-.face-edit { width: 220px; height: 220px; border-radius: 50%; overflow: hidden; border: 3px solid var(--accent); position: relative; cursor: grab; touch-action: none; background: #000; }
-.face-edit img { width: 100%; height: 100%; object-fit: cover; display: block; pointer-events: none; }
+.face-crop { width: 320px; height: 300px; border-radius: 10px; overflow: hidden; position: relative; cursor: grab; touch-action: none; background: #0b0806; border: 1px solid var(--line); }
+.face-crop:active { cursor: grabbing; }
+.face-crop img { position: absolute; max-width: none; user-select: none; pointer-events: none; }
+.face-crop .crop-ring { position: absolute; left: 50%; top: 50%; width: 220px; height: 220px; margin: -110px 0 0 -110px; border-radius: 50%; border: 3px solid var(--accent); box-shadow: 0 0 0 999px #000000a8; pointer-events: none; }
 .face-sizes { display: flex; gap: 14px; align-items: flex-end; }
 .face-sizes .badge.xs { width: 24px; height: 24px; }
 .face-sizes figure { margin: 0; display: flex; flex-direction: column; align-items: center; gap: 4px; font-size: 11px; color: var(--muted); }

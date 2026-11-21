@@ -86,14 +86,22 @@ function badge(def, cls = '', transformed = false) {
   return `<div class="badge ${cls}" style="--c1:${c1};--c2:${c2}">${initials(def.name)}</div>`;
 }
 // size / position on the field and portrait framing, set in the Character Layout module
+// Sprite settings are per side ("<id>[:tf]:you" / ":foe", left/right as seen on screen);
+// an older shared "<id>[:tf]" entry covers a side with none of its own (its left/right mirrors on your side).
 function artStyle(id, tf, back) {
-  const L = (tf && S.layout.sprites[`${id}:tf`]) || S.layout.sprites[id] || {};
+  const side = back ? 'you' : 'foe';
+  const all = S.layout.sprites;
+  let L = {}; let own = true;
+  for (const k of tf ? [`${id}:tf`, id] : [id]) {
+    if (all[`${k}:${side}`]) { L = all[`${k}:${side}`]; break; }
+    if (all[k]) { L = all[k]; own = false; break; }
+  }
+  const dx = own || !back ? (L.dx || 0) : -(L.dx || 0);
   const out = ['transform-origin:50% 100%'];
   if (back) out.push('transform:scaleX(-1)');
   const sc = (L.scale ?? 100) / 100;
   if (sc !== 1) out.push(`scale:${sc}`);
-  // offsets are drawn for the enemy-side (unmirrored) view, so they flip with the sprite
-  if (L.dx || L.dy) out.push(`translate:${back ? -(L.dx || 0) : (L.dx || 0)}% ${L.dy || 0}%`);
+  if (dx || L.dy) out.push(`translate:${dx}% ${L.dy || 0}%`);
   return out.join(';');
 }
 function faceStyle(id, tf) {
