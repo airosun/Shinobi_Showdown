@@ -3295,8 +3295,9 @@ async function boulderRoll(ctx, spiked) {
 }
 /** A shadow creeping along the ground from the user's feet to a unit's feet. */
 function shadowTo(ctx, el, ms = 420) { return stretch(ctx, feetOf(ctx, ctx.userEl), feetOf(ctx, el), shadowStrip, ms, 2400); }
-function sandWave(ctx, a, b, w, h, ms = 520) {
-  const wv = spawn(ctx, `<div style="width:${w}px;height:${h}px;border-radius:50% 50% 20% 20%;background:radial-gradient(ellipse at 50% 30%,#f2deb0,#d9b56a 50%,#a8864e);box-shadow:0 0 14px #c9a86b"></div>`, a, { life: ms + 1200 });
+function sandWave(ctx, a, b, w, h, ms = 520, water = false) {
+  const bg = water ? 'radial-gradient(ellipse at 50% 30%,#e6f7ff,#7ec8ff 50%,#2a7ad8);box-shadow:0 0 16px #4ab0ff' : 'radial-gradient(ellipse at 50% 30%,#f2deb0,#d9b56a 50%,#a8864e);box-shadow:0 0 14px #c9a86b';
+  const wv = spawn(ctx, `<div style="width:${w}px;height:${h}px;border-radius:50% 50% 20% 20%;background:${bg}"></div>`, a, { life: ms + 1200 });
   return fly(ctx, wv, a, b, ms, { rotate: 0, scale: [0.1, 1], ease: 'ease-in' }).then(() => wv);
 }
 const sandGrains = (ctx, at, spread, n = 30) => Array.from({ length: n }, () => { const d = spawn(ctx, `<div style="width:${rnd(4, 8)}px;height:${rnd(4, 8)}px;border-radius:50%;background:#d9b56a"></div>`, { x: at.x + rnd(-spread, spread), y: at.y + rnd(-spread * 0.4, spread * 0.4) }, { life: 1200 }); return d; });
@@ -3898,7 +3899,7 @@ const ART10 = {
 const glitch = (h) => `<div class="ax-glitch" style="width:${h * 0.5}px;height:${h * 0.78}px;background:repeating-linear-gradient(0deg,#000 0 10px,#1b1630 10px 13px,#000 13px 22px);box-shadow:0 0 18px #6b4bd6, inset 0 0 0 2px #2a2050"></div>`;
 const waterBall = (s = 30) => `<div style="width:${s}px;height:${s}px;border-radius:50%;background:radial-gradient(circle at 35% 35%,#fff,#bfe8ff 30%,#4ab0ff 70%);box-shadow:0 0 10px #4ab0ff"></div>`;
 const splash = (ctx, at, n = 10, r = 70) => { for (let i = 0; i < n; i++) { const d = spawn(ctx, '<div style="width:8px;height:8px;border-radius:50%;background:#bfe8ff"></div>', at, { life: 700 }); const t = rnd(0, Math.PI * 2); fly(ctx, d, at, { x: at.x + Math.cos(t) * r, y: at.y + Math.sin(t) * r * 0.8 }, 400, { rotate: 0, ease: 'ease-out' }).then(() => d.remove()); } };
-function waterWave(ctx, h = 0.9) { const box = sideBox(ctx); return sandWave(ctx, ctx.from, box.c, box.w + 140, box.h * h, 560).then((wv) => { wv.firstElementChild.style.background = 'radial-gradient(ellipse at 50% 30%,#e6f7ff,#7ec8ff 50%,#2a7ad8)'; wv.firstElementChild.style.boxShadow = '0 0 16px #4ab0ff'; return wv; }); }
+function waterWave(ctx, h = 0.9) { const box = sideBox(ctx); return sandWave(ctx, ctx.from, box.c, box.w + 140, box.h * h, 560, true); }
 async function waterSphere(ctx, sharks) {
   const to = ctx.tos[0]; const el = ctx.targetEls[0]; const { h } = sizeOf(el);
   lunge(ctx, to, 0.6, 600); await wait(280 * ctx.sp);
