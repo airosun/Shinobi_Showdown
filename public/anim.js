@@ -3920,15 +3920,21 @@ Object.assign(ANIMS, {
   },
   madara_taijutsu: { desc: 'User hits the target with a flurry of blows.', play: (ctx) => flurryIn(ctx, 8) },
   universal_pull: {
-    desc: 'The opposite of Almighty Push: a purple ring closes in and drags the target toward the user.',
+    desc: 'The opposite of Almighty Push: a purple ring centred on the user starts past the target, then its edge pulls inward, dragging the target in with it.',
     async play(ctx) {
-      const to = ctx.tos[0]; const el = ctx.targetEls[0]; const { h } = sizeOf(el);
-      const r = spawn(ctx, `<div style="width:${h}px;height:${h}px;border-radius:50%;border:5px solid #d6c4ff;box-shadow:0 0 18px #b99cff"></div>`, to, { life: 1200 });
-      r.animate([{ transform: 'translate(-50%,-50%) scale(1.6)', opacity: 0 }, { transform: 'translate(-50%,-50%) scale(.3)', opacity: 1 }], { duration: 450 * ctx.sp, easing: 'ease-in', fill: 'forwards' });
-      await wait(350 * ctx.sp);
-      const dx = (ctx.from.x - to.x) * 0.4; const dy = (ctx.from.y - to.y) * 0.4;
-      el.animate([{ transform: 'translate(0,0)' }, { transform: `translate(${dx}px,${dy}px)`, offset: 0.4 }, { transform: `translate(${dx}px,${dy}px)`, offset: 0.7 }, { transform: 'translate(0,0)' }], { duration: 1000 * ctx.sp, easing: 'ease-in-out' });
-      await wait(400 * ctx.sp); shake(ctx); wrapRing(ctx, el, 'border:4px solid #d6c4ff;box-shadow:0 0 10px #b99cff', 500); await wait(500 * ctx.sp); fade(ctx, r, 200);
+      const to = ctx.tos[0]; const el = ctx.targetEls[0];
+      const dist = Math.hypot(to.x - ctx.from.x, to.y - ctx.from.y); const d = (dist + 30) * 2;
+      const r = spawn(ctx, `<div style="width:${d}px;height:${d}px;border-radius:50%;border:5px solid #d6c4ff;background:radial-gradient(circle,#c9b3ff00 55%,#c9b3ff44 70%,#c9b3ff00 72%);box-shadow:0 0 22px #b99cff"></div>`, ctx.from, { life: 1800 });
+      await r.animate([{ transform: 'translate(-50%,-50%) scale(1)', opacity: 0 }, { transform: 'translate(-50%,-50%) scale(1)', opacity: 1 }], { duration: 250 * ctx.sp, fill: 'forwards' }).finished.catch(() => {});
+      const k = 0.55; const end = 1 - k * (dist / (dist + 30));
+      const ms = 600;
+      r.animate([{ transform: 'translate(-50%,-50%) scale(1)', opacity: 1 }, { transform: `translate(-50%,-50%) scale(${end})`, opacity: 1 }], { duration: ms * ctx.sp, easing: 'ease-in', fill: 'forwards' });
+      const ux = (to.x - ctx.from.x) / dist; const uy = (to.y - ctx.from.y) / dist;
+      let raf; const follow = () => { const rr = r.getBoundingClientRect().width / 2; const pull = Math.max(0, dist - (rr - 30)); el.style.transform = `translate(${-ux * pull}px,${-uy * pull}px)`; raf = requestAnimationFrame(follow); }; follow();
+      setTimeout(() => { cancelAnimationFrame(raf); const held = el.style.transform; el.animate([{ transform: held }, { transform: held, offset: 0.5 }, { transform: 'translate(0,0)' }], { duration: 700 * ctx.sp }).finished.then(() => { el.style.transform = ''; }); }, ms * ctx.sp + 30);
+      await wait(ms * ctx.sp);
+      shakeEl(el); el.querySelector('img')?.animate([{ filter: 'none' }, { filter: 'drop-shadow(0 0 12px #b99cff) drop-shadow(0 0 4px #d6c4ff)' }, { filter: 'none' }], { duration: 700 * ctx.sp });
+      fade(ctx, r, 300); await wait(500 * ctx.sp);
     },
   },
   shadow_clone_barrage: {
