@@ -2,7 +2,7 @@
 import { SHINOBI, SHINOBI_BY_ID, SUBSTITUTIONS, COST_CAP } from './data/shinobi.js';
 import { NATURE_LABELS, KEKKEI_GENKAI, BASIC_NATURES as CYCLE_NATURES, AMPLIFIED_BY, advantage } from './engine/natures.js';
 import * as E from './engine/battle.js';
-import { chooseActions } from './engine/ai.js';
+import { chooseActions, chooseActionsSmart, buildCpuTeam } from './engine/ai.js';
 import { randomTeam } from './engine/teams.js';
 import * as FX from './fx.js';
 import { playJutsu, playDecoy, poof, logSubstitute, poisonBubbles, CURSE_MARK, SHARINGAN, TSUKUYOMI_MOON } from './anim.js';
@@ -16,6 +16,7 @@ const S = {
   dex: { mode: 'shinobi', id: null, era: 'all', query: '', sort: 'roster', tf: false, from: 'title', jid: null, jquery: '', jcat: 'all', jsort: 'name' },
   phase: null,              // select | play | over
   mode: null,               // hotseat | cpu | online
+  cpuLevel: (() => { try { return localStorage.getItem('ss-cpu') || 'hard'; } catch { return 'hard'; } })(), // hard | normal
   me: 0,                    // online: which side this browser plays
   net: null,                // online connection state (see Online section)
   names: ['Player 1', 'Player 2'],
@@ -208,6 +209,7 @@ const SCREENS = {
         <h3 style="margin:0;font-size:20px">${sideName(b.side)} — build your team</h3>
         <span class="grow"></span>
         ${S.mode === 'online' ? onlineBuilderNote() : ''}
+        ${S.mode === 'cpu' ? `<label class="small muted">CPU <select data-change="cpuLevel"><option value="hard" ${S.cpuLevel === 'hard' ? 'selected' : ''}>Hard — plans ahead, picks a team to counter yours</option><option value="normal" ${S.cpuLevel === 'normal' ? 'selected' : ''}>Normal — the old heuristic CPU</option></select></label>` : ''}
         <label class="small muted">Name <input type="text" value="${esc(S.names[b.side])}" data-change="rename" maxlength="18"></label>
       </div>
       <div class="builder">
@@ -1134,7 +1136,15 @@ function nextStep() {
     if (opts.length === 1 && (opts[0].type === 'none' || opts[0].type === 'weaveRelease')) S.choices[side][u.uid] = { actor: u.uid, type: opts[0].type };
   }
   if (S.mode === 'cpu' && side === 1) {
-    for (const a of chooseActions(st, 1)) S.choices[1][a.actor] = a;
+    let picks;
+    if (S.cpuLevel === 'normal') picks = chooseActions(st, 1);
+    else {
+      // with the Intel preview the CPU gets to see one of your orders, same as you would
+      const yours = Object.values(S.choices[0]);
+      const known = st.teams[1].preview && !st.teams[0].preview && yours.length ? [yours[Math.floor(Math.random() * yours.length)]] : [];
+      picks = chooseActionsSmart(st, 1, Math.random, { known });
+    }
+    for (const a of picks) S.choices[1][a.actor] = a;
     S.step += 1;
     nextStep();
     return;
@@ -1496,7 +1506,8 @@ function bootOnline() {
 // ---------------------------------------------------------------- actions
 const ACTIONS = {
   startHotseat() { S.mode = 'hotseat'; S.names = ['Player 1', 'Player 2']; S.specs = [null, null]; newBuilder(0); render(); },
-  startCpu() { S.mode = 'cpu'; S.names = ['Player 1', 'CPU']; S.specs = [null, randomTeam()]; newBuilder(0); render(); },
+  startCpu() { S.mode = 'cpu'; S.names = ['Player 1', 'CPU']; S.specs = [null, null]; newBuilder(0); render(); },
+  cpuLevel(v) { S.cpuLevel = v; try { localStorage.setItem('ss-cpu', v); } catch {} },
   toggleRules() { S.showRules = !S.showRules; render(); },
   toTitle() { if (S.mode === 'online') netLeave(); S.screen = 'title'; render(); },
   openDex() { S.dex.from = S.screen === 'dex' ? S.dex.from : S.screen; S.screen = 'dex'; render(); window.scrollTo(0, 0); },
@@ -1546,6 +1557,7 @@ const ACTIONS = {
       showPass(1, 'Build your team in secret.', () => { newBuilder(1); render(); });
       return;
     }
+    if (S.mode === 'cpu') S.specs[1] = S.cpuLevel === 'normal' ? randomTeam() : buildCpuTeam(S.specs[0]);
     S.specs.forEach((sp, i) => { if (sp) sp.name = S.names[i]; });
     startBattle();
   },
@@ -1592,7 +1604,6 @@ const ACTIONS = {
   rematch() { if (S.mode === 'online') { S.net.rematchSent = true; netSend({ t: 'rematch' }); render(); return; } startBattle(); },
   newTeams() {
     if (S.mode === 'online') { netSend({ t: 'newTeams' }); return; }
-    if (S.mode === 'cpu') S.specs[1] = randomTeam();
     newBuilder(0); render();
   },
 };

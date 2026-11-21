@@ -1,4 +1,4 @@
-// Simple heuristic CPU. Used for "vs CPU" quick tests and the balance sim.
+// Heuristic CPU ("Normal", and the balance sim) plus the lookahead CPU ("Hard") below.
 import {
   availableActions, onField, getJutsu, computeDamage, slotOf, defOf, unsecuredTotal,
 } from './battle.js';
@@ -105,4 +105,183 @@ export function chooseActions(state, side, rng = Math.random) {
     actions.push(pick.action);
   }
   return actions;
+}
+
+// ---------------------------------------------------------------------------
+// Smarter CPU: one-turn lookahead.
+// Start from the heuristic plan, then for each shinobi try every legal action
+// (and target), play the whole turn out on copies of the battle against a few
+// predicted enemy plans, and keep whatever leaves the position best.
+// Because the engine is deterministic and cheap to copy, this sees things the
+// heuristic can't: Substituting out of a predicted lethal hit, focusing a KO,
+// when Gather Intel will actually land, or when a Charge leaves you exposed.
+// ---------------------------------------------------------------------------
+import { resolveTurn, missionScore, createBattle } from './battle.js';
+import { randomTeam } from './teams.js';
+import { teamCost } from './battle.js';
+const costOf = (t) => teamCost(t.members);
+import { makeRng } from './rng.js';
+
+export const W = { alive: 140, hp: 120, chakra: 60, intel: 3.2, unsecured: 2.2, threat: 0.25 };
+if (globalThis.process?.env?.AI_W) Object.assign(W, JSON.parse(globalThis.process.env.AI_W));
+const STATUS_COST = { bind: 22, genjutsu: 18, paralyze: 12, burn: 9, poison: 9, exhausted: 12 };
+
+function cloneState(state, seed) {
+  const { log, ...rest } = state;
+  const c = structuredClone(rest);
+  c.log = [];
+  Object.defineProperty(c, 'rng', { value: makeRng(seed), enumerable: false, writable: true });
+  return c;
+}
+
+// best single-target damage a unit could deal next turn with what it can afford (rough "threat")
+function threat(state, u, foes) {
+  if (u.ko || !foes.length) return 0;
+  let best = 0;
+  for (const id of u.loadout) {
+    const j = getJutsu(id);
+    if (!j.power || (j.requiresTransform && !u.transform)) continue;
+    for (const e of foes) best = Math.max(best, computeDamage(state, u, e, j, { noRandom: true }).damage);
+  }
+  return best;
+}
+
+/** Position value for `side` (positive = good for side). */
+export function evaluate(state, side) {
+  if (state.winner === side) return 100000 - state.turn;
+  if (state.winner === 1 - side) return -100000 + state.turn;
+  if (state.winner === 'draw') return 0;
+  let v = 0;
+  for (const s of [0, 1]) {
+    const sign = s === side ? 1 : -1;
+    const team = state.teams[s];
+    const foes = onField(state, 1 - s);
+    let tv = 0;
+    for (const id of team.slots) {
+      const u = state.units[id];
+      if (u.ko) continue;
+      const hpF = u.hp / u.maxHp;
+      tv += W.alive + W.hp * hpF;                       // being alive matters most; HP next
+      tv += W.chakra * Math.min(1, u.chakra / Math.max(1, u.maxChakra)); // fuel for future jutsu
+      tv += 0.15 * u.resolve;
+      if (u.transform) tv += 12 * Math.max(0, u.transform.turnsLeft);
+      if (u.weaving?.kind === 'transform') tv += 30;
+      if (u.weaving?.kind === 'jutsu') {
+        const j = getJutsu(u.weaving.jutsuId);
+        tv += j.power ? 0.45 * Math.max(...foes.map((e) => computeDamage(state, u, e, j, { noRandom: true }).damage), 0) : 20;
+      }
+      for (const [k, st] of Object.entries(u.statuses)) tv -= (STATUS_COST[k] || 6) * Math.min(3, st.turns || 1);
+      for (const b of u.buffs) tv += (b.mult - 1) * 60 * Math.min(3, b.turns);
+      tv += W.threat * threat(state, u, foes) * Math.min(1, u.chakra / Math.max(1, u.maxChakra) + 0.3);
+      // Intel still in hand can be lost if this shinobi falls
+      tv += W.unsecured * unsecuredTotal(u) * (0.6 + 0.4 * hpF);
+    }
+    const intel = team.securedIntel;
+    tv += W.intel * intel + (intel >= 75 ? 25 : 0) + (intel >= 90 ? 40 : 0);
+    if (state.turn > state.maxTurns - 3) tv += 1.5 * missionScore(state, s);
+    v += sign * tv;
+  }
+  return v;
+}
+
+function candidates(state, u) {
+  const out = [];
+  const opts = availableActions(state, u.uid);
+  for (const o of opts) {
+    if (o.disabled) continue;
+    if (o.type === 'none' || o.type === 'weaveRelease') return [{ actor: u.uid, type: o.type }];
+    const base = { actor: u.uid, type: o.type };
+    if (o.jutsuId) base.jutsuId = o.jutsuId;
+    if (o.overexert) base.overexert = true;
+    if (o.type === 'jutsu' || o.type === 'kunai') {
+      const j = getJutsu(o.jutsuId);
+      if (j.effects.some((e) => e.type === 'selfKO') && u.hp > u.maxHp * 0.35) continue;
+      if (j.target === 'enemy') {
+        for (const e of onField(state, 1 - u.side)) out.push({ ...base, target: { slot: slotOf(state, e) } });
+      } else if (j.target === 'ally') {
+        const revive = j.effects.some((e) => e.type === 'revive');
+        const pool = revive ? state.teams[u.side].slots.map((id) => state.units[id]).filter((x) => x.ko)
+          : onField(state, u.side).filter((x) => !j.effects.some((e) => e.type === 'bodyguard') || x !== u);
+        for (const a of pool) out.push({ ...base, target: { slot: slotOf(state, a) } });
+      } else out.push({ ...base, target: { slot: slotOf(state, u) } });
+    } else out.push(base);
+  }
+  return out;
+}
+
+/**
+ * Smarter CPU orders for `side`.
+ * opts.samples: predicted enemy plans to test against (more = stronger, slower)
+ * opts.passes: rounds of improving each shinobi's choice given the others'
+ * opts.known: enemy actions the CPU has seen (Intel preview)
+ */
+export function chooseActionsSmart(state, side, rng = Math.random, { samples = 6, passes = 2, known = [] } = {}) {
+  if (state.winner !== null) return [];
+  const mine = onField(state, side);
+  const plan = new Map(chooseActions(state, side, rng).map((a) => [a.actor, a]));
+  // predicted enemy plans (the heuristic AI with different dice), with anything we've seen pinned in
+  const scen = [];
+  for (let k = 0; k < samples; k++) {
+    const r = makeRng(Math.floor(rng() * 2 ** 31));
+    const ep = chooseActions(state, 1 - side, r);
+    for (const kn of known) { const i = ep.findIndex((a) => a.actor === kn.actor); if (i >= 0) ep[i] = kn; }
+    scen.push({ enemy: ep, seed: Math.floor(rng() * 2 ** 31) });
+  }
+  const score = (p) => {
+    let tot = 0;
+    for (const sc of scen) {
+      const c = cloneState(state, sc.seed);
+      try { resolveTurn(c, [...p.values(), ...sc.enemy].map((a) => ({ ...a }))); } catch { return -Infinity; }
+      tot += evaluate(c, side);
+    }
+    return tot / scen.length;
+  };
+  const cands = new Map(mine.map((u) => [u.uid, candidates(state, u)]));
+  let best = score(plan);
+  for (let pass = 0; pass < passes; pass++) {
+    let improved = false;
+    for (const u of mine) {
+      const list = cands.get(u.uid);
+      if (list.length <= 1) { if (list[0]) plan.set(u.uid, list[0]); continue; }
+      const cur = plan.get(u.uid);
+      let pick = cur; let pickS = best;
+      for (const a of list) {
+        if (cur && JSON.stringify(a) === JSON.stringify(cur)) continue;
+        plan.set(u.uid, a);
+        const s = score(plan) + rng() * 1.5; // a little noise so it isn't fully predictable
+        if (s > pickS + 0.5) { pick = a; pickS = s; }
+      }
+      plan.set(u.uid, pick);
+      if (pick !== cur) { best = pickS; improved = true; }
+    }
+    if (!improved) break;
+  }
+  return mine.map((u) => plan.get(u.uid)).filter(Boolean);
+}
+
+/**
+ * CPU team for Hard: a handful of full-budget teams with their signature loadouts,
+ * each tried in quick heuristic-vs-heuristic games against the player's team; keep the best.
+ */
+export function buildCpuTeam(playerSpec, rng = Math.random, { candidates = 6, games = 6 } = {}) {
+  let best = null; let bestScore = -1;
+  for (let c = 0; c < candidates; c++) {
+    let team = randomTeam(rng, { keepDefaults: 1 });
+    for (let k = 0; k < 4; k++) { // lean towards spending the whole budget
+      const t = randomTeam(rng, { keepDefaults: 1 });
+      if (costOf(t) > costOf(team)) team = t;
+    }
+    if (!playerSpec) return team;
+    let wins = 0;
+    for (let g = 0; g < games; g++) {
+      const specs = [{ name: 'P', members: playerSpec.members }, { name: 'CPU', members: team.members }];
+      const st = createBattle(specs, { seed: Math.floor(rng() * 2 ** 31) });
+      const r = makeRng(Math.floor(rng() * 2 ** 31));
+      let guard = 0;
+      while (st.winner === null && guard++ < 40) resolveTurn(st, [...chooseActions(st, 0, r), ...chooseActions(st, 1, r)]);
+      wins += st.winner === 1 ? 1 : st.winner === 'draw' ? 0.5 : 0;
+    }
+    if (wins > bestScore) { bestScore = wins; best = team; }
+  }
+  return best;
 }
