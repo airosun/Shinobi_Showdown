@@ -4013,7 +4013,8 @@ Object.assign(ANIMS, {
       const svg = `<svg width="${Math.max(w * 1.25, h * 0.75)}" height="${h * 1.08}" viewBox="0 0 100 120" preserveAspectRatio="none" style="filter:drop-shadow(0 4px 4px #0008)">${tier(58, 118, 50)}${tier(30, 88, 40)}${tier(6, 58, 30)}<path d="M50 0 54 10 46 10Z" fill="#fafafa" stroke="#a8a8a8"/></svg>`;
       const n = spawn(ctx, svg, { x: f.x, y: f.y + 6 }, { life: 1900 });
       n.style.transformOrigin = '50% 100%';
-      await n.animate([{ transform: 'translate(-50%,-100%) scale(.2,0)' }, { transform: 'translate(-50%,-100%) scale(1,1)' }], { duration: 420 * ctx.sp, easing: 'ease-out', fill: 'forwards' }).finished.catch(() => {});
+      n.style.transform = 'translate(-50%,-100%)';
+      await n.animate([{ clipPath: 'inset(0 0 100% 0)' }, { clipPath: 'inset(0 0 0% 0)' }], { duration: 520 * ctx.sp, easing: 'ease-out', fill: 'forwards' }).finished.catch(() => {});
       await wait(750 * ctx.sp); fade(ctx, n, 300);
     },
   },
