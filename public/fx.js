@@ -25,8 +25,38 @@ export const wait = (ms) => new Promise((r) => setTimeout(r, ms));
 const OVR = {};
 if (typeof fetch !== 'undefined') {
   fetch('img/index.json').then((r) => (r.ok ? r.json() : [])).then((list) => {
-    for (const f of list) { const m = /^(.+)\.(png|webp|svg|gif|jpe?g)$/i.exec(f); if (m) OVR[m[1]] = `img/${encodeURIComponent(f)}`; }
+    for (const f of list) {
+      const m = /^(.+)\.(png|webp|svg|gif|jpe?g)$/i.exec(f);
+      if (!m) continue;
+      OVR[m[1]] = `img/${encodeURIComponent(f)}`;
+      if (!/svg|gif/i.test(m[2])) trimSprite(m[1], OVR[m[1]]);
+    }
   }).catch(() => {});
+}
+// cut away the transparent margin around a custom sprite so it fills its box
+function trimSprite(name, url) {
+  const img = new Image();
+  img.onload = () => {
+    try {
+      const W = img.naturalWidth; const H = img.naturalHeight;
+      const k = Math.min(1, 256 / Math.max(W, H));
+      const c = document.createElement('canvas'); c.width = Math.max(1, Math.round(W * k)); c.height = Math.max(1, Math.round(H * k));
+      const g = c.getContext('2d'); g.drawImage(img, 0, 0, c.width, c.height);
+      const d = g.getImageData(0, 0, c.width, c.height).data;
+      let x0 = c.width; let y0 = c.height; let x1 = -1; let y1 = -1;
+      for (let y = 0; y < c.height; y++) for (let x = 0; x < c.width; x++) if (d[(y * c.width + x) * 4 + 3] > 8) { if (x < x0) x0 = x; if (x > x1) x1 = x; if (y < y0) y0 = y; if (y > y1) y1 = y; }
+      if (x1 < 0) return;
+      const sx = Math.max(0, Math.floor((x0 - 1) / k)); const sy = Math.max(0, Math.floor((y0 - 1) / k));
+      const sw = Math.min(W - sx, Math.ceil((x1 + 2) / k) - sx); const sh = Math.min(H - sy, Math.ceil((y1 + 2) / k) - sy);
+      if (sw >= W * 0.97 && sh >= H * 0.97) return; // nothing worth trimming
+      const out = document.createElement('canvas');
+      const ok = Math.min(1, 1024 / Math.max(sw, sh));
+      out.width = Math.round(sw * ok); out.height = Math.round(sh * ok);
+      out.getContext('2d').drawImage(img, sx, sy, sw, sh, 0, 0, out.width, out.height);
+      out.toBlob((b) => { if (b) OVR[name] = URL.createObjectURL(b); }, 'image/png');
+    } catch { /* keep the original */ }
+  };
+  img.src = url;
 }
 export function spriteUrl(name, jutsuId = null) { return (jutsuId && OVR[`${jutsuId}__${name}`]) || OVR[name] || null; }
 /** Swap drawn pieces inside root (and root itself) for the user's images where one exists. */
