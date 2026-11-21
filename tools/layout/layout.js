@@ -49,8 +49,10 @@ function artStyle(id, tf, back) {
 function faceStyle(id, tf) {
   const F = (tf && S.layout.faces[`${id}:tf`]) || S.layout.faces[id];
   if (!F) return '';
-  const x = F.x ?? 50; const y = F.y ?? 50;
-  return `object-position:${x}% ${y}%;transform-origin:${x}% ${y}%;scale:${(F.zoom ?? 100) / 100}`;
+  const z = (F.zoom ?? 100) / 100;
+  let cx = F.cx ?? 50; let cy = F.cy ?? 50;
+  if (F.x != null || F.y != null) { const f = Math.min(1, 1 / z); cx = (F.x ?? 50) * (1 - f) + 50 * f; cy = (F.y ?? 50) * (1 - f) + 50 * f; } // older focus-style entries
+  return `transform-origin:50% 50%;transform:scale(${z}) translate(${+(50 - cx).toFixed(2)}%, ${+(50 - cy).toFixed(2)}%)`;
 }
 function faceSrc(id, tf) { const a = art(id); return (tf && a.transformFace) || a.face; }
 function badge(id, cls = '', tf = false) {
@@ -70,7 +72,7 @@ function render() {
   const d = SHINOBI_BY_ID[S.id];
   const tf = S.tf && hasTf(S.id);
   const fk = tf && art(S.id).transformFace ? `${S.id}:tf` : S.id;
-  const F = S.layout.faces[fk] || {};
+  const FN = faceNow();
   const q = S.q.toLowerCase();
   const items = LIST.filter((s) => !q || s.name.toLowerCase().includes(q));
   const refOpts = (sel) => LIST.map((s) => `<option value="${s.id}" ${s.id === sel ? 'selected' : ''}>${esc(s.name)}</option>`).join('');
@@ -109,7 +111,7 @@ ${SIDES.map((side) => { const E = effective(S.id, tf, side); const own = layoutF
     ${hasTf(S.id) ? `<div class="sect"><div class="row" style="margin-top:0"><button class="small ghost" data-act="copyForm">Copy both sides to ${tf ? 'normal' : 'transformed'} form</button></div></div>` : ''}
     <div class="sect">
       <h3>Portrait${tf && art(S.id).transformFace ? ' (transformed)' : ''}</h3>
-      ${[['zoom', 'Zoom', 100, 400, 100, '%'], ['x', 'Focus left ↔ right', 0, 100, 50, '%'], ['y', 'Focus top ↕ bottom', 0, 100, 50, '%']].map(([p, label, min, max, def, u]) => `<div class="sl"><label>${label} <b id="v-f${p}">${F[p] ?? def}${u}</b></label><input type="range" data-f="${p}" min="${min}" max="${max}" step="1" value="${F[p] ?? def}"></div>`).join('')}
+      ${[['zoom', 'Zoom', 50, 400, '%'], ['cx', 'Centre left ↔ right', 0, 100, '%'], ['cy', 'Centre top ↕ bottom', 0, 100, '%']].map(([p, label, min, max, u]) => `<div class="sl"><label>${label} <b id="v-f${p}">${FN[p]}${u}</b></label><input type="range" data-f="${p}" min="${min}" max="${max}" step="1" value="${FN[p]}"></div>`).join('')}
       <div class="row"><button class="small ghost" data-act="resetFace">Reset</button></div>
     </div>
     <div class="sect muted small">Changes save automatically. Tell me in the chat when you're done and I'll put them in the game — or use <b>Export layout.json</b> and upload it to <code>public/data/</code>.</div>
@@ -135,7 +137,7 @@ function clean(coll, k, defs) {
   for (const [p, d] of Object.entries(defs)) if (o[p] === d || o[p] == null) delete o[p];
   if (!Object.keys(o).length) delete S.layout[coll][k];
 }
-const SDEF = { scale: 100, dx: 0, dy: 0 }; const FDEF = { zoom: 100, x: 50, y: 50 };
+const SDEF = { scale: 100, dx: 0, dy: 0 }; const FDEF = { zoom: 100, cx: 50, cy: 50 };
 // the side's own entry, seeded from what it shows now (so taking over from a shared entry changes nothing visible)
 function sideEntry(side) {
   const tf = S.tf && hasTf(S.id);
@@ -151,8 +153,8 @@ function setSprite(side, p, v) {
 // a side entry equal to the defaults still has to exist if a shared entry would otherwise take over
 function keepOwn(k) { if (!S.layout.sprites[k]) { const base = k.replace(/:(you|foe)$/, ''); if (S.layout.sprites[base] || (base.endsWith(':tf') && S.layout.sprites[base.slice(0, -3)])) S.layout.sprites[k] = { scale: 100 }; } }
 function setFace(p, v) {
-  const k = S.tf && art(S.id).transformFace ? `${S.id}:tf` : S.id;
-  (S.layout.faces[k] ||= {})[p] = v;
+  const k = faceKey();
+  S.layout.faces[k] = { ...faceNow(), [p]: v };
   clean('faces', k, FDEF); persist('faces', k); livePaint();
 }
 // update just the styles (no full re-render) so dragging and sliders stay smooth
@@ -166,8 +168,8 @@ function livePaint() {
     for (const p of Object.keys(SDEF)) { const el = document.querySelector(`[data-s="${p}"][data-side="${side}"]`); if (el && document.activeElement !== el) el.value = E[p]; const v = $(`v-${side}-${p}`); if (v) v.textContent = `${E[p]}%`; }
   }
   paintCrop();
-  const F = S.layout.faces[tf && art(S.id).transformFace ? `${S.id}:tf` : S.id] || {};
-  for (const [p, d] of Object.entries(FDEF)) { const el = document.querySelector(`[data-f="${p}"]`); if (el && document.activeElement !== el) el.value = F[p] ?? d; const v = $(`v-f${p}`); if (v) v.textContent = `${F[p] ?? d}%`; }
+  const FN = faceNow();
+  for (const p of Object.keys(FDEF)) { const el = document.querySelector(`[data-f="${p}"]`); if (el && document.activeElement !== el) el.value = FN[p]; const v = $(`v-f${p}`); if (v) v.textContent = `${FN[p]}%`; }
 }
 function mountDrag() {
   document.querySelectorAll('img[data-drag]').forEach((im) => {
@@ -190,47 +192,44 @@ function mountDrag() {
   if (img.complete) paintCrop(); else img.addEventListener('load', paintCrop);
   fe.addEventListener('pointerdown', (e) => {
     e.preventDefault(); fe.setPointerCapture(e.pointerId);
-    const g = cropGeom(); if (!g) return;
-    const F = faceNow();
-    // the visible window's left/top edge as a share of the picture
-    const st = { x: e.clientX, y: e.clientY, lx: (F.x / 100) * (1 - g.fx), ly: (F.y / 100) * (1 - g.fy) };
+    const F = faceNow(); const E = (CROP_D * F.zoom) / 100; // picture size on screen
+    const st = { x: e.clientX, y: e.clientY, cx: F.cx, cy: F.cy };
     const move = (ev) => {
-      // the picture follows the pointer, so the window moves the other way
-      const lx = st.lx - ((ev.clientX - st.x) * g.fx) / CROP_D;
-      const ly = st.ly - ((ev.clientY - st.y) * g.fy) / CROP_D;
-      if (g.fx < 1) setFaceRaw('x', Math.round(clamp((lx / (1 - g.fx)) * 100, 0, 100)));
-      if (g.fy < 1) setFaceRaw('y', Math.round(clamp((ly / (1 - g.fy)) * 100, 0, 100)));
+      // the picture follows the pointer, so the point under the ring's centre moves the other way
+      setFaceRaw('cx', Math.round(clamp(st.cx - ((ev.clientX - st.x) / E) * 100, 0, 100)));
+      setFaceRaw('cy', Math.round(clamp(st.cy - ((ev.clientY - st.y) / E) * 100, 0, 100)));
       livePaint();
     };
-    const up = () => { fe.removeEventListener('pointermove', move); fe.removeEventListener('pointerup', up); persist('faces', faceKey()); markList(); };
-    fe.addEventListener('pointermove', move); fe.addEventListener('pointerup', up);
+    const up = () => { fe.removeEventListener('pointermove', move); fe.removeEventListener('pointerup', up); fe.removeEventListener('pointercancel', up); persist('faces', faceKey()); markList(); };
+    fe.addEventListener('pointermove', move); fe.addEventListener('pointerup', up); fe.addEventListener('pointercancel', up);
   });
   fe.addEventListener('wheel', (e) => {
     e.preventDefault();
-    setFace('zoom', Math.round(clamp(faceNow().zoom * (e.deltaY < 0 ? 1.08 : 1 / 1.08), 100, 400)));
+    setFace('zoom', Math.round(clamp(faceNow().zoom * (e.deltaY < 0 ? 1.08 : 1 / 1.08), 50, 400)));
     markList();
   }, { passive: false });
 }
 // --- portrait cropper: the whole picture is shown, the ring is what the game's circle shows
 const CROP_D = 220; // ring diameter (px), centred in the box
 const faceKey = () => (S.tf && art(S.id).transformFace ? `${S.id}:tf` : S.id);
-function faceNow() { const F = S.layout.faces[faceKey()] || {}; return { x: F.x ?? 50, y: F.y ?? 50, zoom: F.zoom ?? 100 }; }
-// In the game the picture covers the circle, is zoomed, and focus x/y places the visible window inside the spare room:
-// per axis the window is f = 1 / (zoom × length/shortest side) of the picture, and its left edge sits at x% of (1 − f).
-function cropGeom() {
-  const img = $('cropImg'); if (!img || !img.naturalWidth) return null;
-  const z = faceNow().zoom / 100; const w = img.naturalWidth; const h = img.naturalHeight; const m = Math.min(w, h);
-  return { w, h, fx: m / (z * w), fy: m / (z * h) };
+function faceNow() {
+  const F = S.layout.faces[faceKey()] || {};
+  const zoom = F.zoom ?? 100;
+  if (F.x == null && F.y == null) return { zoom, cx: F.cx ?? 50, cy: F.cy ?? 50 };
+  const f = Math.min(1, 100 / zoom); // older focus-style entry → the point at the centre
+  return { zoom, cx: Math.round((F.x ?? 50) * (1 - f) + 50 * f), cy: Math.round((F.y ?? 50) * (1 - f) + 50 * f) };
 }
+// The whole picture is shown; the ring is the game's circle. The picture covers the circle at 100% zoom,
+// and the point (cx, cy) sits at the ring's centre.
 function paintCrop() {
-  const img = $('cropImg'); const g = cropGeom(); if (!img || !g) return;
+  const img = $('cropImg'); if (!img || !img.naturalWidth) return;
   const F = faceNow(); const box = $('faceEdit');
-  const W = CROP_D / g.fx; const H = CROP_D / g.fy; // picture size on screen
-  const left = (F.x / 100) * (1 - g.fx) * W; const top = (F.y / 100) * (1 - g.fy) * H;
-  const ox = (box.clientWidth - CROP_D) / 2; const oy = (box.clientHeight - CROP_D) / 2;
-  Object.assign(img.style, { width: `${W}px`, height: `${H}px`, left: `${ox - left}px`, top: `${oy - top}px` });
+  const E = (CROP_D * F.zoom) / 100; const m = Math.min(img.naturalWidth, img.naturalHeight);
+  const W = (E * img.naturalWidth) / m; const H = (E * img.naturalHeight) / m;
+  const px = (W - E) / 2 + (F.cx / 100) * E; const py = (H - E) / 2 + (F.cy / 100) * E;
+  Object.assign(img.style, { width: `${W}px`, height: `${H}px`, left: `${box.clientWidth / 2 - px}px`, top: `${box.clientHeight / 2 - py}px` });
 }
-function setFaceRaw(p, v) { const k = S.tf && art(S.id).transformFace ? `${S.id}:tf` : S.id; (S.layout.faces[k] ||= {})[p] = v; clean('faces', k, FDEF); }
+function setFaceRaw(p, v) { const k = faceKey(); S.layout.faces[k] = { ...faceNow(), [p]: v }; clean('faces', k, FDEF); }
 function markList() { const b = document.querySelector(`.ly-item[data-arg="${S.id}"]`); if (b && edited(S.id) && !b.querySelector('.tag')) b.insertAdjacentHTML('beforeend', '<span class="tag">set</span>'); }
 
 async function exportJson() {

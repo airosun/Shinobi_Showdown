@@ -20,7 +20,8 @@
 .face-crop { width: 320px; height: 300px; border-radius: 10px; overflow: hidden; position: relative; cursor: grab; touch-action: none; background: #0b0806; border: 1px solid var(--line); }
 .face-crop:active { cursor: grabbing; }
 .face-crop img { position: absolute; max-width: none; user-select: none; pointer-events: none; }
-.face-crop .crop-ring { position: absolute; left: 50%; top: 50%; width: 220px; height: 220px; margin: -110px 0 0 -110px; border-radius: 50%; border: 3px solid var(--accent); box-shadow: 0 0 0 999px #000000a8; pointer-events: none; }
+.face-crop .crop-ring { position: absolute; left: 50%; top: 50%; width: 220px; height: 220px; margin: -110px 0 0 -110px; border-radius: 50%; border: 3px solid var(--accent); box-shadow: 0 0 0 999px #000000a8; pointer-events: none; z-index: 2; }
+.face-crop img { z-index: 1; }
 .face-sizes { display: flex; gap: 14px; align-items: flex-end; }
 .face-sizes .badge.xs { width: 24px; height: 24px; }
 .face-sizes figure { margin: 0; display: flex; flex-direction: column; align-items: center; gap: 4px; font-size: 11px; color: var(--muted); }

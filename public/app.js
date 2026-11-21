@@ -104,11 +104,14 @@ function artStyle(id, tf, back) {
   if (dx || L.dy) out.push(`translate:${dx}% ${L.dy || 0}%`);
   return out.join(';');
 }
+// portrait: zoom, and the point of the picture (cx, cy in %) that sits at the circle's centre
 function faceStyle(id, tf) {
   const F = (tf && S.layout.faces[`${id}:tf`]) || S.layout.faces[id];
   if (!F) return '';
-  const x = F.x ?? 50; const y = F.y ?? 50;
-  return `object-position:${x}% ${y}%;transform-origin:${x}% ${y}%;scale:${(F.zoom ?? 100) / 100}`;
+  const z = (F.zoom ?? 100) / 100;
+  let cx = F.cx ?? 50; let cy = F.cy ?? 50;
+  if (F.x != null || F.y != null) { const f = Math.min(1, 1 / z); cx = (F.x ?? 50) * (1 - f) + 50 * f; cy = (F.y ?? 50) * (1 - f) + 50 * f; } // older focus-style entries
+  return `transform-origin:50% 50%;transform:scale(${z}) translate(${+(50 - cx).toFixed(2)}%, ${+(50 - cy).toFixed(2)}%)`;
 }
 /** Battle art (front view; your side is mirrored). Falls back to the badge. */
 function sprite(def, back, transformed = false) {
