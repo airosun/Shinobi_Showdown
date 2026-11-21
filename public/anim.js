@@ -4006,8 +4006,16 @@ Object.assign(ANIMS, {
     },
   },
   needle_jizo: {
-    desc: 'Spiky white hair wraps around the user.',
-    async play(ctx) { const { w, h } = ctx.userSize; const n = spawn(ctx, `<svg width="${w * 1.1}" height="${h}" viewBox="0 0 100 100" preserveAspectRatio="none">${Array.from({ length: 22 }, (_, i) => { const a = (i / 22) * Math.PI * 2; return `<path d="M50 50L${50 + Math.cos(a) * 48} ${50 + Math.sin(a) * 48}" stroke="#f4f4f4" stroke-width="5" stroke-linecap="round"/>`; }).join('')}<ellipse cx="50" cy="50" rx="34" ry="40" fill="#e8e8e8ee" stroke="#bdbdbd" stroke-width="2"/></svg>`, ctx.from, { life: 1800 }); await grow(ctx, n, 380, 'scale(.2)', 'scale(1)'); await wait(700 * ctx.sp); fade(ctx, n, 300); },
+    desc: 'Spiky white hair wraps around the user in the shape of a Christmas tree.',
+    async play(ctx) {
+      const { w, h } = ctx.userSize; const f = feetOf(ctx, ctx.userEl);
+      const tier = (top, bot, half) => { const n = 9; let d = `M50 ${top}`; for (let k = 0; k <= n; k++) { const x = 50 + half * (k / n * 2 - 1) * -1; void x; } d = `M50 ${top} `; for (let k = 0; k <= n; k++) { const t = k / n; const x = 50 + half - 2 * half * t; d += `L${x.toFixed(1)} ${bot + (k % 2 ? -6 : 3)} `; } return `<path d="${d}Z" fill="#f2f2f0" stroke="#a8a8a8" stroke-width="1.6" stroke-linejoin="round"/>${Array.from({ length: 5 }, (_, k) => `<path d="M50 ${top + 4}L${50 - half * 0.8 + k * half * 0.4} ${bot - 4}" stroke="#d0d0d0" stroke-width="1"/>`).join('')}`; };
+      const svg = `<svg width="${Math.max(w * 1.25, h * 0.75)}" height="${h * 1.08}" viewBox="0 0 100 120" preserveAspectRatio="none" style="filter:drop-shadow(0 4px 4px #0008)">${tier(58, 118, 50)}${tier(30, 88, 40)}${tier(6, 58, 30)}<path d="M50 0 54 10 46 10Z" fill="#fafafa" stroke="#a8a8a8"/></svg>`;
+      const n = spawn(ctx, svg, { x: f.x, y: f.y + 6 }, { life: 1900 });
+      n.style.transformOrigin = '50% 100%';
+      await n.animate([{ transform: 'translate(-50%,-100%) scale(.2,0)' }, { transform: 'translate(-50%,-100%) scale(1,1)' }], { duration: 420 * ctx.sp, easing: 'ease-out', fill: 'forwards' }).finished.catch(() => {});
+      await wait(750 * ctx.sp); fade(ctx, n, 300);
+    },
   },
   cutting_whirlwind: { desc: 'User swings their giant fan and sends wind blades at every enemy.', play: (ctx) => windBlades(ctx, { size: 90 }) },
   great_sickle_weasel: { desc: 'User swings their giant fan and sends one wind blade at each enemy at the same time.', play: (ctx) => windBlades(ctx, { size: 120 }) },
