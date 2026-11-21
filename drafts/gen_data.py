@@ -38,7 +38,7 @@ COST_OVERRIDES = {'kurenai': 5, 'sakura_war': 9, 'tenten_ship': 7, 'kakashi_p1':
                   # balance pass 6 (batch 6)
                   'shisui': 8, 'shizune': 5, 'iruka': 4, 'choji_ship': 7, 'naruto_p1': 5, 'naruto_sage': 7, 'sakura_war': 8,
                   # balance pass 7 (chakra rebalance: smaller chakra pools)
-                  'gaara_ship': 9, 'kakashi_ship': 6, 'kankuro_ship': 5, 'hinata_ship': 6, 'gengetsu': 6, 'shisui': 7, 'danzo': 8, 'konohamaru': 6, 'karui': 6, 'onoki': 7, 'hidan': 7}
+                  'gaara_ship': 9, 'kakashi_ship': 6, 'kankuro_ship': 5, 'hinata_ship': 6, 'gengetsu': 6, 'shisui': 7, 'danzo': 8, 'konohamaru': 6, 'karui': 6, 'onoki': 7, 'hidan': 7, 'naruto_war': 11, 'shino_p1': 5, 'killer_bee': 10, 'zetsu_black': 5, 'temari_p1': 5, 'kiba_ship': 7, 'yamato': 6}
 JUTSU_OVERRIDES = {
     'amaterasu': {'effects': [{'type': 'burn', 'chance': 1, 'turns': 3}], 'cost': 55, 'desc': 'Black flames wherever he looks. Always Burns (3 turns). Ignores Substitution.'},
     'katsuyu': {'effects': [{'type': 'heal', 'value': 0.15}, {'type': 'buff', 'stat': 'def', 'mult': 1.2, 'turns': 2}], 'desc': "Katsuyu's clones heal all allies 15% and give +20% DEF for 2 turns."},

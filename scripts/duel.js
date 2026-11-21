@@ -14,7 +14,7 @@ for (let g = 0; g < games; g++) {
   const st = createBattle(teams, { seed: Math.floor(rng() * 1e9) });
   const r = makeRng(Math.floor(rng() * 1e9));
   let guard = 0;
-  while (st.winner === null && guard++ < 50) {
+  while (st.winner === null && guard++ < 200) {
     const a = smart === 0 ? [...chooseActionsSmart(st, 0, r, opts), ...chooseActions(st, 1, r)] : [...chooseActions(st, 0, r), ...chooseActionsSmart(st, 1, r, opts)];
     resolveTurn(st, a);
   }

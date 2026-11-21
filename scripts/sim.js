@@ -20,7 +20,7 @@ for (let g = 0; g < games; g++) {
   const aiRng = makeRng(Math.floor(rng() * 1e9));
   let guard = 0;
   const seenLow = new Set();
-  while (st.winner === null && guard++ < 50) {
+  while (st.winner === null && guard++ < 200) {
     for (const side of [0, 1]) for (const u of onField(st, side)) {
       CK.unitTurns++;
       const f = u.chakra / u.maxChakra;

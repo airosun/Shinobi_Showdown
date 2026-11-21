@@ -14,7 +14,7 @@ export const BALANCE = {
   hpScale: 3,             // max HP = base hp * hpScale
   chakraScale: 0.85,      // max Chakra = base chk * chakraScale (smaller tank: Charge / Kunai / overexert decisions come up mid-battle)
   damageScale: 0.42,
-  maxTurns: 20,
+  maxTurns: null,         // no turn limit: the battle ends by Elimination or Intel
   intelToWin: 100,
   koScore: 25,            // Mission Score per KO (turn-limit tiebreak)
   chakraRegen: 0.03,      // passive regen per turn (Charge is the real refill)
@@ -563,7 +563,7 @@ function dealDamage(state, target, amount, source, msg = null, extra = {}) {
   if (msg) log(state, msg, 'damage', target, { amount, src: source?.uid, ...extra });
   target.flags.tookDamage = true;
   // carrying unsecured Intel is risky: an enemy hit knocks some (or all) of it loose
-  if (extra.hit && source && source.side !== target.side && target.hp > 0 && target.unsecured.length) dropIntel(state, target, amount, extra.crit);
+  if (extra.single && source && source.side !== target.side && target.hp > 0 && target.unsecured.length) dropIntel(state, target, amount, extra.crit);
   target.resolve = Math.min(100, target.resolve + Math.round((amount / target.maxHp) * 100 * BALANCE.resolveFromDamage));
   // Hidan's curse: damage he takes is also dealt to the linked enemy
   if (target.link && !extra.mirrored) {
@@ -702,6 +702,7 @@ function performJutsu(state, actor, jutsu, target, ctx = {}) {
     const enemy = tgt.side !== actor.side;
 
     if (enemy && jutsu.category === 'genjutsu') {
+      if (!aoe) tgt.flags.singleHit = true; // a single-target move reached them (stops Gather Intel)
       performGenjutsu(state, actor, tgt, jutsu);
       continue;
     }
@@ -753,6 +754,9 @@ function performJutsu(state, actor, jutsu, target, ctx = {}) {
       }
     }
 
+    // the move connected: a single-target one stops Gather Intel
+    if (enemy && !aoe) tgt.flags.singleHit = true;
+
     // damage
     if (jutsu.power > 0 && enemy) {
       let collab = !!ctx.collab;
@@ -777,7 +781,7 @@ function performJutsu(state, actor, jutsu, target, ctx = {}) {
       if (adv > 1) notes.push('super effective');
       if (adv < 1) notes.push('resisted');
       if (adv > 1) actor.resolve = Math.min(100, actor.resolve + BALANCE.resolveSuperEffective);
-      dealDamage(state, tgt, damage, actor, `${tgt.name} takes ${damage} damage${notes.length ? ` (${notes.join(', ')})` : ''}.`, { crit, adv, hit: true, jutsu: jutsu.id });
+      dealDamage(state, tgt, damage, actor, `${tgt.name} takes ${damage} damage${notes.length ? ` (${notes.join(', ')})` : ''}.`, { crit, adv, hit: true, jutsu: jutsu.id, single: !aoe });
       if (jutsu.nature) {
         (state._hits[tgt.uid] ||= []).push({ nature: jutsu.nature, side: actor.side });
       }
@@ -879,7 +883,7 @@ function performGenjutsu(state, actor, tgt, jutsu) {
   }
   if (jutsu.power) {
     const { damage, crit } = computeDamage(state, caster, victim, jutsu, {});
-    dealDamage(state, victim, damage, caster, `${victim.name} takes ${damage} damage${crit ? ' (critical)' : ''}.`, { crit, hit: true, jutsu: jutsu.id });
+    dealDamage(state, victim, damage, caster, `${victim.name} takes ${damage} damage${crit ? ' (critical)' : ''}.`, { crit, hit: true, jutsu: jutsu.id, single: jutsu.target === 'enemy' });
     if (victim.ko) return;
   }
   for (const eff of jutsu.effects) {
@@ -1245,8 +1249,16 @@ function executeAction(state, u, a, clashes, cancelled, entries) {
       return;
     }
     case 'gather': {
-      if (u.flags.tookDamage) { log(state, `${u.name} was hit and couldn't gather Intel!`, 'intel', u); return; }
+      // only a single-target move can stop a gatherer: the opponent has to read who is scouting
+      if (u.flags.singleHit) { log(state, `${u.name} was singled out and couldn't gather Intel!`, 'intel', u, { act: 'Gather Intel' }); return; }
       awardIntel(state, u, (isSpecialist(u) ? BALANCE.intelGatherSpecialist : BALANCE.intelGather) + auraVal(state, u.side, 'gatherBonus') + (GATHER[traitOf(u)] || 0), 'reconnaissance');
+      // a successful gather sends everything this shinobi is carrying home: it is all secured at once
+      const carried = unsecuredTotal(u);
+      if (carried) {
+        state.teams[u.side].securedIntel += carried;
+        u.unsecured = [];
+        log(state, `${u.name} secures ${carried} Intel for the team.`, 'intel', u, { secured: carried });
+      }
       return;
     }
     case 'kunai':
@@ -1491,7 +1503,7 @@ function checkWin(state) {
     if (!enemyAlive) { wins[side] = true; reasons[side] = 'Elimination'; }
     if (state.teams[side].securedIntel >= BALANCE.intelToWin) { wins[side] = true; reasons[side] ||= 'Intel'; }
   }
-  const timeUp = state.turn >= state.maxTurns;
+  const timeUp = !!state.maxTurns && state.turn >= state.maxTurns;
   if (!wins[0] && !wins[1] && !timeUp) return;
   if (wins[0] !== wins[1]) {
     const w = wins[0] ? 0 : 1;

@@ -95,37 +95,45 @@ test('consecutive substitutions lose reliability', () => {
   assert.ok(st.log.some((l) => l.text.includes('substitution fails')));
 });
 
-test('gathered Intel secures at the end of the next turn', () => {
+test('a successful Gather secures its Intel at once, plus whatever was carried', () => {
   const st = battle(T0, T1);
+  st.units['1-2'].unsecured.push({ amount: 10, turn: 1 });
   resolveTurn(st, [{ actor: '1-3', type: 'none' }, { actor: '1-2', type: 'gather' }]);
-  assert.equal(st.teams[1].securedIntel, 2); // only Ino's support relay
-  assert.ok(st.units['1-2'].unsecured.length);
-  resolveTurn(st, []);
-  // Shikamaru: Infiltrator gather * 1.25 (200 IQ), plus two Ino relays (stage 1 = 2)
-  assert.equal(st.teams[1].securedIntel, Math.round(BALANCE.intelGatherSpecialist * 1.25) + 4);
+  // Shikamaru: Infiltrator gather * 1.25 (200 IQ) + the 10 he carried + Ino's relay (stage 1 = 2)
+  assert.equal(st.teams[1].securedIntel, Math.round(BALANCE.intelGatherSpecialist * 1.25) + 10 + 2);
+  assert.equal(st.units['1-2'].unsecured.length, 0);
 });
 
 test('a spy KO\'d before securing loses their Intel', () => {
   const st = battle(T0, T1);
-  resolveTurn(st, [{ actor: '1-2', type: 'gather' }]);
+  st.units['1-2'].unsecured.push({ amount: 20, turn: 1 });
   st.units['1-2'].hp = 1;
   resolveTurn(st, [{ actor: '0-0', type: 'kunai', target: { slot: 2 } }]);
   assert.ok(st.units['1-2'].ko);
   assert.ok(st.log.some((l) => l.text.includes('unsecured Intel was lost')));
-  // just relays: 2 (3 standing) then 3 (2 standing after the KO)
-  assert.equal(st.teams[1].securedIntel, 5);
+  assert.equal(st.teams[1].securedIntel, 3); // just the relay (stage 2 after the KO)
 });
 
-test('Gather Intel fails if hit first', () => {
+test('Gather Intel is stopped by a single-target move', () => {
   const st = battle(T0, T1);
   resolveTurn(st, [{ actor: '1-2', type: 'gather' }, { actor: '0-0', type: 'kunai', target: { slot: 2 } }]);
-  assert.equal(st.units['1-2'].unsecured.length, 0);
+  assert.ok(st.log.some((l) => l.text.includes("couldn't gather Intel")));
+  assert.equal(st.teams[1].securedIntel, 2);
+});
+
+test('area attacks do not stop Gather Intel or knock Intel loose', () => {
+  const st = battle(['tenten_ship', 'sasuke_p1', 'sakura_shippuden', 'lee_p1'], T1);
+  st.units['1-0'].unsecured.push({ amount: 10, turn: 1 });
+  // Tenten's Kunai & Shuriken hit every enemy (Weapon Mistress)
+  resolveTurn(st, [{ actor: '1-2', type: 'gather' }, { actor: '0-0', type: 'kunai', target: { slot: 0 } }]);
+  assert.ok(!st.log.some((l) => l.text.includes("couldn't gather Intel")));
+  assert.ok(!st.log.some((l) => l.text.includes('drops')));
 });
 
 test('Guard halves enemy Intel gains', () => {
   const st = battle(T0, T1);
-  resolveTurn(st, [{ actor: '1-2', type: 'gather' }, { actor: '0-1', type: 'guard' }]);
-  assert.equal(st.units['1-2'].unsecured[0].amount, Math.round(BALANCE.intelGatherSpecialist * 1.25 * 0.5));
+  resolveTurn(st, [{ actor: '1-3', type: 'none' }, { actor: '1-2', type: 'gather' }, { actor: '0-1', type: 'guard' }]);
+  assert.equal(st.teams[1].securedIntel, Math.round(BALANCE.intelGatherSpecialist * 1.25 * 0.5) + 2);
 });
 
 test('Jutsu Clash: Water overpowers Fire', () => {
@@ -178,14 +186,12 @@ test('support does not need a loadout', () => {
   assert.deepEqual(validateTeam({ members: [member('naruto_p1'), member('sasuke_p1'), member('sakura_shippuden'), sup] }), []);
 });
 
-test('turn limit decides by Mission Score', () => {
+test('there is no turn limit', () => {
   const st = battle(T0, T1);
-  st.turn = BALANCE.maxTurns;
+  st.turn = 60;
   st.teams[0].securedIntel = 40;
-  st.teams[1].securedIntel = 0;
   resolveTurn(st, []);
-  assert.equal(st.winner, 0);
-  assert.match(st.winReason, /Mission Score/);
+  assert.equal(st.winner, null);
 });
 
 test('charged jutsu takes two turns and locks the user in', () => {

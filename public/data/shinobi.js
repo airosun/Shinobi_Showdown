@@ -251,7 +251,7 @@ export const SHINOBI = [
     "baseId": "naruto",
     "name": "Naruto Uzumaki (Kurama Link Mode)",
     "era": "Shippuden",
-    "cost": 10,
+    "cost": 11,
     "natures": {
       "primary": "wind",
       "secondary": "yang"
@@ -1180,7 +1180,7 @@ export const SHINOBI = [
     "baseId": "yamato",
     "name": "Yamato",
     "era": "Shippuden",
-    "cost": 7,
+    "cost": 6,
     "natures": {
       "primary": "wood",
       "secondary": "water"
@@ -1959,7 +1959,7 @@ export const SHINOBI = [
     "baseId": "kiba",
     "name": "Kiba Inuzuka",
     "era": "Shippuden",
-    "cost": 6,
+    "cost": 7,
     "natures": {
       "primary": null,
       "secondary": null
@@ -2033,7 +2033,7 @@ export const SHINOBI = [
     "baseId": "shino",
     "name": "Shino Aburame (Part I)",
     "era": "Part I",
-    "cost": 4,
+    "cost": 5,
     "natures": {
       "primary": null,
       "secondary": null
@@ -2879,7 +2879,7 @@ export const SHINOBI = [
     "baseId": "temari",
     "name": "Temari (Part I)",
     "era": "Part I",
-    "cost": 6,
+    "cost": 5,
     "natures": {
       "primary": "wind",
       "secondary": null
@@ -4366,7 +4366,7 @@ export const SHINOBI = [
     "baseId": "zetsu",
     "name": "Zetsu (Black)",
     "era": "Shippuden",
-    "cost": 4,
+    "cost": 5,
     "natures": {
       "primary": "yin",
       "secondary": "earth"
@@ -5789,7 +5789,7 @@ export const SHINOBI = [
     "baseId": "killer",
     "name": "Killer Bee",
     "era": "Shippuden",
-    "cost": 9,
+    "cost": 10,
     "natures": {
       "primary": "lightning",
       "secondary": null

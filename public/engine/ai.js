@@ -5,6 +5,7 @@ import {
 
 export const AI_CONSERVE_DEFAULT = 2.5;
 let AI_CONSERVE = Number(globalThis.process?.env?.AI_CONSERVE ?? AI_CONSERVE_DEFAULT);
+const AI_SCOUT_FOCUS = Number(globalThis.process?.env?.AI_SCOUT ?? 1.35);
 
 export function chooseActions(state, side, rng = Math.random) {
   const actions = [];
@@ -80,6 +81,13 @@ export function chooseActions(state, side, rng = Math.random) {
           if (!j.power) s = j.effects.some((x) => ['bind', 'genjutsu'].includes(x.type)) ? (e.statuses.bind ? 5 : 45) : 20;
           if (j.effects.some((x) => x.type === 'intel')) s += 15;
           if (unsecuredTotal(e) > 0) s *= 1.3;
+          // read the scouts: only a single-target move stops a Gather, so lean on likely gatherers
+          if (o.type !== 'jutsu' || j.target === 'enemy') {
+            const scout = defOf(e).roles.some((r) => r === 'Sensor' || r === 'Infiltrator');
+            const theirIntel = state.teams[e.side].securedIntel;
+            if (scout) s *= AI_SCOUT_FOCUS * (theirIntel >= 60 ? 1.25 : 1);
+            else if (theirIntel >= 60) s *= 1.1;
+          }
           if (j.power && s >= e.hp) s *= 1.4;
           if (j.charged) s *= 0.55;
           s = ox(s, j.power && s >= e.hp);
@@ -219,7 +227,7 @@ export function evaluate(state, side) {
     if (!supportSkillState(state, s).disabled) tv += 8; // a skill in hand has some value
     const intel = team.securedIntel;
     tv += W.intel * intel + (intel >= 75 ? 25 : 0) + (intel >= 90 ? 40 : 0);
-    if (state.turn > state.maxTurns - 3) tv += 1.5 * missionScore(state, s);
+    if (state.maxTurns && state.turn > state.maxTurns - 3) tv += 1.5 * missionScore(state, s);
     v += sign * tv;
   }
   return v;

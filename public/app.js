@@ -156,7 +156,7 @@ document.getElementById('menuBtn').addEventListener('click', () => {
 
 function render() {
   tip.classList.add('hidden');
-  topinfo.textContent = S.screen === 'battle' && S.battle ? `${modeLabel()} · Turn ${Math.min((S.view || S.battle).turn, S.battle.maxTurns)} / ${S.battle.maxTurns}` : '';
+  topinfo.textContent = S.screen === 'battle' && S.battle ? `${modeLabel()} · Turn ${(S.view || S.battle).turn}` : '';
   document.getElementById('dexBtn').classList.toggle('hidden', S.screen === 'battle' || S.screen === 'pass' || S.screen === 'dex');
   document.body.dataset.screen = S.screen;
   // keep scrolled lists (Dex) where they were
@@ -550,10 +550,10 @@ function rulesHtml() {
       <li><b>Jutsu Clash:</b> two ninjutsu aimed at each other collide — the stronger nature breaks through at 70% power.</li>
       <li><b>Collaboration:</b> Wind then Fire (or Water then Lightning) on the same target in one turn = ×1.3.</li>
       <li><b>Substitution:</b> a Stance that negates the first single-target hit. Repeating it lowers the odds (100/50/25%). Area attacks are only halved; Sharingan sees through logs; genjutsu ignores it.</li>
-      <li><b>Intel:</b> Gather Intel (+${E.BALANCE.intelGather}, or +${E.BALANCE.intelGatherSpecialist} for Sensors and Infiltrators), land genjutsu, reveal enemy jutsu and score KOs (+${E.BALANCE.intelKO}). New Intel is <i>unsecured</i> until the carrier survives the end of the next turn — Each enemy hit on the carrier knocks half of it loose (a big hit or a critical drops all of it), and a KO loses it all. Guard halves enemy Intel gains (a Sensor on guard quarters them).</li>
+      <li><b>Intel:</b> Gather Intel (+${E.BALANCE.intelGather}, or +${E.BALANCE.intelGatherSpecialist} for Sensors and Infiltrators), land genjutsu, reveal enemy jutsu and score KOs (+${E.BALANCE.intelKO}). Intel from anything but Gather is <i>unsecured</i> until the carrier survives the end of the next turn. A successful Gather secures what it finds <i>and</i> everything that shinobi was carrying, on the spot. Only <b>single-target</b> moves interfere: one aimed at a gatherer stops the Gather, and a single-target hit on a carrier knocks half their unsecured Intel loose (a big hit or a critical drops all of it). A KO loses it all. Guard halves enemy Intel gains (a Sensor on guard quarters them).</li>
       <li><b>Roles:</b><ul class="roles-list">${ROLE_ORDER.map((r) => `<li><b>${r}</b> — ${ROLE_INFO[r]}</li>`).join('')}</ul></li>
       <li><b>Milestones:</b> 25 Intel reveals an enemy loadout, 50 reveals another and makes enemy Chakra visible, 75 lets you see one enemy order before choosing.</li>
-      <li><b>Win:</b> KO all 3 enemy shinobi, <i>or</i> secure 100 Intel. After turn 20, the highest Mission Score (25 per KO + Intel) wins.</li>
+      <li><b>Win:</b> KO all 3 enemy shinobi, <i>or</i> secure 100 Intel. There is no turn limit. If both sides get there in the same turn, the higher Mission Score (25 per KO + Intel) wins.</li>
       <li><b>Chakra</b> is scarce: pools are small and only ~3% comes back each turn. <b>Charge Chakra</b> restores half your pool (but you take +25% damage that turn). Out of Chakra? Throw kunai, Charge, or <b>overexert</b> — force the jutsu out anyway by paying the shortfall in HP and becoming Exhausted. Ending a turn at 0 Chakra also costs HP.</li>
       <li><b>Resolve</b> builds as you take hits or lose allies and powers transformations.</li>
     </ul>
@@ -757,7 +757,7 @@ function syncField() {
   }
   const m = document.getElementById('mission');
   if (m) m.innerHTML = missionHtml();
-  topinfo.textContent = `${modeLabel()} · Turn ${Math.min(vs.turn, S.battle.maxTurns)} / ${S.battle.maxTurns}`;
+  topinfo.textContent = `${modeLabel()} · Turn ${vs.turn}`;
 }
 
 function fieldSignature(vs) {
@@ -786,7 +786,7 @@ function missionHtml() {
       </div>
     </div>`;
   };
-  return `<div class="row"><h2 style="margin:0">Mission</h2><span class="grow"></span><span class="turn">Turn ${Math.min(vs.turn, S.battle.maxTurns)}<span class="muted" style="font-size:18px"> / ${S.battle.maxTurns}</span></span></div>
+  return `<div class="row"><h2 style="margin:0">Mission</h2><span class="grow"></span><span class="turn">Turn ${vs.turn}</span></div>
     ${box(0)}${box(1)}`;
 }
 
@@ -913,7 +913,7 @@ function actionSections(st, u) {
   const SUB = {
     kunai: (o) => { const k = E.getJutsu(o.jutsuId); return `POW ${k.power} · free · +2${k.target === 'allEnemies' ? ' · all enemies' : ''}`; },
     charge: () => `+${Math.round(E.BALANCE.chargeChakra * 100)}% Chakra · −2 · vulnerable`,
-    gather: () => `+${(E.defOf(u).roles.some((r) => r === 'Sensor' || r === 'Infiltrator') ? E.BALANCE.intelGatherSpecialist : E.BALANCE.intelGather) + E.auraVal(S.battle, u.side, 'gatherBonus')} Intel · −1 · fails if hit`,
+    gather: () => `+${(E.defOf(u).roles.some((r) => r === 'Sensor' || r === 'Infiltrator') ? E.BALANCE.intelGatherSpecialist : E.BALANCE.intelGather) + E.auraVal(S.battle, u.side, 'gatherBonus')} Intel, secured · −1 · single-target hit stops it`,
     substitute: (o) => `CK ${o.cost} · Stance${o.note ? ` · ${o.note}` : ''}`,
     guard: () => 'Stance · halve enemy Intel',
     release: () => 'Stance · break genjutsu',
@@ -922,7 +922,7 @@ function actionSections(st, u) {
   const TIPS = {
     kunai: KUNAI_TIP,
     charge: 'Restore half of your max Chakra (it resolves last). You take +25% damage this turn. Passive regen is small, so this is how you refill.',
-    gather: `Priority −1. Gain ${E.BALANCE.intelGather} Intel (${E.BALANCE.intelGatherSpecialist} for Sensors and Infiltrators). Fails if you were hit earlier this turn. The Intel is unsecured until you survive the end of next turn.`,
+    gather: `Priority −1. Gain ${E.BALANCE.intelGather} Intel (${E.BALANCE.intelGatherSpecialist} for Sensors and Infiltrators) and secure it on the spot, along with any unsecured Intel you were carrying. Only a single-target move aimed at you earlier this turn stops it.`,
     substitute: `${SUBSTITUTIONS[u.substitution].desc} Success drops to 50% / 25% if used on consecutive turns. Area attacks are only halved.`,
     guard: 'Stance. Enemy Intel gains are halved this turn (quartered if a Sensor guards), and you take 25% less damage.',
     release: 'Stance. Break free of genjutsu.',
