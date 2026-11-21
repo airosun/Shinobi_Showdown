@@ -18,6 +18,45 @@ export function jutsuColor(j) {
 
 export const wait = (ms) => new Promise((r) => setTimeout(r, ms));
 
+// ---------------------------------------------------------------- custom sprite overrides
+// Every drawn piece of an animation carries data-sp="<name>". Drop an image named <name>.png
+// (or .webp / .svg / .gif / .jpg) into public/img and it replaces the drawn version everywhere;
+// <jutsu_id>__<name>.png replaces it for that one jutsu only. The server lists public/img at /img/index.json.
+const OVR = {};
+if (typeof fetch !== 'undefined') {
+  fetch('img/index.json').then((r) => (r.ok ? r.json() : [])).then((list) => {
+    for (const f of list) { const m = /^(.+)\.(png|webp|svg|gif|jpe?g)$/i.exec(f); if (m) OVR[m[1]] = `img/${encodeURIComponent(f)}`; }
+  }).catch(() => {});
+}
+export function spriteUrl(name, jutsuId = null) { return (jutsuId && OVR[`${jutsuId}__${name}`]) || OVR[name] || null; }
+/** Swap drawn pieces inside root (and root itself) for the user's images where one exists. */
+export function applySprites(root, jutsuId = null) {
+  if (!root || !Object.keys(OVR).length) return;
+  const els = [...(root.dataset?.sp ? [root] : []), ...root.querySelectorAll('[data-sp]')];
+  for (const el of els) {
+    const url = spriteUrl(el.dataset.sp, jutsuId);
+    if (!url) continue;
+    if (el.tagName.toLowerCase() === 'svg') {
+      const img = document.createElement('img');
+      img.src = url;
+      img.dataset.sp = el.dataset.sp;
+      img.dataset.ovr = '1';
+      const cls = el.getAttribute('class'); if (cls) img.setAttribute('class', cls);
+      img.setAttribute('style', el.getAttribute('style') || '');
+      const w = el.getAttribute('width'); const h = el.getAttribute('height');
+      if (w) img.style.width = `${parseFloat(w)}px`;
+      if (h) img.style.height = `${parseFloat(h)}px`;
+      img.style.objectFit = 'contain'; img.style.display = 'block';
+      el.replaceWith(img);
+    } else {
+      el.dataset.ovr = '1';
+      el.style.background = `url("${url}") center / contain no-repeat`;
+      el.style.border = 'none'; el.style.borderRadius = '0'; el.style.boxShadow = 'none'; el.style.clipPath = 'none';
+    }
+  }
+}
+const NO_SPRITE = new Set(['pop', 'banner', 'log']);
+
 export function centerOf(el, arena) {
   const a = arena.getBoundingClientRect();
   const r = el.getBoundingClientRect();
@@ -28,6 +67,8 @@ export function fx(arena, cls, at, html = '') {
   const d = document.createElement('div');
   d.className = `fx ${cls}`;
   d.innerHTML = html;
+  const parts = cls.trim().split(/\s+/);
+  if (!NO_SPRITE.has(parts[0])) { d.dataset.sp = `fx-${parts.join('-')}`; applySprites(d); }
   d.style.left = `${at.x}px`;
   d.style.top = `${at.y}px`;
   arena.appendChild(d);
@@ -68,8 +109,7 @@ export function lunge(el, from, to, sp = 1) {
 
 export function orb(arena, from, to, color, { small = false, sp = 1 } = {}) {
   const o = fx(arena, `orb ${small ? 'small' : ''}`, from);
-  o.style.background = color;
-  o.style.boxShadow = `0 0 18px 6px ${color}`;
+  if (!o.dataset.ovr) { o.style.background = color; o.style.boxShadow = `0 0 18px 6px ${color}`; }
   const dur = (small ? 260 : 440) * sp;
   o.animate([
     { transform: 'translate(-50%,-50%) scale(.6)' },
@@ -78,7 +118,7 @@ export function orb(arena, from, to, color, { small = false, sp = 1 } = {}) {
   setTimeout(() => {
     o.remove();
     const b = fx(arena, 'burst', to);
-    b.style.background = color;
+    if (!b.dataset.ovr) b.style.background = color;
   }, dur);
   return dur;
 }
@@ -86,7 +126,7 @@ export function orb(arena, from, to, color, { small = false, sp = 1 } = {}) {
 export function ring(arena, el, cls = '', color = null) {
   if (!el) return;
   const r = fx(arena, `ring ${cls}`, centerOf(el, arena));
-  if (color) { r.style.borderColor = color; r.style.boxShadow = `0 0 18px ${color}`; }
+  if (color && !r.dataset.ovr) { r.style.borderColor = color; r.style.boxShadow = `0 0 18px ${color}`; }
 }
 
 export function faint(el) {

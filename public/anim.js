@@ -36,6 +36,7 @@ function spawn(ctx, html, at, { z = 6, life = 4000 } = {}) {
   d.style.top = `${at.y}px`;
   d.style.zIndex = z;
   d.innerHTML = html;
+  FX.applySprites(d, ctx.j?.id);
   ctx.arena.appendChild(d);
   if (life) setTimeout(() => d.remove(), life * ctx.sp);
   return d;
@@ -58,11 +59,11 @@ const pop = (ctx, node, ms = 250) => node.animate([{ opacity: 0, transform: 'tra
 const shake = (ctx) => ctx.targetEls.forEach((t) => FX.shake(t));
 const shakeEl = (el) => FX.shake(el);
 const boom = (ctx, at, color = '#ffe066', size = 120) => {
-  const b = spawn(ctx, `<div style="width:${size}px;height:${size}px;border-radius:50%;background:radial-gradient(circle,#fff 0%,${color} 35%,${color}00 70%)"></div>`, at, { life: 900 });
+  const b = spawn(ctx, `<div data-sp="boom" style="width:${size}px;height:${size}px;border-radius:50%;background:radial-gradient(circle,#fff 0%,${color} 35%,${color}00 70%)"></div>`, at, { life: 900 });
   b.animate([{ transform: 'translate(-50%,-50%) scale(.2)', opacity: 1 }, { transform: 'translate(-50%,-50%) scale(1.5)', opacity: 0 }], { duration: 550 * ctx.sp, easing: 'ease-out', fill: 'forwards' });
 };
 const puff = (ctx, at, color = '#ffffff', size = 70) => {
-  const p = spawn(ctx, `<div style="width:${size}px;height:${size}px;border-radius:50%;background:radial-gradient(circle,${color}e0 0%,${color}80 40%,${color}00 70%)"></div>`, at, { life: 1200 });
+  const p = spawn(ctx, `<div data-sp="puff" style="width:${size}px;height:${size}px;border-radius:50%;background:radial-gradient(circle,${color}e0 0%,${color}80 40%,${color}00 70%)"></div>`, at, { life: 1200 });
   p.animate([{ transform: 'translate(-50%,-50%) scale(.4)', opacity: 0.9 }, { transform: `translate(calc(-50% + ${(Math.random() - 0.5) * 30}px), calc(-50% - 40px)) scale(1.6)`, opacity: 0 }], { duration: 900 * ctx.sp, easing: 'ease-out', fill: 'forwards' });
 };
 const lunge = (ctx, to, k = 0.55, ms = 520) => {
@@ -79,7 +80,7 @@ const ghostOf = (ctx, at, opacity = 0.55) => {
   const img = userImg(ctx);
   const { w, h } = ctx.userSize || sizeOf(ctx.userEl);
   const html = img ? `<img src="${img.getAttribute('src')}" style="height:${h}px;${img.style.transform ? `transform:${img.style.transform};` : ''}opacity:${opacity};filter:drop-shadow(0 0 6px #fff)">`
-    : `<div style="width:${w}px;height:${h}px;border-radius:50%;background:#fff;opacity:${opacity}"></div>`;
+    : `<div data-sp="ghostOf" style="width:${w}px;height:${h}px;border-radius:50%;background:#fff;opacity:${opacity}"></div>`;
   return spawn(ctx, html, at, { life: 1500 });
 };
 // enemy side box (all units of the targets' side)
@@ -94,26 +95,26 @@ function sideBox(ctx) {
 
 // ---------------------------------------------------------------- art (inline SVG)
 const ART = {
-  star: (s = 26, c = '#c9ced6') => `<svg width="${s}" height="${s}" viewBox="-10 -10 20 20" class="ax-spin"><path d="M0-10 2-2 10 0 2 2 0 10-2 2-10 0-2-2Z" fill="${c}" stroke="#555" stroke-width=".8"/><circle r="1.8" fill="#333"/></svg>`,
-  bone: (l = 70) => `<svg width="${l}" height="16" viewBox="0 0 70 16"><path d="M0 8 Q30 1 70 8 Q30 15 0 8Z" fill="#f4f1e8" stroke="#cfc8b4"/></svg>`,
-  spike: (l = 60, c = '#151515') => `<svg width="${l}" height="14" viewBox="0 0 60 14"><path d="M0 2 60 7 0 12Z" fill="${c}" stroke="#7a5cff" stroke-width=".8"/></svg>`,
-  missile: () => `<svg width="46" height="14" viewBox="0 0 46 14"><path d="M8 3h28l8 4-8 4H8Z" fill="#9aa3ad" stroke="#555"/><path d="M8 3 3 0v14l5-3" fill="#6b737c"/><path d="M3 4-8 7 3 10Z" fill="#ff9a3c"/></svg>`,
-  flame: (s = 40, c1 = '#000', c2 = '#7a2bd6') => `<svg width="${s}" height="${s * 1.3}" viewBox="0 0 40 52" class="ax-flicker"><path d="M20 52C6 52 0 42 4 30 7 22 12 18 12 8c6 4 10 10 10 16 2-4 2-8 1-12 9 6 15 16 13 26-2 10-8 14-16 14Z" fill="${c1}" stroke="${c2}" stroke-width="2.5"/></svg>`,
-  bubble: (s = 22) => `<svg width="${s}" height="${s}" viewBox="0 0 20 20"><circle cx="10" cy="10" r="9" fill="#bfe8ff33" stroke="#e6f7ff" stroke-width="1.2"/><circle cx="7" cy="6" r="2" fill="#fff" opacity=".8"/></svg>`,
-  axe: () => `<svg width="56" height="44" viewBox="0 0 56 44"><path d="M0 22h34" stroke="#8a6a52" stroke-width="7" stroke-linecap="round"/><path d="M30 4c14 2 24 10 24 18S44 40 30 42c4-6 5-13 5-20S34 10 30 4Z" fill="#c9b8a8" stroke="#6b5444" stroke-width="2"/></svg>`,
-  palm: () => `<svg width="48" height="48" viewBox="0 0 48 48"><circle cx="24" cy="24" r="20" fill="#fff6" stroke="#fff" stroke-width="3"/><path d="M16 30V18m6 12V14m6 16V15m6 15V19" stroke="#fff" stroke-width="3" stroke-linecap="round"/></svg>`,
-  eye: () => `<svg width="64" height="34" viewBox="0 0 64 34"><path d="M2 17C14 2 50 2 62 17 50 32 14 32 2 17Z" fill="#f4f2ff" stroke="#c9c2e8" stroke-width="2"/><circle cx="32" cy="17" r="9" fill="#e9e4ff" stroke="#b9b0dd"/><path d="M2 17c8-3 12-8 14-12M62 17c-8-3-12-8-14-12M10 26c6-2 9-3 12-6M54 26c-6-2-9-3-12-6" stroke="#b89bd8" stroke-width="1.5" fill="none"/></svg>`,
-  rasengan: (s = 54) => `<div class="ax-spin" style="width:${s}px;height:${s}px;border-radius:50%;background:conic-gradient(from 0deg,#e8f6ff,#4aa3ff,#cfeaff,#1f6fd6,#e8f6ff);box-shadow:0 0 22px 8px #6cb8ffaa"></div>`,
-  ant: () => `<svg width="140" height="150" viewBox="0 0 90 96"><g stroke="#3a2a22" stroke-width="2"><path d="M20 30 4 18M20 40 2 40M20 50 4 62M70 30 86 18M70 40 88 40M70 50 86 62" stroke="#5e4a3e" stroke-width="5" stroke-linecap="round"/><path d="M36 68 32 94M54 68 58 94" stroke="#3a2a22" stroke-width="9" stroke-linecap="round"/><path d="M36 68 32 94M54 68 58 94" stroke="#8c7b6c" stroke-width="6" stroke-linecap="round"/><ellipse cx="45" cy="42" rx="26" ry="30" fill="#7a6a5c"/><ellipse cx="45" cy="18" rx="13" ry="11" fill="#8c7b6c"/></g><path d="M37 9 31-2M53 9 59-2" stroke="#c8202a" stroke-width="4" stroke-linecap="round"/><circle cx="40" cy="18" r="2" fill="#111"/><circle cx="50" cy="18" r="2" fill="#111"/><path d="M33 40h24M33 50h24" stroke="#4a3a30" stroke-width="2"/></svg>`,
-  antBody: (h = 160) => `<svg width="${h * 0.72}" height="${h}" viewBox="0 0 72 100"><g stroke="#3a2a22" stroke-width="2.5"><ellipse cx="36" cy="58" rx="32" ry="40" fill="#7a6a5c"/><ellipse cx="36" cy="18" rx="16" ry="14" fill="#8c7b6c"/></g><path d="M27 7 20-6M45 7 52-6" stroke="#c8202a" stroke-width="5" stroke-linecap="round"/><circle cx="30" cy="18" r="2.5" fill="#111"/><circle cx="42" cy="18" r="2.5" fill="#111"/><path d="M14 52h44M14 66h44" stroke="#4a3a30" stroke-width="2.5"/><path d="M20 28c10 6 22 6 32 0" stroke="#5e4a3e" stroke-width="2" fill="none"/></svg>`,
-  antLimb: () => `<svg width="64" height="14" viewBox="0 0 64 14"><path d="M0 7H42" stroke="#5e4a3e" stroke-width="7" stroke-linecap="round"/><circle cx="22" cy="7" r="4.5" fill="#7a6a5c" stroke="#3a2a22"/><path d="M40 2 64 7 40 12Z" fill="#c9ced6" stroke="#444"/></svg>`,
-  crowBody: (s = 120) => `<svg width="${s}" height="${s}" viewBox="0 0 120 120"><path d="M60 6C88 6 108 28 110 56 112 86 90 112 60 114 30 112 8 86 10 56 12 28 32 6 60 6Z" fill="#1d1d24" stroke="#5a5a6e" stroke-width="3"/><path d="M42 40h36M42 70h36" stroke="#5a5a6e" stroke-width="3"/></svg>`,
-  blade: (l = 40) => `<svg width="${l}" height="10" viewBox="0 0 40 10"><path d="M0 5 40 1v8Z" fill="#c9ced6" stroke="#444"/></svg>`,
-  spider: () => `<svg width="34" height="28" viewBox="0 0 22 18"><g stroke="#f4f4f4" stroke-width="1.6" fill="none"><path d="M6 7 0 2M6 9 0 9M6 11 0 16M16 7 22 2M16 9 22 9M16 11 22 16"/></g><ellipse cx="11" cy="9" rx="6" ry="5" fill="#fafafa" stroke="#bbb"/></svg>`,
-  dragon: () => `<svg width="170" height="90" viewBox="0 0 170 90"><path d="M10 50C40 40 60 60 90 52 112 46 120 30 140 28l18-10-4 16 12 4-16 6c-14 12-30 24-56 26-26 2-44-10-84-12Z" fill="#f6f4ee" stroke="#c9c4b4" stroke-width="2"/><path d="M70 40 54 6l28 30M100 40l10-30 6 28" fill="#efece2" stroke="#c9c4b4" stroke-width="2"/><circle cx="148" cy="30" r="2.5" fill="#333"/></svg>`,
-  teardrop: () => `<svg width="70" height="90" viewBox="0 0 70 90"><path d="M35 0C45 26 66 42 66 60A31 31 0 0 1 4 60C4 42 25 26 35 0Z" fill="#f6f4ee" stroke="#c9c4b4" stroke-width="3"/><circle cx="35" cy="62" r="9" fill="#e9e5d8"/></svg>`,
+  star: (s = 26, c = '#c9ced6') => `<svg data-sp="art-star" width="${s}" height="${s}" viewBox="-10 -10 20 20" class="ax-spin"><path d="M0-10 2-2 10 0 2 2 0 10-2 2-10 0-2-2Z" fill="${c}" stroke="#555" stroke-width=".8"/><circle r="1.8" fill="#333"/></svg>`,
+  bone: (l = 70) => `<svg data-sp="art-bone-1" width="${l}" height="16" viewBox="0 0 70 16"><path d="M0 8 Q30 1 70 8 Q30 15 0 8Z" fill="#f4f1e8" stroke="#cfc8b4"/></svg>`,
+  spike: (l = 60, c = '#151515') => `<svg data-sp="art-spike" width="${l}" height="14" viewBox="0 0 60 14"><path d="M0 2 60 7 0 12Z" fill="${c}" stroke="#7a5cff" stroke-width=".8"/></svg>`,
+  missile: () => `<svg data-sp="art-missile" width="46" height="14" viewBox="0 0 46 14"><path d="M8 3h28l8 4-8 4H8Z" fill="#9aa3ad" stroke="#555"/><path d="M8 3 3 0v14l5-3" fill="#6b737c"/><path d="M3 4-8 7 3 10Z" fill="#ff9a3c"/></svg>`,
+  flame: (s = 40, c1 = '#000', c2 = '#7a2bd6') => `<svg data-sp="art-flame" width="${s}" height="${s * 1.3}" viewBox="0 0 40 52" class="ax-flicker"><path d="M20 52C6 52 0 42 4 30 7 22 12 18 12 8c6 4 10 10 10 16 2-4 2-8 1-12 9 6 15 16 13 26-2 10-8 14-16 14Z" fill="${c1}" stroke="${c2}" stroke-width="2.5"/></svg>`,
+  bubble: (s = 22) => `<svg data-sp="art-bubble" width="${s}" height="${s}" viewBox="0 0 20 20"><circle cx="10" cy="10" r="9" fill="#bfe8ff33" stroke="#e6f7ff" stroke-width="1.2"/><circle cx="7" cy="6" r="2" fill="#fff" opacity=".8"/></svg>`,
+  axe: () => `<svg data-sp="art-axe" width="56" height="44" viewBox="0 0 56 44"><path d="M0 22h34" stroke="#8a6a52" stroke-width="7" stroke-linecap="round"/><path d="M30 4c14 2 24 10 24 18S44 40 30 42c4-6 5-13 5-20S34 10 30 4Z" fill="#c9b8a8" stroke="#6b5444" stroke-width="2"/></svg>`,
+  palm: () => `<svg data-sp="art-palm" width="48" height="48" viewBox="0 0 48 48"><circle cx="24" cy="24" r="20" fill="#fff6" stroke="#fff" stroke-width="3"/><path d="M16 30V18m6 12V14m6 16V15m6 15V19" stroke="#fff" stroke-width="3" stroke-linecap="round"/></svg>`,
+  eye: () => `<svg data-sp="art-eye" width="64" height="34" viewBox="0 0 64 34"><path d="M2 17C14 2 50 2 62 17 50 32 14 32 2 17Z" fill="#f4f2ff" stroke="#c9c2e8" stroke-width="2"/><circle cx="32" cy="17" r="9" fill="#e9e4ff" stroke="#b9b0dd"/><path d="M2 17c8-3 12-8 14-12M62 17c-8-3-12-8-14-12M10 26c6-2 9-3 12-6M54 26c-6-2-9-3-12-6" stroke="#b89bd8" stroke-width="1.5" fill="none"/></svg>`,
+  rasengan: (s = 54) => `<div data-sp="art-rasengan" class="ax-spin" style="width:${s}px;height:${s}px;border-radius:50%;background:conic-gradient(from 0deg,#e8f6ff,#4aa3ff,#cfeaff,#1f6fd6,#e8f6ff);box-shadow:0 0 22px 8px #6cb8ffaa"></div>`,
+  ant: () => `<svg data-sp="art-ant" width="140" height="150" viewBox="0 0 90 96"><g stroke="#3a2a22" stroke-width="2"><path d="M20 30 4 18M20 40 2 40M20 50 4 62M70 30 86 18M70 40 88 40M70 50 86 62" stroke="#5e4a3e" stroke-width="5" stroke-linecap="round"/><path d="M36 68 32 94M54 68 58 94" stroke="#3a2a22" stroke-width="9" stroke-linecap="round"/><path d="M36 68 32 94M54 68 58 94" stroke="#8c7b6c" stroke-width="6" stroke-linecap="round"/><ellipse cx="45" cy="42" rx="26" ry="30" fill="#7a6a5c"/><ellipse cx="45" cy="18" rx="13" ry="11" fill="#8c7b6c"/></g><path d="M37 9 31-2M53 9 59-2" stroke="#c8202a" stroke-width="4" stroke-linecap="round"/><circle cx="40" cy="18" r="2" fill="#111"/><circle cx="50" cy="18" r="2" fill="#111"/><path d="M33 40h24M33 50h24" stroke="#4a3a30" stroke-width="2"/></svg>`,
+  antBody: (h = 160) => `<svg data-sp="art-antBody" width="${h * 0.72}" height="${h}" viewBox="0 0 72 100"><g stroke="#3a2a22" stroke-width="2.5"><ellipse cx="36" cy="58" rx="32" ry="40" fill="#7a6a5c"/><ellipse cx="36" cy="18" rx="16" ry="14" fill="#8c7b6c"/></g><path d="M27 7 20-6M45 7 52-6" stroke="#c8202a" stroke-width="5" stroke-linecap="round"/><circle cx="30" cy="18" r="2.5" fill="#111"/><circle cx="42" cy="18" r="2.5" fill="#111"/><path d="M14 52h44M14 66h44" stroke="#4a3a30" stroke-width="2.5"/><path d="M20 28c10 6 22 6 32 0" stroke="#5e4a3e" stroke-width="2" fill="none"/></svg>`,
+  antLimb: () => `<svg data-sp="art-antLimb" width="64" height="14" viewBox="0 0 64 14"><path d="M0 7H42" stroke="#5e4a3e" stroke-width="7" stroke-linecap="round"/><circle cx="22" cy="7" r="4.5" fill="#7a6a5c" stroke="#3a2a22"/><path d="M40 2 64 7 40 12Z" fill="#c9ced6" stroke="#444"/></svg>`,
+  crowBody: (s = 120) => `<svg data-sp="art-crowBody" width="${s}" height="${s}" viewBox="0 0 120 120"><path d="M60 6C88 6 108 28 110 56 112 86 90 112 60 114 30 112 8 86 10 56 12 28 32 6 60 6Z" fill="#1d1d24" stroke="#5a5a6e" stroke-width="3"/><path d="M42 40h36M42 70h36" stroke="#5a5a6e" stroke-width="3"/></svg>`,
+  blade: (l = 40) => `<svg data-sp="art-blade" width="${l}" height="10" viewBox="0 0 40 10"><path d="M0 5 40 1v8Z" fill="#c9ced6" stroke="#444"/></svg>`,
+  spider: () => `<svg data-sp="art-spider" width="34" height="28" viewBox="0 0 22 18"><g stroke="#f4f4f4" stroke-width="1.6" fill="none"><path d="M6 7 0 2M6 9 0 9M6 11 0 16M16 7 22 2M16 9 22 9M16 11 22 16"/></g><ellipse cx="11" cy="9" rx="6" ry="5" fill="#fafafa" stroke="#bbb"/></svg>`,
+  dragon: () => `<svg data-sp="art-dragon" width="170" height="90" viewBox="0 0 170 90"><path d="M10 50C40 40 60 60 90 52 112 46 120 30 140 28l18-10-4 16 12 4-16 6c-14 12-30 24-56 26-26 2-44-10-84-12Z" fill="#f6f4ee" stroke="#c9c4b4" stroke-width="2"/><path d="M70 40 54 6l28 30M100 40l10-30 6 28" fill="#efece2" stroke="#c9c4b4" stroke-width="2"/><circle cx="148" cy="30" r="2.5" fill="#333"/></svg>`,
+  teardrop: () => `<svg data-sp="art-teardrop" width="70" height="90" viewBox="0 0 70 90"><path d="M35 0C45 26 66 42 66 60A31 31 0 0 1 4 60C4 42 25 26 35 0Z" fill="#f6f4ee" stroke="#c9c4b4" stroke-width="3"/><circle cx="35" cy="62" r="9" fill="#e9e5d8"/></svg>`,
 };
-const goldChain = (len) => `<svg width="${len}" height="14" viewBox="0 0 ${len} 14"><line x1="0" y1="7" x2="${len}" y2="7" stroke="#f7d354" stroke-width="5" stroke-dasharray="10 4" stroke-linecap="round" style="filter:drop-shadow(0 0 4px #ffcf33)"/></svg>`;
+const goldChain = (len) => `<svg data-sp="goldChain" width="${len}" height="14" viewBox="0 0 ${len} 14"><line x1="0" y1="7" x2="${len}" y2="7" stroke="#f7d354" stroke-width="5" stroke-dasharray="10 4" stroke-linecap="round" style="filter:drop-shadow(0 0 4px #ffcf33)"/></svg>`;
 
 /** A gold chain growing from a to b (rotated line that scales out from a). */
 async function chain(ctx, a, b, ms = 380) {
@@ -129,7 +130,7 @@ async function chain(ctx, a, b, ms = 380) {
 function wrapRing(ctx, el, html, ms = 900) {
   const { w, h } = sizeOf(el);
   const at = FX.centerOf(el, ctx.arena);
-  const n = spawn(ctx, `<div style="width:${w * 0.9}px;height:${h * 0.55}px;border-radius:50%;${html}"></div>`, at, { life: ms + 900 });
+  const n = spawn(ctx, `<div data-sp="wrapRing" style="width:${w * 0.9}px;height:${h * 0.55}px;border-radius:50%;${html}"></div>`, at, { life: ms + 900 });
   n.animate([{ transform: 'translate(-50%,-50%) scale(1.6) rotate(0deg)', opacity: 0 }, { transform: 'translate(-50%,-50%) scale(1) rotate(200deg)', opacity: 1, offset: 0.5 }, { transform: 'translate(-50%,-50%) scale(.95) rotate(360deg)', opacity: 1 }], { duration: ms * ctx.sp, easing: 'ease-out', fill: 'forwards' });
   setTimeout(() => fade(ctx, n, 400), (ms + 300) * ctx.sp);
   return n;
@@ -192,7 +193,7 @@ export const ANIMS = {
     desc: 'A light purple circle expands from the user until it reaches and strikes the target.',
     async play(ctx) {
       const r = Math.hypot(ctx.tos[0].x - ctx.from.x, ctx.tos[0].y - ctx.from.y) * 2;
-      const c = spawn(ctx, `<div style="width:${r}px;height:${r}px;border-radius:50%;border:5px solid #d6c4ff;background:radial-gradient(circle,#c9b3ff00 55%,#c9b3ff55 70%,#c9b3ff00 72%);box-shadow:0 0 24px #b99cff"></div>`, ctx.from, { life: 1200 });
+      const c = spawn(ctx, `<div data-sp="almighty_push" style="width:${r}px;height:${r}px;border-radius:50%;border:5px solid #d6c4ff;background:radial-gradient(circle,#c9b3ff00 55%,#c9b3ff55 70%,#c9b3ff00 72%);box-shadow:0 0 24px #b99cff"></div>`, ctx.from, { life: 1200 });
       await c.animate([{ transform: 'translate(-50%,-50%) scale(.05)', opacity: 1 }, { transform: 'translate(-50%,-50%) scale(1)', opacity: 0.9 }], { duration: 520 * ctx.sp, easing: 'ease-out', fill: 'forwards' }).finished.catch(() => {});
       shake(ctx);
       fade(ctx, c, 250);
@@ -218,7 +219,7 @@ export const ANIMS = {
     async play(ctx) {
       const { h } = sizeOf(ctx.userEl);
       const at = { x: ctx.from.x + (ctx.isFoe ? -40 : 40), y: ctx.from.y };
-      const g = spawn(ctx, `<div class="ax-glitch" style="width:${h * 0.55}px;height:${h * 0.8}px;background:repeating-linear-gradient(0deg,#000 0 10px,#1b1630 10px 13px,#000 13px 22px);box-shadow:0 0 18px #6b4bd6, inset 0 0 0 2px #2a2050"></div>`, at, { life: 1600 });
+      const g = spawn(ctx, `<div data-sp="dimension_shift" class="ax-glitch" style="width:${h * 0.55}px;height:${h * 0.8}px;background:repeating-linear-gradient(0deg,#000 0 10px,#1b1630 10px 13px,#000 13px 22px);box-shadow:0 0 18px #6b4bd6, inset 0 0 0 2px #2a2050"></div>`, at, { life: 1600 });
       await pop(ctx, g, 160);
       await wait(700 * ctx.sp);
       fade(ctx, g, 300);
@@ -240,7 +241,7 @@ export const ANIMS = {
     async play(ctx) {
       const { w, h } = sizeOf(ctx.userEl);
       const f = feetOf(ctx, ctx.userEl);
-      const wall = spawn(ctx, `<div style="width:${Math.max(70, w * 0.75)}px;height:${h * 0.85}px;border-radius:40% 40% 6px 6px;background:radial-gradient(circle at 30% 30%,#ead7a6,#c9a86b 60%,#a8864e);box-shadow:inset 0 -10px 18px #8a6a3a, 0 0 14px #d9b56a88"></div>`, { x: f.x + (ctx.isFoe ? -26 : 26), y: f.y }, { life: 1700 });
+      const wall = spawn(ctx, `<div data-sp="sand_armor" style="width:${Math.max(70, w * 0.75)}px;height:${h * 0.85}px;border-radius:40% 40% 6px 6px;background:radial-gradient(circle at 30% 30%,#ead7a6,#c9a86b 60%,#a8864e);box-shadow:inset 0 -10px 18px #8a6a3a, 0 0 14px #d9b56a88"></div>`, { x: f.x + (ctx.isFoe ? -26 : 26), y: f.y }, { life: 1700 });
       wall.style.transformOrigin = '50% 100%';
       await wall.animate([{ transform: 'translate(-50%,-100%) scaleY(0)' }, { transform: 'translate(-50%,-100%) scaleY(1)' }], { duration: 450 * ctx.sp, easing: 'ease-out', fill: 'forwards' }).finished.catch(() => {});
       await wait(600 * ctx.sp);
@@ -305,7 +306,7 @@ export const ANIMS = {
     desc: 'A black lightning strike shaped like a panther flies from the user to the target.',
     async play(ctx) {
       const to = ctx.tos[0];
-      const bolt = `<svg width="110" height="50" viewBox="0 0 110 50" style="filter:drop-shadow(0 0 6px #8a5cff)"><path d="M0 26 22 18 30 30 50 14 58 28 78 12 84 22 100 8 110 18 96 30 104 32 84 44 78 34 60 46 52 34 34 46 26 34 8 40Z" fill="#0d0b12" stroke="#b49bff" stroke-width="1.5"/><path d="M96 12l6-10 4 10M86 14l2-10 6 8" stroke="#b49bff" stroke-width="2" fill="none"/></svg>`;
+      const bolt = `<svg data-sp="black_panther" width="110" height="50" viewBox="0 0 110 50" style="filter:drop-shadow(0 0 6px #8a5cff)"><path d="M0 26 22 18 30 30 50 14 58 28 78 12 84 22 100 8 110 18 96 30 104 32 84 44 78 34 60 46 52 34 34 46 26 34 8 40Z" fill="#0d0b12" stroke="#b49bff" stroke-width="1.5"/><path d="M96 12l6-10 4 10M86 14l2-10 6 8" stroke="#b49bff" stroke-width="2" fill="none"/></svg>`;
       const b = spawn(ctx, bolt, ctx.from, { life: 1200 });
       await fly(ctx, b, ctx.from, to, 360);
       b.remove();
@@ -388,7 +389,7 @@ export const ANIMS = {
     desc: "A fog cloud spreads from the user and covers the enemies' side.",
     async play(ctx) {
       const box = sideBox(ctx);
-      const fog = spawn(ctx, `<div style="width:${box.w + 120}px;height:${box.h + 60}px;border-radius:50%;background:radial-gradient(ellipse,#cfe8c8cc 0%,#b9d8b0aa 45%,#b9d8b000 72%);filter:blur(4px)"></div>`, ctx.from, { life: 2400 });
+      const fog = spawn(ctx, `<div data-sp="solid_fog" style="width:${box.w + 120}px;height:${box.h + 60}px;border-radius:50%;background:radial-gradient(ellipse,#cfe8c8cc 0%,#b9d8b0aa 45%,#b9d8b000 72%);filter:blur(4px)"></div>`, ctx.from, { life: 2400 });
       await fly(ctx, fog, ctx.from, box.c, 600, { rotate: 0, scale: [0.2, 1], ease: 'ease-out' });
       shake(ctx);
       setTimeout(() => fade(ctx, fog, 600), 700 * ctx.sp);
@@ -399,7 +400,7 @@ export const ANIMS = {
     async play(ctx) {
       for (let i = 0; i < 8; i++) { puff(ctx, { x: ctx.from.x + (Math.random() - 0.5) * 50, y: ctx.from.y + (Math.random() - 0.3) * 60 }); await wait(50 * ctx.sp); }
       const { h } = sizeOf(ctx.userEl);
-      const sh = spawn(ctx, `<div style="width:${h * 0.35}px;height:${h * 0.85}px;border-radius:50%;background:radial-gradient(ellipse,#ffffffaa,#e8f2ff55 55%,#ffffff00 72%);box-shadow:0 0 24px #fff8"></div>`, { x: ctx.from.x + (ctx.isFoe ? -45 : 45), y: ctx.from.y }, { life: 1600 });
+      const sh = spawn(ctx, `<div data-sp="steam_armor" style="width:${h * 0.35}px;height:${h * 0.85}px;border-radius:50%;background:radial-gradient(ellipse,#ffffffaa,#e8f2ff55 55%,#ffffff00 72%);box-shadow:0 0 24px #fff8"></div>`, { x: ctx.from.x + (ctx.isFoe ? -45 : 45), y: ctx.from.y }, { life: 1600 });
       await pop(ctx, sh, 300);
       await wait(600 * ctx.sp);
       fade(ctx, sh, 350);
@@ -473,7 +474,7 @@ export const ANIMS = {
       ctx.userEl.animate([{ filter: 'brightness(1)' }, { filter: 'brightness(4)' }], { duration: 400 * ctx.sp, fill: 'forwards' });
       await wait(400 * ctx.sp);
       const d = far * 2 + 80;
-      const e = spawn(ctx, `<div style="width:${d}px;height:${d}px;border-radius:50%;background:radial-gradient(circle,#fff 0%,#fff6c2 20%,#ffd04a 40%,#ff7a1a 58%,#ff7a1a00 70%)"></div>`, ctx.from, { life: 1600 });
+      const e = spawn(ctx, `<div data-sp="c0" style="width:${d}px;height:${d}px;border-radius:50%;background:radial-gradient(circle,#fff 0%,#fff6c2 20%,#ffd04a 40%,#ff7a1a 58%,#ff7a1a00 70%)"></div>`, ctx.from, { life: 1600 });
       await e.animate([{ transform: 'translate(-50%,-50%) scale(.05)', opacity: 1 }, { transform: 'translate(-50%,-50%) scale(1)', opacity: 1 }], { duration: 650 * ctx.sp, easing: 'ease-out', fill: 'forwards' }).finished.catch(() => {});
       shake(ctx);
       ctx.userEl.getAnimations().forEach((a) => a.cancel());
@@ -517,7 +518,7 @@ export const ANIMS = {
       await fly(ctx, b, top, { x: box.c.x, y: box.c.y }, 600, { rotate: 180, ease: 'ease-in' });
       b.remove();
       const d = box.w + 140;
-      const e = spawn(ctx, `<div style="width:${d}px;height:${d * 0.6}px;border-radius:50%;background:radial-gradient(ellipse,#fff 0%,#ffe9a0 25%,#ffb340 50%,#ff7a1a00 72%)"></div>`, box.c, { life: 1400 });
+      const e = spawn(ctx, `<div data-sp="c3_bomb" style="width:${d}px;height:${d * 0.6}px;border-radius:50%;background:radial-gradient(ellipse,#fff 0%,#ffe9a0 25%,#ffb340 50%,#ff7a1a00 72%)"></div>`, box.c, { life: 1400 });
       await e.animate([{ transform: 'translate(-50%,-50%) scale(.1)', opacity: 1 }, { transform: 'translate(-50%,-50%) scale(1)', opacity: 1 }], { duration: 380 * ctx.sp, easing: 'ease-out', fill: 'forwards' }).finished.catch(() => {});
       shake(ctx);
       fade(ctx, e, 500);
@@ -541,7 +542,7 @@ export const ANIMS = {
 // shared pieces
 async function radar(ctx, el) {
   const at = FX.centerOf(el, ctx.arena); const { h } = sizeOf(el); const d = Math.max(90, h * 0.9);
-  const r = spawn(ctx, `<div style="width:${d}px;height:${d}px;border-radius:50%;border:2px solid #6dff9a;background:repeating-radial-gradient(circle,#6dff9a22 0 2px,transparent 2px ${d / 6}px);box-shadow:0 0 12px #6dff9a88;position:relative;overflow:hidden"><div class="ax-spin" style="position:absolute;inset:0;border-radius:50%;background:conic-gradient(#6dff9aaa,#6dff9a00 25%,#6dff9a00);animation-duration:.6s"></div></div>`, at, { life: 1700 });
+  const r = spawn(ctx, `<div data-sp="radar-1" style="width:${d}px;height:${d}px;border-radius:50%;border:2px solid #6dff9a;background:repeating-radial-gradient(circle,#6dff9a22 0 2px,transparent 2px ${d / 6}px);box-shadow:0 0 12px #6dff9a88;position:relative;overflow:hidden"><div data-sp="radar-2" class="ax-spin" style="position:absolute;inset:0;border-radius:50%;background:conic-gradient(#6dff9aaa,#6dff9a00 25%,#6dff9a00);animation-duration:.6s"></div></div>`, at, { life: 1700 });
   await pop(ctx, r, 200);
   await wait(900 * ctx.sp);
   fade(ctx, r, 300);
@@ -588,30 +589,30 @@ const grow = (ctx, n, ms, from = 'scale(.2)', to = 'scale(1)', origin) => {
   return n.animate([{ transform: `translate(-50%,-50%) ${from}`, opacity: 1 }, { transform: `translate(-50%,-50%) ${to}`, opacity: 1 }], { duration: ms * ctx.sp, easing: 'ease-out', fill: 'forwards' }).finished.catch(() => {});
 };
 const ART2 = {
-  claw: (c = '#fff', glow = '#fff') => `<svg width="70" height="70" viewBox="0 0 70 70" style="filter:drop-shadow(0 0 6px ${glow})"><path d="M14 6C30 24 36 44 34 66M28 4C44 22 50 42 48 64M42 4C58 20 64 38 62 58" stroke="${c}" stroke-width="5" fill="none" stroke-linecap="round"/></svg>`,
-  crescent: (s = 110, c = '#9fd8ff', glow = '#4aa3ff') => `<svg width="${s}" height="${s}" viewBox="0 0 100 100" style="filter:drop-shadow(0 0 8px ${glow})"><path d="M10 80C30 30 70 10 95 12 70 22 42 44 22 86Z" fill="${c}"/></svg>`,
-  crack: (w = 130) => `<svg width="${w}" height="${w * 0.4}" viewBox="0 0 130 52"><g stroke="#2a1d12" stroke-width="3.5" fill="none" stroke-linecap="round"><path d="M65 26 40 14 22 18 4 8M65 26 44 34 30 46 10 48M65 26 88 12 104 16 126 6M65 26 90 36 100 48 124 46M65 26 62 4M65 26 70 50"/></g><ellipse cx="65" cy="26" rx="16" ry="7" fill="#2a1d1288"/></svg>`,
-  petal: (c = '#ffb7d5') => `<svg width="14" height="10" viewBox="0 0 14 10"><path d="M0 5C3 0 10 0 14 5 10 10 3 10 0 5Z" fill="${c}" stroke="#ff8fbf" stroke-width=".8"/></svg>`,
-  rock: (s = 26) => `<svg width="${s}" height="${s}" viewBox="0 0 20 20"><path d="M3 6 9 1 17 4 19 12 13 19 4 17 1 11Z" fill="#8a7f72" stroke="#4e463e" stroke-width="1.2"/><path d="M6 8 10 6M11 12 15 10" stroke="#5f564c"/></svg>`,
-  note: (c = '#c79bff', s = 22) => `<svg width="${s}" height="${s * 1.3}" viewBox="0 0 20 26" style="filter:drop-shadow(0 0 4px ${c})"><ellipse cx="6" cy="21" rx="5.5" ry="4" fill="${c}" transform="rotate(-20 6 21)"/><path d="M11 20V2c3 2 7 4 8 9" stroke="${c}" stroke-width="2.4" fill="none" stroke-linecap="round"/></svg>`,
-  wing: (w = 70) => `<svg width="${w}" height="${w * 0.4}" viewBox="0 0 70 28"><path d="M0 14C14 0 54-2 70 10 54 26 16 28 0 14Z" fill="#ffcf5a55" stroke="#ffe9a8" stroke-width="1.5"/><path d="M4 14C24 10 46 10 66 11M10 15 30 22M12 13 34 5" stroke="#ffe9a8aa" fill="none"/></svg>`,
-  clam: (s = 120) => `<svg width="${s}" height="${s * 0.8}" viewBox="0 0 120 96"><path d="M60 92C20 92 4 64 6 40 20 12 100 12 114 40 116 64 100 92 60 92Z" fill="#d9b9a6" stroke="#8a6a5a" stroke-width="3"/><path d="M60 92 22 26M60 92 40 18M60 92V16M60 92 80 18M60 92 98 26" stroke="#a88472" stroke-width="2.5"/><path d="M48 92h24v4H48Z" fill="#8a6a5a"/></svg>`,
-  bird: (w = 120) => `<svg width="${w}" height="${w * 0.5}" viewBox="0 0 120 60"><path d="M4 30C30 24 40 4 60 20 74 6 96 4 116 12 100 18 92 26 86 30 100 34 108 44 112 52 90 44 74 44 60 44 44 46 26 42 4 30Z" fill="#f6f4ee" stroke="#c9c4b4" stroke-width="2"/><circle cx="100" cy="14" r="2" fill="#333"/><path d="M110 12l8 2-7 3" fill="#e9e5d8" stroke="#c9c4b4"/></svg>`,
-  puppet: () => `<svg width="125" height="150" viewBox="0 0 80 96"><g stroke-linecap="round"><path d="M28 34 6 22M28 44 4 50M52 34 74 22M52 44 76 50" stroke="#7d6b5e" stroke-width="5"/><path d="M34 70 28 94M46 70 52 94" stroke="#7d6b5e" stroke-width="6"/></g><rect x="26" y="28" width="28" height="44" rx="8" fill="#8b7d70" stroke="#4a3e35" stroke-width="2"/><circle cx="40" cy="18" r="11" fill="#9a8c7e" stroke="#4a3e35" stroke-width="2"/><path d="M28 14 26 2 34 10 38 0 42 9 48 0 50 10 56 4 52 16Z" fill="#6b4226" stroke="#3e2614"/><circle cx="36" cy="19" r="1.8" fill="#111"/><circle cx="44" cy="19" r="1.8" fill="#111"/></svg>`,
-  curse: (s = 120) => `<svg width="${s}" height="${s}" viewBox="0 0 100 100"><circle cx="50" cy="50" r="44" fill="none" stroke="#111" stroke-width="5" pathLength="1" stroke-dasharray="1" stroke-dashoffset="1"/><path d="M12 30H88L50 94Z" fill="none" stroke="#111" stroke-width="5" stroke-linejoin="round" pathLength="1" stroke-dasharray="1" stroke-dashoffset="1"/></svg>`,
-  stake: (h = 90) => `<svg width="${h * 0.24}" height="${h}" viewBox="0 0 22 90"><path d="M11 0 21 22V90H1V22Z" fill="#9b6b3e" stroke="#5a3a1e" stroke-width="2"/><path d="M6 34 8 70M15 30 14 80" stroke="#7a5230" stroke-width="1.5"/></svg>`,
-  boneSpike: (h = 70) => `<svg width="${h * 0.26}" height="${h}" viewBox="0 0 18 70"><path d="M9 0 17 70H1Z" fill="#f4f1e8" stroke="#bfb7a2" stroke-width="1.5"/></svg>`,
-  butterfly: (s = 28) => `<svg width="${s}" height="${s * 0.8}" viewBox="0 0 30 24" class="ax-flapx"><path d="M15 12C10 0 0 0 2 8 3 12 9 13 15 12ZM15 12C20 0 30 0 28 8 27 12 21 13 15 12ZM15 12C10 18 4 22 6 16 7 13 11 12 15 12ZM15 12C20 18 26 22 24 16 23 13 19 12 15 12Z" fill="#fbfbf7" stroke="#cfcfc4" stroke-width=".8"/></svg>`,
-  tiger: (s = 200) => `<svg width="${s}" height="${s * 0.85}" viewBox="0 0 200 170" style="filter:drop-shadow(0 0 14px #bfe9ff)"><path d="M30 40 44 4 76 30C90 24 110 24 124 30L156 4 170 40C190 64 192 110 168 138 146 162 118 168 100 168S54 162 32 138C8 110 10 64 30 40Z" fill="#dff4ff55" stroke="#e8f8ff" stroke-width="4"/><path d="M60 70 84 82M140 70 116 82" stroke="#fff" stroke-width="6" stroke-linecap="round"/><path d="M100 30V58M78 34 86 54M122 34 114 54M36 92 58 96M164 92 142 96M40 116 62 112M160 116 138 112" stroke="#bfe9ff" stroke-width="5" stroke-linecap="round"/><path d="M84 120Q100 132 116 120M100 108V124" stroke="#fff" stroke-width="4" fill="none"/><path d="M78 132 84 150M122 132 116 150" stroke="#fff" stroke-width="5" stroke-linecap="round"/></svg>`,
-  mannequin: (h = 150) => `<svg width="${h * 0.45}" height="${h}" viewBox="0 0 54 120"><circle cx="27" cy="14" r="11" fill="#e8ddd0" stroke="#9a8c7e" stroke-width="2"/><path d="M14 30H40L44 66 38 68 36 118H29L27 76 25 118H18L16 68 10 66Z" fill="#e8ddd0" stroke="#9a8c7e" stroke-width="2" stroke-linejoin="round"/><path d="M27 28V70M14 46H40" stroke="#b9a996" stroke-dasharray="3 3"/></svg>`,
+  claw: (c = '#fff', glow = '#fff') => `<svg data-sp="art-claw" width="70" height="70" viewBox="0 0 70 70" style="filter:drop-shadow(0 0 6px ${glow})"><path d="M14 6C30 24 36 44 34 66M28 4C44 22 50 42 48 64M42 4C58 20 64 38 62 58" stroke="${c}" stroke-width="5" fill="none" stroke-linecap="round"/></svg>`,
+  crescent: (s = 110, c = '#9fd8ff', glow = '#4aa3ff') => `<svg data-sp="art-crescent" width="${s}" height="${s}" viewBox="0 0 100 100" style="filter:drop-shadow(0 0 8px ${glow})"><path d="M10 80C30 30 70 10 95 12 70 22 42 44 22 86Z" fill="${c}"/></svg>`,
+  crack: (w = 130) => `<svg data-sp="art-crack" width="${w}" height="${w * 0.4}" viewBox="0 0 130 52"><g stroke="#2a1d12" stroke-width="3.5" fill="none" stroke-linecap="round"><path d="M65 26 40 14 22 18 4 8M65 26 44 34 30 46 10 48M65 26 88 12 104 16 126 6M65 26 90 36 100 48 124 46M65 26 62 4M65 26 70 50"/></g><ellipse cx="65" cy="26" rx="16" ry="7" fill="#2a1d1288"/></svg>`,
+  petal: (c = '#ffb7d5') => `<svg data-sp="art-petal" width="14" height="10" viewBox="0 0 14 10"><path d="M0 5C3 0 10 0 14 5 10 10 3 10 0 5Z" fill="${c}" stroke="#ff8fbf" stroke-width=".8"/></svg>`,
+  rock: (s = 26) => `<svg data-sp="art-rock" width="${s}" height="${s}" viewBox="0 0 20 20"><path d="M3 6 9 1 17 4 19 12 13 19 4 17 1 11Z" fill="#8a7f72" stroke="#4e463e" stroke-width="1.2"/><path d="M6 8 10 6M11 12 15 10" stroke="#5f564c"/></svg>`,
+  note: (c = '#c79bff', s = 22) => `<svg data-sp="art-note" width="${s}" height="${s * 1.3}" viewBox="0 0 20 26" style="filter:drop-shadow(0 0 4px ${c})"><ellipse cx="6" cy="21" rx="5.5" ry="4" fill="${c}" transform="rotate(-20 6 21)"/><path d="M11 20V2c3 2 7 4 8 9" stroke="${c}" stroke-width="2.4" fill="none" stroke-linecap="round"/></svg>`,
+  wing: (w = 70) => `<svg data-sp="art-wing" width="${w}" height="${w * 0.4}" viewBox="0 0 70 28"><path d="M0 14C14 0 54-2 70 10 54 26 16 28 0 14Z" fill="#ffcf5a55" stroke="#ffe9a8" stroke-width="1.5"/><path d="M4 14C24 10 46 10 66 11M10 15 30 22M12 13 34 5" stroke="#ffe9a8aa" fill="none"/></svg>`,
+  clam: (s = 120) => `<svg data-sp="art-clam" width="${s}" height="${s * 0.8}" viewBox="0 0 120 96"><path d="M60 92C20 92 4 64 6 40 20 12 100 12 114 40 116 64 100 92 60 92Z" fill="#d9b9a6" stroke="#8a6a5a" stroke-width="3"/><path d="M60 92 22 26M60 92 40 18M60 92V16M60 92 80 18M60 92 98 26" stroke="#a88472" stroke-width="2.5"/><path d="M48 92h24v4H48Z" fill="#8a6a5a"/></svg>`,
+  bird: (w = 120) => `<svg data-sp="art-bird" width="${w}" height="${w * 0.5}" viewBox="0 0 120 60"><path d="M4 30C30 24 40 4 60 20 74 6 96 4 116 12 100 18 92 26 86 30 100 34 108 44 112 52 90 44 74 44 60 44 44 46 26 42 4 30Z" fill="#f6f4ee" stroke="#c9c4b4" stroke-width="2"/><circle cx="100" cy="14" r="2" fill="#333"/><path d="M110 12l8 2-7 3" fill="#e9e5d8" stroke="#c9c4b4"/></svg>`,
+  puppet: () => `<svg data-sp="art-puppet" width="125" height="150" viewBox="0 0 80 96"><g stroke-linecap="round"><path d="M28 34 6 22M28 44 4 50M52 34 74 22M52 44 76 50" stroke="#7d6b5e" stroke-width="5"/><path d="M34 70 28 94M46 70 52 94" stroke="#7d6b5e" stroke-width="6"/></g><rect x="26" y="28" width="28" height="44" rx="8" fill="#8b7d70" stroke="#4a3e35" stroke-width="2"/><circle cx="40" cy="18" r="11" fill="#9a8c7e" stroke="#4a3e35" stroke-width="2"/><path d="M28 14 26 2 34 10 38 0 42 9 48 0 50 10 56 4 52 16Z" fill="#6b4226" stroke="#3e2614"/><circle cx="36" cy="19" r="1.8" fill="#111"/><circle cx="44" cy="19" r="1.8" fill="#111"/></svg>`,
+  curse: (s = 120) => `<svg data-sp="art-curse" width="${s}" height="${s}" viewBox="0 0 100 100"><circle cx="50" cy="50" r="44" fill="none" stroke="#111" stroke-width="5" pathLength="1" stroke-dasharray="1" stroke-dashoffset="1"/><path d="M12 30H88L50 94Z" fill="none" stroke="#111" stroke-width="5" stroke-linejoin="round" pathLength="1" stroke-dasharray="1" stroke-dashoffset="1"/></svg>`,
+  stake: (h = 90) => `<svg data-sp="art-stake" width="${h * 0.24}" height="${h}" viewBox="0 0 22 90"><path d="M11 0 21 22V90H1V22Z" fill="#9b6b3e" stroke="#5a3a1e" stroke-width="2"/><path d="M6 34 8 70M15 30 14 80" stroke="#7a5230" stroke-width="1.5"/></svg>`,
+  boneSpike: (h = 70) => `<svg data-sp="art-boneSpike" width="${h * 0.26}" height="${h}" viewBox="0 0 18 70"><path d="M9 0 17 70H1Z" fill="#f4f1e8" stroke="#bfb7a2" stroke-width="1.5"/></svg>`,
+  butterfly: (s = 28) => `<svg data-sp="art-butterfly" width="${s}" height="${s * 0.8}" viewBox="0 0 30 24" class="ax-flapx"><path d="M15 12C10 0 0 0 2 8 3 12 9 13 15 12ZM15 12C20 0 30 0 28 8 27 12 21 13 15 12ZM15 12C10 18 4 22 6 16 7 13 11 12 15 12ZM15 12C20 18 26 22 24 16 23 13 19 12 15 12Z" fill="#fbfbf7" stroke="#cfcfc4" stroke-width=".8"/></svg>`,
+  tiger: (s = 200) => `<svg data-sp="art-tiger" width="${s}" height="${s * 0.85}" viewBox="0 0 200 170" style="filter:drop-shadow(0 0 14px #bfe9ff)"><path d="M30 40 44 4 76 30C90 24 110 24 124 30L156 4 170 40C190 64 192 110 168 138 146 162 118 168 100 168S54 162 32 138C8 110 10 64 30 40Z" fill="#dff4ff55" stroke="#e8f8ff" stroke-width="4"/><path d="M60 70 84 82M140 70 116 82" stroke="#fff" stroke-width="6" stroke-linecap="round"/><path d="M100 30V58M78 34 86 54M122 34 114 54M36 92 58 96M164 92 142 96M40 116 62 112M160 116 138 112" stroke="#bfe9ff" stroke-width="5" stroke-linecap="round"/><path d="M84 120Q100 132 116 120M100 108V124" stroke="#fff" stroke-width="4" fill="none"/><path d="M78 132 84 150M122 132 116 150" stroke="#fff" stroke-width="5" stroke-linecap="round"/></svg>`,
+  mannequin: (h = 150) => `<svg data-sp="art-mannequin" width="${h * 0.45}" height="${h}" viewBox="0 0 54 120"><circle cx="27" cy="14" r="11" fill="#e8ddd0" stroke="#9a8c7e" stroke-width="2"/><path d="M14 30H40L44 66 38 68 36 118H29L27 76 25 118H18L16 68 10 66Z" fill="#e8ddd0" stroke="#9a8c7e" stroke-width="2" stroke-linejoin="round"/><path d="M27 28V70M14 46H40" stroke="#b9a996" stroke-dasharray="3 3"/></svg>`,
 };
-const greyChain = (len) => `<svg width="${len}" height="12" viewBox="0 0 ${len} 12"><line x1="0" y1="6" x2="${len}" y2="6" stroke="#b9c0c8" stroke-width="4" stroke-dasharray="9 4" stroke-linecap="round" style="filter:drop-shadow(0 0 2px #000)"/></svg>`;
-const thread = (len) => `<svg width="${len}" height="10" viewBox="0 0 ${len} 10"><path d="M0 3H${len}M0 7H${len}" stroke="#8fd3ff" stroke-width="1.4" style="filter:drop-shadow(0 0 3px #4aa3ff)"/></svg>`;
+const greyChain = (len) => `<svg data-sp="greyChain" width="${len}" height="12" viewBox="0 0 ${len} 12"><line x1="0" y1="6" x2="${len}" y2="6" stroke="#b9c0c8" stroke-width="4" stroke-dasharray="9 4" stroke-linecap="round" style="filter:drop-shadow(0 0 2px #000)"/></svg>`;
+const thread = (len) => `<svg data-sp="thread" width="${len}" height="10" viewBox="0 0 ${len} 10"><path d="M0 3H${len}M0 7H${len}" stroke="#8fd3ff" stroke-width="1.4" style="filter:drop-shadow(0 0 3px #4aa3ff)"/></svg>`;
 const armSvg = (len) => {
   const L = (x1, y1, x2, y2) => `<path d="M${x1} ${y1}L${x2} ${y2}" stroke="#fff1c2" stroke-width="12" stroke-linecap="round"/><path d="M${x1} ${y1}L${x2} ${y2}" stroke="#ffc35c" stroke-width="8" stroke-linecap="round"/>`;
   const C = (x, y) => `<path d="M${x} ${y}q14 0 12 9" stroke="#fff1c2" stroke-width="12" stroke-linecap="round" fill="none"/><path d="M${x} ${y}q14 0 12 9" stroke="#ffc35c" stroke-width="8" stroke-linecap="round" fill="none"/>`;
   const x = len;
-  return `<svg width="${len + 120}" height="80" viewBox="0 0 ${len + 120} 80" style="overflow:visible;filter:drop-shadow(0 0 10px #ff8a1f)"><path d="M0 34Q${len * 0.5} 32 ${x} 32V48Q${len * 0.5} 48 0 46Z" fill="#ffae3c" opacity=".9"/>`
+  return `<svg data-sp="armSvg" width="${len + 120}" height="80" viewBox="0 0 ${len + 120} 80" style="overflow:visible;filter:drop-shadow(0 0 10px #ff8a1f)"><path d="M0 34Q${len * 0.5} 32 ${x} 32V48Q${len * 0.5} 48 0 46Z" fill="#ffae3c" opacity=".9"/>`
     + `<g transform="translate(${x} 40) scale(1.9) translate(${-x} -40)"><g class="open">${L(x + 18, 29, x + 50, 18)}${L(x + 20, 36, x + 56, 32)}${L(x + 20, 44, x + 55, 47)}${L(x + 18, 51, x + 48, 60)}${L(x + 6, 29, x + 20, 8)}</g>`
     + `<g class="shut" style="display:none">${C(x + 20, 29)}${C(x + 22, 36)}${C(x + 22, 44)}${C(x + 20, 51)}${L(x + 6, 30, x + 24, 24)}</g>`
     + `<rect x="${x - 4}" y="25" width="30" height="31" rx="11" fill="#ffc35c" stroke="#fff1c2" stroke-width="2"/></g></svg>`;
@@ -629,7 +630,7 @@ async function stretch(ctx, a, b, mk, ms = 380, life = 2600) {
 function bolt(ctx, a, b, { color = '#9fd8ff', glow = '#4aa3ff', ms = 450, width = 3 } = {}) {
   const len = Math.hypot(b.x - a.x, b.y - a.y);
   const path = () => { let d = 'M0 20'; const n = Math.max(4, Math.round(len / 22)); for (let i = 1; i < n; i++) d += ` L${(len * i) / n} ${20 + rnd(-12, 12)}`; return `${d} L${len} 20`; };
-  const n = spawn(ctx, `<svg width="${len}" height="40" viewBox="0 0 ${len} 40" style="filter:drop-shadow(0 0 6px ${glow})"><path d="${path()}" stroke="${color}" stroke-width="${width}" fill="none" stroke-linejoin="round"/><path d="${path()}" stroke="#fff" stroke-width="1.2" fill="none"/></svg>`, a, { life: ms + 200 });
+  const n = spawn(ctx, `<svg data-sp="bolt" width="${len}" height="40" viewBox="0 0 ${len} 40" style="filter:drop-shadow(0 0 6px ${glow})"><path d="${path()}" stroke="${color}" stroke-width="${width}" fill="none" stroke-linejoin="round"/><path d="${path()}" stroke="#fff" stroke-width="1.2" fill="none"/></svg>`, a, { life: ms + 200 });
   n.style.transformOrigin = '0 50%';
   n.style.transform = `translate(0,-50%) rotate(${ang(a, b)}deg)`;
   const iv = setInterval(() => { const ps = n.querySelectorAll('path'); ps[0]?.setAttribute('d', path()); ps[1]?.setAttribute('d', path()); }, 60);
@@ -638,7 +639,7 @@ function bolt(ctx, a, b, { color = '#9fd8ff', glow = '#4aa3ff', ms = 450, width 
 }
 /** Crackling electricity ball at a point. */
 function sparkBall(ctx, at, size = 46, life = 900) {
-  const n = spawn(ctx, `<div style="width:${size}px;height:${size}px;border-radius:50%;background:radial-gradient(circle,#fff 0%,#bfe6ff 30%,#4aa3ff88 60%,#4aa3ff00 72%);box-shadow:0 0 18px #6cc4ff"></div>`, at, { life });
+  const n = spawn(ctx, `<div data-sp="sparkBall" style="width:${size}px;height:${size}px;border-radius:50%;background:radial-gradient(circle,#fff 0%,#bfe6ff 30%,#4aa3ff88 60%,#4aa3ff00 72%);box-shadow:0 0 18px #6cc4ff"></div>`, at, { life });
   for (let i = 0; i < 5; i++) setTimeout(() => { const t = rnd(0, Math.PI * 2); bolt(ctx, at, { x: at.x + Math.cos(t) * size, y: at.y + Math.sin(t) * size }, { ms: 120, width: 2 }); }, i * 90 * ctx.sp);
   return n;
 }
@@ -666,7 +667,7 @@ function scatter(ctx, at, html, n = 12, dist = 90, ms = 800) {
 async function dash(ctx, k = 0.62, ms = 500) { const to = ctx.tos[0]; lunge(ctx, to, k, ms); await wait(ms * 0.45 * ctx.sp); return to; }
 function glowAura(ctx, el, color = '#5dff8f', ms = 1100) {
   const { w, h } = sizeOf(el); const at = FX.centerOf(el, ctx.arena);
-  const n = spawn(ctx, `<div style="width:${w * 0.95}px;height:${h * 0.95}px;border-radius:45%;background:radial-gradient(ellipse,${color}55 0%,${color}33 45%,${color}00 70%);box-shadow:0 0 30px ${color}88"></div>`, at, { life: ms + 500 });
+  const n = spawn(ctx, `<div data-sp="glowAura" style="width:${w * 0.95}px;height:${h * 0.95}px;border-radius:45%;background:radial-gradient(ellipse,${color}55 0%,${color}33 45%,${color}00 70%);box-shadow:0 0 30px ${color}88"></div>`, at, { life: ms + 500 });
   n.animate([{ opacity: 0, transform: 'translate(-50%,-50%) scale(.8)' }, { opacity: 1, transform: 'translate(-50%,-50%) scale(1.05)', offset: 0.3 }, { opacity: 0.8, transform: 'translate(-50%,-50%) scale(1)', offset: 0.7 }, { opacity: 0, transform: 'translate(-50%,-50%) scale(1.1)' }], { duration: ms * ctx.sp, fill: 'forwards' });
   el.animate([{ filter: 'none' }, { filter: `drop-shadow(0 0 12px ${color}) brightness(1.2)`, offset: 0.4 }, { filter: 'none' }], { duration: ms * ctx.sp });
 }
@@ -680,7 +681,7 @@ function noteStream(ctx, a, b, color, delay = 0, n = 5) {
 }
 function mistOver(ctx, color) {
   const box = sideBox(ctx);
-  const fog = spawn(ctx, `<div style="width:${box.w + 120}px;height:${box.h + 60}px;border-radius:50%;background:radial-gradient(ellipse,${color}cc 0%,${color}99 45%,${color}00 72%);filter:blur(4px)"></div>`, ctx.from, { life: 2400 });
+  const fog = spawn(ctx, `<div data-sp="mistOver" style="width:${box.w + 120}px;height:${box.h + 60}px;border-radius:50%;background:radial-gradient(ellipse,${color}cc 0%,${color}99 45%,${color}00 72%);filter:blur(4px)"></div>`, ctx.from, { life: 2400 });
   return { fog, go: fly(ctx, fog, ctx.from, box.c, 650, { rotate: 0, scale: [0.15, 1], ease: 'ease-out' }) };
 }
 
@@ -799,7 +800,7 @@ Object.assign(ANIMS, {
           setTimeout(() => r.remove(), 700 * ctx.sp);
         })));
         const d = h * 0.95;
-        const ball = spawn(ctx, `<div style="width:${d}px;height:${d}px;border-radius:50%;background:radial-gradient(circle at 35% 30%,#a99d8e,#7a6f62 55%,#4e463e);box-shadow:inset -10px -12px 20px #2e2822,0 0 14px #000;border:3px solid #4e463e"></div>`, to, { life: 1800 });
+        const ball = spawn(ctx, `<div data-sp="chibaku_tensei" style="width:${d}px;height:${d}px;border-radius:50%;background:radial-gradient(circle at 35% 30%,#a99d8e,#7a6f62 55%,#4e463e);box-shadow:inset -10px -12px 20px #2e2822,0 0 14px #000;border:3px solid #4e463e"></div>`, to, { life: 1800 });
         await grow(ctx, ball, 260, 'scale(.3)', 'scale(1)');
         shakeEl(el);
         setTimeout(() => fade(ctx, ball, 400), 700 * ctx.sp);
@@ -840,7 +841,7 @@ Object.assign(ANIMS, {
       const to = ctx.tos[0];
       const s = sparkBall(ctx, ctx.from, 40, 900);
       await pop(ctx, s, 220);
-      const blade = (len) => `<svg width="${len}" height="16" viewBox="0 0 ${len} 16" style="filter:drop-shadow(0 0 8px #4aa3ff)"><path d="M0 4H${len - 18}L${len} 8 ${len - 18} 12H0Z" fill="#cfeeff" stroke="#fff" stroke-width="1"/></svg>`;
+      const blade = (len) => `<svg data-sp="chidori_spear" width="${len}" height="16" viewBox="0 0 ${len} 16" style="filter:drop-shadow(0 0 8px #4aa3ff)"><path d="M0 4H${len - 18}L${len} 8 ${len - 18} 12H0Z" fill="#cfeeff" stroke="#fff" stroke-width="1"/></svg>`;
       const b = await stretch(ctx, ctx.from, to, blade, 200, 1200);
       bolt(ctx, ctx.from, to, { ms: 300 });
       boom(ctx, to, '#9fd8ff', 90);
@@ -870,11 +871,11 @@ Object.assign(ANIMS, {
     desc: 'A black orb with a purple aura and tiny blue and red sparks grows in front of the user, then fires at the enemies.',
     async play(ctx) {
       const at = { x: ctx.from.x + (ctx.isFoe ? -60 : 60), y: ctx.from.y - 20 };
-      const orb = spawn(ctx, `<div style="width:90px;height:90px;border-radius:50%;background:radial-gradient(circle at 40% 35%,#2a2235,#000 60%);box-shadow:0 0 0 4px #7a3cff66,0 0 30px 12px #8a4bffaa"></div>`, at, { life: 2600 });
+      const orb = spawn(ctx, `<div data-sp="chomei_bomb-1" style="width:90px;height:90px;border-radius:50%;background:radial-gradient(circle at 40% 35%,#2a2235,#000 60%);box-shadow:0 0 0 4px #7a3cff66,0 0 30px 12px #8a4bffaa"></div>`, at, { life: 2600 });
       const sparks = setInterval(() => {
         const box = orb.getBoundingClientRect(); const a = ctx.arena.getBoundingClientRect();
         const c = { x: box.left - a.left + box.width / 2, y: box.top - a.top + box.height / 2 };
-        const p = spawn(ctx, `<div style="width:7px;height:7px;border-radius:50%;background:${Math.random() < 0.5 ? '#4ab0ff' : '#ff4a4a'};box-shadow:0 0 6px currentColor"></div>`, c, { life: 600 });
+        const p = spawn(ctx, `<div data-sp="chomei_bomb-2" style="width:7px;height:7px;border-radius:50%;background:${Math.random() < 0.5 ? '#4ab0ff' : '#ff4a4a'};box-shadow:0 0 6px currentColor"></div>`, c, { life: 600 });
         const t = rnd(0, Math.PI * 2);
         fly(ctx, p, c, { x: c.x + Math.cos(t) * 60, y: c.y + Math.sin(t) * 60 }, 400, { rotate: 0, ease: 'ease-out' }).then(() => p.remove());
       }, 40);
@@ -956,7 +957,7 @@ Object.assign(ANIMS, {
     decoy(ctx, el) {
       const at = FX.centerOf(el, ctx.arena);
       el.animate([{ opacity: 1 }, { opacity: 0, offset: 0.1 }, { opacity: 0, offset: 0.85 }, { opacity: 1 }], { duration: 1400 * ctx.sp });
-      const crow = '<svg width="54" height="32" viewBox="0 0 34 20" class="ax-flap"><path d="M17 12C12 4 4 2 0 6 6 6 10 9 13 13ZM17 12C22 4 30 2 34 6 28 6 24 9 21 13Z" fill="#111"/><ellipse cx="17" cy="13" rx="5" ry="3.5" fill="#111"/><path d="M21 12l4 1-4 1" fill="#333"/></svg>';
+      const crow = '<svg data-sp="crow_clone" width="54" height="32" viewBox="0 0 34 20" class="ax-flap"><path d="M17 12C12 4 4 2 0 6 6 6 10 9 13 13ZM17 12C22 4 30 2 34 6 28 6 24 9 21 13Z" fill="#111"/><ellipse cx="17" cy="13" rx="5" ry="3.5" fill="#111"/><path d="M21 12l4 1-4 1" fill="#333"/></svg>';
       for (let i = 0; i < 16; i++) {
         const st = { x: at.x + rnd(-40, 40), y: at.y + rnd(-60, 60) };
         const c = spawn(ctx, crow, st, { life: 1400 });
@@ -1079,7 +1080,7 @@ Object.assign(ANIMS, {
         await fly(ctx, b, st, { x: t.x + rnd(-30, 30), y: t.y + rnd(-40, 30) }, 560, { rotate: 0, arc: rnd(-40, 60), ease: 'ease-in-out' });
         b.remove();
       }))));
-      ctx.tos.forEach((t) => scatter(ctx, t, '<div style="width:8px;height:6px;background:#fbfbf7"></div>', 6, 50, 500));
+      ctx.tos.forEach((t) => scatter(ctx, t, '<div data-sp="paper_butterflies" style="width:8px;height:6px;background:#fbfbf7"></div>', 6, 50, 500));
       shake(ctx);
     },
   },
@@ -1153,23 +1154,23 @@ Object.assign(ANIMS, {
 
 // ---------------------------------------------------------------- batch 3 (sheet rows 78–115)
 const ART3 = {
-  tree: (h = 200) => `<svg width="${h * 0.8}" height="${h}" viewBox="0 0 160 200"><path d="M70 200C72 160 66 140 60 120 48 100 30 96 14 90M74 150C84 120 104 104 130 100M64 118C70 90 76 70 80 40" stroke="#5a3a1e" stroke-width="12" fill="none" stroke-linecap="round"/><path d="M62 200C66 170 72 150 86 130 96 116 112 112 140 116" stroke="#6b4626" stroke-width="9" fill="none" stroke-linecap="round"/><g fill="#3f7a3a" stroke="#2c5a28" stroke-width="2" opacity=".95"><circle cx="80" cy="34" r="30"/><circle cx="40" cy="58" r="26"/><circle cx="124" cy="62" r="28"/><circle cx="20" cy="88" r="18"/><circle cx="140" cy="100" r="18"/></g><g fill="#e889c0"><circle cx="70" cy="28" r="4"/><circle cx="100" cy="44" r="4"/><circle cx="44" cy="52" r="4"/><circle cx="128" cy="58" r="4"/></g></svg>`,
-  mirror: (h = 90) => `<svg width="${h * 0.6}" height="${h}" viewBox="0 0 60 100"><rect x="3" y="3" width="54" height="94" rx="4" fill="#d6f2ff66" stroke="#e8fbff" stroke-width="3"/><path d="M12 20 30 8M10 44 46 14M14 70 50 40" stroke="#ffffffaa" stroke-width="2"/></svg>`,
-  needle: () => '<svg width="34" height="4" viewBox="0 0 34 4"><path d="M0 2H34" stroke="#e8fbff" stroke-width="2" stroke-linecap="round" style="filter:drop-shadow(0 0 3px #7fd6ff)"/></svg>',
-  ogre: (h = 240) => `<svg width="${h * 0.8}" height="${h}" viewBox="0 0 160 200"><path d="M30 90C14 110 8 140 16 170M130 90C146 110 152 140 144 170" stroke="#f1d2b6" stroke-width="22" stroke-linecap="round"/><circle cx="16" cy="172" r="14" fill="#f1d2b6" stroke="#b58a6a" stroke-width="2"/><circle cx="144" cy="172" r="14" fill="#f1d2b6" stroke="#b58a6a" stroke-width="2"/><path d="M36 78C50 66 110 66 124 78L130 170C110 186 50 186 30 170Z" fill="#f4dcc4" stroke="#b58a6a" stroke-width="3"/><path d="M60 100C70 108 90 108 100 100M80 110V150M64 130H96" stroke="#d7b296" stroke-width="2.5" fill="none"/><path d="M30 170H130V200H30Z" fill="#5a4636"/><circle cx="80" cy="44" r="32" fill="#f4dcc4" stroke="#b58a6a" stroke-width="3"/><path d="M48 40H112V54H48Z" fill="#fafafa" stroke="#cfcfcf" stroke-width="2"/><path d="M68 69Q80 60 92 69" stroke="#8a5a4a" stroke-width="3" fill="none"/><path d="M60 66 56 74M100 66 104 74" stroke="#fff" stroke-width="4"/></svg>`,
-  cube: (s = 120) => `<svg width="${s}" height="${s}" viewBox="0 0 100 100"><g fill="#ffffff22" stroke="#f4fbff" stroke-width="2.5" stroke-linejoin="round" style="filter:drop-shadow(0 0 8px #bfe9ff)"><path d="M20 30 50 16 80 30 50 44Z"/><path d="M20 30V72L50 86V44Z"/><path d="M80 30V72L50 86V44Z"/></g></svg>`,
-  rockFist: (s = 64) => `<svg width="${s}" height="${s}" viewBox="0 0 64 64"><path d="M6 20 18 6 40 4 58 16 60 40 48 58 22 60 6 46Z" fill="#8a7f72" stroke="#4e463e" stroke-width="3"/><path d="M22 18V32M34 14V30M46 18V32M14 34 28 40 46 40" stroke="#5f564c" stroke-width="3" stroke-linecap="round"/></svg>`,
-  golem: (h = 220) => `<svg width="${h * 0.8}" height="${h}" viewBox="0 0 160 200"><g fill="#8a7f72" stroke="#4e463e" stroke-width="3" stroke-linejoin="round"><path d="M40 70 120 70 130 150 30 150Z"/><path d="M60 22 100 22 108 62 52 62Z"/><path d="M40 76 10 120 22 134 50 98Z"/><path class="g-arm" d="M120 76 150 120 138 134 110 98Z"/><path d="M44 150 40 198 70 198 74 150ZM86 150 90 198 120 198 116 150Z"/></g><path d="M66 40H94" stroke="#ffcf5a" stroke-width="4" style="filter:drop-shadow(0 0 4px #ffcf5a)"/><path d="M60 90 80 100 100 92M56 120 76 116" stroke="#5f564c" stroke-width="3" fill="none"/></svg>`,
-  snake: (s = 70) => `<svg width="${s}" height="${s * 0.7}" viewBox="0 0 70 50" style="filter:drop-shadow(0 0 8px #b44bff)"><path d="M0 10C12 2 34 0 52 6L70 14 46 18C34 19 14 20 0 22Z" fill="#e8e6dc" stroke="#6a4a8a" stroke-width="2" stroke-linejoin="round"/><path d="M0 26C12 26 30 26 42 28L64 38 46 42C30 42 12 38 0 34Z" fill="#dcd8c8" stroke="#6a4a8a" stroke-width="2" stroke-linejoin="round"/><path d="M8 22C20 23 34 24 44 26" stroke="#7a1f3a" stroke-width="5"/><path d="M60 16 58 26M50 18 49 26M56 36 55 29" stroke="#fff" stroke-width="2.4" stroke-linecap="round"/><circle cx="40" cy="9" r="3" fill="#d4a017" stroke="#333"/><path d="M40 7V11" stroke="#111" stroke-width="1.4"/></svg>`,
-  scales: (len) => `<svg width="${len}" height="26" viewBox="0 0 ${len} 26" style="filter:drop-shadow(0 0 6px #b44bff)"><path d="M0 6H${len}V20H0Z" fill="#e8e6dc" stroke="#6a4a8a" stroke-width="2"/><path d="M0 13H${len}" stroke="#c8c4b2" stroke-width="6" stroke-dasharray="6 5"/></svg>`,
-  airFist: (s = 40) => `<svg width="${s}" height="${s}" viewBox="0 0 40 40"><path d="M6 12C6 6 30 4 34 10 38 16 38 28 32 32 26 36 10 36 6 30Z" fill="#e8f8ff44" stroke="#f4fcff" stroke-width="2.5"/><path d="M14 10V20M22 9V20M30 12V22" stroke="#f4fcff" stroke-width="2"/></svg>`,
-  staff: (len) => `<svg width="${len}" height="20" viewBox="0 0 ${len} 20"><rect x="0" y="5" width="${len}" height="10" rx="4" fill="#141414" stroke="#3a3a3a"/><rect x="0" y="3" width="20" height="14" rx="3" fill="#e6b422" stroke="#8a6a12"/><rect x="${len - 20}" y="3" width="20" height="14" rx="3" fill="#e6b422" stroke="#8a6a12"/></svg>`,
-  cleaver: (l = 150) => `<svg width="${l}" height="${l * 0.36}" viewBox="0 0 150 54"><rect x="0" y="22" width="34" height="10" rx="3" fill="#6b4a2a"/><path d="M32 6H146L150 48H32Z" fill="#d7dde3" stroke="#5a6068" stroke-width="2.5"/><circle cx="126" cy="18" r="8" fill="#2a2f36"/><path d="M96 48A8 8 0 0 1 112 48" fill="#2a2f36"/></svg>`,
-  kunai: () => `<svg width="46" height="16" viewBox="0 0 46 16"><path d="M18 8 46 8 34 3ZM18 8 46 8 34 13Z" fill="#c9ced6" stroke="#555"/><rect x="2" y="6" width="16" height="4" fill="#3a3a3a"/><circle cx="3" cy="8" r="3" fill="none" stroke="#3a3a3a" stroke-width="1.5"/><rect x="6" y="1" width="9" height="14" fill="#f3e3b0" stroke="#b08a3a"/><path d="M8 4h5M8 7h5M8 10h5" stroke="#c0392b" stroke-width="1.2"/></svg>`,
-  tag: () => '<svg width="20" height="30" viewBox="0 0 20 30"><rect x="1" y="1" width="18" height="28" fill="#f3e3b0" stroke="#b08a3a"/><path d="M5 6h10M10 6v18M5 14h10M6 22h8" stroke="#c0392b" stroke-width="1.8"/></svg>',
+  tree: (h = 200) => `<svg data-sp="art-tree-1" width="${h * 0.8}" height="${h}" viewBox="0 0 160 200"><path d="M70 200C72 160 66 140 60 120 48 100 30 96 14 90M74 150C84 120 104 104 130 100M64 118C70 90 76 70 80 40" stroke="#5a3a1e" stroke-width="12" fill="none" stroke-linecap="round"/><path d="M62 200C66 170 72 150 86 130 96 116 112 112 140 116" stroke="#6b4626" stroke-width="9" fill="none" stroke-linecap="round"/><g fill="#3f7a3a" stroke="#2c5a28" stroke-width="2" opacity=".95"><circle cx="80" cy="34" r="30"/><circle cx="40" cy="58" r="26"/><circle cx="124" cy="62" r="28"/><circle cx="20" cy="88" r="18"/><circle cx="140" cy="100" r="18"/></g><g fill="#e889c0"><circle cx="70" cy="28" r="4"/><circle cx="100" cy="44" r="4"/><circle cx="44" cy="52" r="4"/><circle cx="128" cy="58" r="4"/></g></svg>`,
+  mirror: (h = 90) => `<svg data-sp="art-mirror" width="${h * 0.6}" height="${h}" viewBox="0 0 60 100"><rect x="3" y="3" width="54" height="94" rx="4" fill="#d6f2ff66" stroke="#e8fbff" stroke-width="3"/><path d="M12 20 30 8M10 44 46 14M14 70 50 40" stroke="#ffffffaa" stroke-width="2"/></svg>`,
+  needle: () => '<svg data-sp="art-needle-1" width="34" height="4" viewBox="0 0 34 4"><path d="M0 2H34" stroke="#e8fbff" stroke-width="2" stroke-linecap="round" style="filter:drop-shadow(0 0 3px #7fd6ff)"/></svg>',
+  ogre: (h = 240) => `<svg data-sp="art-ogre" width="${h * 0.8}" height="${h}" viewBox="0 0 160 200"><path d="M30 90C14 110 8 140 16 170M130 90C146 110 152 140 144 170" stroke="#f1d2b6" stroke-width="22" stroke-linecap="round"/><circle cx="16" cy="172" r="14" fill="#f1d2b6" stroke="#b58a6a" stroke-width="2"/><circle cx="144" cy="172" r="14" fill="#f1d2b6" stroke="#b58a6a" stroke-width="2"/><path d="M36 78C50 66 110 66 124 78L130 170C110 186 50 186 30 170Z" fill="#f4dcc4" stroke="#b58a6a" stroke-width="3"/><path d="M60 100C70 108 90 108 100 100M80 110V150M64 130H96" stroke="#d7b296" stroke-width="2.5" fill="none"/><path d="M30 170H130V200H30Z" fill="#5a4636"/><circle cx="80" cy="44" r="32" fill="#f4dcc4" stroke="#b58a6a" stroke-width="3"/><path d="M48 40H112V54H48Z" fill="#fafafa" stroke="#cfcfcf" stroke-width="2"/><path d="M68 69Q80 60 92 69" stroke="#8a5a4a" stroke-width="3" fill="none"/><path d="M60 66 56 74M100 66 104 74" stroke="#fff" stroke-width="4"/></svg>`,
+  cube: (s = 120) => `<svg data-sp="art-cube" width="${s}" height="${s}" viewBox="0 0 100 100"><g fill="#ffffff22" stroke="#f4fbff" stroke-width="2.5" stroke-linejoin="round" style="filter:drop-shadow(0 0 8px #bfe9ff)"><path d="M20 30 50 16 80 30 50 44Z"/><path d="M20 30V72L50 86V44Z"/><path d="M80 30V72L50 86V44Z"/></g></svg>`,
+  rockFist: (s = 64) => `<svg data-sp="art-rockFist" width="${s}" height="${s}" viewBox="0 0 64 64"><path d="M6 20 18 6 40 4 58 16 60 40 48 58 22 60 6 46Z" fill="#8a7f72" stroke="#4e463e" stroke-width="3"/><path d="M22 18V32M34 14V30M46 18V32M14 34 28 40 46 40" stroke="#5f564c" stroke-width="3" stroke-linecap="round"/></svg>`,
+  golem: (h = 220) => `<svg data-sp="art-golem" width="${h * 0.8}" height="${h}" viewBox="0 0 160 200"><g fill="#8a7f72" stroke="#4e463e" stroke-width="3" stroke-linejoin="round"><path d="M40 70 120 70 130 150 30 150Z"/><path d="M60 22 100 22 108 62 52 62Z"/><path d="M40 76 10 120 22 134 50 98Z"/><path class="g-arm" d="M120 76 150 120 138 134 110 98Z"/><path d="M44 150 40 198 70 198 74 150ZM86 150 90 198 120 198 116 150Z"/></g><path d="M66 40H94" stroke="#ffcf5a" stroke-width="4" style="filter:drop-shadow(0 0 4px #ffcf5a)"/><path d="M60 90 80 100 100 92M56 120 76 116" stroke="#5f564c" stroke-width="3" fill="none"/></svg>`,
+  snake: (s = 70) => `<svg data-sp="art-snake" width="${s}" height="${s * 0.7}" viewBox="0 0 70 50" style="filter:drop-shadow(0 0 8px #b44bff)"><path d="M0 10C12 2 34 0 52 6L70 14 46 18C34 19 14 20 0 22Z" fill="#e8e6dc" stroke="#6a4a8a" stroke-width="2" stroke-linejoin="round"/><path d="M0 26C12 26 30 26 42 28L64 38 46 42C30 42 12 38 0 34Z" fill="#dcd8c8" stroke="#6a4a8a" stroke-width="2" stroke-linejoin="round"/><path d="M8 22C20 23 34 24 44 26" stroke="#7a1f3a" stroke-width="5"/><path d="M60 16 58 26M50 18 49 26M56 36 55 29" stroke="#fff" stroke-width="2.4" stroke-linecap="round"/><circle cx="40" cy="9" r="3" fill="#d4a017" stroke="#333"/><path d="M40 7V11" stroke="#111" stroke-width="1.4"/></svg>`,
+  scales: (len) => `<svg data-sp="art-scales" width="${len}" height="26" viewBox="0 0 ${len} 26" style="filter:drop-shadow(0 0 6px #b44bff)"><path d="M0 6H${len}V20H0Z" fill="#e8e6dc" stroke="#6a4a8a" stroke-width="2"/><path d="M0 13H${len}" stroke="#c8c4b2" stroke-width="6" stroke-dasharray="6 5"/></svg>`,
+  airFist: (s = 40) => `<svg data-sp="art-airFist" width="${s}" height="${s}" viewBox="0 0 40 40"><path d="M6 12C6 6 30 4 34 10 38 16 38 28 32 32 26 36 10 36 6 30Z" fill="#e8f8ff44" stroke="#f4fcff" stroke-width="2.5"/><path d="M14 10V20M22 9V20M30 12V22" stroke="#f4fcff" stroke-width="2"/></svg>`,
+  staff: (len) => `<svg data-sp="art-staff" width="${len}" height="20" viewBox="0 0 ${len} 20"><rect x="0" y="5" width="${len}" height="10" rx="4" fill="#141414" stroke="#3a3a3a"/><rect x="0" y="3" width="20" height="14" rx="3" fill="#e6b422" stroke="#8a6a12"/><rect x="${len - 20}" y="3" width="20" height="14" rx="3" fill="#e6b422" stroke="#8a6a12"/></svg>`,
+  cleaver: (l = 150) => `<svg data-sp="art-cleaver" width="${l}" height="${l * 0.36}" viewBox="0 0 150 54"><rect x="0" y="22" width="34" height="10" rx="3" fill="#6b4a2a"/><path d="M32 6H146L150 48H32Z" fill="#d7dde3" stroke="#5a6068" stroke-width="2.5"/><circle cx="126" cy="18" r="8" fill="#2a2f36"/><path d="M96 48A8 8 0 0 1 112 48" fill="#2a2f36"/></svg>`,
+  kunai: () => `<svg data-sp="art-kunai" width="46" height="16" viewBox="0 0 46 16"><path d="M18 8 46 8 34 3ZM18 8 46 8 34 13Z" fill="#c9ced6" stroke="#555"/><rect x="2" y="6" width="16" height="4" fill="#3a3a3a"/><circle cx="3" cy="8" r="3" fill="none" stroke="#3a3a3a" stroke-width="1.5"/><rect x="6" y="1" width="9" height="14" fill="#f3e3b0" stroke="#b08a3a"/><path d="M8 4h5M8 7h5M8 10h5" stroke="#c0392b" stroke-width="1.2"/></svg>`,
+  tag: () => '<svg data-sp="art-tag" width="20" height="30" viewBox="0 0 20 30"><rect x="1" y="1" width="18" height="28" fill="#f3e3b0" stroke="#b08a3a"/><path d="M5 6h10M10 6v18M5 14h10M6 22h8" stroke="#c0392b" stroke-width="1.8"/></svg>',
 };
 
-const darkChain = (len) => `<svg width="${len}" height="14" viewBox="0 0 ${len} 14"><line x1="0" y1="7" x2="${len}" y2="7" stroke="#1b1b1f" stroke-width="6" stroke-dasharray="11 4" stroke-linecap="round" style="filter:drop-shadow(0 0 5px #ff2a2a) drop-shadow(0 0 2px #ff2a2a)"/></svg>`;
+const darkChain = (len) => `<svg data-sp="darkChain" width="${len}" height="14" viewBox="0 0 ${len} 14"><line x1="0" y1="7" x2="${len}" y2="7" stroke="#1b1b1f" stroke-width="6" stroke-dasharray="11 4" stroke-linecap="round" style="filter:drop-shadow(0 0 5px #ff2a2a) drop-shadow(0 0 2px #ff2a2a)"/></svg>`;
 
 /** Akamaru sprite matching the casting Kiba (Part I → puppy, otherwise grown). */
 function akamaru(ctx, at, k = 1) {
@@ -1182,7 +1183,7 @@ function akamaru(ctx, at, k = 1) {
 }
 /** Spinning grey vortex (Fang Over Fang style). */
 function vortex(ctx, at, w, h, color = '#c9ced6') {
-  return spawn(ctx, `<div style="width:${w}px;height:${h}px;border-radius:50%;background:repeating-conic-gradient(from 0deg,${color}dd 0 10deg,${color}55 10deg 22deg,#ffffff00 22deg 36deg);box-shadow:0 0 16px ${color};filter:blur(1.2px);animation:ax-spin .14s linear infinite"></div>`, at, { life: 2000 });
+  return spawn(ctx, `<div data-sp="vortex" style="width:${w}px;height:${h}px;border-radius:50%;background:repeating-conic-gradient(from 0deg,${color}dd 0 10deg,${color}55 10deg 22deg,#ffffff00 22deg 36deg);box-shadow:0 0 16px ${color};filter:blur(1.2px);animation:ax-spin .14s linear infinite"></div>`, at, { life: 2000 });
 }
 /** Grow an element from the ground at a point (bottom-anchored). */
 function rise(ctx, n, ms = 320, delay = 0) {
@@ -1190,7 +1191,7 @@ function rise(ctx, n, ms = 320, delay = 0) {
   return n.animate([{ transform: 'translate(-50%,-100%) scaleY(0)' }, { transform: 'translate(-50%,-100%) scaleY(1)' }], { duration: ms * ctx.sp, delay: delay * ctx.sp, easing: 'ease-out', fill: 'both' }).finished.catch(() => {});
 }
 function dome(ctx, at, w, h, life = 1900) {
-  const n = spawn(ctx, `<div style="width:${w}px;height:${h}px;border-radius:50% 50% 8px 8px / 90% 90% 8px 8px;background:radial-gradient(circle at 40% 30%,#b3a089,#8a7560 55%,#5e4e3e);box-shadow:inset 0 -12px 22px #3e3226, 0 0 10px #000a;opacity:.94"><div style="position:absolute;inset:0;border-radius:inherit;background:repeating-linear-gradient(160deg,#0000 0 18px,#4e3e3088 18px 21px)"></div></div>`, at, { life });
+  const n = spawn(ctx, `<div data-sp="dome-1" style="width:${w}px;height:${h}px;border-radius:50% 50% 8px 8px / 90% 90% 8px 8px;background:radial-gradient(circle at 40% 30%,#b3a089,#8a7560 55%,#5e4e3e);box-shadow:inset 0 -12px 22px #3e3226, 0 0 10px #000a;opacity:.94"><div data-sp="dome-2" style="position:absolute;inset:0;border-radius:inherit;background:repeating-linear-gradient(160deg,#0000 0 18px,#4e3e3088 18px 21px)"></div></div>`, at, { life });
   n.firstElementChild.style.position = 'relative';
   return n;
 }
@@ -1220,7 +1221,7 @@ Object.assign(ANIMS, {
     desc: 'User sprays a pink mist at the target, and a tree grows up under them.',
     async play(ctx) {
       const to = ctx.tos[0]; const el = ctx.targetEls[0];
-      const m = spawn(ctx, '<div style="width:120px;height:90px;border-radius:50%;background:radial-gradient(ellipse,#ffb3dccc,#ffb3dc66 50%,#ffb3dc00 72%);filter:blur(3px)"></div>', ctx.from, { life: 2200 });
+      const m = spawn(ctx, '<div data-sp="tree_binding" style="width:120px;height:90px;border-radius:50%;background:radial-gradient(ellipse,#ffb3dccc,#ffb3dc66 50%,#ffb3dc00 72%);filter:blur(3px)"></div>', ctx.from, { life: 2200 });
       await fly(ctx, m, ctx.from, to, 450, { rotate: 0, scale: [0.3, 1.4], ease: 'ease-out' });
       const f = feetOf(ctx, el); const { h } = sizeOf(el);
       const t = spawn(ctx, ART3.tree(h * 1.15), { x: f.x, y: f.y + 6 }, { life: 2200 });
@@ -1291,7 +1292,7 @@ Object.assign(ANIMS, {
     desc: 'User emits a transparent cone at the target.',
     async play(ctx) {
       const to = ctx.tos[0]; const { h } = sizeOf(ctx.targetEls[0]);
-      const cone = (len) => `<svg width="${len}" height="${h * 0.7}" viewBox="0 0 ${len} 100" preserveAspectRatio="none" style="filter:drop-shadow(0 0 8px #e8fbff)"><path d="M0 50 ${len} 0V100Z" fill="#f4fbff33" stroke="#f4fbff" stroke-width="2" vector-effect="non-scaling-stroke"/><ellipse cx="${len}" cy="50" rx="${Math.min(30, len * 0.06)}" ry="50" fill="#f4fbff55" stroke="#ffffff" stroke-width="2" vector-effect="non-scaling-stroke"/></svg>`;
+      const cone = (len) => `<svg data-sp="dust_cone" width="${len}" height="${h * 0.7}" viewBox="0 0 ${len} 100" preserveAspectRatio="none" style="filter:drop-shadow(0 0 8px #e8fbff)"><path d="M0 50 ${len} 0V100Z" fill="#f4fbff33" stroke="#f4fbff" stroke-width="2" vector-effect="non-scaling-stroke"/><ellipse cx="${len}" cy="50" rx="${Math.min(30, len * 0.06)}" ry="50" fill="#f4fbff55" stroke="#ffffff" stroke-width="2" vector-effect="non-scaling-stroke"/></svg>`;
       const n = await stretch(ctx, ctx.from, to, cone, 380, 1500);
       boom(ctx, to, '#ffffff', 120);
       ctx.targetEls[0].animate([{ filter: 'none' }, { filter: 'brightness(3) saturate(0)' }, { filter: 'none' }], { duration: 450 * ctx.sp });
@@ -1345,7 +1346,7 @@ Object.assign(ANIMS, {
       const to = ctx.tos[0];
       const len = Math.hypot(to.x - ctx.from.x, to.y - ctx.from.y);
       const wild = () => { let d = 'M0 30'; for (let i = 1; i <= 4; i++) d += ` Q${(len * (i - 0.5)) / 4} ${30 + rnd(-28, 28)} ${(len * i) / 4} ${30 + rnd(-10, 10)}`; return d; };
-      const mk = () => `<svg width="${len}" height="60" viewBox="0 0 ${len} 60" style="overflow:visible">${Array.from({ length: 5 }, () => `<path d="${wild()}" stroke="#0d0d0d" stroke-width="${rnd(1.5, 3.5)}" fill="none" style="filter:drop-shadow(0 0 2px #6a6a6a)"/>`).join('')}</svg>`;
+      const mk = () => `<svg data-sp="earth_grudge_threads" width="${len}" height="60" viewBox="0 0 ${len} 60" style="overflow:visible">${Array.from({ length: 5 }, () => `<path d="${wild()}" stroke="#0d0d0d" stroke-width="${rnd(1.5, 3.5)}" fill="none" style="filter:drop-shadow(0 0 2px #6a6a6a)"/>`).join('')}</svg>`;
       const n = await stretch(ctx, ctx.from, to, mk, 360, 1800);
       wrapRing(ctx, ctx.targetEls[0], 'border:3px solid #0d0d0d;box-shadow:0 0 0 4px #0d0d0d55, inset 0 0 0 6px #0d0d0d44', 700);
       shake(ctx);
@@ -1390,7 +1391,7 @@ Object.assign(ANIMS, {
       const box = sideBox(ctx);
       const w = box.w + 80; const h = box.h * 0.9;
       const back = { x: box.c.x, y: box.y1 + box.h * 0.35 };
-      const s = spawn(ctx, `<div style="width:${w}px;height:${h}px;border-radius:10px 10px 4px 4px;background:linear-gradient(#9b8a76,#6e5e4c);box-shadow:inset 0 -10px 18px #3e3226,0 0 10px #000a;background-image:repeating-linear-gradient(170deg,#0000 0 22px,#4e3e3066 22px 25px),linear-gradient(#9b8a76,#6e5e4c)"></div>`, back, { life: 2200, z: 1 });
+      const s = spawn(ctx, `<div data-sp="earth_shore_return" style="width:${w}px;height:${h}px;border-radius:10px 10px 4px 4px;background:linear-gradient(#9b8a76,#6e5e4c);box-shadow:inset 0 -10px 18px #3e3226,0 0 10px #000a;background-image:repeating-linear-gradient(170deg,#0000 0 22px,#4e3e3066 22px 25px),linear-gradient(#9b8a76,#6e5e4c)"></div>`, back, { life: 2200, z: 1 });
       await rise(ctx, s, 380);
       s.style.zIndex = '7';
       await s.animate([{ transform: 'translate(-50%,-100%) perspective(600px) rotateX(0deg)' }, { transform: `translate(-50%,-100%) translateY(${box.h * 0.55}px) perspective(600px) rotateX(-70deg)` }], { duration: 300 * ctx.sp, easing: 'ease-in', fill: 'forwards' }).finished.catch(() => {});
@@ -1403,7 +1404,7 @@ Object.assign(ANIMS, {
     desc: 'An earth wall grows from the ground in front of the user.',
     async play(ctx) {
       const { w, h } = sizeOf(ctx.userEl); const f = feetOf(ctx, ctx.userEl);
-      const wall = spawn(ctx, `<div style="width:${Math.max(70, w * 0.75)}px;height:${h * 0.85}px;border-radius:14px 14px 4px 4px;background:repeating-linear-gradient(165deg,#0000 0 18px,#4e3e3077 18px 21px),linear-gradient(#a8957e,#6e5e4c);box-shadow:inset 0 -10px 18px #3e3226,0 0 10px #000a"></div>`, { x: f.x + (ctx.isFoe ? -26 : 26), y: f.y + 4 }, { life: 1700 });
+      const wall = spawn(ctx, `<div data-sp="earth_spear" style="width:${Math.max(70, w * 0.75)}px;height:${h * 0.85}px;border-radius:14px 14px 4px 4px;background:repeating-linear-gradient(165deg,#0000 0 18px,#4e3e3077 18px 21px),linear-gradient(#a8957e,#6e5e4c);box-shadow:inset 0 -10px 18px #3e3226,0 0 10px #000a"></div>`, { x: f.x + (ctx.isFoe ? -26 : 26), y: f.y + 4 }, { life: 1700 });
       await rise(ctx, wall, 420);
       await wait(600 * ctx.sp);
       fade(ctx, wall, 350);
@@ -1455,7 +1456,7 @@ Object.assign(ANIMS, {
     desc: 'An earth wall grows from the ground in front of the whole ally team.',
     async play(ctx) {
       const box = sideBox(ctx);
-      const wall = spawn(ctx, `<div style="width:${box.w + 60}px;height:${box.h * 0.6}px;border-radius:16px 16px 4px 4px;background:repeating-linear-gradient(165deg,#0000 0 22px,#4e3e3077 22px 25px),linear-gradient(#a8957e,#6e5e4c);box-shadow:inset 0 -10px 18px #3e3226,0 0 10px #000a;opacity:.9"></div>`, { x: box.c.x + (ctx.isFoe ? -30 : 30), y: box.y2 + 10 }, { life: 2000, z: 7 });
+      const wall = spawn(ctx, `<div data-sp="mud_wall" style="width:${box.w + 60}px;height:${box.h * 0.6}px;border-radius:16px 16px 4px 4px;background:repeating-linear-gradient(165deg,#0000 0 22px,#4e3e3077 22px 25px),linear-gradient(#a8957e,#6e5e4c);box-shadow:inset 0 -10px 18px #3e3226,0 0 10px #000a;opacity:.9"></div>`, { x: box.c.x + (ctx.isFoe ? -30 : 30), y: box.y2 + 10 }, { life: 2000, z: 7 });
       await rise(ctx, wall, 480);
       await wait(700 * ctx.sp);
       fade(ctx, wall, 350);
@@ -1503,7 +1504,7 @@ Object.assign(ANIMS, {
     desc: 'A blue dome of aura covers the user.',
     async play(ctx) {
       const { w, h } = sizeOf(ctx.userEl); const f = feetOf(ctx, ctx.userEl);
-      const d = spawn(ctx, `<div style="width:${Math.max(140, w * 1.3)}px;height:${h * 1.02}px;border-radius:50% 50% 10% 10% / 90% 90% 10% 10%;background:radial-gradient(ellipse at 50% 80%,#bfe6ff22,#4aa3ff55 70%,#9fd8ffaa);box-shadow:0 0 26px #4aa3ff,inset 0 0 18px #cfeeff;overflow:hidden;position:relative"><div class="ax-spin" style="position:absolute;inset:-20%;background:repeating-conic-gradient(#ffffff33 0 10deg,#0000 10deg 30deg);animation-duration:.5s"></div></div>`, { x: f.x, y: f.y + 6 }, { life: 1800 });
+      const d = spawn(ctx, `<div data-sp="rotation-1" style="width:${Math.max(140, w * 1.3)}px;height:${h * 1.02}px;border-radius:50% 50% 10% 10% / 90% 90% 10% 10%;background:radial-gradient(ellipse at 50% 80%,#bfe6ff22,#4aa3ff55 70%,#9fd8ffaa);box-shadow:0 0 26px #4aa3ff,inset 0 0 18px #cfeeff;overflow:hidden;position:relative"><div data-sp="rotation-2" class="ax-spin" style="position:absolute;inset:-20%;background:repeating-conic-gradient(#ffffff33 0 10deg,#0000 10deg 30deg);animation-duration:.5s"></div></div>`, { x: f.x, y: f.y + 6 }, { life: 1800 });
       await rise(ctx, d, 300);
       await wait(800 * ctx.sp);
       fade(ctx, d, 350);
@@ -1514,7 +1515,7 @@ Object.assign(ANIMS, {
     async play(ctx) {
       const to = await dash(ctx, 0.66, 500);
       const p = spawn(ctx, ART.palm(), to, { life: 600 }); p.animate([{ transform: 'translate(-50%,-50%) scale(.4)', opacity: 1 }, { transform: 'translate(-50%,-50%) scale(1.4)', opacity: 0 }], { duration: 400 * ctx.sp, fill: 'forwards' });
-      const r = spawn(ctx, '<div style="width:160px;height:160px;border-radius:50%;border:6px solid #f4fcffcc;box-shadow:0 0 18px #bfe9ff"></div>', to, { life: 800 });
+      const r = spawn(ctx, '<div data-sp="vacuum_palm" style="width:160px;height:160px;border-radius:50%;border:6px solid #f4fcffcc;box-shadow:0 0 18px #bfe9ff"></div>', to, { life: 800 });
       r.animate([{ transform: 'translate(-50%,-50%) scale(.2)', opacity: 1 }, { transform: 'translate(-50%,-50%) scale(1.6)', opacity: 0 }], { duration: 520 * ctx.sp, easing: 'ease-out', fill: 'forwards' });
       shake(ctx);
     },
@@ -1525,7 +1526,7 @@ Object.assign(ANIMS, {
       const box = sideBox(ctx);
       ctx.userEl.animate([{ transform: 'translate(0,0)' }, { transform: `translate(${ctx.isFoe ? -14 : 14}px,0)`, offset: 0.3 }, { transform: 'translate(0,0)' }], { duration: 420 * ctx.sp });
       const h = box.h * 0.9;
-      const wave = spawn(ctx, `<svg width="${h * 0.5}" height="${h}" viewBox="0 0 50 100" style="filter:drop-shadow(0 0 12px #bfe9ff)"><path d="M6 2C40 20 40 80 6 98 26 70 26 30 6 2Z" fill="#f4fcff99" stroke="#ffffff" stroke-width="2"/><path d="M20 10C44 30 44 70 20 90" stroke="#ffffffaa" stroke-width="3" fill="none"/></svg>`, ctx.from, { life: 1200 });
+      const wave = spawn(ctx, `<svg data-sp="vacuum_wall" width="${h * 0.5}" height="${h}" viewBox="0 0 50 100" style="filter:drop-shadow(0 0 12px #bfe9ff)"><path d="M6 2C40 20 40 80 6 98 26 70 26 30 6 2Z" fill="#f4fcff99" stroke="#ffffff" stroke-width="2"/><path d="M20 10C44 30 44 70 20 90" stroke="#ffffffaa" stroke-width="3" fill="none"/></svg>`, ctx.from, { life: 1200 });
       if (ctx.isFoe) wave.firstElementChild.style.transform = 'scaleX(-1)';
       await fly(ctx, wave, ctx.from, box.c, 380, { rotate: 0, scale: [0.4, 1.3], ease: 'ease-in' });
       ctx.tos.forEach((t) => puff(ctx, t, '#ffffff', 90));
@@ -1581,7 +1582,7 @@ Object.assign(ANIMS, {
     desc: 'A large black orb grows in front of the user, then flies out and hits every enemy.',
     async play(ctx) {
       const at = { x: ctx.from.x + (ctx.isFoe ? -60 : 60), y: ctx.from.y - 20 };
-      const o = spawn(ctx, '<div style="width:110px;height:110px;border-radius:50%;background:radial-gradient(circle at 38% 32%,#3a3a44,#050507 60%);box-shadow:0 0 20px 6px #00000099,0 0 40px #6b6b8a55"></div>', at, { life: 2400 });
+      const o = spawn(ctx, '<div data-sp="expansive_tsb" style="width:110px;height:110px;border-radius:50%;background:radial-gradient(circle at 38% 32%,#3a3a44,#050507 60%);box-shadow:0 0 20px 6px #00000099,0 0 40px #6b6b8a55"></div>', at, { life: 2400 });
       await grow(ctx, o, 600, 'scale(.1)', 'scale(1)');
       const box = sideBox(ctx);
       await fly(ctx, o, at, box.c, 380, { rotate: 0, scale: [1, Math.min(2.2, Math.max(1.6, box.w / 110))], ease: 'ease-in' });
@@ -1667,7 +1668,7 @@ Object.assign(ANIMS, {
       const to = ctx.tos[0]; const { h } = sizeOf(ctx.targetEls[0]);
       const bugs = Array.from({ length: 40 }, () => {
         const st = { x: to.x + rnd(-h, h) * 0.9, y: to.y + rnd(-h, h) * 0.7 };
-        const b = spawn(ctx, `<div style="width:${rnd(3, 6)}px;height:${rnd(3, 5)}px;border-radius:50%;background:#0b0b0b"></div>`, st, { life: 2200 });
+        const b = spawn(ctx, `<div data-sp="female_bug" style="width:${rnd(3, 6)}px;height:${rnd(3, 5)}px;border-radius:50%;background:#0b0b0b"></div>`, st, { life: 2200 });
         const pts = Array.from({ length: 5 }, () => `translate(calc(-50% + ${to.x - st.x + rnd(-h * 0.35, h * 0.35)}px), calc(-50% + ${to.y - st.y + rnd(-h * 0.45, h * 0.45)}px))`);
         b.animate([{ transform: 'translate(-50%,-50%)', opacity: 0 }, ...pts.map((t) => ({ transform: t, opacity: 1 })), { transform: pts[4], opacity: 0 }], { duration: 1600 * ctx.sp, easing: 'ease-in-out', fill: 'forwards' });
         return b;
@@ -1698,14 +1699,14 @@ Object.assign(ANIMS, {
 
 // ---------------------------------------------------------------- batch 4 (sheet rows 116–153)
 const ART4 = {
-  fireball: (s = 60, blue = false) => `<div style="width:${s}px;height:${s}px;border-radius:50%;background:radial-gradient(circle at 45% 45%,#fff 0%,${blue ? '#bfe6ff 20%,#4aa3ff 45%,#1f5fd6 62%,#1f5fd600 72%' : '#fff3b0 18%,#ffb340 40%,#ff5a1a 60%,#ff5a1a00 72%'});box-shadow:0 0 ${s * 0.4}px ${blue ? '#4aa3ff' : '#ff7a1a'}"></div>`,
-  tripleKunai: () => '<svg width="40" height="22" viewBox="0 0 40 22"><path d="M14 11 40 11 30 7ZM14 11 40 11 30 15Z" fill="#c9ced6" stroke="#555"/><path d="M20 11 30 1 27 9ZM20 11 30 21 27 13Z" fill="#c9ced6" stroke="#555"/><rect x="2" y="9" width="12" height="4" fill="#3a3a3a"/><circle cx="2" cy="11" r="2.5" fill="none" stroke="#3a3a3a" stroke-width="1.5"/></svg>',
-  seal: (s = 70) => `<svg width="${s}" height="${s}" viewBox="0 0 100 100" style="filter:drop-shadow(0 0 8px #b44bff)"><circle cx="50" cy="50" r="40" fill="none" stroke="#2a0f3a" stroke-width="4"/><circle cx="50" cy="50" r="14" fill="none" stroke="#2a0f3a" stroke-width="3"/>${[0, 72, 144, 216, 288].map((a) => `<g transform="rotate(${a} 50 50)"><path d="M50 36V14" stroke="#2a0f3a" stroke-width="3"/><circle cx="50" cy="12" r="4" fill="#2a0f3a"/></g>`).join('')}<path d="M44 50h12M50 44v12" stroke="#2a0f3a" stroke-width="2.5"/></svg>`,
-  flute: () => '<svg width="70" height="10" viewBox="0 0 70 10"><rect x="0" y="2" width="70" height="6" rx="3" fill="#e9e4d8" stroke="#8a7e66"/><circle cx="20" cy="5" r="1.4" fill="#5a4e3a"/><circle cx="32" cy="5" r="1.4" fill="#5a4e3a"/><circle cx="44" cy="5" r="1.4" fill="#5a4e3a"/></svg>',
-  lion: (s = 80) => `<svg width="${s}" height="${s}" viewBox="0 0 100 100" style="filter:drop-shadow(0 0 12px #4aa3ff)">${Array.from({ length: 14 }, (_, i) => { const a = (i / 14) * Math.PI * 2; return `<path d="M${50 + Math.cos(a) * 30} ${50 + Math.sin(a) * 30}L${50 + Math.cos(a + 0.22) * 48} ${50 + Math.sin(a + 0.22) * 48}L${50 + Math.cos(a + 0.44) * 30} ${50 + Math.sin(a + 0.44) * 30}Z" fill="#6cc4ff" opacity=".85"/>`; }).join('')}<circle cx="50" cy="52" r="30" fill="#bfe6ff" stroke="#4aa3ff" stroke-width="3" opacity=".95"/><path d="M38 44l6 4M62 44l-6 4" stroke="#1f5fd6" stroke-width="4" stroke-linecap="round"/><path d="M44 60Q50 66 56 60M50 54v6M40 66Q50 76 60 66" stroke="#1f5fd6" stroke-width="3" fill="none"/><path d="M28 30 22 18 36 26M72 30 78 18 64 26" fill="#6cc4ff"/></svg>`,
-  fan: (l = 170) => `<svg width="${l}" height="${l * 0.3}" viewBox="0 0 170 50"><rect x="0" y="4" width="170" height="42" rx="6" fill="#efe6cf" stroke="#6b5a3a" stroke-width="2.5"/><path d="M0 12H170M0 38H170" stroke="#3a3a3a" stroke-width="3"/><circle cx="56" cy="25" r="8" fill="#6a3fa0"/><circle cx="96" cy="25" r="8" fill="#6a3fa0"/><circle cx="136" cy="25" r="8" fill="#6a3fa0"/></svg>`,
-  waterFist: (s = 80) => `<svg width="${s}" height="${s}" viewBox="0 0 80 80" style="filter:drop-shadow(0 0 8px #4ab0ff)"><path d="M10 26C8 12 36 6 52 10 70 14 76 30 72 48 68 66 50 74 32 72 14 70 8 56 10 40Z" fill="#8fd3ff99" stroke="#e6f7ff" stroke-width="3"/><path d="M28 20V36M42 16V34M56 20V36" stroke="#e6f7ff" stroke-width="3" stroke-linecap="round"/><circle cx="26" cy="54" r="5" fill="#ffffff88"/></svg>`,
-  needle: () => '<svg width="40" height="6" viewBox="0 0 40 6"><path d="M0 3H40" stroke="#d9dde3" stroke-width="2" stroke-linecap="round"/><path d="M36 1 40 3 36 5" fill="#888"/></svg>',
+  fireball: (s = 60, blue = false) => `<div data-sp="art-fireball" style="width:${s}px;height:${s}px;border-radius:50%;background:radial-gradient(circle at 45% 45%,#fff 0%,${blue ? '#bfe6ff 20%,#4aa3ff 45%,#1f5fd6 62%,#1f5fd600 72%' : '#fff3b0 18%,#ffb340 40%,#ff5a1a 60%,#ff5a1a00 72%'});box-shadow:0 0 ${s * 0.4}px ${blue ? '#4aa3ff' : '#ff7a1a'}"></div>`,
+  tripleKunai: () => '<svg data-sp="art-tripleKunai" width="40" height="22" viewBox="0 0 40 22"><path d="M14 11 40 11 30 7ZM14 11 40 11 30 15Z" fill="#c9ced6" stroke="#555"/><path d="M20 11 30 1 27 9ZM20 11 30 21 27 13Z" fill="#c9ced6" stroke="#555"/><rect x="2" y="9" width="12" height="4" fill="#3a3a3a"/><circle cx="2" cy="11" r="2.5" fill="none" stroke="#3a3a3a" stroke-width="1.5"/></svg>',
+  seal: (s = 70) => `<svg data-sp="art-seal" width="${s}" height="${s}" viewBox="0 0 100 100" style="filter:drop-shadow(0 0 8px #b44bff)"><circle cx="50" cy="50" r="40" fill="none" stroke="#2a0f3a" stroke-width="4"/><circle cx="50" cy="50" r="14" fill="none" stroke="#2a0f3a" stroke-width="3"/>${[0, 72, 144, 216, 288].map((a) => `<g transform="rotate(${a} 50 50)"><path d="M50 36V14" stroke="#2a0f3a" stroke-width="3"/><circle cx="50" cy="12" r="4" fill="#2a0f3a"/></g>`).join('')}<path d="M44 50h12M50 44v12" stroke="#2a0f3a" stroke-width="2.5"/></svg>`,
+  flute: () => '<svg data-sp="art-flute" width="70" height="10" viewBox="0 0 70 10"><rect x="0" y="2" width="70" height="6" rx="3" fill="#e9e4d8" stroke="#8a7e66"/><circle cx="20" cy="5" r="1.4" fill="#5a4e3a"/><circle cx="32" cy="5" r="1.4" fill="#5a4e3a"/><circle cx="44" cy="5" r="1.4" fill="#5a4e3a"/></svg>',
+  lion: (s = 80) => `<svg data-sp="art-lion" width="${s}" height="${s}" viewBox="0 0 100 100" style="filter:drop-shadow(0 0 12px #4aa3ff)">${Array.from({ length: 14 }, (_, i) => { const a = (i / 14) * Math.PI * 2; return `<path d="M${50 + Math.cos(a) * 30} ${50 + Math.sin(a) * 30}L${50 + Math.cos(a + 0.22) * 48} ${50 + Math.sin(a + 0.22) * 48}L${50 + Math.cos(a + 0.44) * 30} ${50 + Math.sin(a + 0.44) * 30}Z" fill="#6cc4ff" opacity=".85"/>`; }).join('')}<circle cx="50" cy="52" r="30" fill="#bfe6ff" stroke="#4aa3ff" stroke-width="3" opacity=".95"/><path d="M38 44l6 4M62 44l-6 4" stroke="#1f5fd6" stroke-width="4" stroke-linecap="round"/><path d="M44 60Q50 66 56 60M50 54v6M40 66Q50 76 60 66" stroke="#1f5fd6" stroke-width="3" fill="none"/><path d="M28 30 22 18 36 26M72 30 78 18 64 26" fill="#6cc4ff"/></svg>`,
+  fan: (l = 170) => `<svg data-sp="art-fan" width="${l}" height="${l * 0.3}" viewBox="0 0 170 50"><rect x="0" y="4" width="170" height="42" rx="6" fill="#efe6cf" stroke="#6b5a3a" stroke-width="2.5"/><path d="M0 12H170M0 38H170" stroke="#3a3a3a" stroke-width="3"/><circle cx="56" cy="25" r="8" fill="#6a3fa0"/><circle cx="96" cy="25" r="8" fill="#6a3fa0"/><circle cx="136" cy="25" r="8" fill="#6a3fa0"/></svg>`,
+  waterFist: (s = 80) => `<svg data-sp="art-waterFist" width="${s}" height="${s}" viewBox="0 0 80 80" style="filter:drop-shadow(0 0 8px #4ab0ff)"><path d="M10 26C8 12 36 6 52 10 70 14 76 30 72 48 68 66 50 74 32 72 14 70 8 56 10 40Z" fill="#8fd3ff99" stroke="#e6f7ff" stroke-width="3"/><path d="M28 20V36M42 16V34M56 20V36" stroke="#e6f7ff" stroke-width="3" stroke-linecap="round"/><circle cx="26" cy="54" r="5" fill="#ffffff88"/></svg>`,
+  needle: () => '<svg data-sp="art-needle-2" width="40" height="6" viewBox="0 0 40 6"><path d="M0 3H40" stroke="#d9dde3" stroke-width="2" stroke-linecap="round"/><path d="M36 1 40 3 36 5" fill="#888"/></svg>',
 };
 
 function fireball(ctx, a, b, { size = 60, blue = false, ms = 420, arc = 0, trail = true } = {}) {
@@ -1719,14 +1720,14 @@ function burnAt(ctx, el, blue = false) {
   [-22, 0, 22].forEach((dx, i) => { const n = spawn(ctx, ART.flame(30 + (i === 1 ? 14 : 0), blue ? '#2f7bff' : '#ff6a1a', blue ? '#bfe0ff' : '#ffd04a'), { x: f.x + dx, y: f.y - 28 }, { life: 1300 }); pop(ctx, n, 180); setTimeout(() => fade(ctx, n, 300), 750 * ctx.sp); });
 }
 function yellowFlash(ctx, at) {
-  const n = spawn(ctx, '<div style="width:120px;height:120px;border-radius:50%;background:radial-gradient(circle,#fff 0%,#ffe066 30%,#ffd04a00 70%)"></div>', at, { life: 700 });
+  const n = spawn(ctx, '<div data-sp="yellowFlash" style="width:120px;height:120px;border-radius:50%;background:radial-gradient(circle,#fff 0%,#ffe066 30%,#ffd04a00 70%)"></div>', at, { life: 700 });
   n.animate([{ transform: 'translate(-50%,-50%) scale(.2)', opacity: 1 }, { transform: 'translate(-50%,-50%) scale(1.2)', opacity: 0 }], { duration: 380 * ctx.sp, fill: 'forwards' });
 }
 async function ashBurn(ctx, single = false) {
   let fog;
   if (single) {
     const to = ctx.tos[0];
-    fog = spawn(ctx, '<div style="width:170px;height:150px;border-radius:50%;background:radial-gradient(ellipse,#6e6a66cc 0%,#6e6a6699 45%,#6e6a6600 72%);filter:blur(4px)"></div>', ctx.from, { life: 2400 });
+    fog = spawn(ctx, '<div data-sp="ashBurn" style="width:170px;height:150px;border-radius:50%;background:radial-gradient(ellipse,#6e6a66cc 0%,#6e6a6699 45%,#6e6a6600 72%);filter:blur(4px)"></div>', ctx.from, { life: 2400 });
     await fly(ctx, fog, ctx.from, to, 600, { rotate: 0, scale: [0.2, 1], ease: 'ease-out' });
     for (let i = 0; i < 10; i++) setTimeout(() => boom(ctx, { x: to.x + rnd(-50, 50), y: to.y + rnd(-60, 50) }, '#ff7a1a', rnd(40, 80)), rnd(0, 260) * ctx.sp);
   } else {
@@ -1741,7 +1742,7 @@ async function ashBurn(ctx, single = false) {
 }
 async function wireFlame(ctx) {
   const to = ctx.tos[0];
-  const wire = (len) => `<svg width="${len}" height="6" viewBox="0 0 ${len} 6"><path d="M0 3H${len}" stroke="#d9dde3" stroke-width="1.4"/></svg>`;
+  const wire = (len) => `<svg data-sp="wireFlame" width="${len}" height="6" viewBox="0 0 ${len} 6"><path d="M0 3H${len}" stroke="#d9dde3" stroke-width="1.4"/></svg>`;
   const w = await stretch(ctx, ctx.from, to, wire, 260, 2400);
   await wait(150 * ctx.sp);
   const f = spawn(ctx, ART.flame(34, '#ff6a1a', '#ffd04a'), ctx.from, { life: 1200 });
@@ -1841,11 +1842,11 @@ Object.assign(ANIMS, {
       await Promise.all(ctx.targetEls.map(async (el, i) => {
         const f = feetOf(ctx, el);
         await Promise.all(Array.from({ length: 6 }, (_, k) => wait(k * 40 * ctx.sp).then(async () => {
-          const d = spawn(ctx, `<div style="width:${rnd(10, 18)}px;height:${rnd(10, 18)}px;border-radius:50%;background:radial-gradient(circle at 35% 35%,#7a5a3a,#2a1a0e)"></div>`, ctx.from, { life: 1200 });
+          const d = spawn(ctx, `<div data-sp="toad_oil_flame-1" style="width:${rnd(10, 18)}px;height:${rnd(10, 18)}px;border-radius:50%;background:radial-gradient(circle at 35% 35%,#7a5a3a,#2a1a0e)"></div>`, ctx.from, { life: 1200 });
           await fly(ctx, d, ctx.from, { x: f.x + rnd(-30, 30), y: f.y - rnd(0, 60) }, 380, { rotate: 0, arc: 70 });
           d.remove();
         })));
-        const p = spawn(ctx, '<div style="width:130px;height:30px;border-radius:50%;background:radial-gradient(ellipse,#3a2614,#2a1a0eee 55%,#2a1a0e00 72%)"></div>', { x: f.x, y: f.y }, { life: 2600, z: 1 });
+        const p = spawn(ctx, '<div data-sp="toad_oil_flame-2" style="width:130px;height:30px;border-radius:50%;background:radial-gradient(ellipse,#3a2614,#2a1a0eee 55%,#2a1a0e00 72%)"></div>', { x: f.x, y: f.y }, { life: 2600, z: 1 });
         await pop(ctx, p, 200); pools.push([p, el, i]);
       }));
       await wait(200 * ctx.sp);
@@ -1870,10 +1871,10 @@ Object.assign(ANIMS, {
     desc: 'User throws a round smoke bomb at the enemies that blinds them with a flash.',
     async play(ctx) {
       const box = sideBox(ctx);
-      const b = spawn(ctx, '<div style="width:24px;height:24px;border-radius:50%;background:radial-gradient(circle at 35% 35%,#8a8f99,#2a2d33);border:1.5px solid #111"></div>', ctx.from, { life: 1200 });
+      const b = spawn(ctx, '<div data-sp="flash_bomb-1" style="width:24px;height:24px;border-radius:50%;background:radial-gradient(circle at 35% 35%,#8a8f99,#2a2d33);border:1.5px solid #111"></div>', ctx.from, { life: 1200 });
       await fly(ctx, b, ctx.from, box.c, 480, { rotate: 0, arc: 90, ease: 'ease-in-out' });
       b.remove();
-      const fl = spawn(ctx, `<div style="width:${box.w + 200}px;height:${box.h + 160}px;border-radius:50%;background:radial-gradient(ellipse,#ffffff 0%,#ffffffcc 40%,#ffffff00 72%)"></div>`, box.c, { life: 1200 });
+      const fl = spawn(ctx, `<div data-sp="flash_bomb-2" style="width:${box.w + 200}px;height:${box.h + 160}px;border-radius:50%;background:radial-gradient(ellipse,#ffffff 0%,#ffffffcc 40%,#ffffff00 72%)"></div>`, box.c, { life: 1200 });
       fl.animate([{ opacity: 0 }, { opacity: 1, offset: 0.15 }, { opacity: 0 }], { duration: 800 * ctx.sp, fill: 'forwards' });
       ctx.targetEls.forEach((el) => el.animate([{ filter: 'none' }, { filter: 'brightness(3)' }, { filter: 'none' }], { duration: 700 * ctx.sp }));
       for (let i = 0; i < 4; i++) puff(ctx, { x: box.c.x + rnd(-60, 60), y: box.c.y + rnd(-30, 30) }, '#c9ced6', 110);
@@ -1922,7 +1923,7 @@ Object.assign(ANIMS, {
       const beyond = { x: to.x + (to.x - ctx.from.x) * 0.25, y: to.y + (to.y - ctx.from.y) * 0.25 };
       yellowFlash(ctx, ctx.from);
       ctx.userEl.animate([{ opacity: 1 }, { opacity: 0, offset: 0.08 }, { opacity: 0, offset: 0.85 }, { opacity: 1 }], { duration: 1000 * ctx.sp });
-      const streak = (len) => `<svg width="${len}" height="12" viewBox="0 0 ${len} 12" style="filter:drop-shadow(0 0 6px #ffe066)"><path d="M0 6H${len}" stroke="#fff6c2" stroke-width="4" stroke-linecap="round"/></svg>`;
+      const streak = (len) => `<svg data-sp="ftg_slash" width="${len}" height="12" viewBox="0 0 ${len} 12" style="filter:drop-shadow(0 0 6px #ffe066)"><path d="M0 6H${len}" stroke="#fff6c2" stroke-width="4" stroke-linecap="round"/></svg>`;
       const s = await stretch(ctx, ctx.from, beyond, streak, 120, 900);
       const g = ghostOf(ctx, beyond, 0.8);
       FX.fx(ctx.arena, 'slash', to);
@@ -2052,7 +2053,7 @@ Object.assign(ANIMS, {
       lunge(ctx, to, 0.7, 520);
       await fly(ctx, f, hand, between(hand, to, 0.88), 240, { rotate: 0, scale: [1, 1.8] });
       boom(ctx, to, '#8fd3ff', 140);
-      for (let i = 0; i < 8; i++) { const d = spawn(ctx, '<div style="width:8px;height:8px;border-radius:50%;background:#bfe8ff"></div>', to, { life: 700 }); const t = rnd(0, Math.PI * 2); fly(ctx, d, to, { x: to.x + Math.cos(t) * 70, y: to.y + Math.sin(t) * 60 }, 400, { rotate: 0, ease: 'ease-out' }).then(() => d.remove()); }
+      for (let i = 0; i < 8; i++) { const d = spawn(ctx, '<div data-sp="great_water_arm" style="width:8px;height:8px;border-radius:50%;background:#bfe8ff"></div>', to, { life: 700 }); const t = rnd(0, Math.PI * 2); fly(ctx, d, to, { x: to.x + Math.cos(t) * 70, y: to.y + Math.sin(t) * 60 }, 400, { rotate: 0, ease: 'ease-out' }).then(() => d.remove()); }
       shake(ctx);
       fade(ctx, f, 200);
     },
@@ -2077,7 +2078,7 @@ Object.assign(ANIMS, {
       const to = ctx.tos[0];
       await Promise.all(Array.from({ length: 10 }, (_, i) => wait(i * 30 * ctx.sp).then(async () => {
         const st = { x: ctx.from.x + rnd(-12, 12), y: ctx.from.y - 30 + rnd(-12, 12) };
-        const n = spawn(ctx, '<svg width="46" height="4" viewBox="0 0 46 4"><path d="M0 2H46" stroke="#fafafa" stroke-width="2" stroke-linecap="round" style="filter:drop-shadow(0 0 3px #fff)"/></svg>', st, { life: 900 });
+        const n = spawn(ctx, '<svg data-sp="hair_needles" width="46" height="4" viewBox="0 0 46 4"><path d="M0 2H46" stroke="#fafafa" stroke-width="2" stroke-linecap="round" style="filter:drop-shadow(0 0 3px #fff)"/></svg>', st, { life: 900 });
         await fly(ctx, n, st, { x: to.x + rnd(-24, 24), y: to.y + rnd(-40, 30) }, 260, { ease: 'linear' });
         n.remove();
       })));
@@ -2091,7 +2092,7 @@ Object.assign(ANIMS, {
     async play(ctx) {
       const to = ctx.tos[0];
       if (ctx.targetEls[0] !== ctx.userEl) { lunge(ctx, to, 0.75, 760); await wait(320 * ctx.sp); }
-      const bite = spawn(ctx, '<svg width="40" height="30" viewBox="0 0 40 30"><path d="M4 8Q20 0 36 8" stroke="#fff" stroke-width="3" fill="none"/><path d="M4 22Q20 30 36 22" stroke="#fff" stroke-width="3" fill="none"/><path d="M10 7v5M16 5v6M22 5v6M28 6v5M10 23v-5M16 25v-6M22 25v-6M28 24v-5" stroke="#fff" stroke-width="2.4" stroke-linecap="round"/></svg>', { x: to.x, y: to.y - 10 }, { life: 900 });
+      const bite = spawn(ctx, '<svg data-sp="healing_bite" width="40" height="30" viewBox="0 0 40 30"><path d="M4 8Q20 0 36 8" stroke="#fff" stroke-width="3" fill="none"/><path d="M4 22Q20 30 36 22" stroke="#fff" stroke-width="3" fill="none"/><path d="M10 7v5M16 5v6M22 5v6M28 6v5M10 23v-5M16 25v-6M22 25v-6M28 24v-5" stroke="#fff" stroke-width="2.4" stroke-linecap="round"/></svg>', { x: to.x, y: to.y - 10 }, { life: 900 });
       bite.animate([{ transform: 'translate(-50%,-50%) scaleY(1.6)', opacity: 0 }, { transform: 'translate(-50%,-50%) scaleY(.7)', opacity: 1, offset: 0.4 }, { transform: 'translate(-50%,-50%) scaleY(.7)', opacity: 0 }], { duration: 600 * ctx.sp, fill: 'forwards' });
       await wait(250 * ctx.sp);
       glowAura(ctx, ctx.targetEls[0]);
@@ -2139,20 +2140,20 @@ Object.assign(ANIMS, {
 });
 
 // ---------------------------------------------------------------- batch 5 (sheet rows 154–190)
-export const SHARINGAN = (s = 30) => `<svg width="${s}" height="${s}" viewBox="0 0 40 40"><circle cx="20" cy="20" r="18" fill="#d0101a" stroke="#1a0000" stroke-width="2.5"/><circle cx="20" cy="20" r="10.5" fill="none" stroke="#5a0006" stroke-width="1.2"/><circle cx="20" cy="20" r="4" fill="#111"/>${[0, 120, 240].map((a) => `<g transform="rotate(${a} 20 20)"><circle cx="20" cy="9.5" r="3" fill="#111"/><path d="M20 6.5C24 6.5 25 10 23 12" stroke="#111" stroke-width="1.8" fill="none"/></g>`).join('')}</svg>`;
-export const TSUKUYOMI_MOON = (s = 150) => `<svg width="${s}" height="${s}" viewBox="0 0 100 100" style="filter:drop-shadow(0 0 30px #ff2a2a) drop-shadow(0 0 10px #ff5a5a)"><circle cx="50" cy="50" r="46" fill="#e0242c"/><circle cx="50" cy="50" r="46" fill="url(#tm-g)"/><defs><radialGradient id="tm-g"><stop offset="0" stop-color="#ff6a6a" stop-opacity=".5"/><stop offset="1" stop-color="#7a0008" stop-opacity=".6"/></radialGradient></defs>${[12, 22, 32].map((r) => `<circle cx="50" cy="50" r="${r}" fill="none" stroke="#3a0004" stroke-width="2"/>`).join('')}<circle cx="50" cy="50" r="6" fill="#120000"/>${[0, 40, 80, 120, 160, 200, 240, 280, 320].map((a, i) => `<g transform="rotate(${a} 50 50)"><circle cx="50" cy="${i % 3 === 0 ? 18 : i % 3 === 1 ? 28 : 38}" r="3" fill="#120000"/></g>`).join('')}</svg>`;
+export const SHARINGAN = (s = 30) => `<svg data-sp="SHARINGAN" width="${s}" height="${s}" viewBox="0 0 40 40"><circle cx="20" cy="20" r="18" fill="#d0101a" stroke="#1a0000" stroke-width="2.5"/><circle cx="20" cy="20" r="10.5" fill="none" stroke="#5a0006" stroke-width="1.2"/><circle cx="20" cy="20" r="4" fill="#111"/>${[0, 120, 240].map((a) => `<g transform="rotate(${a} 20 20)"><circle cx="20" cy="9.5" r="3" fill="#111"/><path d="M20 6.5C24 6.5 25 10 23 12" stroke="#111" stroke-width="1.8" fill="none"/></g>`).join('')}</svg>`;
+export const TSUKUYOMI_MOON = (s = 150) => `<svg data-sp="TSUKUYOMI_MOON" width="${s}" height="${s}" viewBox="0 0 100 100" style="filter:drop-shadow(0 0 30px #ff2a2a) drop-shadow(0 0 10px #ff5a5a)"><circle cx="50" cy="50" r="46" fill="#e0242c"/><circle cx="50" cy="50" r="46" fill="url(#tm-g)"/><defs><radialGradient id="tm-g"><stop offset="0" stop-color="#ff6a6a" stop-opacity=".5"/><stop offset="1" stop-color="#7a0008" stop-opacity=".6"/></radialGradient></defs>${[12, 22, 32].map((r) => `<circle cx="50" cy="50" r="${r}" fill="none" stroke="#3a0004" stroke-width="2"/>`).join('')}<circle cx="50" cy="50" r="6" fill="#120000"/>${[0, 40, 80, 120, 160, 200, 240, 280, 320].map((a, i) => `<g transform="rotate(${a} 50 50)"><circle cx="50" cy="${i % 3 === 0 ? 18 : i % 3 === 1 ? 28 : 38}" r="3" fill="#120000"/></g>`).join('')}</svg>`;
 const ART5 = {
-  shieldBlue: (w, h) => `<div style="width:${w}px;height:${h}px;border-radius:50%;background:radial-gradient(ellipse,#bfe6ff55,#4aa3ff66 55%,#4aa3ff00 72%);box-shadow:0 0 24px #4aa3ff, inset 0 0 22px #cfeeff;border:3px solid #9fd8ffcc"></div>`,
-  waterShield: (w, h) => `<div style="width:${w}px;height:${h}px;border-radius:44% 44% 10px 10px;background:linear-gradient(#bfe8ffaa,#4ab0ffaa);box-shadow:inset 0 0 18px #e6f7ff,0 0 16px #4ab0ff;border:2px solid #e6f7ffcc;overflow:hidden;position:relative"><div style="position:absolute;inset:0;background:repeating-linear-gradient(0deg,#ffffff00 0 10px,#ffffff44 10px 12px);animation:ax-flicker .5s infinite"></div></div>`,
-  tail: (len) => `<svg width="${len + 30}" height="30" viewBox="0 0 ${len + 30} 30" style="filter:drop-shadow(0 0 4px #000)"><path d="M0 15H${len}" stroke="#3b3a3f" stroke-width="10" stroke-dasharray="14 3"/><path d="M0 15H${len}" stroke="#6d6a74" stroke-width="4" stroke-dasharray="14 3"/><path d="M${len - 4} 6 ${len + 30} 15 ${len - 4} 24Z" fill="#c9ced6" stroke="#3b3a3f" stroke-width="2"/></svg>`,
-  hookStaff: (len) => `<svg width="${len + 30}" height="40" viewBox="0 0 ${len + 30} 40"><rect x="0" y="17" width="${len}" height="6" rx="3" fill="#4e7a3a" stroke="#2a4a20"/><path d="M${len} 20C${len + 18} 20 ${len + 24} 10 ${len + 16} 4" stroke="#4e7a3a" stroke-width="5" fill="none" stroke-linecap="round"/><g transform="translate(${len + 4} 26)">${[0, 72, 144, 216, 288].map((a) => `<ellipse cx="0" cy="-5" rx="3.2" ry="5" fill="#ff8fbf" transform="rotate(${a})"/>`).join('')}<circle r="2.5" fill="#ffd04a"/></g></svg>`,
-  spikeBall: (s = 120) => `<svg width="${s}" height="${s}" viewBox="0 0 100 100">${Array.from({ length: 16 }, (_, i) => { const a = (i / 16) * Math.PI * 2; return `<path d="M${50 + Math.cos(a - 0.15) * 38} ${50 + Math.sin(a - 0.15) * 38}L${50 + Math.cos(a) * 50} ${50 + Math.sin(a) * 50}L${50 + Math.cos(a + 0.15) * 38} ${50 + Math.sin(a + 0.15) * 38}Z" fill="#6b4226"/>`; }).join('')}<circle cx="50" cy="50" r="39" fill="#8b5a32" stroke="#4a2c16" stroke-width="3"/><path d="M24 40Q50 30 76 40M22 58Q50 50 78 60M34 76Q50 70 66 78" stroke="#5a3820" stroke-width="3" fill="none"/></svg>`,
-  inkBird: (s = 80) => `<svg width="${s}" height="${s * 0.6}" viewBox="0 0 80 48" class="ax-flap"><path d="M40 26C30 10 14 4 2 10 14 14 22 20 30 28ZM40 26C50 10 66 4 78 10 66 14 58 20 50 28Z" fill="#fff" stroke="#000" stroke-width="3.5" stroke-linejoin="round"/><ellipse cx="40" cy="30" rx="12" ry="8" fill="#fff" stroke="#000" stroke-width="3.5"/><path d="M50 28l8 2-8 3" fill="#fff" stroke="#000" stroke-width="2.5"/></svg>`,
-  inkSnake: (s = 60) => `<svg width="${s}" height="${s * 0.4}" viewBox="0 0 60 24"><path d="M2 12C10 2 18 22 28 12S44 2 50 10" stroke="#000" stroke-width="9" fill="none" stroke-linecap="round"/><path d="M2 12C10 2 18 22 28 12S44 2 50 10" stroke="#fff" stroke-width="4" fill="none" stroke-linecap="round"/><ellipse cx="52" cy="11" rx="7" ry="5.5" fill="#fff" stroke="#000" stroke-width="3"/><circle cx="54" cy="9" r="1.3" fill="#000"/></svg>`,
-  innerHead: (h = 200) => `<svg width="${h}" height="${h}" viewBox="0 0 100 100"><path d="M14 58C10 28 30 8 50 8S90 28 86 58L94 92 76 74 70 96 60 78 50 98 40 78 30 96 24 74 6 92Z" fill="#14101a" opacity=".78"/><path d="M28 46 42 52M72 46 58 52" stroke="#fff" stroke-width="4" stroke-linecap="round"/><path d="M30 54Q36 58 42 55M70 54Q64 58 58 55" stroke="#fff" stroke-width="2.5" fill="none"/><path d="M36 70Q50 82 64 70Q50 76 36 70Z" fill="#fff"/><path d="M46 22 50 16 54 22 50 28Z" fill="#fff"/><text x="80" y="20" font-family="sans-serif" font-weight="900" font-size="14" fill="#fff">CHA!</text></svg>`,
-  ironBlock: (w, h) => `<div style="width:${w}px;height:${h}px;border-radius:8px;background:repeating-linear-gradient(45deg,#16161a 0 6px,#26262c 6px 8px);box-shadow:0 0 18px #000, inset 0 0 12px #5a3a7a"></div>`,
+  shieldBlue: (w, h) => `<div data-sp="art-shieldBlue" style="width:${w}px;height:${h}px;border-radius:50%;background:radial-gradient(ellipse,#bfe6ff55,#4aa3ff66 55%,#4aa3ff00 72%);box-shadow:0 0 24px #4aa3ff, inset 0 0 22px #cfeeff;border:3px solid #9fd8ffcc"></div>`,
+  waterShield: (w, h) => `<div data-sp="art-waterShield-1" style="width:${w}px;height:${h}px;border-radius:44% 44% 10px 10px;background:linear-gradient(#bfe8ffaa,#4ab0ffaa);box-shadow:inset 0 0 18px #e6f7ff,0 0 16px #4ab0ff;border:2px solid #e6f7ffcc;overflow:hidden;position:relative"><div data-sp="art-waterShield-2" style="position:absolute;inset:0;background:repeating-linear-gradient(0deg,#ffffff00 0 10px,#ffffff44 10px 12px);animation:ax-flicker .5s infinite"></div></div>`,
+  tail: (len) => `<svg data-sp="art-tail" width="${len + 30}" height="30" viewBox="0 0 ${len + 30} 30" style="filter:drop-shadow(0 0 4px #000)"><path d="M0 15H${len}" stroke="#3b3a3f" stroke-width="10" stroke-dasharray="14 3"/><path d="M0 15H${len}" stroke="#6d6a74" stroke-width="4" stroke-dasharray="14 3"/><path d="M${len - 4} 6 ${len + 30} 15 ${len - 4} 24Z" fill="#c9ced6" stroke="#3b3a3f" stroke-width="2"/></svg>`,
+  hookStaff: (len) => `<svg data-sp="art-hookStaff" width="${len + 30}" height="40" viewBox="0 0 ${len + 30} 40"><rect x="0" y="17" width="${len}" height="6" rx="3" fill="#4e7a3a" stroke="#2a4a20"/><path d="M${len} 20C${len + 18} 20 ${len + 24} 10 ${len + 16} 4" stroke="#4e7a3a" stroke-width="5" fill="none" stroke-linecap="round"/><g transform="translate(${len + 4} 26)">${[0, 72, 144, 216, 288].map((a) => `<ellipse cx="0" cy="-5" rx="3.2" ry="5" fill="#ff8fbf" transform="rotate(${a})"/>`).join('')}<circle r="2.5" fill="#ffd04a"/></g></svg>`,
+  spikeBall: (s = 120) => `<svg data-sp="art-spikeBall" width="${s}" height="${s}" viewBox="0 0 100 100">${Array.from({ length: 16 }, (_, i) => { const a = (i / 16) * Math.PI * 2; return `<path d="M${50 + Math.cos(a - 0.15) * 38} ${50 + Math.sin(a - 0.15) * 38}L${50 + Math.cos(a) * 50} ${50 + Math.sin(a) * 50}L${50 + Math.cos(a + 0.15) * 38} ${50 + Math.sin(a + 0.15) * 38}Z" fill="#6b4226"/>`; }).join('')}<circle cx="50" cy="50" r="39" fill="#8b5a32" stroke="#4a2c16" stroke-width="3"/><path d="M24 40Q50 30 76 40M22 58Q50 50 78 60M34 76Q50 70 66 78" stroke="#5a3820" stroke-width="3" fill="none"/></svg>`,
+  inkBird: (s = 80) => `<svg data-sp="art-inkBird" width="${s}" height="${s * 0.6}" viewBox="0 0 80 48" class="ax-flap"><path d="M40 26C30 10 14 4 2 10 14 14 22 20 30 28ZM40 26C50 10 66 4 78 10 66 14 58 20 50 28Z" fill="#fff" stroke="#000" stroke-width="3.5" stroke-linejoin="round"/><ellipse cx="40" cy="30" rx="12" ry="8" fill="#fff" stroke="#000" stroke-width="3.5"/><path d="M50 28l8 2-8 3" fill="#fff" stroke="#000" stroke-width="2.5"/></svg>`,
+  inkSnake: (s = 60) => `<svg data-sp="art-inkSnake" width="${s}" height="${s * 0.4}" viewBox="0 0 60 24"><path d="M2 12C10 2 18 22 28 12S44 2 50 10" stroke="#000" stroke-width="9" fill="none" stroke-linecap="round"/><path d="M2 12C10 2 18 22 28 12S44 2 50 10" stroke="#fff" stroke-width="4" fill="none" stroke-linecap="round"/><ellipse cx="52" cy="11" rx="7" ry="5.5" fill="#fff" stroke="#000" stroke-width="3"/><circle cx="54" cy="9" r="1.3" fill="#000"/></svg>`,
+  innerHead: (h = 200) => `<svg data-sp="art-innerHead" width="${h}" height="${h}" viewBox="0 0 100 100"><path d="M14 58C10 28 30 8 50 8S90 28 86 58L94 92 76 74 70 96 60 78 50 98 40 78 30 96 24 74 6 92Z" fill="#14101a" opacity=".78"/><path d="M28 46 42 52M72 46 58 52" stroke="#fff" stroke-width="4" stroke-linecap="round"/><path d="M30 54Q36 58 42 55M70 54Q64 58 58 55" stroke="#fff" stroke-width="2.5" fill="none"/><path d="M36 70Q50 82 64 70Q50 76 36 70Z" fill="#fff"/><path d="M46 22 50 16 54 22 50 28Z" fill="#fff"/><text x="80" y="20" font-family="sans-serif" font-weight="900" font-size="14" fill="#fff">CHA!</text></svg>`,
+  ironBlock: (w, h) => `<div data-sp="art-ironBlock" style="width:${w}px;height:${h}px;border-radius:8px;background:repeating-linear-gradient(45deg,#16161a 0 6px,#26262c 6px 8px);box-shadow:0 0 18px #000, inset 0 0 12px #5a3a7a"></div>`,
 };
-const swirl = (s) => `<div class="ax-spin" style="width:${s}px;height:${s}px;border-radius:50%;animation-duration:.6s;background:repeating-conic-gradient(from 0deg,#2a1d3a 0 15deg,#0b0710 15deg 30deg);-webkit-mask:radial-gradient(circle,#000 0 15%,#000a 40%,#0000 70%);mask:radial-gradient(circle,#000 0 15%,#000a 40%,#0000 70%);box-shadow:0 0 20px #5a3a7a"></div>`;
+const swirl = (s) => `<div data-sp="swirl" class="ax-spin" style="width:${s}px;height:${s}px;border-radius:50%;animation-duration:.6s;background:repeating-conic-gradient(from 0deg,#2a1d3a 0 15deg,#0b0710 15deg 30deg);-webkit-mask:radial-gradient(circle,#000 0 15%,#000a 40%,#0000 70%);mask:radial-gradient(circle,#000 0 15%,#000a 40%,#0000 70%);box-shadow:0 0 20px #5a3a7a"></div>`;
 
 function snakeStrike(ctx, n, color = '#8a6a44') {
   return Promise.all(ctx.tos.map((t, i) => wait(i * 80 * ctx.sp).then(async () => {
@@ -2177,7 +2178,7 @@ function shieldFront(ctx, html, life = 1600) {
   return pop(ctx, n, 300).then(() => wait(650 * ctx.sp)).then(() => fade(ctx, n, 350)).then(() => h);
 }
 function bugCloud(ctx, at, n = 50, spread = 50) {
-  return Array.from({ length: n }, () => spawn(ctx, `<div style="width:${rnd(3, 5)}px;height:${rnd(3, 4)}px;border-radius:50%;background:#0b0b0b"></div>`, { x: at.x + rnd(-spread, spread), y: at.y + rnd(-spread, spread) }, { life: 3000 }));
+  return Array.from({ length: n }, () => spawn(ctx, `<div data-sp="bugCloud" style="width:${rnd(3, 5)}px;height:${rnd(3, 4)}px;border-radius:50%;background:#0b0b0b"></div>`, { x: at.x + rnd(-spread, spread), y: at.y + rnd(-spread, spread) }, { life: 3000 }));
 }
 async function swarm(ctx, to, shape) {
   const bugs = bugCloud(ctx, ctx.from, 60, 30);
@@ -2288,12 +2289,12 @@ Object.assign(ANIMS, {
     desc: 'An ice pool forms below the target and ice needles spring up and bind them.',
     async play(ctx) {
       const el = ctx.targetEls[0]; const f = feetOf(ctx, el); const { h } = sizeOf(el);
-      const pool = spawn(ctx, '<div style="width:160px;height:36px;border-radius:50%;background:radial-gradient(ellipse,#e6f7ffee,#9fd8ffcc 55%,#9fd8ff00 72%);box-shadow:0 0 14px #9fd8ff"></div>', f, { life: 2200, z: 1 });
+      const pool = spawn(ctx, '<div data-sp="ice_prison-1" style="width:160px;height:36px;border-radius:50%;background:radial-gradient(ellipse,#e6f7ffee,#9fd8ffcc 55%,#9fd8ff00 72%);box-shadow:0 0 14px #9fd8ff"></div>', f, { life: 2200, z: 1 });
       await pop(ctx, pool, 300);
       const sp = [];
       for (let i = 0; i < 12; i++) {
         const x = f.x + rnd(-62, 62);
-        const n = spawn(ctx, `<svg width="12" height="${h * rnd(0.4, 0.8)}" viewBox="0 0 12 100" preserveAspectRatio="none"><path d="M6 0 12 100H0Z" fill="#d6f2ffdd" stroke="#ffffff" stroke-width="1" vector-effect="non-scaling-stroke"/></svg>`, { x, y: f.y + rnd(-6, 8) }, { life: 2000 });
+        const n = spawn(ctx, `<svg data-sp="ice_prison-2" width="12" height="${h * rnd(0.4, 0.8)}" viewBox="0 0 12 100" preserveAspectRatio="none"><path d="M6 0 12 100H0Z" fill="#d6f2ffdd" stroke="#ffffff" stroke-width="1" vector-effect="non-scaling-stroke"/></svg>`, { x, y: f.y + rnd(-6, 8) }, { life: 2000 });
         n.style.transform = 'translate(-50%,-100%) scaleY(0)'; sp.push(n); rise(ctx, n, 200, rnd(0, 150));
       }
       await wait(380 * ctx.sp);
@@ -2306,7 +2307,7 @@ Object.assign(ANIMS, {
     desc: 'A red moon with a Sharingan rises and the sky turns red; a Sharingan marks every enemy caught. The moon and red sky stay for as long as the genjutsu lasts.',
     async play(ctx) {
       const A = ctx.arena.getBoundingClientRect();
-      const sky = spawn(ctx, `<div style="width:${A.width}px;height:${A.height * 0.55}px;background:linear-gradient(#5a0008e0,#a0101ab0 60%,#a0101a00)"></div>`, { x: A.width / 2, y: A.height * 0.275 }, { life: 2600, z: 1 });
+      const sky = spawn(ctx, `<div data-sp="infinite_tsukuyomi" style="width:${A.width}px;height:${A.height * 0.55}px;background:linear-gradient(#5a0008e0,#a0101ab0 60%,#a0101a00)"></div>`, { x: A.width / 2, y: A.height * 0.275 }, { life: 2600, z: 1 });
       sky.animate([{ opacity: 0 }, { opacity: 1 }], { duration: 600 * ctx.sp, fill: 'forwards' });
       const moon = spawn(ctx, TSUKUYOMI_MOON(Math.min(160, A.height * 0.32)), { x: A.width * 0.5, y: A.height * 0.16 }, { life: 2600, z: 1 });
       await moon.animate([{ transform: 'translate(-50%,-50%) translateY(60px) scale(.6)', opacity: 0 }, { transform: 'translate(-50%,-50%) translateY(0) scale(1)', opacity: 1 }], { duration: 800 * ctx.sp, easing: 'ease-out', fill: 'forwards' }).finished.catch(() => {});
@@ -2337,7 +2338,7 @@ Object.assign(ANIMS, {
     decoy(ctx, el) {
       const f = feetOf(ctx, el);
       el.animate([{ transform: 'scaleY(1)', filter: 'none', opacity: 1, transformOrigin: '50% 100%' }, { transform: 'scaleY(.05)', filter: 'brightness(0)', opacity: 1, offset: 0.3, transformOrigin: '50% 100%' }, { transform: 'scaleY(.05)', opacity: 0, offset: 0.8, transformOrigin: '50% 100%' }, { transform: 'scaleY(1)', opacity: 1, transformOrigin: '50% 100%' }], { duration: 1500 * ctx.sp });
-      const p = spawn(ctx, '<div style="width:140px;height:30px;border-radius:50%;background:radial-gradient(ellipse,#000,#000e 55%,#0000 72%)"></div>', f, { life: 1600, z: 1 });
+      const p = spawn(ctx, '<div data-sp="ink_clone" style="width:140px;height:30px;border-radius:50%;background:radial-gradient(ellipse,#000,#000e 55%,#0000 72%)"></div>', f, { life: 1600, z: 1 });
       p.animate([{ transform: 'translate(-50%,-50%) scale(.2)' }, { transform: 'translate(-50%,-50%) scale(1)', offset: 0.3 }, { transform: 'translate(-50%,-50%) scale(1)', opacity: 1, offset: 0.8 }, { transform: 'translate(-50%,-50%) scale(1)', opacity: 0 }], { duration: 1500 * ctx.sp, fill: 'forwards' });
     },
   },
@@ -2346,11 +2347,11 @@ Object.assign(ANIMS, {
     async play(ctx) {
       const el = ctx.targetEls[0]; const f = feetOf(ctx, el); const to = ctx.tos[0];
       await Promise.all(Array.from({ length: 10 }, (_, k) => wait(k * 30 * ctx.sp).then(async () => {
-        const d = spawn(ctx, `<div style="width:${rnd(10, 18)}px;height:${rnd(10, 18)}px;border-radius:50%;background:#050505"></div>`, ctx.from, { life: 1200 });
+        const d = spawn(ctx, `<div data-sp="ink_creation-1" style="width:${rnd(10, 18)}px;height:${rnd(10, 18)}px;border-radius:50%;background:#050505"></div>`, ctx.from, { life: 1200 });
         await fly(ctx, d, ctx.from, { x: to.x + rnd(-24, 24), y: to.y + rnd(-50, 30) }, 360, { rotate: 0, arc: 40 }); d.remove();
       })));
       el.animate([{ filter: 'none' }, { filter: 'brightness(.35)' }, { filter: 'none' }], { duration: 900 * ctx.sp });
-      const p = spawn(ctx, '<div style="width:140px;height:32px;border-radius:50%;background:radial-gradient(ellipse,#000,#000e 55%,#0000 72%)"></div>', f, { life: 1800, z: 1 });
+      const p = spawn(ctx, '<div data-sp="ink_creation-2" style="width:140px;height:32px;border-radius:50%;background:radial-gradient(ellipse,#000,#000e 55%,#0000 72%)"></div>', f, { life: 1800, z: 1 });
       await pop(ctx, p, 300); shake(ctx); setTimeout(() => fade(ctx, p, 400), 700 * ctx.sp);
     },
   },
@@ -2381,7 +2382,7 @@ Object.assign(ANIMS, {
       el.animate([{ opacity: 1 }, { opacity: 0, offset: 0.1 }, { opacity: 0, offset: 0.85 }, { opacity: 1 }], { duration: 1400 * ctx.sp });
       for (let i = 0; i < 70; i++) {
         const st = { x: at.x + rnd(-h * 0.2, h * 0.2), y: at.y + rnd(-h * 0.45, h * 0.45) };
-        const b = spawn(ctx, `<div style="width:${rnd(3, 5)}px;height:${rnd(3, 4)}px;border-radius:50%;background:#0b0b0b"></div>`, st, { life: 1400 });
+        const b = spawn(ctx, `<div data-sp="insect_clone" style="width:${rnd(3, 5)}px;height:${rnd(3, 4)}px;border-radius:50%;background:#0b0b0b"></div>`, st, { life: 1400 });
         const t = rnd(0, Math.PI * 2);
         fly(ctx, b, st, { x: st.x + Math.cos(t) * rnd(60, 160), y: st.y + Math.sin(t) * rnd(40, 120) }, rnd(700, 1100), { rotate: 0, ease: 'ease-out' }).then(() => b.remove());
       }
@@ -2404,7 +2405,7 @@ Object.assign(ANIMS, {
       const bugs = [];
       for (let i = 0; i < 160; i++) {
         const st = { x: ctx.from.x + rnd(-10, 10), y: ctx.from.y + rnd(-10, 10) };
-        const b = spawn(ctx, `<div style="width:${rnd(3, 5)}px;height:${rnd(3, 4)}px;border-radius:50%;background:#0b0b0b"></div>`, st, { life: 2200 });
+        const b = spawn(ctx, `<div data-sp="insect_wall" style="width:${rnd(3, 5)}px;height:${rnd(3, 4)}px;border-radius:50%;background:#0b0b0b"></div>`, st, { life: 2200 });
         bugs.push(b);
         fly(ctx, b, st, { x: x0 + rnd(-h * 0.14, h * 0.14), y: f.y - rnd(0, h * 0.9) }, rnd(250, 450), { rotate: 0, ease: 'ease-out' });
       }
@@ -2516,7 +2517,7 @@ Object.assign(ANIMS, {
     async play(ctx) {
       const ws = ctx.targetEls.map((el) => {
         const { w, h } = sizeOf(el); const f = feetOf(ctx, el);
-        const n = spawn(ctx, `<div style="width:${Math.max(60, w * 0.6)}px;height:${h * 0.8}px;border-radius:40% 40% 6px 6px;background:radial-gradient(circle at 30% 30%,#ead7a6,#c9a86b 60%,#a8864e);box-shadow:inset 0 -10px 18px #8a6a3a, 0 0 14px #d9b56a88;opacity:.92"></div>`, { x: f.x + (ctx.isFoe ? -24 : 24), y: f.y + 4 }, { life: 1900, z: 7 });
+        const n = spawn(ctx, `<div data-sp="kazekage_shield" style="width:${Math.max(60, w * 0.6)}px;height:${h * 0.8}px;border-radius:40% 40% 6px 6px;background:radial-gradient(circle at 30% 30%,#ead7a6,#c9a86b 60%,#a8864e);box-shadow:inset 0 -10px 18px #8a6a3a, 0 0 14px #d9b56a88;opacity:.92"></div>`, { x: f.x + (ctx.isFoe ? -24 : 24), y: f.y + 4 }, { life: 1900, z: 7 });
         rise(ctx, n, 420); return n;
       });
       await wait(1100 * ctx.sp); ws.forEach((n) => fade(ctx, n, 350));
@@ -2531,7 +2532,7 @@ Object.assign(ANIMS, {
       await wait(400 * ctx.sp);
       const sky = { x: to.x + rnd(-20, 20), y: -20 };
       const A = ctx.arena.getBoundingClientRect();
-      const fl = spawn(ctx, `<div style="width:${A.width}px;height:${A.height}px;background:#e6f4ff"></div>`, { x: A.width / 2, y: A.height / 2 }, { life: 600, z: 9 });
+      const fl = spawn(ctx, `<div data-sp="kirin" style="width:${A.width}px;height:${A.height}px;background:#e6f4ff"></div>`, { x: A.width / 2, y: A.height / 2 }, { life: 600, z: 9 });
       fl.animate([{ opacity: 0.8 }, { opacity: 0 }], { duration: 400 * ctx.sp, fill: 'forwards' });
       for (let i = 0; i < 3; i++) setTimeout(() => bolt(ctx, sky, { x: to.x + rnd(-8, 8), y: to.y + 20 }, { ms: 380, width: 10 - i * 3, color: '#cfeeff', glow: '#4aa3ff' }), i * 50 * ctx.sp);
       boom(ctx, to, '#9fd8ff', 220); crackAt(ctx, ctx.targetEls[0]);
@@ -2549,12 +2550,12 @@ async function iaiSlash(ctx, size) {
 
 // ---------------------------------------------------------------- batch 6 (sheet rows 191–229) + smoke / log substitution
 const ART6 = {
-  leaf: () => '<svg width="16" height="10" viewBox="0 0 16 10"><path d="M0 5C4 0 12 0 16 5 12 10 4 10 0 5Z" fill="#5fb84a" stroke="#2f6a24" stroke-width=".8"/><path d="M1 5H15" stroke="#2f6a24" stroke-width=".6"/></svg>',
-  hound: (s = 110) => `<svg width="${s}" height="${s * 0.55}" viewBox="0 0 110 60" style="filter:drop-shadow(0 0 10px #4aa3ff)"><path d="M6 34 22 28 30 30 42 22 66 22 80 14 90 4 94 14 108 18 98 26 104 30 90 32 84 40 92 52 82 52 74 42 52 42 46 52 38 52 40 40 26 44 14 44Z" fill="#cfeeff" stroke="#ffffff" stroke-width="2" stroke-linejoin="round"/><circle cx="96" cy="18" r="2" fill="#1f5fd6"/></svg>`,
-  lavaStar: (s = 34) => `<svg width="${s}" height="${s}" viewBox="-10 -10 20 20" class="ax-spin" style="filter:drop-shadow(0 0 6px #ff6a1a)"><path d="M0-10 2-2 10 0 2 2 0 10-2 2-10 0-2-2Z" fill="#ff7a1a" stroke="#ffd04a" stroke-width=".8"/><circle r="2.5" fill="#ffe9a0"/></svg>`,
-  lavaFist: (s = 64) => `<svg width="${s}" height="${s}" viewBox="0 0 64 64" style="filter:drop-shadow(0 0 10px #ff6a1a)"><path d="M6 20 18 6 40 4 58 16 60 40 48 58 22 60 6 46Z" fill="#ff7a1a" stroke="#7a2a0a" stroke-width="3"/><path d="M22 18V32M34 14V30M46 18V32M14 34 28 40 46 40" stroke="#ffd04a" stroke-width="3" stroke-linecap="round"/></svg>`,
+  leaf: () => '<svg data-sp="art-leaf" width="16" height="10" viewBox="0 0 16 10"><path d="M0 5C4 0 12 0 16 5 12 10 4 10 0 5Z" fill="#5fb84a" stroke="#2f6a24" stroke-width=".8"/><path d="M1 5H15" stroke="#2f6a24" stroke-width=".6"/></svg>',
+  hound: (s = 110) => `<svg data-sp="art-hound" width="${s}" height="${s * 0.55}" viewBox="0 0 110 60" style="filter:drop-shadow(0 0 10px #4aa3ff)"><path d="M6 34 22 28 30 30 42 22 66 22 80 14 90 4 94 14 108 18 98 26 104 30 90 32 84 40 92 52 82 52 74 42 52 42 46 52 38 52 40 40 26 44 14 44Z" fill="#cfeeff" stroke="#ffffff" stroke-width="2" stroke-linejoin="round"/><circle cx="96" cy="18" r="2" fill="#1f5fd6"/></svg>`,
+  lavaStar: (s = 34) => `<svg data-sp="art-lavaStar" width="${s}" height="${s}" viewBox="-10 -10 20 20" class="ax-spin" style="filter:drop-shadow(0 0 6px #ff6a1a)"><path d="M0-10 2-2 10 0 2 2 0 10-2 2-10 0-2-2Z" fill="#ff7a1a" stroke="#ffd04a" stroke-width=".8"/><circle r="2.5" fill="#ffe9a0"/></svg>`,
+  lavaFist: (s = 64) => `<svg data-sp="art-lavaFist" width="${s}" height="${s}" viewBox="0 0 64 64" style="filter:drop-shadow(0 0 10px #ff6a1a)"><path d="M6 20 18 6 40 4 58 16 60 40 48 58 22 60 6 46Z" fill="#ff7a1a" stroke="#7a2a0a" stroke-width="3"/><path d="M22 18V32M34 14V30M46 18V32M14 34 28 40 46 40" stroke="#ffd04a" stroke-width="3" stroke-linecap="round"/></svg>`,
 };
-const lavaBlob = (s) => `<div style="width:${s}px;height:${s}px;border-radius:50%;background:radial-gradient(circle at 35% 35%,#ffe9a0,#ff7a1a 45%,#b8300a);box-shadow:0 0 10px #ff6a1a"></div>`;
+const lavaBlob = (s) => `<div data-sp="lavaBlob" style="width:${s}px;height:${s}px;border-radius:50%;background:radial-gradient(circle at 35% 35%,#ffe9a0,#ff7a1a 45%,#b8300a);box-shadow:0 0 10px #ff6a1a"></div>`;
 
 /** A dense white smoke cloud (ninja 'poof'). */
 function smokeCloud(ctx, at, r) {
@@ -2562,7 +2563,7 @@ function smokeCloud(ctx, at, r) {
     const t = (i / 9) * Math.PI * 2; const d = i === 0 ? 0 : r * rnd(0.35, 0.6);
     const p = { x: at.x + Math.cos(t) * d, y: at.y + Math.sin(t) * d * 1.2 };
     const s = r * rnd(0.8, 1.1);
-    const n = spawn(ctx, `<div style="width:${s}px;height:${s}px;border-radius:50%;background:radial-gradient(circle at 40% 40%,#ffffff 0%,#f1f1f1 50%,#e2e2e2f0 62%,#e2e2e200 72%)"></div>`, p, { life: 1100 });
+    const n = spawn(ctx, `<div data-sp="smokeCloud" style="width:${s}px;height:${s}px;border-radius:50%;background:radial-gradient(circle at 40% 40%,#ffffff 0%,#f1f1f1 50%,#e2e2e2f0 62%,#e2e2e200 72%)"></div>`, p, { life: 1100 });
     n.style.zIndex = '8';
     n.animate([{ transform: 'translate(-50%,-50%) scale(.2)', opacity: 1 }, { transform: 'translate(-50%,-50%) scale(1)', opacity: 1, offset: 0.3 }, { transform: `translate(calc(-50% + ${(p.x - at.x) * 0.3}px), calc(-50% + ${(p.y - at.y) * 0.3 - 14}px)) scale(1.15)`, opacity: 0 }], { duration: 850 * ctx.sp, easing: 'ease-out', fill: 'forwards' });
   }
@@ -2584,7 +2585,7 @@ export function logSubstitute(arena, el, { sp = 1 } = {}) {
   smokeCloud(ctx, at, h * 0.5);
   el.animate([{ opacity: 1 }, { opacity: 0, offset: 0.08 }, { opacity: 0, offset: 0.86 }, { opacity: 1 }], { duration: 1500 * sp });
   const lh = h * 0.62;
-  const log = spawn(ctx, `<svg width="${lh * 0.42}" height="${lh}" viewBox="0 0 42 100"><rect x="3" y="8" width="36" height="88" rx="6" fill="#8a5a32" stroke="#4a2c16" stroke-width="2.5"/><path d="M12 20 14 60M24 14 22 86M32 30 33 76" stroke="#6b4226" stroke-width="2.5" fill="none"/><ellipse cx="21" cy="8" rx="18" ry="6" fill="#c99a62" stroke="#4a2c16" stroke-width="2"/><ellipse cx="21" cy="8" rx="10" ry="3" fill="none" stroke="#8a5a32" stroke-width="1.5"/><ellipse cx="21" cy="8" rx="4" ry="1.3" fill="#8a5a32"/></svg>`, { x: f.x, y: f.y - lh / 2 }, { life: 1600 * sp + 200 });
+  const log = spawn(ctx, `<svg data-sp="logSubstitute" width="${lh * 0.42}" height="${lh}" viewBox="0 0 42 100"><rect x="3" y="8" width="36" height="88" rx="6" fill="#8a5a32" stroke="#4a2c16" stroke-width="2.5"/><path d="M12 20 14 60M24 14 22 86M32 30 33 76" stroke="#6b4226" stroke-width="2.5" fill="none"/><ellipse cx="21" cy="8" rx="18" ry="6" fill="#c99a62" stroke="#4a2c16" stroke-width="2"/><ellipse cx="21" cy="8" rx="10" ry="3" fill="none" stroke="#8a5a32" stroke-width="1.5"/><ellipse cx="21" cy="8" rx="4" ry="1.3" fill="#8a5a32"/></svg>`, { x: f.x, y: f.y - lh / 2 }, { life: 1600 * sp + 200 });
   log.animate([{ transform: 'translate(-50%,-50%) rotate(0deg)', opacity: 0 }, { transform: 'translate(-50%,-50%) rotate(-4deg)', opacity: 1, offset: 0.1 }, { transform: 'translate(-50%,-50%) rotate(5deg)', opacity: 1, offset: 0.25 }, { transform: 'translate(-50%,-50%) rotate(-2deg)', opacity: 1, offset: 0.4 }, { transform: 'translate(-50%,-50%) rotate(0deg)', opacity: 1, offset: 0.78 }, { transform: 'translate(-50%,-50%) rotate(0deg)', opacity: 0 }], { duration: 1500 * sp, fill: 'forwards' });
   setTimeout(() => smokeCloud(ctx, at, h * 0.42), 1150 * sp);
 }
@@ -2609,12 +2610,12 @@ async function spinKick(ctx) {
 function goldSand(ctx, a, b, n = 40, spread = 40, ms = 420) {
   return Promise.all(Array.from({ length: n }, (_, i) => wait(i * 8 * ctx.sp).then(async () => {
     const st = { x: a.x + rnd(-spread, spread) * 0.5, y: a.y + rnd(-spread, spread) * 0.5 };
-    const d = spawn(ctx, `<div style="width:${rnd(5, 10)}px;height:${rnd(5, 10)}px;border-radius:50%;background:#e6b422;box-shadow:0 0 4px #ffd65a"></div>`, st, { life: ms + 900 });
+    const d = spawn(ctx, `<div data-sp="goldSand" style="width:${rnd(5, 10)}px;height:${rnd(5, 10)}px;border-radius:50%;background:#e6b422;box-shadow:0 0 4px #ffd65a"></div>`, st, { life: ms + 900 });
     await fly(ctx, d, st, { x: b.x + rnd(-spread, spread), y: b.y + rnd(-spread, spread) }, ms, { rotate: 0, arc: rnd(-30, 50), ease: 'ease-in-out' });
     setTimeout(() => fade(ctx, d, 300), 300 * ctx.sp);
   })));
 }
-const blueOrb = (s = 30) => `<div style="width:${s}px;height:${s}px;border-radius:50%;background:radial-gradient(circle,#fff,#8fd3ff 40%,#4aa3ff88 65%,#4aa3ff00 72%);box-shadow:0 0 16px #4aa3ff"></div>`;
+const blueOrb = (s = 30) => `<div data-sp="blueOrb" style="width:${s}px;height:${s}px;border-radius:50%;background:radial-gradient(circle,#fff,#8fd3ff 40%,#4aa3ff88 65%,#4aa3ff00 72%);box-shadow:0 0 16px #4aa3ff"></div>`;
 
 Object.assign(ANIMS, {
   kokuo_bomb: { desc: 'A black orb with a purple aura and tiny blue and red sparks grows in front of the user, then fires at the enemies.', play: (ctx) => ANIMS.chomei_bomb.play(ctx) },
@@ -2674,7 +2675,7 @@ Object.assign(ANIMS, {
     desc: 'A wall of lava forms in front of the user.',
     async play(ctx) {
       const { w, h } = sizeOf(ctx.userEl); const f = feetOf(ctx, ctx.userEl);
-      const wall = spawn(ctx, `<div style="width:${Math.max(80, w * 0.8)}px;height:${h * 0.85}px;border-radius:30px 30px 6px 6px;background:radial-gradient(ellipse at 50% 20%,#ffe9a0,#ff7a1a 40%,#b8300a 75%,#5a1a0a);box-shadow:0 0 22px #ff6a1a, inset 0 -12px 20px #3a0e04"></div>`, { x: f.x + (ctx.isFoe ? -30 : 30), y: f.y + 4 }, { life: 1900 });
+      const wall = spawn(ctx, `<div data-sp="magma_wall" style="width:${Math.max(80, w * 0.8)}px;height:${h * 0.85}px;border-radius:30px 30px 6px 6px;background:radial-gradient(ellipse at 50% 20%,#ffe9a0,#ff7a1a 40%,#b8300a 75%,#5a1a0a);box-shadow:0 0 22px #ff6a1a, inset 0 -12px 20px #3a0e04"></div>`, { x: f.x + (ctx.isFoe ? -30 : 30), y: f.y + 4 }, { life: 1900 });
       await rise(ctx, wall, 450);
       for (let i = 0; i < 4; i++) puff(ctx, { x: f.x + (ctx.isFoe ? -30 : 30) + rnd(-20, 20), y: f.y - h * 0.8 }, '#c9a9a0', 60);
       await wait(700 * ctx.sp); fade(ctx, wall, 350);
@@ -2687,7 +2688,7 @@ Object.assign(ANIMS, {
       const mouth = { x: ctx.from.x, y: ctx.from.y - sizeOf(ctx.userEl).h * 0.3 };
       const g = spawn(ctx, lavaBlob(34), mouth, { life: 1200 });
       await fly(ctx, g, mouth, to, 420, { rotate: 0, arc: 60 }); g.remove();
-      const shell = spawn(ctx, `<div style="width:${w * 0.85}px;height:${h * 0.7}px;border-radius:40%;background:radial-gradient(circle at 40% 35%,#ffe9a0,#ff7a1a 45%,#b8300a);box-shadow:0 0 16px #ff6a1a;opacity:.85"></div>`, to, { life: 2000 });
+      const shell = spawn(ctx, `<div data-sp="quicklime" style="width:${w * 0.85}px;height:${h * 0.7}px;border-radius:40%;background:radial-gradient(circle at 40% 35%,#ffe9a0,#ff7a1a 45%,#b8300a);box-shadow:0 0 16px #ff6a1a;opacity:.85"></div>`, to, { life: 2000 });
       await grow(ctx, shell, 220, 'scale(.3)', 'scale(1)');
       shake(ctx);
       await wait(250 * ctx.sp);
@@ -2736,7 +2737,7 @@ Object.assign(ANIMS, {
     desc: 'The user puts up a wall of crackling blue electricity.',
     async play(ctx) {
       const { h } = sizeOf(ctx.userEl); const f = feetOf(ctx, ctx.userEl); const x = f.x + (ctx.isFoe ? -44 : 44);
-      const glow = spawn(ctx, `<div style="width:46px;height:${h * 0.9}px;border-radius:20px;background:radial-gradient(ellipse,#bfe6ff66,#4aa3ff33 60%,#4aa3ff00 72%);box-shadow:0 0 20px #4aa3ff"></div>`, { x, y: f.y - h * 0.45 }, { life: 1500 });
+      const glow = spawn(ctx, `<div data-sp="lightning_armor" style="width:46px;height:${h * 0.9}px;border-radius:20px;background:radial-gradient(ellipse,#bfe6ff66,#4aa3ff33 60%,#4aa3ff00 72%);box-shadow:0 0 20px #4aa3ff"></div>`, { x, y: f.y - h * 0.45 }, { life: 1500 });
       pop(ctx, glow, 200);
       for (let k = 0; k < 10; k++) { for (let i = 0; i < 3; i++) bolt(ctx, { x: x + rnd(-14, 14), y: f.y }, { x: x + rnd(-14, 14), y: f.y - h * 0.9 }, { ms: 120, width: 2.5 }); await wait(90 * ctx.sp); }
       fade(ctx, glow, 250);
@@ -2773,7 +2774,7 @@ Object.assign(ANIMS, {
     async play(ctx) {
       const to = ctx.tos[0]; const hand = { x: ctx.from.x + (ctx.isFoe ? -24 : 24), y: ctx.from.y };
       const s = sparkBall(ctx, hand, 40, 1500); await pop(ctx, s, 250);
-      const tip = (len) => `<svg width="${len}" height="22" viewBox="0 0 ${len} 22" style="filter:drop-shadow(0 0 8px #4aa3ff)"><path d="M0 4 ${len} 11 0 18Z" fill="#cfeeff" stroke="#fff"/></svg>`;
+      const tip = (len) => `<svg data-sp="lariat" width="${len}" height="22" viewBox="0 0 ${len} 22" style="filter:drop-shadow(0 0 8px #4aa3ff)"><path d="M0 4 ${len} 11 0 18Z" fill="#cfeeff" stroke="#fff"/></svg>`;
       const pt = await stretch(ctx, hand, { x: hand.x + (to.x > hand.x ? 60 : -60), y: hand.y + (to.y - hand.y) * 0.15 }, tip, 250, 1400);
       await wait(150 * ctx.sp);
       lunge(ctx, to, 0.75, 460);
@@ -2814,7 +2815,7 @@ Object.assign(ANIMS, {
     desc: 'User sends a wave of gold sand that crashes into the target.',
     async play(ctx) {
       const to = ctx.tos[0];
-      const wv = spawn(ctx, '<div style="width:140px;height:110px;border-radius:50% 50% 20% 20%;background:radial-gradient(ellipse at 50% 30%,#fff3b0,#e6b422 50%,#9a7410);box-shadow:0 0 18px #ffd65a"></div>', ctx.from, { life: 1500 });
+      const wv = spawn(ctx, '<div data-sp="gold_avalanche" style="width:140px;height:110px;border-radius:50% 50% 20% 20%;background:radial-gradient(ellipse at 50% 30%,#fff3b0,#e6b422 50%,#9a7410);box-shadow:0 0 18px #ffd65a"></div>', ctx.from, { life: 1500 });
       goldSand(ctx, ctx.from, to, 30, 50, 460);
       await fly(ctx, wv, ctx.from, to, 460, { rotate: 0, scale: [0.3, 1.4], ease: 'ease-in' });
       boom(ctx, to, '#ffd65a', 170); shake(ctx); fade(ctx, wv, 250);
@@ -2825,7 +2826,7 @@ Object.assign(ANIMS, {
     async play(ctx) {
       const to = ctx.tos[0]; const el = ctx.targetEls[0]; const { w, h } = sizeOf(el);
       await goldSand(ctx, { x: to.x, y: to.y + h * 0.4 }, to, 50, h * 0.45, 400);
-      const c = spawn(ctx, `<div style="width:${w * 0.85}px;height:${h * 0.9}px;border-radius:30% 30% 12% 12%;background:repeating-linear-gradient(170deg,#0000 0 12px,#9a741066 12px 14px),radial-gradient(ellipse at 50% 30%,#fff3b0,#e6b422 55%,#9a7410);box-shadow:0 0 16px #ffd65a;opacity:.9"></div>`, to, { life: 1800 });
+      const c = spawn(ctx, `<div data-sp="gold_dust_coffin" style="width:${w * 0.85}px;height:${h * 0.9}px;border-radius:30% 30% 12% 12%;background:repeating-linear-gradient(170deg,#0000 0 12px,#9a741066 12px 14px),radial-gradient(ellipse at 50% 30%,#fff3b0,#e6b422 55%,#9a7410);box-shadow:0 0 16px #ffd65a;opacity:.9"></div>`, to, { life: 1800 });
       await grow(ctx, c, 260, 'scaleY(.2)', 'scaleY(1)');
       shake(ctx); await wait(650 * ctx.sp); fade(ctx, c, 300);
     },
@@ -2835,7 +2836,7 @@ Object.assign(ANIMS, {
     async play(ctx) {
       const ws = ctx.targetEls.map((el) => {
         const { w, h } = sizeOf(el); const f = feetOf(ctx, el);
-        const n = spawn(ctx, `<div style="width:${Math.max(60, w * 0.6)}px;height:${h * 0.8}px;border-radius:40% 40% 6px 6px;background:radial-gradient(circle at 30% 30%,#fff3b0,#e6b422 60%,#9a7410);box-shadow:inset 0 -10px 18px #7a5a0a, 0 0 14px #ffd65a88;opacity:.92"></div>`, { x: f.x + (ctx.isFoe ? -24 : 24), y: f.y + 4 }, { life: 1900, z: 7 });
+        const n = spawn(ctx, `<div data-sp="gold_dust_wall" style="width:${Math.max(60, w * 0.6)}px;height:${h * 0.8}px;border-radius:40% 40% 6px 6px;background:radial-gradient(circle at 30% 30%,#fff3b0,#e6b422 60%,#9a7410);box-shadow:inset 0 -10px 18px #7a5a0a, 0 0 14px #ffd65a88;opacity:.92"></div>`, { x: f.x + (ctx.isFoe ? -24 : 24), y: f.y + 4 }, { life: 1900, z: 7 });
         rise(ctx, n, 420); return n;
       });
       await wait(1100 * ctx.sp); ws.forEach((n) => fade(ctx, n, 350));
@@ -2845,7 +2846,7 @@ Object.assign(ANIMS, {
     desc: 'User sends a massive wave of gold sand that crashes into every enemy.',
     async play(ctx) {
       const box = sideBox(ctx);
-      const wv = spawn(ctx, `<div style="width:${box.w + 120}px;height:${box.h * 0.9}px;border-radius:50% 50% 20% 20%;background:radial-gradient(ellipse at 50% 30%,#fff3b0,#e6b422 50%,#9a7410);box-shadow:0 0 22px #ffd65a"></div>`, ctx.from, { life: 1800 });
+      const wv = spawn(ctx, `<div data-sp="gold_dust_wave" style="width:${box.w + 120}px;height:${box.h * 0.9}px;border-radius:50% 50% 20% 20%;background:radial-gradient(ellipse at 50% 30%,#fff3b0,#e6b422 50%,#9a7410);box-shadow:0 0 22px #ffd65a"></div>`, ctx.from, { life: 1800 });
       goldSand(ctx, ctx.from, box.c, 60, box.w * 0.5, 560);
       await fly(ctx, wv, ctx.from, box.c, 560, { rotate: 0, scale: [0.1, 1], ease: 'ease-in' });
       ctx.tos.forEach((t) => boom(ctx, t, '#ffd65a', 120)); shake(ctx); fade(ctx, wv, 300);
@@ -2898,7 +2899,7 @@ Object.assign(ANIMS, {
       await pop(ctx, g, 200); await wait(450 * ctx.sp);
       g.firstElementChild.style.transition = `filter ${250 * ctx.sp}ms`; g.firstElementChild.style.filter = 'brightness(2) sepia(1) hue-rotate(170deg) saturate(4)';
       await wait(250 * ctx.sp);
-      scatter(ctx, at, '<div style="width:7px;height:7px;border-radius:50%;background:#8fd3ff;box-shadow:0 0 6px #4aa3ff"></div>', 26, 90, 900);
+      scatter(ctx, at, '<div data-sp="mind_clone_spy" style="width:7px;height:7px;border-radius:50%;background:#8fd3ff;box-shadow:0 0 6px #4aa3ff"></div>', 26, 90, 900);
       fade(ctx, g, 200);
     },
   },
@@ -2938,25 +2939,25 @@ export function poisonBubbles(arena, el, { sp = 1 } = {}) {
   for (let i = 0; i < 12; i++) {
     setTimeout(() => {
       const s = rnd(10, 22);
-      const b = spawn(ctx, `<svg width="${s}" height="${s}" viewBox="0 0 20 20"><circle cx="10" cy="10" r="8.5" fill="#a64bff88" stroke="#e2b8ff" stroke-width="1.4"/><circle cx="7" cy="6.5" r="2" fill="#fff" opacity=".7"/></svg>`, { x: top.x + rnd(-r.width * 0.22, r.width * 0.22), y: top.y + rnd(-6, 14) }, { life: 1300 });
+      const b = spawn(ctx, `<svg data-sp="poisonBubbles" width="${s}" height="${s}" viewBox="0 0 20 20"><circle cx="10" cy="10" r="8.5" fill="#a64bff88" stroke="#e2b8ff" stroke-width="1.4"/><circle cx="7" cy="6.5" r="2" fill="#fff" opacity=".7"/></svg>`, { x: top.x + rnd(-r.width * 0.22, r.width * 0.22), y: top.y + rnd(-6, 14) }, { life: 1300 });
       b.animate([{ transform: 'translate(-50%,-50%) scale(.3)', opacity: 1 }, { transform: `translate(calc(-50% + ${rnd(-14, 14)}px), calc(-50% - ${rnd(40, 70)}px)) scale(1.05)`, opacity: 0.9, offset: 0.85 }, { transform: `translate(calc(-50% + ${rnd(-14, 14)}px), calc(-50% - ${rnd(60, 80)}px)) scale(1.3)`, opacity: 0 }], { duration: rnd(800, 1100) * sp, easing: 'ease-out', fill: 'forwards' });
     }, i * 55 * sp);
   }
 }
 /** Hidan's ritual mark (circle with an inverted triangle), drawn flat on the ground. */
-export const CURSE_MARK = (s = 110, glow = false) => `<svg width="${s}" height="${s * 0.38}" viewBox="0 0 100 38"><g transform="scale(1 .38)" fill="none" stroke="${glow ? '#7a2bd6' : '#111'}" stroke-width="5" stroke-linejoin="round" style="${glow ? 'filter:drop-shadow(0 0 6px #b44bff)' : ''}"><circle cx="50" cy="50" r="44"/><path d="M12 30H88L50 94Z"/></g></svg>`;
+export const CURSE_MARK = (s = 110, glow = false) => `<svg data-sp="CURSE_MARK" width="${s}" height="${s * 0.38}" viewBox="0 0 100 38"><g transform="scale(1 .38)" fill="none" stroke="${glow ? '#7a2bd6' : '#111'}" stroke-width="5" stroke-linejoin="round" style="${glow ? 'filter:drop-shadow(0 0 6px #b44bff)' : ''}"><circle cx="50" cy="50" r="44"/><path d="M12 30H88L50 94Z"/></g></svg>`;
 
 const ART7 = {
-  tentacle: (h = 110) => `<svg width="${h * 0.5}" height="${h}" viewBox="0 0 50 100"><path d="M18 100C10 80 14 60 22 44 30 28 26 14 34 4 40 0 46 6 42 12 36 22 40 36 36 52 32 68 36 84 40 100Z" fill="#d97a8a" stroke="#8a3a4a" stroke-width="2.5"/>${[20, 34, 48, 62, 76, 90].map((y, i) => `<circle cx="${36 - i * 1.2}" cy="${y}" r="3.4" fill="#f7c2cb" stroke="#8a3a4a"/>`).join('')}</svg>`,
-  paperStar: (s = 46) => `<svg width="${s}" height="${s}" viewBox="-10 -10 20 20" class="ax-spin"><path d="M0-10 3-3 10 0 3 3 0 10-3 3-10 0-3-3Z" fill="#fbfbf7" stroke="#bdbdb2" stroke-width=".6"/><path d="M0-10 0 10M-10 0 10 0" stroke="#d8d8cf" stroke-width=".5"/></svg>`,
-  shinigami: (s = 70) => `<svg width="${s}" height="${s * 1.1}" viewBox="0 0 60 66" style="filter:drop-shadow(0 0 10px #7a2bd6)"><path d="M8 18C8 6 52 6 52 18L54 44C50 60 10 60 6 44Z" fill="#e8e2f2" stroke="#3a2a4a" stroke-width="2.5"/><path d="M4 18 14 2 22 14M56 18 46 2 38 14" fill="#e8e2f2" stroke="#3a2a4a" stroke-width="2"/><path d="M16 26 26 30 16 32ZM44 26 34 30 44 32Z" fill="#1a0a2a"/><path d="M18 44Q30 52 42 44" stroke="#1a0a2a" stroke-width="2.5" fill="none"/><path d="M22 44v5M27 46v5M32 46v5M37 44v5" stroke="#1a0a2a" stroke-width="1.6"/></svg>`,
-  fourSymbols: (s = 90) => `<svg width="${s}" height="${s}" viewBox="0 0 100 100" style="filter:drop-shadow(0 0 6px #000)"><circle cx="50" cy="50" r="44" fill="none" stroke="#111" stroke-width="3"/><circle cx="50" cy="50" r="12" fill="none" stroke="#111" stroke-width="3"/>${[0, 90, 180, 270].map((a) => `<g transform="rotate(${a} 50 50)"><path d="M50 6V38" stroke="#111" stroke-width="2.5"/><path d="M42 18H58M44 26H56" stroke="#111" stroke-width="2"/></g>`).join('')}<path d="M50 38 42 50 50 62 58 50Z" fill="#111"/></svg>`,
-  puppetRed: (h = 90) => `<svg width="${h * 0.6}" height="${h}" viewBox="0 0 60 100"><circle cx="30" cy="14" r="10" fill="#e3c39a" stroke="#6b4a2a" stroke-width="2"/><path d="M24 8Q30 2 36 8" stroke="#3a2614" stroke-width="3" fill="none"/><path d="M14 28H46L52 86 42 98H18L8 86Z" fill="#b8202a" stroke="#5a0a10" stroke-width="2"/><path d="M14 30 4 56M46 30 56 56" stroke="#e3c39a" stroke-width="6" stroke-linecap="round"/><path d="M30 28V96" stroke="#7a1018" stroke-width="2"/></svg>`,
-  salamander: (w = 220) => `<svg width="${w}" height="${w * 0.55}" viewBox="0 0 200 110"><path d="M20 70C10 50 30 30 60 32 90 20 130 22 160 36 184 44 196 60 190 74 186 90 160 96 130 92L70 94C40 96 26 88 20 70Z" fill="#8c8278" stroke="#4e463e" stroke-width="3"/><path d="M40 92 30 108M70 94 66 110M140 92 146 108M168 88 178 104" stroke="#6e6660" stroke-width="10" stroke-linecap="round"/><ellipse cx="170" cy="56" rx="22" ry="16" fill="#9a9086" stroke="#4e463e" stroke-width="3"/><circle cx="176" cy="50" r="4" fill="#e6b422" stroke="#222"/><path d="M152 66Q168 74 186 64" stroke="#3a322a" stroke-width="2.5" fill="none"/>${[60, 80, 100, 120, 140].map((x) => `<circle cx="${x}" cy="${48 + (x % 40) / 4}" r="5" fill="#6e6660"/>`).join('')}<path d="M24 66C8 70 0 60 4 52" stroke="#8c8278" stroke-width="10" fill="none" stroke-linecap="round"/></svg>`,
-  salamanderPuppet: (w = 220) => `<svg width="${w}" height="${w * 0.6}" viewBox="0 0 200 120"><path d="M40 52 56 18 72 40 88 10 104 38 120 12 134 40 150 22 158 50Z" fill="#3e3631" stroke="#1e1a17" stroke-width="2.5" stroke-linejoin="round"/><path d="M56 22V48M88 14V46M120 16V46M150 26V50" stroke="#5a504a" stroke-width="2"/><path d="M20 80C10 60 30 40 60 42 90 30 130 32 160 46 184 54 196 70 190 84 186 100 160 106 130 102L70 104C40 106 26 98 20 80Z" fill="#6e655c" stroke="#4e463e" stroke-width="3"/>${[52, 80, 108, 136, 160].map((x) => `<path d="M${x} ${x < 150 ? 40 : 46}C${x - 6} 70 ${x - 6} 86 ${x} 104" stroke="#4e463e" stroke-width="3" fill="none"/>`).join('')}${[66, 94, 122, 148].map((x) => `<circle cx="${x}" cy="74" r="3" fill="#4e463e"/>`).join('')}<path d="M40 102 30 118M70 104 66 120M140 102 146 118M168 98 178 114" stroke="#564e47" stroke-width="10" stroke-linecap="round"/><path d="M40 102 30 118M70 104 66 120M140 102 146 118M168 98 178 114" stroke="#4e463e" stroke-width="2" stroke-dasharray="3 5"/><ellipse cx="172" cy="66" rx="22" ry="16" fill="#7a7168" stroke="#4e463e" stroke-width="3"/><circle cx="178" cy="60" r="4" fill="#3ddc5a" stroke="#222"/><path d="M154 76Q170 84 188 74" stroke="#3a322a" stroke-width="2.5" fill="none"/><path d="M24 76C8 80 0 70 4 62" stroke="#6e655c" stroke-width="10" fill="none" stroke-linecap="round"/></svg>`,
-  samehada: (l = 150) => `<svg width="${l}" height="${l * 0.3}" viewBox="0 0 150 46"><rect x="0" y="19" width="26" height="8" rx="3" fill="#3a3a5a"/><path d="M24 10H140Q150 23 140 36H24Z" fill="#5a6ea8" stroke="#2a3460" stroke-width="2"/>${Array.from({ length: 10 }, (_, i) => `<path d="M${30 + i * 11} 10l5-9 5 9M${30 + i * 11} 36l5 9 5-9" fill="#7a8ed0" stroke="#2a3460"/>`).join('')}</svg>`,
-  buddha: (w = 300) => `<svg width="${w}" height="${w * 0.9}" viewBox="0 0 300 270"><g fill="#9b6b3e" stroke="#5a3a1e" stroke-width="3">${Array.from({ length: 12 }, (_, i) => { const a = -170 + i * 14; const r = (a * Math.PI) / 180; return `<path d="M150 120L${150 + Math.cos(r) * 140} ${130 + Math.sin(r) * 120}" stroke-width="12" stroke-linecap="round"/><circle cx="${150 + Math.cos(r) * 140}" cy="${130 + Math.sin(r) * 120}" r="11"/>`; }).join('')}<path d="M90 110C90 70 210 70 210 110L220 260H80Z"/><circle cx="150" cy="70" r="38"/><path d="M120 50Q150 30 180 50" fill="none"/></g><path d="M134 66H144M156 66H166M140 86Q150 92 160 86" stroke="#3a2614" stroke-width="3" fill="none"/><circle cx="150" cy="50" r="5" fill="#3a2614"/></svg>`,
-  redDragon: (w = 200) => `<svg width="${w}" height="${w * 0.4}" viewBox="0 0 200 80" style="filter:drop-shadow(0 0 10px #ff2a2a)"><path d="M0 44C20 20 40 64 64 40S104 18 128 38 160 50 172 36" stroke="#ff3a3a99" stroke-width="16" fill="none" stroke-linecap="round"/><path d="M168 24 196 34 176 44 196 50 168 54Z" fill="#ff5a5a99" stroke="#ffb3b3" stroke-width="2"/><path d="M168 24 160 10M176 26 176 12" stroke="#ffb3b3" stroke-width="2.5"/><circle cx="178" cy="34" r="2.5" fill="#fff"/></svg>`,
+  tentacle: (h = 110) => `<svg data-sp="art-tentacle" width="${h * 0.5}" height="${h}" viewBox="0 0 50 100"><path d="M18 100C10 80 14 60 22 44 30 28 26 14 34 4 40 0 46 6 42 12 36 22 40 36 36 52 32 68 36 84 40 100Z" fill="#d97a8a" stroke="#8a3a4a" stroke-width="2.5"/>${[20, 34, 48, 62, 76, 90].map((y, i) => `<circle cx="${36 - i * 1.2}" cy="${y}" r="3.4" fill="#f7c2cb" stroke="#8a3a4a"/>`).join('')}</svg>`,
+  paperStar: (s = 46) => `<svg data-sp="art-paperStar" width="${s}" height="${s}" viewBox="-10 -10 20 20" class="ax-spin"><path d="M0-10 3-3 10 0 3 3 0 10-3 3-10 0-3-3Z" fill="#fbfbf7" stroke="#bdbdb2" stroke-width=".6"/><path d="M0-10 0 10M-10 0 10 0" stroke="#d8d8cf" stroke-width=".5"/></svg>`,
+  shinigami: (s = 70) => `<svg data-sp="art-shinigami" width="${s}" height="${s * 1.1}" viewBox="0 0 60 66" style="filter:drop-shadow(0 0 10px #7a2bd6)"><path d="M8 18C8 6 52 6 52 18L54 44C50 60 10 60 6 44Z" fill="#e8e2f2" stroke="#3a2a4a" stroke-width="2.5"/><path d="M4 18 14 2 22 14M56 18 46 2 38 14" fill="#e8e2f2" stroke="#3a2a4a" stroke-width="2"/><path d="M16 26 26 30 16 32ZM44 26 34 30 44 32Z" fill="#1a0a2a"/><path d="M18 44Q30 52 42 44" stroke="#1a0a2a" stroke-width="2.5" fill="none"/><path d="M22 44v5M27 46v5M32 46v5M37 44v5" stroke="#1a0a2a" stroke-width="1.6"/></svg>`,
+  fourSymbols: (s = 90) => `<svg data-sp="art-fourSymbols" width="${s}" height="${s}" viewBox="0 0 100 100" style="filter:drop-shadow(0 0 6px #000)"><circle cx="50" cy="50" r="44" fill="none" stroke="#111" stroke-width="3"/><circle cx="50" cy="50" r="12" fill="none" stroke="#111" stroke-width="3"/>${[0, 90, 180, 270].map((a) => `<g transform="rotate(${a} 50 50)"><path d="M50 6V38" stroke="#111" stroke-width="2.5"/><path d="M42 18H58M44 26H56" stroke="#111" stroke-width="2"/></g>`).join('')}<path d="M50 38 42 50 50 62 58 50Z" fill="#111"/></svg>`,
+  puppetRed: (h = 90) => `<svg data-sp="art-puppetRed" width="${h * 0.6}" height="${h}" viewBox="0 0 60 100"><circle cx="30" cy="14" r="10" fill="#e3c39a" stroke="#6b4a2a" stroke-width="2"/><path d="M24 8Q30 2 36 8" stroke="#3a2614" stroke-width="3" fill="none"/><path d="M14 28H46L52 86 42 98H18L8 86Z" fill="#b8202a" stroke="#5a0a10" stroke-width="2"/><path d="M14 30 4 56M46 30 56 56" stroke="#e3c39a" stroke-width="6" stroke-linecap="round"/><path d="M30 28V96" stroke="#7a1018" stroke-width="2"/></svg>`,
+  salamander: (w = 220) => `<svg data-sp="art-salamander" width="${w}" height="${w * 0.55}" viewBox="0 0 200 110"><path d="M20 70C10 50 30 30 60 32 90 20 130 22 160 36 184 44 196 60 190 74 186 90 160 96 130 92L70 94C40 96 26 88 20 70Z" fill="#8c8278" stroke="#4e463e" stroke-width="3"/><path d="M40 92 30 108M70 94 66 110M140 92 146 108M168 88 178 104" stroke="#6e6660" stroke-width="10" stroke-linecap="round"/><ellipse cx="170" cy="56" rx="22" ry="16" fill="#9a9086" stroke="#4e463e" stroke-width="3"/><circle cx="176" cy="50" r="4" fill="#e6b422" stroke="#222"/><path d="M152 66Q168 74 186 64" stroke="#3a322a" stroke-width="2.5" fill="none"/>${[60, 80, 100, 120, 140].map((x) => `<circle cx="${x}" cy="${48 + (x % 40) / 4}" r="5" fill="#6e6660"/>`).join('')}<path d="M24 66C8 70 0 60 4 52" stroke="#8c8278" stroke-width="10" fill="none" stroke-linecap="round"/></svg>`,
+  salamanderPuppet: (w = 220) => `<svg data-sp="art-salamanderPuppet" width="${w}" height="${w * 0.6}" viewBox="0 0 200 120"><path d="M40 52 56 18 72 40 88 10 104 38 120 12 134 40 150 22 158 50Z" fill="#3e3631" stroke="#1e1a17" stroke-width="2.5" stroke-linejoin="round"/><path d="M56 22V48M88 14V46M120 16V46M150 26V50" stroke="#5a504a" stroke-width="2"/><path d="M20 80C10 60 30 40 60 42 90 30 130 32 160 46 184 54 196 70 190 84 186 100 160 106 130 102L70 104C40 106 26 98 20 80Z" fill="#6e655c" stroke="#4e463e" stroke-width="3"/>${[52, 80, 108, 136, 160].map((x) => `<path d="M${x} ${x < 150 ? 40 : 46}C${x - 6} 70 ${x - 6} 86 ${x} 104" stroke="#4e463e" stroke-width="3" fill="none"/>`).join('')}${[66, 94, 122, 148].map((x) => `<circle cx="${x}" cy="74" r="3" fill="#4e463e"/>`).join('')}<path d="M40 102 30 118M70 104 66 120M140 102 146 118M168 98 178 114" stroke="#564e47" stroke-width="10" stroke-linecap="round"/><path d="M40 102 30 118M70 104 66 120M140 102 146 118M168 98 178 114" stroke="#4e463e" stroke-width="2" stroke-dasharray="3 5"/><ellipse cx="172" cy="66" rx="22" ry="16" fill="#7a7168" stroke="#4e463e" stroke-width="3"/><circle cx="178" cy="60" r="4" fill="#3ddc5a" stroke="#222"/><path d="M154 76Q170 84 188 74" stroke="#3a322a" stroke-width="2.5" fill="none"/><path d="M24 76C8 80 0 70 4 62" stroke="#6e655c" stroke-width="10" fill="none" stroke-linecap="round"/></svg>`,
+  samehada: (l = 150) => `<svg data-sp="art-samehada" width="${l}" height="${l * 0.3}" viewBox="0 0 150 46"><rect x="0" y="19" width="26" height="8" rx="3" fill="#3a3a5a"/><path d="M24 10H140Q150 23 140 36H24Z" fill="#5a6ea8" stroke="#2a3460" stroke-width="2"/>${Array.from({ length: 10 }, (_, i) => `<path d="M${30 + i * 11} 10l5-9 5 9M${30 + i * 11} 36l5 9 5-9" fill="#7a8ed0" stroke="#2a3460"/>`).join('')}</svg>`,
+  buddha: (w = 300) => `<svg data-sp="art-buddha" width="${w}" height="${w * 0.9}" viewBox="0 0 300 270"><g fill="#9b6b3e" stroke="#5a3a1e" stroke-width="3">${Array.from({ length: 12 }, (_, i) => { const a = -170 + i * 14; const r = (a * Math.PI) / 180; return `<path d="M150 120L${150 + Math.cos(r) * 140} ${130 + Math.sin(r) * 120}" stroke-width="12" stroke-linecap="round"/><circle cx="${150 + Math.cos(r) * 140}" cy="${130 + Math.sin(r) * 120}" r="11"/>`; }).join('')}<path d="M90 110C90 70 210 70 210 110L220 260H80Z"/><circle cx="150" cy="70" r="38"/><path d="M120 50Q150 30 180 50" fill="none"/></g><path d="M134 66H144M156 66H166M140 86Q150 92 160 86" stroke="#3a2614" stroke-width="3" fill="none"/><circle cx="150" cy="50" r="5" fill="#3a2614"/></svg>`,
+  redDragon: (w = 200) => `<svg data-sp="art-redDragon" width="${w}" height="${w * 0.4}" viewBox="0 0 200 80" style="filter:drop-shadow(0 0 10px #ff2a2a)"><path d="M0 44C20 20 40 64 64 40S104 18 128 38 160 50 172 36" stroke="#ff3a3a99" stroke-width="16" fill="none" stroke-linecap="round"/><path d="M168 24 196 34 176 44 196 50 168 54Z" fill="#ff5a5a99" stroke="#ffb3b3" stroke-width="2"/><path d="M168 24 160 10M176 26 176 12" stroke="#ffb3b3" stroke-width="2.5"/><circle cx="178" cy="34" r="2.5" fill="#fff"/></svg>`,
 };
 
 async function reviveAnim(ctx, { samsara = false } = {}) {
@@ -2990,7 +2991,7 @@ async function rasenganStrike(ctx, size) {
   boom(ctx, to, '#6cb8ff', size * 2.2); shake(ctx); fade(ctx, r, 200);
 }
 function purpleCloud(ctx, at, w, h) {
-  return spawn(ctx, `<div style="width:${w}px;height:${h}px;border-radius:50%;background:radial-gradient(ellipse,#9a3bdccc 0%,#7a2bd699 45%,#7a2bd600 72%);filter:blur(4px)"></div>`, at, { life: 2400 });
+  return spawn(ctx, `<div data-sp="purpleCloud" style="width:${w}px;height:${h}px;border-radius:50%;background:radial-gradient(ellipse,#9a3bdccc 0%,#7a2bd699 45%,#7a2bd600 72%);filter:blur(4px)"></div>`, at, { life: 2400 });
 }
 
 Object.assign(ANIMS, {
@@ -3044,7 +3045,7 @@ Object.assign(ANIMS, {
   paper_spear: {
     desc: 'User fires a spear made of sheets of paper at the target.',
     async play(ctx) {
-      const spear = (len) => `<svg width="${len}" height="20" viewBox="0 0 ${len} 20"><path d="M0 7H${len - 26}V13H0Z" fill="#fbfbf7" stroke="#bdbdb2"/>${Array.from({ length: Math.floor(len / 18) }, (_, i) => `<path d="M${i * 18} 7l8-4 0 14-8-4" fill="#efefe6" stroke="#cfcfc4"/>`).join('')}<path d="M${len - 28} 2 ${len} 10 ${len - 28} 18Z" fill="#fbfbf7" stroke="#9a9a90"/></svg>`;
+      const spear = (len) => `<svg data-sp="paper_spear" width="${len}" height="20" viewBox="0 0 ${len} 20"><path d="M0 7H${len - 26}V13H0Z" fill="#fbfbf7" stroke="#bdbdb2"/>${Array.from({ length: Math.floor(len / 18) }, (_, i) => `<path d="M${i * 18} 7l8-4 0 14-8-4" fill="#efefe6" stroke="#cfcfc4"/>`).join('')}<path d="M${len - 28} 2 ${len} 10 ${len - 28} 18Z" fill="#fbfbf7" stroke="#9a9a90"/></svg>`;
       const n = await stretch(ctx, ctx.from, ctx.tos[0], spear, 240, 1300);
       boom(ctx, ctx.tos[0], '#ffffff', 90); shake(ctx); setTimeout(() => fade(ctx, n, 250), 250 * ctx.sp);
     },
@@ -3067,7 +3068,7 @@ Object.assign(ANIMS, {
     desc: 'User grows a giant arm and strikes the enemies with it.',
     async play(ctx) {
       const box = sideBox(ctx); const tgt = { x: box.c.x, y: box.c.y };
-      const arm = (len) => `<svg width="${len + 84}" height="96" viewBox="0 0 ${len + 84} 96"><path d="M0 34Q${len / 2} 24 ${len} 26V70Q${len / 2} 72 0 62Z" fill="#e8b98e" stroke="#7a4a2a" stroke-width="3"/><g transform="translate(${len - 8} 0)" stroke="#7a4a2a" stroke-width="3" stroke-linejoin="round"><path d="M4 22C10 12 30 8 52 10 72 12 86 24 86 48 86 72 72 86 52 88 30 90 10 84 4 74Z" fill="#f0c49a"/><path d="M60 12C74 12 84 20 84 30 84 36 78 38 72 37M62 32C76 32 86 38 86 48 86 54 80 56 74 55M62 51C76 51 86 57 85 66 84 72 78 74 72 73M58 69C70 70 80 76 78 82 76 87 68 88 62 86" fill="#f4caa2"/><path d="M60 12V86" fill="none"/><path d="M20 40C30 34 46 34 56 40 60 44 58 52 50 52 40 52 28 50 20 52Z" fill="#f4caa2"/><path d="M50 40C54 42 56 46 54 50" fill="none" stroke-width="2"/></g></svg>`;
+      const arm = (len) => `<svg data-sp="partial_expansion" width="${len + 84}" height="96" viewBox="0 0 ${len + 84} 96"><path d="M0 34Q${len / 2} 24 ${len} 26V70Q${len / 2} 72 0 62Z" fill="#e8b98e" stroke="#7a4a2a" stroke-width="3"/><g transform="translate(${len - 8} 0)" stroke="#7a4a2a" stroke-width="3" stroke-linejoin="round"><path d="M4 22C10 12 30 8 52 10 72 12 86 24 86 48 86 72 72 86 52 88 30 90 10 84 4 74Z" fill="#f0c49a"/><path d="M60 12C74 12 84 20 84 30 84 36 78 38 72 37M62 32C76 32 86 38 86 48 86 54 80 56 74 55M62 51C76 51 86 57 85 66 84 72 78 74 72 73M58 69C70 70 80 76 78 82 76 87 68 88 62 86" fill="#f4caa2"/><path d="M60 12V86" fill="none"/><path d="M20 40C30 34 46 34 56 40 60 44 58 52 50 52 40 52 28 50 20 52Z" fill="#f4caa2"/><path d="M50 40C54 42 56 46 54 50" fill="none" stroke-width="2"/></g></svg>`;
       const n = await stretch(ctx, ctx.from, between(ctx.from, tgt, 0.8), arm, 380, 1500);
       n.animate([{ transform: `translate(0,-50%) rotate(${ang(ctx.from, tgt) - 14}deg)` }, { transform: `translate(0,-50%) rotate(${ang(ctx.from, tgt) + 14}deg)` }], { duration: 300 * ctx.sp, fill: 'forwards' });
       await wait(200 * ctx.sp);
@@ -3079,7 +3080,7 @@ Object.assign(ANIMS, {
     desc: 'User flies at high speed and bites the target.',
     async play(ctx) {
       const to = await lunging(ctx, 0.78, 380);
-      const bite = spawn(ctx, '<svg width="60" height="44" viewBox="0 0 40 30"><path d="M4 8Q20 0 36 8M4 22Q20 30 36 22" stroke="#fff" stroke-width="3" fill="none"/><path d="M10 7v6M16 5v7M22 5v7M28 6v6M10 23v-6M16 25v-7M22 25v-7M28 24v-6" stroke="#fff" stroke-width="2.4" stroke-linecap="round"/></svg>', to, { life: 800 });
+      const bite = spawn(ctx, '<svg data-sp="passing_fang" width="60" height="44" viewBox="0 0 40 30"><path d="M4 8Q20 0 36 8M4 22Q20 30 36 22" stroke="#fff" stroke-width="3" fill="none"/><path d="M10 7v6M16 5v7M22 5v7M28 6v6M10 23v-6M16 25v-7M22 25v-7M28 24v-6" stroke="#fff" stroke-width="2.4" stroke-linecap="round"/></svg>', to, { life: 800 });
       bite.animate([{ transform: 'translate(-50%,-50%) scaleY(1.6)', opacity: 0 }, { transform: 'translate(-50%,-50%) scaleY(.6)', opacity: 1, offset: 0.4 }, { transform: 'translate(-50%,-50%) scaleY(.6)', opacity: 0 }], { duration: 500 * ctx.sp, fill: 'forwards' });
       shake(ctx);
     },
@@ -3088,7 +3089,7 @@ Object.assign(ANIMS, {
     desc: 'User swings a giant sword that strikes every enemy at once, with a blue aura on the strike.',
     async play(ctx) {
       const box = sideBox(ctx); const len = Math.hypot(box.c.x - ctx.from.x, box.c.y - ctx.from.y) + box.w * 0.3;
-      const sword = `<svg width="${len}" height="34" viewBox="0 0 ${len} 34" style="filter:drop-shadow(0 0 14px #4aa3ff)"><rect x="0" y="12" width="60" height="10" rx="4" fill="#3a5aa8"/><path d="M60 4H${len - 40}L${len} 17 ${len - 40} 30H60Z" fill="#9fd8ffcc" stroke="#e6f6ff" stroke-width="2"/></svg>`;
+      const sword = `<svg data-sp="susanoo_sword" width="${len}" height="34" viewBox="0 0 ${len} 34" style="filter:drop-shadow(0 0 14px #4aa3ff)"><rect x="0" y="12" width="60" height="10" rx="4" fill="#3a5aa8"/><path d="M60 4H${len - 40}L${len} 17 ${len - 40} 30H60Z" fill="#9fd8ffcc" stroke="#e6f6ff" stroke-width="2"/></svg>`;
       const s = spawn(ctx, sword, ctx.from, { life: 1400 }); s.style.transformOrigin = '0 50%';
       const a = ang(ctx.from, box.c); const sw = ctx.isFoe ? 60 : -60;
       await s.animate([{ transform: `translate(0,-50%) rotate(${a + sw}deg)`, opacity: 0 }, { transform: `translate(0,-50%) rotate(${a + sw}deg)`, opacity: 1, offset: 0.35 }, { transform: `translate(0,-50%) rotate(${a - sw * 0.3}deg)`, opacity: 1 }], { duration: 650 * ctx.sp, easing: 'ease-in', fill: 'forwards' }).finished.catch(() => {});
@@ -3100,7 +3101,7 @@ Object.assign(ANIMS, {
     desc: 'User strikes the target with their sickle; the hit has a purple aura.',
     async play(ctx) {
       const to = ctx.tos[0];
-      const sickle = (len) => `<svg width="${len + 30}" height="40" viewBox="0 0 ${len + 30} 40"><path d="M0 20H${len}" stroke="#b9c0c8" stroke-width="3" stroke-dasharray="6 3"/><path d="M${len} 20V8" stroke="#6b4a2a" stroke-width="4"/><path d="M${len} 8C${len + 20} 6 ${len + 30} 18 ${len + 26} 30 ${len + 20} 18 ${len + 12} 12 ${len} 12Z" fill="#c9ced6" stroke="#444" stroke-width="1.5"/></svg>`;
+      const sickle = (len) => `<svg data-sp="hanzo_kusarigama" width="${len + 30}" height="40" viewBox="0 0 ${len + 30} 40"><path d="M0 20H${len}" stroke="#b9c0c8" stroke-width="3" stroke-dasharray="6 3"/><path d="M${len} 20V8" stroke="#6b4a2a" stroke-width="4"/><path d="M${len} 8C${len + 20} 6 ${len + 30} 18 ${len + 26} 30 ${len + 20} 18 ${len + 12} 12 ${len} 12Z" fill="#c9ced6" stroke="#444" stroke-width="1.5"/></svg>`;
       const n = await stretch(ctx, ctx.from, between(ctx.from, to, 0.9), sickle, 300, 1300);
       slashArc(ctx, to, { color: '#d9b3ff', glow: '#7a2bd6', size: 110, rot: 60 }); boom(ctx, to, '#b44bff', 90); shake(ctx);
       setTimeout(() => fade(ctx, n, 250), 250 * ctx.sp);
@@ -3114,7 +3115,7 @@ Object.assign(ANIMS, {
     desc: 'User throws a round smoke bomb at the enemies that bursts into a purple poison cloud.',
     async play(ctx) {
       const box = sideBox(ctx);
-      const b = spawn(ctx, '<div style="width:24px;height:24px;border-radius:50%;background:radial-gradient(circle at 35% 35%,#8a8f99,#2a2d33);border:1.5px solid #111"></div>', ctx.from, { life: 1200 });
+      const b = spawn(ctx, '<div data-sp="poison_bomb" style="width:24px;height:24px;border-radius:50%;background:radial-gradient(circle at 35% 35%,#8a8f99,#2a2d33);border:1.5px solid #111"></div>', ctx.from, { life: 1200 });
       await fly(ctx, b, ctx.from, box.c, 480, { rotate: 0, arc: 90, ease: 'ease-in-out' }); b.remove();
       const c = purpleCloud(ctx, box.c, box.w + 140, box.h + 60);
       await grow(ctx, c, 380, 'scale(.1)', 'scale(1)'); shake(ctx); setTimeout(() => fade(ctx, c, 600), 600 * ctx.sp);
@@ -3124,9 +3125,9 @@ Object.assign(ANIMS, {
     desc: 'A transparent red ring of aura spreads around the user.',
     async play(ctx) {
       const { h } = ctx.userSize;
-      const r = spawn(ctx, `<div style="width:${h * 0.9}px;height:${h * 0.9}px;border-radius:50%;background:radial-gradient(circle,#ff2a2a00 40%,#ff2a2a44 62%,#ff2a2a00 72%);border:3px solid #ff5a5a88;box-shadow:0 0 18px #ff2a2a88"></div>`, ctx.from, { life: 1800 });
+      const r = spawn(ctx, `<div data-sp="preta_absorb-1" style="width:${h * 0.9}px;height:${h * 0.9}px;border-radius:50%;background:radial-gradient(circle,#ff2a2a00 40%,#ff2a2a44 62%,#ff2a2a00 72%);border:3px solid #ff5a5a88;box-shadow:0 0 18px #ff2a2a88"></div>`, ctx.from, { life: 1800 });
       await grow(ctx, r, 450, 'scale(.3)', 'scale(1)');
-      for (let i = 0; i < 10; i++) { const st = { x: ctx.tos[0].x + rnd(-30, 30), y: ctx.tos[0].y + rnd(-40, 40) }; const d = spawn(ctx, '<div style="width:8px;height:8px;border-radius:50%;background:#ff8a8a;box-shadow:0 0 6px #ff2a2a"></div>', st, { life: 900 }); fly(ctx, d, st, ctx.from, 500, { rotate: 0, ease: 'ease-in' }).then(() => d.remove()); }
+      for (let i = 0; i < 10; i++) { const st = { x: ctx.tos[0].x + rnd(-30, 30), y: ctx.tos[0].y + rnd(-40, 40) }; const d = spawn(ctx, '<div data-sp="preta_absorb-2" style="width:8px;height:8px;border-radius:50%;background:#ff8a8a;box-shadow:0 0 6px #ff2a2a"></div>', st, { life: 900 }); fly(ctx, d, st, ctx.from, 500, { rotate: 0, ease: 'ease-in' }).then(() => d.remove()); }
       shake(ctx); await wait(600 * ctx.sp); fade(ctx, r, 300);
     },
   },
@@ -3146,11 +3147,11 @@ Object.assign(ANIMS, {
     desc: "User forms a large blue spiraling orb with four spinning fins and throws it at the enemies' side, where it bursts into an expanding blue dome that hits every enemy.",
     async play(ctx) {
       const box = sideBox(ctx); const hand = { x: ctx.from.x, y: ctx.from.y - ctx.userSize.h * 0.45 };
-      const rs = spawn(ctx, `<div style="position:relative;width:140px;height:140px"><div class="ax-spin" style="position:absolute;inset:0;animation-duration:.25s;background:conic-gradient(#e8f6ff 0 8deg,#0000 8deg 90deg,#e8f6ff 90deg 98deg,#0000 98deg 180deg,#e8f6ff 180deg 188deg,#0000 188deg 270deg,#e8f6ff 270deg 278deg,#0000 278deg);-webkit-mask:radial-gradient(circle,#0000 30%,#000 32%,#000 70%,#0000 71%);mask:radial-gradient(circle,#0000 30%,#000 32%,#000 70%,#0000 71%);filter:drop-shadow(0 0 8px #9fd8ff)"></div><div style="position:absolute;left:35px;top:35px">${ART.rasengan(70)}</div></div>`, hand, { life: 2400 });
+      const rs = spawn(ctx, `<div style="position:relative;width:140px;height:140px"><div data-sp="thrown_rasenshuriken-1" class="ax-spin" style="position:absolute;inset:0;animation-duration:.25s;background:conic-gradient(#e8f6ff 0 8deg,#0000 8deg 90deg,#e8f6ff 90deg 98deg,#0000 98deg 180deg,#e8f6ff 180deg 188deg,#0000 188deg 270deg,#e8f6ff 270deg 278deg,#0000 278deg);-webkit-mask:radial-gradient(circle,#0000 30%,#000 32%,#000 70%,#0000 71%);mask:radial-gradient(circle,#0000 30%,#000 32%,#000 70%,#0000 71%);filter:drop-shadow(0 0 8px #9fd8ff)"></div><div style="position:absolute;left:35px;top:35px">${ART.rasengan(70)}</div></div>`, hand, { life: 2400 });
       await pop(ctx, rs, 400); await wait(200 * ctx.sp);
       await fly(ctx, rs, hand, box.c, 480, { rotate: 0, arc: 40, ease: 'ease-in' }); rs.remove();
       const d = box.w + 160;
-      const dome = spawn(ctx, `<div style="width:${d}px;height:${d * 0.7}px;border-radius:50%;background:radial-gradient(ellipse,#ffffff 0%,#cfeeffcc 30%,#6cb8ff88 55%,#6cb8ff00 72%);box-shadow:0 0 30px #6cb8ff"></div>`, box.c, { life: 1600 });
+      const dome = spawn(ctx, `<div data-sp="thrown_rasenshuriken-2" style="width:${d}px;height:${d * 0.7}px;border-radius:50%;background:radial-gradient(ellipse,#ffffff 0%,#cfeeffcc 30%,#6cb8ff88 55%,#6cb8ff00 72%);box-shadow:0 0 30px #6cb8ff"></div>`, box.c, { life: 1600 });
       await grow(ctx, dome, 420, 'scale(.05)', 'scale(1)'); shake(ctx); fade(ctx, dome, 500);
     },
   },
@@ -3176,7 +3177,7 @@ Object.assign(ANIMS, {
       const hands = { x: ctx.from.x, y: ctx.from.y - h * 0.1 };
       for (const [i, [p, at]] of ps.entries()) {
         const ti = i % ctx.tos.length; const t = ctx.tos[ti];
-        const th = await stretch(ctx, hands, at, (len) => `<svg width="${len}" height="4" viewBox="0 0 ${len} 4"><path d="M0 2H${len}" stroke="#8fd3ff" stroke-width="1.2" style="filter:drop-shadow(0 0 2px #4aa3ff)"/></svg>`, 60, 1400);
+        const th = await stretch(ctx, hands, at, (len) => `<svg data-sp="hundred_puppets" width="${len}" height="4" viewBox="0 0 ${len} 4"><path d="M0 2H${len}" stroke="#8fd3ff" stroke-width="1.2" style="filter:drop-shadow(0 0 2px #4aa3ff)"/></svg>`, 60, 1400);
         fly(ctx, p, at, { x: t.x + rnd(-20, 20), y: t.y + rnd(-30, 10) }, 260, { rotate: 0, ease: 'ease-in' }).then(() => { boom(ctx, t, '#ffffff', 60); shakeEl(ctx.targetEls[ti]); fade(ctx, p, 250); fade(ctx, th, 250); });
         await wait(110 * ctx.sp);
       }
@@ -3193,9 +3194,9 @@ Object.assign(ANIMS, {
       const to = ctx.tos[0]; const { h } = sizeOf(ctx.targetEls[0]);
       const s = spawn(ctx, ART7.fourSymbols(Math.max(80, ctx.userSize.h * 0.42)), ctx.from, { life: 2600 });
       await s.animate([{ transform: 'translate(-50%,-50%) scale(1.8) rotate(-90deg)', opacity: 0 }, { transform: 'translate(-50%,-50%) scale(1) rotate(0deg)', opacity: 1 }], { duration: 400 * ctx.sp, fill: 'forwards' }).finished.catch(() => {});
-      for (let i = 0; i < 18; i++) { const d = spawn(ctx, `<div style="width:${rnd(10, 20)}px;height:${rnd(10, 20)}px;border-radius:50%;background:#050505;box-shadow:0 0 8px #000"></div>`, ctx.from, { life: 900 }); fly(ctx, d, ctx.from, { x: to.x + rnd(-30, 30), y: to.y + rnd(-40, 40) }, 340, { rotate: 0, arc: rnd(-30, 30) }).then(() => d.remove()); await wait(18 * ctx.sp); }
+      for (let i = 0; i < 18; i++) { const d = spawn(ctx, `<div data-sp="reverse_tetragram-1" style="width:${rnd(10, 20)}px;height:${rnd(10, 20)}px;border-radius:50%;background:#050505;box-shadow:0 0 8px #000"></div>`, ctx.from, { life: 900 }); fly(ctx, d, ctx.from, { x: to.x + rnd(-30, 30), y: to.y + rnd(-40, 40) }, 340, { rotate: 0, arc: rnd(-30, 30) }).then(() => d.remove()); await wait(18 * ctx.sp); }
       await wait(300 * ctx.sp);
-      const orb = spawn(ctx, `<div style="width:${h * 0.95}px;height:${h * 0.95}px;border-radius:50%;background:radial-gradient(circle,#00000055,#000000aa 65%,#000000cc);box-shadow:0 0 20px #000"></div>`, to, { life: 1800 });
+      const orb = spawn(ctx, `<div data-sp="reverse_tetragram-2" style="width:${h * 0.95}px;height:${h * 0.95}px;border-radius:50%;background:radial-gradient(circle,#00000055,#000000aa 65%,#000000cc);box-shadow:0 0 20px #000"></div>`, to, { life: 1800 });
       await grow(ctx, orb, 300, 'scale(.2)', 'scale(1)'); shake(ctx); await wait(450 * ctx.sp); fade(ctx, orb, 300); fade(ctx, s, 300);
     },
   },
@@ -3218,12 +3219,12 @@ Object.assign(ANIMS, {
   },
   sage_arm_cannon: {
     desc: 'User fires a high-speed volley of blue chakra at the target.',
-    async play(ctx) { for (let i = 0; i < 9; i++) { const b = spawn(ctx, '<div style="width:22px;height:22px;border-radius:50%;background:radial-gradient(circle,#fff,#8fd3ff 45%,#4aa3ff00 72%);box-shadow:0 0 12px #4aa3ff"></div>', ctx.from, { life: 600 }); fly(ctx, b, ctx.from, { x: ctx.tos[0].x + rnd(-14, 14), y: ctx.tos[0].y + rnd(-20, 20) }, 180, { rotate: 0, ease: 'linear' }).then(() => { b.remove(); boom(ctx, ctx.tos[0], '#6cc4ff', 60); shake(ctx); }); await wait(55 * ctx.sp); } await wait(200 * ctx.sp); },
+    async play(ctx) { for (let i = 0; i < 9; i++) { const b = spawn(ctx, '<div data-sp="sage_arm_cannon" style="width:22px;height:22px;border-radius:50%;background:radial-gradient(circle,#fff,#8fd3ff 45%,#4aa3ff00 72%);box-shadow:0 0 12px #4aa3ff"></div>', ctx.from, { life: 600 }); fly(ctx, b, ctx.from, { x: ctx.tos[0].x + rnd(-14, 14), y: ctx.tos[0].y + rnd(-20, 20) }, 180, { rotate: 0, ease: 'linear' }).then(() => { b.remove(); boom(ctx, ctx.tos[0], '#6cc4ff', 60); shake(ctx); }); await wait(55 * ctx.sp); } await wait(200 * ctx.sp); },
   },
   inorganic_animation: {
     desc: 'The ground under the enemies turns into chaotic earth spikes that hit each of them.',
     async play(ctx) {
-      ctx.targetEls.forEach((el) => { const f = feetOf(ctx, el); const { h } = sizeOf(el); for (let i = 0; i < 6; i++) { const n = spawn(ctx, `<svg width="22" height="${h * rnd(0.4, 0.8)}" viewBox="0 0 22 100" preserveAspectRatio="none"><path d="M11 0 22 100H0Z" fill="#8a7f72" stroke="#4e463e" stroke-width="1.5" vector-effect="non-scaling-stroke"/></svg>`, { x: f.x + rnd(-50, 50), y: f.y + rnd(-4, 8) }, { life: 1500 }); n.style.transform = `translate(-50%,-100%) rotate(${rnd(-25, 25)}deg) scaleY(0)`; n.style.transformOrigin = '50% 100%'; n.animate([{ transform: `translate(-50%,-100%) rotate(${rnd(-25, 25)}deg) scaleY(0)` }, { transform: `translate(-50%,-100%) rotate(${rnd(-25, 25)}deg) scaleY(1)` }], { duration: 200 * ctx.sp, delay: rnd(0, 200) * ctx.sp, fill: 'both' }); setTimeout(() => fade(ctx, n, 300), 900 * ctx.sp); } });
+      ctx.targetEls.forEach((el) => { const f = feetOf(ctx, el); const { h } = sizeOf(el); for (let i = 0; i < 6; i++) { const n = spawn(ctx, `<svg data-sp="inorganic_animation" width="22" height="${h * rnd(0.4, 0.8)}" viewBox="0 0 22 100" preserveAspectRatio="none"><path d="M11 0 22 100H0Z" fill="#8a7f72" stroke="#4e463e" stroke-width="1.5" vector-effect="non-scaling-stroke"/></svg>`, { x: f.x + rnd(-50, 50), y: f.y + rnd(-4, 8) }, { life: 1500 }); n.style.transform = `translate(-50%,-100%) rotate(${rnd(-25, 25)}deg) scaleY(0)`; n.style.transformOrigin = '50% 100%'; n.animate([{ transform: `translate(-50%,-100%) rotate(${rnd(-25, 25)}deg) scaleY(0)` }, { transform: `translate(-50%,-100%) rotate(${rnd(-25, 25)}deg) scaleY(1)` }], { duration: 200 * ctx.sp, delay: rnd(0, 200) * ctx.sp, fill: 'both' }); setTimeout(() => fade(ctx, n, 300), 900 * ctx.sp); } });
       await wait(350 * ctx.sp); shake(ctx);
     },
   },
@@ -3250,7 +3251,7 @@ Object.assign(ANIMS, {
   white_rage: {
     desc: 'User sends out a sound wave that strikes each enemy.',
     async play(ctx) {
-      for (let k = 0; k < 4; k++) { const r = spawn(ctx, '<div style="width:80px;height:80px;border-radius:50%;border:4px solid #ffffffcc;box-shadow:0 0 12px #fff"></div>', ctx.from, { life: 900 }); const far = Math.max(...ctx.tos.map((t) => Math.hypot(t.x - ctx.from.x, t.y - ctx.from.y))) * 2.2 / 80; r.animate([{ transform: 'translate(-50%,-50%) scale(.3)', opacity: 1 }, { transform: `translate(-50%,-50%) scale(${far})`, opacity: 0 }], { duration: 600 * ctx.sp, easing: 'ease-out', fill: 'forwards' }); await wait(110 * ctx.sp); }
+      for (let k = 0; k < 4; k++) { const r = spawn(ctx, '<div data-sp="white_rage" style="width:80px;height:80px;border-radius:50%;border:4px solid #ffffffcc;box-shadow:0 0 12px #fff"></div>', ctx.from, { life: 900 }); const far = Math.max(...ctx.tos.map((t) => Math.hypot(t.x - ctx.from.x, t.y - ctx.from.y))) * 2.2 / 80; r.animate([{ transform: 'translate(-50%,-50%) scale(.3)', opacity: 1 }, { transform: `translate(-50%,-50%) scale(${far})`, opacity: 0 }], { duration: 600 * ctx.sp, easing: 'ease-out', fill: 'forwards' }); await wait(110 * ctx.sp); }
       await wait(200 * ctx.sp); shake(ctx);
     },
   },
@@ -3272,15 +3273,15 @@ Object.assign(ANIMS, {
 
 // ---------------------------------------------------------------- batch 8 (sheet rows 268–305)
 const ART8 = {
-  sandStar: (s = 34) => `<svg width="${s}" height="${s}" viewBox="-10 -10 20 20" class="ax-spin"><path d="M0-10 2-2 10 0 2 2 0 10-2 2-10 0-2-2Z" fill="#d9b56a" stroke="#8a6a3a" stroke-width=".8"/><circle r="2" fill="#a8864e"/></svg>`,
-  scythe: (s = 90) => `<svg width="${s}" height="${s}" viewBox="0 0 100 100" class="ax-spin" style="animation-duration:.3s"><path d="M50 8V96" stroke="#3a3a3a" stroke-width="5" stroke-linecap="round"/>${[8, 26, 44].map((y, k) => `<path d="M50 ${y}C${66 + k * 2} ${y - 4} ${86 - k * 4} ${y + 4} ${94 - k * 6} ${y + 20 - k * 2} ${80 - k * 4} ${y + 12} ${66} ${y + 10} 50 ${y + 12}Z" fill="#c8202a" stroke="#5a0a10" stroke-width="2"/>`).join('')}</svg>`,
-  heart: (s = 34) => `<svg width="${s}" height="${s}" viewBox="0 0 20 20" style="filter:drop-shadow(0 0 6px #ff6fb5)"><path d="M10 18C2 12 0 8 2 4 4 0 9 1 10 5 11 1 16 0 18 4 20 8 18 12 10 18Z" fill="#ff7ec0" stroke="#fff" stroke-width="1"/></svg>`,
-  web: (s = 120, c = '#ffd65a') => `<svg width="${s}" height="${s}" viewBox="0 0 100 100" style="filter:drop-shadow(0 0 6px ${c})"><g stroke="${c}" stroke-width="2" fill="none">${Array.from({ length: 8 }, (_, i) => { const a = (i / 8) * Math.PI * 2; return `<path d="M50 50L${50 + Math.cos(a) * 48} ${50 + Math.sin(a) * 48}"/>`; }).join('')}${[12, 24, 36, 47].map((r) => `<path d="${Array.from({ length: 9 }, (_, i) => { const a = (i / 8) * Math.PI * 2; return `${i ? 'L' : 'M'}${50 + Math.cos(a) * r} ${50 + Math.sin(a) * r}`; }).join('')}"/>`).join('')}</g></svg>`,
-  goldBow: (s = 110) => `<svg width="${s * 0.5}" height="${s}" viewBox="0 0 50 100" style="filter:drop-shadow(0 0 8px #ffd65a)"><path d="M8 4C44 30 44 70 8 96" stroke="#e6b422" stroke-width="6" fill="none" stroke-linecap="round"/><path d="M8 4V96" stroke="#fff3b0" stroke-width="1.4"/></svg>`,
-  goldArrow: (l = 90) => `<svg width="${l}" height="16" viewBox="0 0 ${l} 16" style="filter:drop-shadow(0 0 8px #ffd65a)"><path d="M0 8H${l - 18}" stroke="#e6b422" stroke-width="4"/><path d="M${l - 22} 1 ${l} 8 ${l - 22} 15Z" fill="#fff3b0" stroke="#e6b422" stroke-width="2"/><path d="M0 2 10 8 0 14" fill="none" stroke="#e6b422" stroke-width="2"/></svg>`,
-  plainBall: (s = 120) => `<svg width="${s}" height="${s}" viewBox="0 0 100 100"><circle cx="50" cy="50" r="46" fill="#8b5a32" stroke="#4a2c16" stroke-width="3"/><path d="M14 40Q50 26 86 40M10 58Q50 48 90 60M24 78Q50 70 76 80" stroke="#5a3820" stroke-width="3" fill="none"/></svg>`,
+  sandStar: (s = 34) => `<svg data-sp="art-sandStar" width="${s}" height="${s}" viewBox="-10 -10 20 20" class="ax-spin"><path d="M0-10 2-2 10 0 2 2 0 10-2 2-10 0-2-2Z" fill="#d9b56a" stroke="#8a6a3a" stroke-width=".8"/><circle r="2" fill="#a8864e"/></svg>`,
+  scythe: (s = 90) => `<svg data-sp="art-scythe" width="${s}" height="${s}" viewBox="0 0 100 100" class="ax-spin" style="animation-duration:.3s"><path d="M50 8V96" stroke="#3a3a3a" stroke-width="5" stroke-linecap="round"/>${[8, 26, 44].map((y, k) => `<path d="M50 ${y}C${66 + k * 2} ${y - 4} ${86 - k * 4} ${y + 4} ${94 - k * 6} ${y + 20 - k * 2} ${80 - k * 4} ${y + 12} ${66} ${y + 10} 50 ${y + 12}Z" fill="#c8202a" stroke="#5a0a10" stroke-width="2"/>`).join('')}</svg>`,
+  heart: (s = 34) => `<svg data-sp="art-heart" width="${s}" height="${s}" viewBox="0 0 20 20" style="filter:drop-shadow(0 0 6px #ff6fb5)"><path d="M10 18C2 12 0 8 2 4 4 0 9 1 10 5 11 1 16 0 18 4 20 8 18 12 10 18Z" fill="#ff7ec0" stroke="#fff" stroke-width="1"/></svg>`,
+  web: (s = 120, c = '#ffd65a') => `<svg data-sp="art-web" width="${s}" height="${s}" viewBox="0 0 100 100" style="filter:drop-shadow(0 0 6px ${c})"><g stroke="${c}" stroke-width="2" fill="none">${Array.from({ length: 8 }, (_, i) => { const a = (i / 8) * Math.PI * 2; return `<path d="M50 50L${50 + Math.cos(a) * 48} ${50 + Math.sin(a) * 48}"/>`; }).join('')}${[12, 24, 36, 47].map((r) => `<path d="${Array.from({ length: 9 }, (_, i) => { const a = (i / 8) * Math.PI * 2; return `${i ? 'L' : 'M'}${50 + Math.cos(a) * r} ${50 + Math.sin(a) * r}`; }).join('')}"/>`).join('')}</g></svg>`,
+  goldBow: (s = 110) => `<svg data-sp="art-goldBow" width="${s * 0.5}" height="${s}" viewBox="0 0 50 100" style="filter:drop-shadow(0 0 8px #ffd65a)"><path d="M8 4C44 30 44 70 8 96" stroke="#e6b422" stroke-width="6" fill="none" stroke-linecap="round"/><path d="M8 4V96" stroke="#fff3b0" stroke-width="1.4"/></svg>`,
+  goldArrow: (l = 90) => `<svg data-sp="art-goldArrow" width="${l}" height="16" viewBox="0 0 ${l} 16" style="filter:drop-shadow(0 0 8px #ffd65a)"><path d="M0 8H${l - 18}" stroke="#e6b422" stroke-width="4"/><path d="M${l - 22} 1 ${l} 8 ${l - 22} 15Z" fill="#fff3b0" stroke="#e6b422" stroke-width="2"/><path d="M0 2 10 8 0 14" fill="none" stroke="#e6b422" stroke-width="2"/></svg>`,
+  plainBall: (s = 120) => `<svg data-sp="art-plainBall" width="${s}" height="${s}" viewBox="0 0 100 100"><circle cx="50" cy="50" r="46" fill="#8b5a32" stroke="#4a2c16" stroke-width="3"/><path d="M14 40Q50 26 86 40M10 58Q50 48 90 60M24 78Q50 70 76 80" stroke="#5a3820" stroke-width="3" fill="none"/></svg>`,
 };
-const shadowStrip = (len) => `<svg width="${len}" height="22" viewBox="0 0 ${len} 22"><path d="M0 11C${len * 0.3} 4 ${len * 0.6} 18 ${len} 11" stroke="#050505" stroke-width="12" fill="none" stroke-linecap="round" opacity=".88"/></svg>`;
+const shadowStrip = (len) => `<svg data-sp="shadowStrip" width="${len}" height="22" viewBox="0 0 ${len} 22"><path d="M0 11C${len * 0.3} 4 ${len * 0.6} 18 ${len} 11" stroke="#050505" stroke-width="12" fill="none" stroke-linecap="round" opacity=".88"/></svg>`;
 
 async function boulderRoll(ctx, spiked) {
   const to = ctx.tos[0]; const { h } = ctx.userSize;
@@ -3297,10 +3298,10 @@ async function boulderRoll(ctx, spiked) {
 function shadowTo(ctx, el, ms = 420) { return stretch(ctx, feetOf(ctx, ctx.userEl), feetOf(ctx, el), shadowStrip, ms, 2400); }
 function sandWave(ctx, a, b, w, h, ms = 520, water = false) {
   const bg = water ? 'radial-gradient(ellipse at 50% 30%,#e6f7ff,#7ec8ff 50%,#2a7ad8);box-shadow:0 0 16px #4ab0ff' : 'radial-gradient(ellipse at 50% 30%,#f2deb0,#d9b56a 50%,#a8864e);box-shadow:0 0 14px #c9a86b';
-  const wv = spawn(ctx, `<div style="width:${w}px;height:${h}px;border-radius:50% 50% 20% 20%;background:${bg}"></div>`, a, { life: ms + 1200 });
+  const wv = spawn(ctx, `<div data-sp="sandWave" style="width:${w}px;height:${h}px;border-radius:50% 50% 20% 20%;background:${bg}"></div>`, a, { life: ms + 1200 });
   return fly(ctx, wv, a, b, ms, { rotate: 0, scale: [0.1, 1], ease: 'ease-in' }).then(() => wv);
 }
-const sandGrains = (ctx, at, spread, n = 30) => Array.from({ length: n }, () => { const d = spawn(ctx, `<div style="width:${rnd(4, 8)}px;height:${rnd(4, 8)}px;border-radius:50%;background:#d9b56a"></div>`, { x: at.x + rnd(-spread, spread), y: at.y + rnd(-spread * 0.4, spread * 0.4) }, { life: 1200 }); return d; });
+const sandGrains = (ctx, at, spread, n = 30) => Array.from({ length: n }, () => { const d = spawn(ctx, `<div data-sp="sandGrains" style="width:${rnd(4, 8)}px;height:${rnd(4, 8)}px;border-radius:50%;background:#d9b56a"></div>`, { x: at.x + rnd(-spread, spread), y: at.y + rnd(-spread * 0.4, spread * 0.4) }, { life: 1200 }); return d; });
 
 Object.assign(ANIMS, {
   human_boulder: { desc: 'User turns into a round brown ball and rolls into the target.', play: (ctx) => boulderRoll(ctx, false) },
@@ -3310,9 +3311,9 @@ Object.assign(ANIMS, {
     async play(ctx) {
       const el = ctx.targetEls[0]; const f = feetOf(ctx, el); const { h } = sizeOf(el);
       const total = 2100;
-      const pool = spawn(ctx, '<div style="width:170px;height:44px;border-radius:50%;background:radial-gradient(ellipse,#e8cf96,#c9a86b 55%,#c9a86b00 72%)"></div>', f, { life: total + 600, z: 1 });
+      const pool = spawn(ctx, '<div data-sp="sand_burial-1" style="width:170px;height:44px;border-radius:50%;background:radial-gradient(ellipse,#e8cf96,#c9a86b 55%,#c9a86b00 72%)"></div>', f, { life: total + 600, z: 1 });
       await pop(ctx, pool, 300);
-      const mound = spawn(ctx, `<div style="width:130px;height:${h * 0.42}px;border-radius:50% 50% 10% 10%;background:radial-gradient(ellipse at 50% 30%,#f2deb0,#d9b56a 55%,#a8864e)"></div>`, { x: f.x, y: f.y + 6 }, { life: total + 600, z: 4 });
+      const mound = spawn(ctx, `<div data-sp="sand_burial-2" style="width:130px;height:${h * 0.42}px;border-radius:50% 50% 10% 10%;background:radial-gradient(ellipse at 50% 30%,#f2deb0,#d9b56a 55%,#a8864e)"></div>`, { x: f.x, y: f.y + 6 }, { life: total + 600, z: 4 });
       rise(ctx, mound, 600);
       el.animate([{ clipPath: 'inset(0 0 0 0)', transform: 'translateY(0)' }, { clipPath: 'inset(0 0 100% 0)', transform: `translateY(${h}px)`, offset: 0.3 }, { clipPath: 'inset(0 0 100% 0)', transform: `translateY(${h}px)`, offset: 0.88 }, { clipPath: 'inset(0 0 0 0)', transform: 'translateY(0)' }], { duration: total * ctx.sp, easing: 'ease-in-out' });
       await wait(total * 0.4 * ctx.sp);
@@ -3330,7 +3331,7 @@ Object.assign(ANIMS, {
       const grains = sandGrains(ctx, { x: to.x, y: to.y + h * 0.4 }, h * 0.5, 40);
       grains.forEach((g) => { const st = { x: parseFloat(g.style.left), y: parseFloat(g.style.top) }; fly(ctx, g, st, { x: to.x + rnd(-w * 0.3, w * 0.3), y: to.y + rnd(-h * 0.4, h * 0.4) }, 380, { rotate: 0, ease: 'ease-in' }).then(() => fade(ctx, g, 300)); });
       await wait(320 * ctx.sp);
-      const c = spawn(ctx, `<div style="width:${w * 0.85}px;height:${h * 0.9}px;border-radius:30% 30% 12% 12%;background:repeating-linear-gradient(170deg,#0000 0 12px,#a8864e66 12px 14px),radial-gradient(ellipse at 50% 30%,#f2deb0,#d9b56a 55%,#a8864e);opacity:.92"></div>`, to, { life: 1800 });
+      const c = spawn(ctx, `<div data-sp="sand_coffin" style="width:${w * 0.85}px;height:${h * 0.9}px;border-radius:30% 30% 12% 12%;background:repeating-linear-gradient(170deg,#0000 0 12px,#a8864e66 12px 14px),radial-gradient(ellipse at 50% 30%,#f2deb0,#d9b56a 55%,#a8864e);opacity:.92"></div>`, to, { life: 1800 });
       await grow(ctx, c, 260, 'scaleY(.2)', 'scaleY(1)'); shake(ctx); await wait(600 * ctx.sp); fade(ctx, c, 300);
     },
   },
@@ -3354,12 +3355,12 @@ Object.assign(ANIMS, {
       const box = sideBox(ctx);
       for (let i = 0; i < 70; i++) {
         const x = rnd(box.x1 - 30, box.x2 + 30); const st = { x, y: -20 };
-        const d = spawn(ctx, `<div style="width:${rnd(8, 18)}px;height:${rnd(18, 36)}px;border-radius:40%;background:#d9b56a;box-shadow:0 0 4px #a8864e"></div>`, st, { life: 1000 });
+        const d = spawn(ctx, `<div data-sp="sand_waterfall_funeral-1" style="width:${rnd(8, 18)}px;height:${rnd(18, 36)}px;border-radius:40%;background:#d9b56a;box-shadow:0 0 4px #a8864e"></div>`, st, { life: 1000 });
         fly(ctx, d, st, { x, y: rnd(box.y1 + box.h * 0.4, box.y2) }, rnd(300, 420), { rotate: 0, ease: 'ease-in' }).then(() => d.remove());
         await wait(8 * ctx.sp);
       }
       await wait(300 * ctx.sp);
-      const pile = spawn(ctx, `<div style="width:${box.w + 120}px;height:${box.h * 0.45}px;border-radius:50% 50% 8px 8px;background:radial-gradient(ellipse at 50% 30%,#f2deb0,#d9b56a 55%,#a8864e)"></div>`, { x: box.c.x, y: box.y2 + 10 }, { life: 1800, z: 7 });
+      const pile = spawn(ctx, `<div data-sp="sand_waterfall_funeral-2" style="width:${box.w + 120}px;height:${box.h * 0.45}px;border-radius:50% 50% 8px 8px;background:radial-gradient(ellipse at 50% 30%,#f2deb0,#d9b56a 55%,#a8864e)"></div>`, { x: box.c.x, y: box.y2 + 10 }, { life: 1800, z: 7 });
       await rise(ctx, pile, 300); shake(ctx); await wait(500 * ctx.sp); fade(ctx, pile, 350);
     },
   },
@@ -3367,7 +3368,7 @@ Object.assign(ANIMS, {
     desc: 'User throws their three-bladed scythe at the target.',
     async play(ctx) {
       const to = ctx.tos[0]; const s = spawn(ctx, ART8.scythe(84), ctx.from, { life: 1600 });
-      const cable = (len) => `<svg width="${len}" height="4" viewBox="0 0 ${len} 4"><path d="M0 2H${len}" stroke="#3a3a3a" stroke-width="1.6"/></svg>`;
+      const cable = (len) => `<svg data-sp="scythe_throw" width="${len}" height="4" viewBox="0 0 ${len} 4"><path d="M0 2H${len}" stroke="#3a3a3a" stroke-width="1.6"/></svg>`;
       stretch(ctx, ctx.from, to, cable, 380, 1400).then((c) => setTimeout(() => fade(ctx, c, 250), 400 * ctx.sp));
       await fly(ctx, s, ctx.from, to, 380, { rotate: 0, arc: 30 });
       FX.fx(ctx.arena, 'slash', to); shake(ctx);
@@ -3438,9 +3439,9 @@ Object.assign(ANIMS, {
     desc: "A shadow stretches from the user's feet to the target, creeps up them and grabs their neck.",
     async play(ctx) {
       const el = ctx.targetEls[0]; const n = await shadowTo(ctx, el, 440); const f = feetOf(ctx, el); const { h } = sizeOf(el);
-      const up = spawn(ctx, `<svg width="40" height="${h * 0.8}" viewBox="0 0 40 100" preserveAspectRatio="none"><path d="M20 100C10 80 30 60 18 40 10 26 16 14 20 6" stroke="#050505" stroke-width="10" fill="none" stroke-linecap="round" opacity=".9" vector-effect="non-scaling-stroke"/></svg>`, { x: f.x, y: f.y }, { life: 2000 });
+      const up = spawn(ctx, `<svg data-sp="shadow_neck_bind-1" width="40" height="${h * 0.8}" viewBox="0 0 40 100" preserveAspectRatio="none"><path d="M20 100C10 80 30 60 18 40 10 26 16 14 20 6" stroke="#050505" stroke-width="10" fill="none" stroke-linecap="round" opacity=".9" vector-effect="non-scaling-stroke"/></svg>`, { x: f.x, y: f.y }, { life: 2000 });
       await rise(ctx, up, 380);
-      const hand = spawn(ctx, '<svg width="54" height="34" viewBox="0 0 54 34"><path d="M4 18C10 4 44 4 50 18M8 22C16 30 38 30 46 22" stroke="#050505" stroke-width="6" fill="none" stroke-linecap="round" opacity=".9"/></svg>', { x: f.x, y: f.y - h * 0.82 }, { life: 1400 });
+      const hand = spawn(ctx, '<svg data-sp="shadow_neck_bind-2" width="54" height="34" viewBox="0 0 54 34"><path d="M4 18C10 4 44 4 50 18M8 22C16 30 38 30 46 22" stroke="#050505" stroke-width="6" fill="none" stroke-linecap="round" opacity=".9"/></svg>', { x: f.x, y: f.y - h * 0.82 }, { life: 1400 });
       await pop(ctx, hand, 200); shake(ctx); await wait(500 * ctx.sp); [n, up, hand].forEach((x) => fade(ctx, x, 300));
     },
   },
@@ -3448,7 +3449,7 @@ Object.assign(ANIMS, {
     desc: "Shadows stretch from the user's feet to every enemy's feet, then shadow spikes shoot up and stab them.",
     async play(ctx) {
       const ns = await Promise.all(ctx.targetEls.map((el) => shadowTo(ctx, el)));
-      const spikes = ctx.targetEls.flatMap((el) => { const f = feetOf(ctx, el); const { h } = sizeOf(el); return [-16, 0, 16].map((dx) => { const s = spawn(ctx, `<svg width="10" height="${h * 0.7}" viewBox="0 0 10 100" preserveAspectRatio="none"><path d="M5 0 10 100H0Z" fill="#050505"/></svg>`, { x: f.x + dx, y: f.y }, { life: 1600 }); s.style.transform = `translate(-50%,-100%) rotate(${dx}deg) scaleY(0)`; s.style.transformOrigin = '50% 100%'; s.animate([{ transform: `translate(-50%,-100%) rotate(${dx}deg) scaleY(0)` }, { transform: `translate(-50%,-100%) rotate(${dx}deg) scaleY(1)` }], { duration: 180 * ctx.sp, fill: 'forwards' }); return s; }); });
+      const spikes = ctx.targetEls.flatMap((el) => { const f = feetOf(ctx, el); const { h } = sizeOf(el); return [-16, 0, 16].map((dx) => { const s = spawn(ctx, `<svg data-sp="shadow_stitching" width="10" height="${h * 0.7}" viewBox="0 0 10 100" preserveAspectRatio="none"><path d="M5 0 10 100H0Z" fill="#050505"/></svg>`, { x: f.x + dx, y: f.y }, { life: 1600 }); s.style.transform = `translate(-50%,-100%) rotate(${dx}deg) scaleY(0)`; s.style.transformOrigin = '50% 100%'; s.animate([{ transform: `translate(-50%,-100%) rotate(${dx}deg) scaleY(0)` }, { transform: `translate(-50%,-100%) rotate(${dx}deg) scaleY(1)` }], { duration: 180 * ctx.sp, fill: 'forwards' }); return s; }); });
       await wait(200 * ctx.sp); shake(ctx); await wait(450 * ctx.sp); [...ns, ...spikes].forEach((x) => fade(ctx, x, 300));
     },
   },
@@ -3459,7 +3460,7 @@ Object.assign(ANIMS, {
     desc: 'A light purple circle expands from the user until it reaches and strikes every enemy.',
     async play(ctx) {
       const r = Math.max(...ctx.tos.map((t) => Math.hypot(t.x - ctx.from.x, t.y - ctx.from.y))) * 2;
-      const c = spawn(ctx, `<div style="width:${r}px;height:${r}px;border-radius:50%;border:5px solid #d6c4ff;background:radial-gradient(circle,#c9b3ff00 55%,#c9b3ff55 70%,#c9b3ff00 72%);box-shadow:0 0 24px #b99cff"></div>`, ctx.from, { life: 1400 });
+      const c = spawn(ctx, `<div data-sp="shinra_tensei" style="width:${r}px;height:${r}px;border-radius:50%;border:5px solid #d6c4ff;background:radial-gradient(circle,#c9b3ff00 55%,#c9b3ff55 70%,#c9b3ff00 72%);box-shadow:0 0 24px #b99cff"></div>`, ctx.from, { life: 1400 });
       await c.animate([{ transform: 'translate(-50%,-50%) scale(.05)', opacity: 1 }, { transform: 'translate(-50%,-50%) scale(1)', opacity: 0.9 }], { duration: 600 * ctx.sp, easing: 'ease-out', fill: 'forwards' }).finished.catch(() => {});
       shake(ctx); fade(ctx, c, 250);
     },
@@ -3493,7 +3494,7 @@ Object.assign(ANIMS, {
     desc: 'User sprays a pink mist at the target that leaves them dazed.',
     async play(ctx) {
       const to = ctx.tos[0];
-      const m = spawn(ctx, '<div style="width:120px;height:90px;border-radius:50%;background:radial-gradient(ellipse,#ffb3dccc,#ffb3dc66 50%,#ffb3dc00 72%);filter:blur(3px)"></div>', ctx.from, { life: 2200 });
+      const m = spawn(ctx, '<div data-sp="sly_mind_affect" style="width:120px;height:90px;border-radius:50%;background:radial-gradient(ellipse,#ffb3dccc,#ffb3dc66 50%,#ffb3dc00 72%);filter:blur(3px)"></div>', ctx.from, { life: 2200 });
       await fly(ctx, m, ctx.from, to, 450, { rotate: 0, scale: [0.3, 1.4], ease: 'ease-out' });
       ctx.targetEls[0].animate([{ transform: 'rotate(0deg)' }, { transform: 'rotate(-7deg)' }, { transform: 'rotate(6deg)' }, { transform: 'rotate(-4deg)' }, { transform: 'rotate(0deg)' }], { duration: 900 * ctx.sp });
       const { h } = sizeOf(ctx.targetEls[0]);
@@ -3503,7 +3504,7 @@ Object.assign(ANIMS, {
   },
   smoke_bomb: {
     desc: 'User throws a round smoke bomb at the enemies that bursts into a white smoke cloud.',
-    async play(ctx) { const box = sideBox(ctx); const b = spawn(ctx, '<div style="width:24px;height:24px;border-radius:50%;background:radial-gradient(circle at 35% 35%,#8a8f99,#2a2d33);border:1.5px solid #111"></div>', ctx.from, { life: 1200 }); await fly(ctx, b, ctx.from, box.c, 480, { rotate: 0, arc: 90, ease: 'ease-in-out' }); b.remove(); const c = spawn(ctx, `<div style="width:${box.w + 140}px;height:${box.h + 60}px;border-radius:50%;background:radial-gradient(ellipse,#f4f4f4ee 0%,#e6e6e6cc 45%,#e6e6e600 72%);filter:blur(4px)"></div>`, box.c, { life: 2400 }); await grow(ctx, c, 380, 'scale(.1)', 'scale(1)'); shake(ctx); setTimeout(() => fade(ctx, c, 600), 700 * ctx.sp); },
+    async play(ctx) { const box = sideBox(ctx); const b = spawn(ctx, '<div data-sp="smoke_bomb-1" style="width:24px;height:24px;border-radius:50%;background:radial-gradient(circle at 35% 35%,#8a8f99,#2a2d33);border:1.5px solid #111"></div>', ctx.from, { life: 1200 }); await fly(ctx, b, ctx.from, box.c, 480, { rotate: 0, arc: 90, ease: 'ease-in-out' }); b.remove(); const c = spawn(ctx, `<div data-sp="smoke_bomb-2" style="width:${box.w + 140}px;height:${box.h + 60}px;border-radius:50%;background:radial-gradient(ellipse,#f4f4f4ee 0%,#e6e6e6cc 45%,#e6e6e600 72%);filter:blur(4px)"></div>`, box.c, { life: 2400 }); await grow(ctx, c, 380, 'scale(.1)', 'scale(1)'); shake(ctx); setTimeout(() => fade(ctx, c, 600), 700 * ctx.sp); },
   },
   son_goku_bomb: { desc: 'A black orb with a purple aura and tiny blue and red sparks grows in front of the user, then fires at the enemies.', play: (ctx) => ANIMS.chomei_bomb.play(ctx) },
   ftg_barrier: {
@@ -3563,7 +3564,7 @@ Object.assign(ANIMS, {
   spore_clone: {
     desc: 'When the user takes damage, they burst into a puff of green spores.',
     async play(ctx) { FX.ring(ctx.arena, ctx.userEl, 'aura'); await wait(400 * ctx.sp); },
-    decoy(ctx, el) { const at = FX.centerOf(el, ctx.arena); const { h } = sizeOf(el); el.animate([{ opacity: 1 }, { opacity: 0, offset: 0.1 }, { opacity: 0, offset: 0.85 }, { opacity: 1 }], { duration: 1300 * ctx.sp }); for (let i = 0; i < 8; i++) puff(ctx, { x: at.x + rnd(-h * 0.2, h * 0.2), y: at.y + rnd(-h * 0.35, h * 0.35) }, '#9be36a', rnd(60, 100)); scatter(ctx, at, '<div style="width:6px;height:6px;border-radius:50%;background:#b7f07a;box-shadow:0 0 4px #6fc23a"></div>', 30, 110, 1000); },
+    decoy(ctx, el) { const at = FX.centerOf(el, ctx.arena); const { h } = sizeOf(el); el.animate([{ opacity: 1 }, { opacity: 0, offset: 0.1 }, { opacity: 0, offset: 0.85 }, { opacity: 1 }], { duration: 1300 * ctx.sp }); for (let i = 0; i < 8; i++) puff(ctx, { x: at.x + rnd(-h * 0.2, h * 0.2), y: at.y + rnd(-h * 0.35, h * 0.35) }, '#9be36a', rnd(60, 100)); scatter(ctx, at, '<div data-sp="spore_clone" style="width:6px;height:6px;border-radius:50%;background:#b7f07a;box-shadow:0 0 4px #6fc23a"></div>', 30, 110, 1000); },
   },
 });
 
@@ -3571,11 +3572,11 @@ Object.assign(ANIMS, {
 /** The shared Tailed Beast Bomb orb. Grows in front of the user; fires at one target, the enemy side, or (keep) is returned for the caller. */
 async function beastBomb(ctx, { size = 90, single = false, keep = false } = {}) {
   const at = { x: ctx.from.x + (ctx.isFoe ? -1 : 1) * (40 + size * 0.25), y: ctx.from.y - 20 };
-  const orb = spawn(ctx, `<div style="width:${size}px;height:${size}px;border-radius:50%;background:radial-gradient(circle at 40% 35%,#2a2235,#000 60%);box-shadow:0 0 0 4px #7a3cff66,0 0 ${size / 3}px ${size / 7}px #8a4bffaa"></div>`, at, { life: 4000 });
+  const orb = spawn(ctx, `<div data-sp="beastBomb-orb" style="width:${size}px;height:${size}px;border-radius:50%;background:radial-gradient(circle at 40% 35%,#2a2235,#000 60%);box-shadow:0 0 0 4px #7a3cff66,0 0 ${size / 3}px ${size / 7}px #8a4bffaa"></div>`, at, { life: 4000 });
   const sparks = setInterval(() => {
     const r = orb.getBoundingClientRect(); const a = ctx.arena.getBoundingClientRect();
     const c = { x: r.left - a.left + r.width / 2, y: r.top - a.top + r.height / 2 };
-    const p = spawn(ctx, `<div style="width:7px;height:7px;border-radius:50%;background:${Math.random() < 0.5 ? '#4ab0ff' : '#ff4a4a'}"></div>`, c, { life: 600 });
+    const p = spawn(ctx, (() => { const blue = Math.random() < 0.5; return `<div data-sp="beastBomb-spark-${blue ? 'blue' : 'red'}" style="width:7px;height:7px;border-radius:50%;background:${blue ? '#4ab0ff' : '#ff4a4a'}"></div>`; })(), c, { life: 600 });
     const t = rnd(0, Math.PI * 2);
     fly(ctx, p, c, { x: c.x + Math.cos(t) * size * 0.66, y: c.y + Math.sin(t) * size * 0.66 }, 400, { rotate: 0, ease: 'ease-out' }).then(() => p.remove());
   }, 40);
@@ -3588,23 +3589,23 @@ async function beastBomb(ctx, { size = 90, single = false, keep = false } = {}) 
   boom(ctx, dest, '#ffffff', 220 + size); shake(ctx);
 }
 const ART9 = {
-  baku: (w = 200) => `<svg width="${w}" height="${w * 0.8}" viewBox="0 0 200 160"><path d="M30 150C10 120 20 60 70 50 110 40 160 60 170 100 176 130 160 150 150 150Z" fill="#6e5a4a" stroke="#3a2a1e" stroke-width="3"/><path d="M160 92C178 84 190 96 186 112 182 128 196 140 192 150" stroke="#6e5a4a" stroke-width="14" fill="none" stroke-linecap="round"/><path d="M160 92C178 84 190 96 186 112 182 128 196 140 192 150" stroke="#3a2a1e" stroke-width="2" fill="none"/><circle cx="140" cy="80" r="5" fill="#111"/><path d="M110 56 100 34 126 50" fill="#5a4838" stroke="#3a2a1e" stroke-width="2"/><path d="M40 150V160M80 150V160M130 150V160" stroke="#3a2a1e" stroke-width="10"/></svg>`,
-  toad: (w = 260) => `<svg width="${w}" height="${w * 0.75}" viewBox="0 0 260 195"><path d="M20 160C10 110 40 60 90 50 110 20 150 20 170 50 220 60 250 110 240 160Z" fill="#c8402a" stroke="#6a1a10" stroke-width="4"/><circle cx="100" cy="50" r="20" fill="#e8b422" stroke="#6a1a10" stroke-width="3"/><circle cx="160" cy="50" r="20" fill="#e8b422" stroke="#6a1a10" stroke-width="3"/><path d="M92 50h16M152 50h16" stroke="#111" stroke-width="4"/><path d="M60 110Q130 140 200 110" stroke="#6a1a10" stroke-width="4" fill="none"/><path d="M110 70 150 90M150 70 110 90" stroke="#3a3a8a" stroke-width="4"/><path d="M20 160 10 190H70L60 160M240 160 250 190H190L200 160" fill="#c8402a" stroke="#6a1a10" stroke-width="3"/></svg>`,
-  weasel: (w = 90) => `<svg width="${w}" height="${w * 0.6}" viewBox="0 0 90 54"><path d="M6 34C14 20 34 18 50 22 62 14 76 16 84 26 78 30 70 32 64 32 56 40 34 44 18 40Z" fill="#fbfbf7" stroke="#9a9a90" stroke-width="2"/><path d="M6 34C0 30 2 22 10 24" stroke="#fbfbf7" stroke-width="6" fill="none"/><circle cx="74" cy="24" r="2" fill="#111"/><path d="M74 20 72 14M78 20 80 14" stroke="#9a9a90" stroke-width="2"/><path d="M60 30 88 50" stroke="#6b4a2a" stroke-width="3"/><path d="M84 46C90 38 90 28 82 24 84 34 82 42 76 48Z" fill="#c9ced6" stroke="#444"/></svg>`,
-  slug: (w = 140) => `<svg width="${w}" height="${w * 0.6}" viewBox="0 0 140 84"><path d="M10 78C10 50 30 30 60 26 80 10 110 14 120 30 132 46 130 70 124 78Z" fill="#f4f4ef" stroke="#a8b8c8" stroke-width="3"/><path d="M60 26C80 22 104 26 120 40" stroke="#4a7ad8" stroke-width="8" fill="none" stroke-linecap="round"/><path d="M100 18 96 4M112 20 114 6" stroke="#a8b8c8" stroke-width="3"/><circle cx="96" cy="4" r="3" fill="#333"/><circle cx="114" cy="6" r="3" fill="#333"/></svg>`,
-  bigSpider: (w = 170) => `<svg width="${w}" height="${w * 0.7}" viewBox="0 0 170 120"><g stroke="#111" stroke-width="7" fill="none" stroke-linecap="round"><path d="M70 60 30 30 8 50M70 66 20 66 4 90M74 74 36 96 24 118M100 60 140 30 162 50M100 66 150 66 166 90M96 74 134 96 146 118"/></g><ellipse cx="85" cy="68" rx="36" ry="30" fill="#151515" stroke="#000" stroke-width="2"/><path d="M68 46Q85 70 70 94M102 46Q85 70 100 94" stroke="#e8622a" stroke-width="6" fill="none"/><ellipse cx="85" cy="34" rx="18" ry="14" fill="#202020"/><circle cx="79" cy="32" r="3" fill="#ff3a3a"/><circle cx="91" cy="32" r="3" fill="#ff3a3a"/></svg>`,
-  dog: (s = 48) => `<svg width="${s}" height="${s * 0.75}" viewBox="0 0 48 36"><path d="M4 24C4 14 14 10 24 12 30 4 40 4 44 12 46 18 42 22 36 22 34 30 24 34 14 32 8 32 4 28 4 24Z" fill="#c8a06a" stroke="#6a4a2a" stroke-width="2"/><path d="M28 10 40 9" stroke="#2a5ad8" stroke-width="4"/><circle cx="38" cy="15" r="1.8" fill="#111"/><path d="M44 16h3" stroke="#111" stroke-width="2"/><path d="M10 32V36M20 33V36" stroke="#6a4a2a" stroke-width="3"/></svg>`,
-  gate: (w = 260) => `<svg width="${w}" height="${w * 0.9}" viewBox="0 0 260 234"><path d="M10 40H250L230 10H30Z" fill="#5a2a5a" stroke="#2a0a2a" stroke-width="3"/><rect x="20" y="40" width="220" height="190" fill="#7a4a3a" stroke="#2a0a2a" stroke-width="3"/><rect x="40" y="60" width="80" height="170" fill="#5a3022" stroke="#2a0a2a" stroke-width="2"/><rect x="140" y="60" width="80" height="170" fill="#5a3022" stroke="#2a0a2a" stroke-width="2"/><circle cx="80" cy="150" r="16" fill="#3a1a1a" stroke="#c8a24a" stroke-width="3"/><circle cx="180" cy="150" r="16" fill="#3a1a1a" stroke="#c8a24a" stroke-width="3"/><path d="M110 30 130 18 150 30" stroke="#c8a24a" stroke-width="4" fill="none"/><circle cx="130" cy="28" r="8" fill="#c8202a"/></svg>`,
-  komainu: (s = 90) => `<svg width="${s}" height="${s * 0.7}" viewBox="0 0 90 63"><path d="M6 46C6 30 18 20 34 22 44 8 64 6 76 18 84 26 86 38 80 44 74 50 64 50 60 46 52 56 30 58 16 56 10 54 6 50 6 46Z" fill="#fff" stroke="#000" stroke-width="4" stroke-linejoin="round"/><path d="M64 14 60 4 70 12M76 20 82 10 80 22" fill="#fff" stroke="#000" stroke-width="3"/><circle cx="72" cy="28" r="3" fill="#000"/><path d="M80 38 70 40 76 44" fill="none" stroke="#000" stroke-width="3"/><path d="M14 56 12 63M30 58 30 63M50 56 52 63" stroke="#000" stroke-width="4"/></svg>`,
-  arrow: (l = 110, c = '#5dff8f', g = '#2ad25a') => `<svg width="${l}" height="18" viewBox="0 0 ${l} 18" style="filter:drop-shadow(0 0 8px ${g})"><path d="M0 9H${l - 20}" stroke="${c}" stroke-width="5" stroke-linecap="round"/><path d="M${l - 26} 1 ${l} 9 ${l - 26} 17Z" fill="${c}"/></svg>`,
-  feather: () => '<svg width="16" height="34" viewBox="0 0 16 34"><path d="M8 0C16 10 14 26 8 34 2 26 0 10 8 0Z" fill="#fafafa" stroke="#d8d8e0" stroke-width="1"/><path d="M8 4V32" stroke="#c8c8d0" stroke-width="1"/></svg>',
-  puppetWhite: (h = 90) => `<svg width="${h * 0.6}" height="${h}" viewBox="0 0 60 100"><circle cx="30" cy="14" r="10" fill="#f6f2ea" stroke="#8a8478" stroke-width="2"/><path d="M14 28H46L52 86 42 98H18L8 86Z" fill="#fafafa" stroke="#9a9a90" stroke-width="2"/><path d="M14 30 4 56M46 30 56 56" stroke="#f6f2ea" stroke-width="6" stroke-linecap="round"/><path d="M30 28V96" stroke="#d8d8d0" stroke-width="2"/></svg>`,
-  meteor: (s = 260) => `<svg width="${s}" height="${s}" viewBox="0 0 100 100" style="filter:drop-shadow(0 0 20px #ff7a1a)"><path d="M50 4C76 6 96 24 96 50 96 76 76 96 50 96 24 96 4 76 6 50 8 24 26 4 50 4Z" fill="#6e6258" stroke="#3a322a" stroke-width="3"/><circle cx="34" cy="34" r="9" fill="#54493f"/><circle cx="64" cy="56" r="12" fill="#54493f"/><circle cx="40" cy="70" r="6" fill="#54493f"/><path d="M8 70C20 90 40 98 60 96" stroke="#ff7a1a" stroke-width="6" fill="none" opacity=".7"/></svg>`,
-  totsuka: (l = 200) => `<svg width="${l}" height="30" viewBox="0 0 ${l} 30" style="filter:drop-shadow(0 0 14px #ff9a2a)"><path d="M0 15C${l * 0.3} 6 ${l * 0.7} 4 ${l} 15 ${l * 0.7} 26 ${l * 0.3} 24 0 15Z" fill="#ffb84add" stroke="#fff3c2" stroke-width="2"/></svg>`,
-  staffBlack: (len) => `<svg width="${len}" height="14" viewBox="0 0 ${len} 14"><rect x="0" y="4" width="${len}" height="6" rx="3" fill="#0a0a0a" stroke="#4a3a6a"/><circle cx="${len - 6}" cy="7" r="7" fill="#0a0a0a" stroke="#6b4bd6" stroke-width="1.5"/></svg>`,
-  smokeDragon: (h = 220) => `<svg width="${h * 0.4}" height="${h}" viewBox="0 0 40 100"><path d="M20 100C6 80 34 70 20 50S8 22 20 8" stroke="#e6e6e6" stroke-width="14" fill="none" stroke-linecap="round" opacity=".85"/><path d="M14 10 20 0 28 8 22 14Z" fill="#f4f4f4"/></svg>`,
+  baku: (w = 200) => `<svg data-sp="art-baku" width="${w}" height="${w * 0.8}" viewBox="0 0 200 160"><path d="M30 150C10 120 20 60 70 50 110 40 160 60 170 100 176 130 160 150 150 150Z" fill="#6e5a4a" stroke="#3a2a1e" stroke-width="3"/><path d="M160 92C178 84 190 96 186 112 182 128 196 140 192 150" stroke="#6e5a4a" stroke-width="14" fill="none" stroke-linecap="round"/><path d="M160 92C178 84 190 96 186 112 182 128 196 140 192 150" stroke="#3a2a1e" stroke-width="2" fill="none"/><circle cx="140" cy="80" r="5" fill="#111"/><path d="M110 56 100 34 126 50" fill="#5a4838" stroke="#3a2a1e" stroke-width="2"/><path d="M40 150V160M80 150V160M130 150V160" stroke="#3a2a1e" stroke-width="10"/></svg>`,
+  toad: (w = 260) => `<svg data-sp="art-toad" width="${w}" height="${w * 0.75}" viewBox="0 0 260 195"><path d="M20 160C10 110 40 60 90 50 110 20 150 20 170 50 220 60 250 110 240 160Z" fill="#c8402a" stroke="#6a1a10" stroke-width="4"/><circle cx="100" cy="50" r="20" fill="#e8b422" stroke="#6a1a10" stroke-width="3"/><circle cx="160" cy="50" r="20" fill="#e8b422" stroke="#6a1a10" stroke-width="3"/><path d="M92 50h16M152 50h16" stroke="#111" stroke-width="4"/><path d="M60 110Q130 140 200 110" stroke="#6a1a10" stroke-width="4" fill="none"/><path d="M110 70 150 90M150 70 110 90" stroke="#3a3a8a" stroke-width="4"/><path d="M20 160 10 190H70L60 160M240 160 250 190H190L200 160" fill="#c8402a" stroke="#6a1a10" stroke-width="3"/></svg>`,
+  weasel: (w = 90) => `<svg data-sp="art-weasel" width="${w}" height="${w * 0.6}" viewBox="0 0 90 54"><path d="M6 34C14 20 34 18 50 22 62 14 76 16 84 26 78 30 70 32 64 32 56 40 34 44 18 40Z" fill="#fbfbf7" stroke="#9a9a90" stroke-width="2"/><path d="M6 34C0 30 2 22 10 24" stroke="#fbfbf7" stroke-width="6" fill="none"/><circle cx="74" cy="24" r="2" fill="#111"/><path d="M74 20 72 14M78 20 80 14" stroke="#9a9a90" stroke-width="2"/><path d="M60 30 88 50" stroke="#6b4a2a" stroke-width="3"/><path d="M84 46C90 38 90 28 82 24 84 34 82 42 76 48Z" fill="#c9ced6" stroke="#444"/></svg>`,
+  slug: (w = 140) => `<svg data-sp="art-slug" width="${w}" height="${w * 0.6}" viewBox="0 0 140 84"><path d="M10 78C10 50 30 30 60 26 80 10 110 14 120 30 132 46 130 70 124 78Z" fill="#f4f4ef" stroke="#a8b8c8" stroke-width="3"/><path d="M60 26C80 22 104 26 120 40" stroke="#4a7ad8" stroke-width="8" fill="none" stroke-linecap="round"/><path d="M100 18 96 4M112 20 114 6" stroke="#a8b8c8" stroke-width="3"/><circle cx="96" cy="4" r="3" fill="#333"/><circle cx="114" cy="6" r="3" fill="#333"/></svg>`,
+  bigSpider: (w = 170) => `<svg data-sp="art-bigSpider" width="${w}" height="${w * 0.7}" viewBox="0 0 170 120"><g stroke="#111" stroke-width="7" fill="none" stroke-linecap="round"><path d="M70 60 30 30 8 50M70 66 20 66 4 90M74 74 36 96 24 118M100 60 140 30 162 50M100 66 150 66 166 90M96 74 134 96 146 118"/></g><ellipse cx="85" cy="68" rx="36" ry="30" fill="#151515" stroke="#000" stroke-width="2"/><path d="M68 46Q85 70 70 94M102 46Q85 70 100 94" stroke="#e8622a" stroke-width="6" fill="none"/><ellipse cx="85" cy="34" rx="18" ry="14" fill="#202020"/><circle cx="79" cy="32" r="3" fill="#ff3a3a"/><circle cx="91" cy="32" r="3" fill="#ff3a3a"/></svg>`,
+  dog: (s = 48) => `<svg data-sp="art-dog" width="${s}" height="${s * 0.75}" viewBox="0 0 48 36"><path d="M4 24C4 14 14 10 24 12 30 4 40 4 44 12 46 18 42 22 36 22 34 30 24 34 14 32 8 32 4 28 4 24Z" fill="#c8a06a" stroke="#6a4a2a" stroke-width="2"/><path d="M28 10 40 9" stroke="#2a5ad8" stroke-width="4"/><circle cx="38" cy="15" r="1.8" fill="#111"/><path d="M44 16h3" stroke="#111" stroke-width="2"/><path d="M10 32V36M20 33V36" stroke="#6a4a2a" stroke-width="3"/></svg>`,
+  gate: (w = 260) => `<svg data-sp="art-gate" width="${w}" height="${w * 0.9}" viewBox="0 0 260 234"><path d="M10 40H250L230 10H30Z" fill="#5a2a5a" stroke="#2a0a2a" stroke-width="3"/><rect x="20" y="40" width="220" height="190" fill="#7a4a3a" stroke="#2a0a2a" stroke-width="3"/><rect x="40" y="60" width="80" height="170" fill="#5a3022" stroke="#2a0a2a" stroke-width="2"/><rect x="140" y="60" width="80" height="170" fill="#5a3022" stroke="#2a0a2a" stroke-width="2"/><circle cx="80" cy="150" r="16" fill="#3a1a1a" stroke="#c8a24a" stroke-width="3"/><circle cx="180" cy="150" r="16" fill="#3a1a1a" stroke="#c8a24a" stroke-width="3"/><path d="M110 30 130 18 150 30" stroke="#c8a24a" stroke-width="4" fill="none"/><circle cx="130" cy="28" r="8" fill="#c8202a"/></svg>`,
+  komainu: (s = 90) => `<svg data-sp="art-komainu" width="${s}" height="${s * 0.7}" viewBox="0 0 90 63"><path d="M6 46C6 30 18 20 34 22 44 8 64 6 76 18 84 26 86 38 80 44 74 50 64 50 60 46 52 56 30 58 16 56 10 54 6 50 6 46Z" fill="#fff" stroke="#000" stroke-width="4" stroke-linejoin="round"/><path d="M64 14 60 4 70 12M76 20 82 10 80 22" fill="#fff" stroke="#000" stroke-width="3"/><circle cx="72" cy="28" r="3" fill="#000"/><path d="M80 38 70 40 76 44" fill="none" stroke="#000" stroke-width="3"/><path d="M14 56 12 63M30 58 30 63M50 56 52 63" stroke="#000" stroke-width="4"/></svg>`,
+  arrow: (l = 110, c = '#5dff8f', g = '#2ad25a') => `<svg data-sp="art-arrow" width="${l}" height="18" viewBox="0 0 ${l} 18" style="filter:drop-shadow(0 0 8px ${g})"><path d="M0 9H${l - 20}" stroke="${c}" stroke-width="5" stroke-linecap="round"/><path d="M${l - 26} 1 ${l} 9 ${l - 26} 17Z" fill="${c}"/></svg>`,
+  feather: () => '<svg data-sp="art-feather" width="16" height="34" viewBox="0 0 16 34"><path d="M8 0C16 10 14 26 8 34 2 26 0 10 8 0Z" fill="#fafafa" stroke="#d8d8e0" stroke-width="1"/><path d="M8 4V32" stroke="#c8c8d0" stroke-width="1"/></svg>',
+  puppetWhite: (h = 90) => `<svg data-sp="art-puppetWhite" width="${h * 0.6}" height="${h}" viewBox="0 0 60 100"><circle cx="30" cy="14" r="10" fill="#f6f2ea" stroke="#8a8478" stroke-width="2"/><path d="M14 28H46L52 86 42 98H18L8 86Z" fill="#fafafa" stroke="#9a9a90" stroke-width="2"/><path d="M14 30 4 56M46 30 56 56" stroke="#f6f2ea" stroke-width="6" stroke-linecap="round"/><path d="M30 28V96" stroke="#d8d8d0" stroke-width="2"/></svg>`,
+  meteor: (s = 260) => `<svg data-sp="art-meteor" width="${s}" height="${s}" viewBox="0 0 100 100" style="filter:drop-shadow(0 0 20px #ff7a1a)"><path d="M50 4C76 6 96 24 96 50 96 76 76 96 50 96 24 96 4 76 6 50 8 24 26 4 50 4Z" fill="#6e6258" stroke="#3a322a" stroke-width="3"/><circle cx="34" cy="34" r="9" fill="#54493f"/><circle cx="64" cy="56" r="12" fill="#54493f"/><circle cx="40" cy="70" r="6" fill="#54493f"/><path d="M8 70C20 90 40 98 60 96" stroke="#ff7a1a" stroke-width="6" fill="none" opacity=".7"/></svg>`,
+  totsuka: (l = 200) => `<svg data-sp="art-totsuka" width="${l}" height="30" viewBox="0 0 ${l} 30" style="filter:drop-shadow(0 0 14px #ff9a2a)"><path d="M0 15C${l * 0.3} 6 ${l * 0.7} 4 ${l} 15 ${l * 0.7} 26 ${l * 0.3} 24 0 15Z" fill="#ffb84add" stroke="#fff3c2" stroke-width="2"/></svg>`,
+  staffBlack: (len) => `<svg data-sp="art-staffBlack" width="${len}" height="14" viewBox="0 0 ${len} 14"><rect x="0" y="4" width="${len}" height="6" rx="3" fill="#0a0a0a" stroke="#4a3a6a"/><circle cx="${len - 6}" cy="7" r="7" fill="#0a0a0a" stroke="#6b4bd6" stroke-width="1.5"/></svg>`,
+  smokeDragon: (h = 220) => `<svg data-sp="art-smokeDragon" width="${h * 0.4}" height="${h}" viewBox="0 0 40 100"><path d="M20 100C6 80 34 70 20 50S8 22 20 8" stroke="#e6e6e6" stroke-width="14" fill="none" stroke-linecap="round" opacity=".85"/><path d="M14 10 20 0 28 8 22 14Z" fill="#f4f4f4"/></svg>`,
 };
-const blueThread = (len) => `<svg width="${len}" height="4" viewBox="0 0 ${len} 4"><path d="M0 2H${len}" stroke="#8fd3ff" stroke-width="1.2" style="filter:drop-shadow(0 0 2px #4aa3ff)"/></svg>`;
+const blueThread = (len) => `<svg data-sp="blueThread" width="${len}" height="4" viewBox="0 0 ${len} 4"><path d="M0 2H${len}" stroke="#8fd3ff" stroke-width="1.2" style="filter:drop-shadow(0 0 2px #4aa3ff)"/></svg>`;
 async function summonPuff(ctx, at, html, { life = 3000, z = 6 } = {}) {
   smokeCloud(ctx, at, 120);
   const n = spawn(ctx, html, at, { life, z }); n.style.opacity = '0';
@@ -3627,7 +3628,7 @@ async function risingDragons(ctx, explode) {
   const box = sideBox(ctx); const { h } = sizeOf(ctx.targetEls[0]);
   const ds = [box.x1 - 30, box.x2 + 30].map((x) => { const d = spawn(ctx, ART9.smokeDragon(h * 1.3), { x, y: box.y2 + 10 }, { life: 2600 }); rise(ctx, d, 450); return d; });
   await wait(500 * ctx.sp);
-  const weapons = [() => ART.star(22), () => ART3.kunai(), () => '<div style="width:16px;height:16px;border-radius:50%;background:radial-gradient(circle at 35% 35%,#8a8f99,#2a2d33)"></div>'];
+  const weapons = [() => ART.star(22), () => ART3.kunai(), () => '<div data-sp="risingDragons" style="width:16px;height:16px;border-radius:50%;background:radial-gradient(circle at 35% 35%,#8a8f99,#2a2d33)"></div>'];
   for (let i = 0; i < 26; i++) {
     const ti = i % ctx.tos.length; const t = ctx.tos[ti]; const st = { x: rnd(box.x1 - 40, box.x2 + 40), y: -20 };
     const w = spawn(ctx, weapons[i % 3](), st, { life: 900 });
@@ -3654,7 +3655,7 @@ Object.assign(ANIMS, {
   laser_circus: {
     desc: 'User fires blue laser beams at every enemy.',
     async play(ctx) {
-      const beam = (len) => `<svg width="${len}" height="14" viewBox="0 0 ${len} 14" style="filter:drop-shadow(0 0 8px #4ab0ff)"><path d="M0 7H${len}" stroke="#bfe6ff" stroke-width="6" stroke-linecap="round"/><path d="M0 7H${len}" stroke="#fff" stroke-width="2"/></svg>`;
+      const beam = (len) => `<svg data-sp="laser_circus" width="${len}" height="14" viewBox="0 0 ${len} 14" style="filter:drop-shadow(0 0 8px #4ab0ff)"><path d="M0 7H${len}" stroke="#bfe6ff" stroke-width="6" stroke-linecap="round"/><path d="M0 7H${len}" stroke="#fff" stroke-width="2"/></svg>`;
       const ns = [];
       for (const [i, t] of ctx.tos.entries()) for (let k = 0; k < 2; k++) { ns.push(await stretch(ctx, { x: ctx.from.x, y: ctx.from.y - 20 + k * 10 }, { x: t.x + rnd(-12, 12), y: t.y + rnd(-16, 16) }, beam, 120, 900)); boom(ctx, t, '#9fd8ff', 70); shakeEl(ctx.targetEls[i]); }
       await wait(200 * ctx.sp); ns.forEach((n) => fade(ctx, n, 200));
@@ -3668,7 +3669,7 @@ Object.assign(ANIMS, {
       const at = { x: ctx.from.x + (ctx.isFoe ? -90 : 90), y: ctx.from.y - 20 };
       const b = await summonPuff(ctx, at, ART9.baku(200)); if (ctx.isFoe) b.firstElementChild.style.transform = 'scaleX(-1)';
       const mouth = { x: at.x + (ctx.isFoe ? -80 : 80), y: at.y + 40 };
-      for (let i = 0; i < 30; i++) { const ti = i % ctx.tos.length; const t = ctx.tos[ti]; const st = { x: t.x + rnd(-30, 30), y: t.y + rnd(-40, 40) }; const d = spawn(ctx, '<div style="width:8px;height:8px;border-radius:50%;background:#8fd3ff;box-shadow:0 0 6px #4aa3ff"></div>', st, { life: 900 }); fly(ctx, d, st, mouth, 600, { rotate: 0, ease: 'ease-in' }).then(() => d.remove()); if (i % 6 === 0) shakeEl(ctx.targetEls[ti]); await wait(25 * ctx.sp); }
+      for (let i = 0; i < 30; i++) { const ti = i % ctx.tos.length; const t = ctx.tos[ti]; const st = { x: t.x + rnd(-30, 30), y: t.y + rnd(-40, 40) }; const d = spawn(ctx, '<div data-sp="summon_baku" style="width:8px;height:8px;border-radius:50%;background:#8fd3ff;box-shadow:0 0 6px #4aa3ff"></div>', st, { life: 900 }); fly(ctx, d, st, mouth, 600, { rotate: 0, ease: 'ease-in' }).then(() => d.remove()); if (i % 6 === 0) shakeEl(ctx.targetEls[ti]); await wait(25 * ctx.sp); }
       await wait(600 * ctx.sp); smokeCloud(ctx, at, 120); b.remove();
     },
   },
@@ -3726,7 +3727,7 @@ Object.assign(ANIMS, {
     async play(ctx) {
       const to = ctx.tos[0]; const at = { x: ctx.from.x + (ctx.isFoe ? -60 : 60), y: ctx.from.y };
       smokeCloud(ctx, at, 140); await wait(150 * ctx.sp);
-      const body = await stretch(ctx, at, between(at, to, 0.86), (len) => `<svg width="${len}" height="44" viewBox="0 0 ${len} 44" style="filter:drop-shadow(0 0 4px #000)"><path d="M0 22H${len}" stroke="#6a3a9a" stroke-width="36" stroke-linecap="round"/><path d="M0 22H${len}" stroke="#4a2070" stroke-width="12" stroke-dasharray="14 10"/></svg>`, 340, 1800);
+      const body = await stretch(ctx, at, between(at, to, 0.86), (len) => `<svg data-sp="summon_manda" width="${len}" height="44" viewBox="0 0 ${len} 44" style="filter:drop-shadow(0 0 4px #000)"><path d="M0 22H${len}" stroke="#6a3a9a" stroke-width="36" stroke-linecap="round"/><path d="M0 22H${len}" stroke="#4a2070" stroke-width="12" stroke-dasharray="14 10"/></svg>`, 340, 1800);
       const head = spawn(ctx, ART3.snake(130).replaceAll('#e8e6dc', '#7a4aaa').replaceAll('#dcd8c8', '#5a3a8a'), between(at, to, 0.86), { life: 1600 });
       head.style.transform = `translate(-20%,-50%) rotate(${ang(at, to)}deg)`; head.style.transformOrigin = '20% 50%';
       boom(ctx, to, '#b44bff', 160); shake(ctx);
@@ -3801,7 +3802,7 @@ Object.assign(ANIMS, {
   ten_puppets: { desc: 'User summons ten puppets with white skin and white robes, tied to them by blue chakra threads, which fly out one by one to strike each enemy.', play: (ctx) => puppetHost(ctx, ART9.puppetWhite, 10) },
   finger_bullets: {
     desc: 'User fires a stream of tiny bone fragments at the target.',
-    async play(ctx) { const to = ctx.tos[0]; for (let i = 0; i < 10; i++) { const st = { x: ctx.from.x + (ctx.isFoe ? -20 : 20), y: ctx.from.y + rnd(-6, 6) }; const b = spawn(ctx, '<svg width="14" height="6" viewBox="0 0 14 6"><path d="M0 3 14 1V5Z" fill="#f4f1e8" stroke="#bfb7a2"/></svg>', st, { life: 600 }); fly(ctx, b, st, { x: to.x + rnd(-14, 14), y: to.y + rnd(-20, 20) }, 180, { ease: 'linear' }).then(() => { b.remove(); shake(ctx); }); await wait(45 * ctx.sp); } await wait(220 * ctx.sp); },
+    async play(ctx) { const to = ctx.tos[0]; for (let i = 0; i < 10; i++) { const st = { x: ctx.from.x + (ctx.isFoe ? -20 : 20), y: ctx.from.y + rnd(-6, 6) }; const b = spawn(ctx, '<svg data-sp="finger_bullets" width="14" height="6" viewBox="0 0 14 6"><path d="M0 3 14 1V5Z" fill="#f4f1e8" stroke="#bfb7a2"/></svg>', st, { life: 600 }); fly(ctx, b, st, { x: to.x + rnd(-14, 14), y: to.y + rnd(-20, 20) }, 180, { ease: 'linear' }).then(() => { b.remove(); shake(ctx); }); await wait(45 * ctx.sp); } await wait(220 * ctx.sp); },
   },
   tengai_shinsei: {
     desc: 'User glows blue, then drops a giant meteor on the enemies, followed by a second one.',
@@ -3872,7 +3873,7 @@ Object.assign(ANIMS, {
   truth_seeking_balls: {
     desc: 'Six black orbs form in front of the user and shoot out at every enemy.',
     async play(ctx) {
-      const orbs = Array.from({ length: 6 }, (_, i) => { const t = (i / 6) * Math.PI * 2; const p = { x: ctx.from.x + (ctx.isFoe ? -50 : 50) + Math.cos(t) * 34, y: ctx.from.y - 30 + Math.sin(t) * 34 }; const o = spawn(ctx, '<div style="width:28px;height:28px;border-radius:50%;background:radial-gradient(circle at 38% 32%,#3a3a44,#050507 60%);box-shadow:0 0 10px #000"></div>', p, { life: 2200 }); o.style.opacity = '0'; setTimeout(() => pop(ctx, o, 150), i * 60 * ctx.sp); return [o, p]; });
+      const orbs = Array.from({ length: 6 }, (_, i) => { const t = (i / 6) * Math.PI * 2; const p = { x: ctx.from.x + (ctx.isFoe ? -50 : 50) + Math.cos(t) * 34, y: ctx.from.y - 30 + Math.sin(t) * 34 }; const o = spawn(ctx, '<div data-sp="truth_seeking_balls" style="width:28px;height:28px;border-radius:50%;background:radial-gradient(circle at 38% 32%,#3a3a44,#050507 60%);box-shadow:0 0 10px #000"></div>', p, { life: 2200 }); o.style.opacity = '0'; setTimeout(() => pop(ctx, o, 150), i * 60 * ctx.sp); return [o, p]; });
       await wait(550 * ctx.sp);
       await Promise.all(orbs.map(([o, p], i) => { const ti = i % ctx.tos.length; return wait(i * 50 * ctx.sp).then(() => fly(ctx, o, p, ctx.tos[ti], 260, { rotate: 0, ease: 'ease-in' })).then(() => { o.remove(); boom(ctx, ctx.tos[ti], '#3a3a44', 110); shakeEl(ctx.targetEls[ti]); }); }));
     },
@@ -3884,26 +3885,26 @@ Object.assign(ANIMS, {
 
 // ---------------------------------------------------------------- batch 10 (sheet rows 344–383): the last of them
 const ART10 = {
-  gunbai: (h = 150) => `<div style="position:relative;width:${h * 0.5}px;height:${h}px"><svg width="${h * 0.5}" height="${h}" viewBox="0 0 50 100" style="position:absolute;inset:0;filter:drop-shadow(0 4px 4px #0008)"><rect x="22" y="60" width="6" height="40" rx="2" fill="#5a3a1e" stroke="#2a1a0e" stroke-width="1.5"/><path d="M25 3A15.5 15.5 0 0 1 36.5 29 16.5 16.5 0 1 1 13.5 29 15.5 15.5 0 0 1 25 3Z" fill="#ece6d6" stroke="#1e1a17" stroke-width="2.5" stroke-linejoin="round"/><path d="M14.5 30.5Q25 26 35.5 30.5" stroke="#1e1a17" stroke-width="1.6" fill="none"/></svg><img src="sprites/battle/uchiha-logo.webp" style="position:absolute;left:50%;top:${h * 0.455}px;height:${h * 0.24}px;transform:translate(-50%,-50%)"></div>`,
-  knife: () => '<svg width="64" height="18" viewBox="0 0 64 18"><rect x="0" y="6" width="20" height="7" rx="2" fill="#5a3a1e"/><path d="M20 4H54C60 4 64 8 62 12L20 14Z" fill="#e6eaef" stroke="#7a8088" stroke-width="1.5"/></svg>',
-  shark: (s = 70) => `<svg width="${s}" height="${s * 0.5}" viewBox="0 0 70 35" style="filter:drop-shadow(0 0 6px #4ab0ff)"><path d="M2 18C14 6 40 4 56 12L68 18 56 24C40 30 14 30 2 18Z" fill="#7ec8ffcc" stroke="#e6f7ff" stroke-width="2"/><path d="M30 8 36 0 40 10Z" fill="#7ec8ffcc" stroke="#e6f7ff" stroke-width="1.5"/><path d="M2 18 0 8 8 16 0 28Z" fill="#7ec8ffcc" stroke="#e6f7ff" stroke-width="1.5"/><circle cx="56" cy="15" r="1.8" fill="#0a2a4a"/><path d="M52 22 56 20 60 22 64 20" stroke="#fff" stroke-width="1.5" fill="none"/></svg>`,
-  waterDragon: (w = 220, c = '#7ec8ff', g = '#4ab0ff') => `<svg width="${w}" height="${w * 0.4}" viewBox="0 0 200 80" style="filter:drop-shadow(0 0 10px ${g})"><path d="M0 44C20 20 40 64 64 40S104 18 128 38 160 50 172 36" stroke="${c}cc" stroke-width="18" fill="none" stroke-linecap="round"/><path d="M0 44C20 20 40 64 64 40S104 18 128 38 160 50 172 36" stroke="#ffffff88" stroke-width="4" fill="none" stroke-linecap="round" stroke-dasharray="6 10"/><path d="M166 22 198 34 176 44 198 52 166 56Z" fill="${c}dd" stroke="#ffffff" stroke-width="2"/><path d="M168 24 160 8M178 26 180 10" stroke="#ffffff" stroke-width="2.5"/><circle cx="180" cy="34" r="2.5" fill="#0a2a4a"/></svg>`,
-  coral: (h = 90) => `<svg width="${h * 0.6}" height="${h}" viewBox="0 0 60 100"><path d="M30 100V60M30 70 14 44 10 24M30 64 44 40 50 18M14 44 4 34M44 40 56 34M30 60 28 30 32 8" stroke="#ff8a9a" stroke-width="7" fill="none" stroke-linecap="round"/><path d="M30 100V60M30 70 14 44 10 24M30 64 44 40 50 18M28 30 32 8" stroke="#ffc2ca" stroke-width="2" fill="none" stroke-linecap="round"/></svg>`,
-  puppetMan: (h = 100) => `<svg width="${h * 0.6}" height="${h}" viewBox="0 0 60 100"><circle cx="30" cy="16" r="11" fill="#d9b38a" stroke="#6b4a2a" stroke-width="2"/><path d="M19 12Q30 0 41 12L40 8Q30 -2 20 8Z" fill="#c8302a"/><path d="M12 30H48L54 88 44 100H16L6 88Z" fill="#1a1a1e" stroke="#000" stroke-width="2"/><path d="M12 32 2 58M48 32 58 58" stroke="#d9b38a" stroke-width="6" stroke-linecap="round"/></svg>`,
-  puppetWoman: (h = 100) => `<svg width="${h * 0.6}" height="${h}" viewBox="0 0 60 100"><path d="M18 12C14 30 16 50 20 58M42 12C46 30 44 50 40 58" stroke="#6b3a1e" stroke-width="7" fill="none"/><circle cx="30" cy="16" r="11" fill="#d9b38a" stroke="#6b4a2a" stroke-width="2"/><path d="M19 14Q30 0 41 14Q30 6 19 14Z" fill="#6b3a1e"/><path d="M12 30H48L54 88 44 100H16L6 88Z" fill="#2f7a3a" stroke="#14401a" stroke-width="2"/><path d="M12 32 2 58M48 32 58 58" stroke="#d9b38a" stroke-width="6" stroke-linecap="round"/></svg>`,
-  airBlade: (s = 90) => `<svg width="${s}" height="${s}" viewBox="0 0 100 100" style="filter:drop-shadow(0 0 8px #bfe9ff)"><path d="M10 80C30 30 70 10 95 12 70 22 42 44 22 86Z" fill="#e8f8ffcc" stroke="#ffffff" stroke-width="2"/></svg>`,
-  tree: (h = 140) => `<svg width="${h * 0.6}" height="${h}" viewBox="0 0 60 100"><path d="M30 100V40M30 60 14 40M30 52 46 34" stroke="#7a4e2a" stroke-width="9" stroke-linecap="round"/><g fill="#3f7a3a" stroke="#2c5a28" stroke-width="2"><circle cx="30" cy="26" r="18"/><circle cx="14" cy="38" r="12"/><circle cx="46" cy="32" r="13"/></g></svg>`,
+  gunbai: (h = 150) => `<div style="position:relative;width:${h * 0.5}px;height:${h}px"><svg data-sp="art-gunbai" width="${h * 0.5}" height="${h}" viewBox="0 0 50 100" style="position:absolute;inset:0;filter:drop-shadow(0 4px 4px #0008)"><rect x="22" y="60" width="6" height="40" rx="2" fill="#5a3a1e" stroke="#2a1a0e" stroke-width="1.5"/><path d="M25 3A15.5 15.5 0 0 1 36.5 29 16.5 16.5 0 1 1 13.5 29 15.5 15.5 0 0 1 25 3Z" fill="#ece6d6" stroke="#1e1a17" stroke-width="2.5" stroke-linejoin="round"/><path d="M14.5 30.5Q25 26 35.5 30.5" stroke="#1e1a17" stroke-width="1.6" fill="none"/></svg><img src="sprites/battle/uchiha-logo.webp" style="position:absolute;left:50%;top:${h * 0.455}px;height:${h * 0.24}px;transform:translate(-50%,-50%)"></div>`,
+  knife: () => '<svg data-sp="art-knife" width="64" height="18" viewBox="0 0 64 18"><rect x="0" y="6" width="20" height="7" rx="2" fill="#5a3a1e"/><path d="M20 4H54C60 4 64 8 62 12L20 14Z" fill="#e6eaef" stroke="#7a8088" stroke-width="1.5"/></svg>',
+  shark: (s = 70) => `<svg data-sp="art-shark" width="${s}" height="${s * 0.5}" viewBox="0 0 70 35" style="filter:drop-shadow(0 0 6px #4ab0ff)"><path d="M2 18C14 6 40 4 56 12L68 18 56 24C40 30 14 30 2 18Z" fill="#7ec8ffcc" stroke="#e6f7ff" stroke-width="2"/><path d="M30 8 36 0 40 10Z" fill="#7ec8ffcc" stroke="#e6f7ff" stroke-width="1.5"/><path d="M2 18 0 8 8 16 0 28Z" fill="#7ec8ffcc" stroke="#e6f7ff" stroke-width="1.5"/><circle cx="56" cy="15" r="1.8" fill="#0a2a4a"/><path d="M52 22 56 20 60 22 64 20" stroke="#fff" stroke-width="1.5" fill="none"/></svg>`,
+  waterDragon: (w = 220, c = '#7ec8ff', g = '#4ab0ff') => `<svg data-sp="art-waterDragon" width="${w}" height="${w * 0.4}" viewBox="0 0 200 80" style="filter:drop-shadow(0 0 10px ${g})"><path d="M0 44C20 20 40 64 64 40S104 18 128 38 160 50 172 36" stroke="${c}cc" stroke-width="18" fill="none" stroke-linecap="round"/><path d="M0 44C20 20 40 64 64 40S104 18 128 38 160 50 172 36" stroke="#ffffff88" stroke-width="4" fill="none" stroke-linecap="round" stroke-dasharray="6 10"/><path d="M166 22 198 34 176 44 198 52 166 56Z" fill="${c}dd" stroke="#ffffff" stroke-width="2"/><path d="M168 24 160 8M178 26 180 10" stroke="#ffffff" stroke-width="2.5"/><circle cx="180" cy="34" r="2.5" fill="#0a2a4a"/></svg>`,
+  coral: (h = 90) => `<svg data-sp="art-coral" width="${h * 0.6}" height="${h}" viewBox="0 0 60 100"><path d="M30 100V60M30 70 14 44 10 24M30 64 44 40 50 18M14 44 4 34M44 40 56 34M30 60 28 30 32 8" stroke="#ff8a9a" stroke-width="7" fill="none" stroke-linecap="round"/><path d="M30 100V60M30 70 14 44 10 24M30 64 44 40 50 18M28 30 32 8" stroke="#ffc2ca" stroke-width="2" fill="none" stroke-linecap="round"/></svg>`,
+  puppetMan: (h = 100) => `<svg data-sp="art-puppetMan" width="${h * 0.6}" height="${h}" viewBox="0 0 60 100"><circle cx="30" cy="16" r="11" fill="#d9b38a" stroke="#6b4a2a" stroke-width="2"/><path d="M19 12Q30 0 41 12L40 8Q30 -2 20 8Z" fill="#c8302a"/><path d="M12 30H48L54 88 44 100H16L6 88Z" fill="#1a1a1e" stroke="#000" stroke-width="2"/><path d="M12 32 2 58M48 32 58 58" stroke="#d9b38a" stroke-width="6" stroke-linecap="round"/></svg>`,
+  puppetWoman: (h = 100) => `<svg data-sp="art-puppetWoman" width="${h * 0.6}" height="${h}" viewBox="0 0 60 100"><path d="M18 12C14 30 16 50 20 58M42 12C46 30 44 50 40 58" stroke="#6b3a1e" stroke-width="7" fill="none"/><circle cx="30" cy="16" r="11" fill="#d9b38a" stroke="#6b4a2a" stroke-width="2"/><path d="M19 14Q30 0 41 14Q30 6 19 14Z" fill="#6b3a1e"/><path d="M12 30H48L54 88 44 100H16L6 88Z" fill="#2f7a3a" stroke="#14401a" stroke-width="2"/><path d="M12 32 2 58M48 32 58 58" stroke="#d9b38a" stroke-width="6" stroke-linecap="round"/></svg>`,
+  airBlade: (s = 90) => `<svg data-sp="art-airBlade" width="${s}" height="${s}" viewBox="0 0 100 100" style="filter:drop-shadow(0 0 8px #bfe9ff)"><path d="M10 80C30 30 70 10 95 12 70 22 42 44 22 86Z" fill="#e8f8ffcc" stroke="#ffffff" stroke-width="2"/></svg>`,
+  tree: (h = 140) => `<svg data-sp="art-tree-2" width="${h * 0.6}" height="${h}" viewBox="0 0 60 100"><path d="M30 100V40M30 60 14 40M30 52 46 34" stroke="#7a4e2a" stroke-width="9" stroke-linecap="round"/><g fill="#3f7a3a" stroke="#2c5a28" stroke-width="2"><circle cx="30" cy="26" r="18"/><circle cx="14" cy="38" r="12"/><circle cx="46" cy="32" r="13"/></g></svg>`,
   woodGolem: (h = 220) => ART3.golem(h).replaceAll('#8a7f72', '#9b6b3e').replaceAll('#4e463e', '#5a3a1e').replaceAll('#5f564c', '#6b4626').replace('stroke="#ffcf5a"', 'stroke="#ff9a3a"'),
-  bone: (l = 70) => `<svg width="${l}" height="14" viewBox="0 0 ${l} 14"><path d="M0 7 10 2H${l - 14}L${l} 7 ${l - 14} 12H10Z" fill="#f4f1e8" stroke="#bfb7a2" stroke-width="1.5"/></svg>`,
+  bone: (l = 70) => `<svg data-sp="art-bone-2" width="${l}" height="14" viewBox="0 0 ${l} 14"><path d="M0 7 10 2H${l - 14}L${l} 7 ${l - 14} 12H10Z" fill="#f4f1e8" stroke="#bfb7a2" stroke-width="1.5"/></svg>`,
 };
-const glitch = (h) => `<div class="ax-glitch" style="width:${h * 0.5}px;height:${h * 0.78}px;background:repeating-linear-gradient(0deg,#000 0 10px,#1b1630 10px 13px,#000 13px 22px);box-shadow:0 0 18px #6b4bd6, inset 0 0 0 2px #2a2050"></div>`;
-const waterBall = (s = 30) => `<div style="width:${s}px;height:${s}px;border-radius:50%;background:radial-gradient(circle at 35% 35%,#fff,#bfe8ff 30%,#4ab0ff 70%);box-shadow:0 0 10px #4ab0ff"></div>`;
-const splash = (ctx, at, n = 10, r = 70) => { for (let i = 0; i < n; i++) { const d = spawn(ctx, '<div style="width:8px;height:8px;border-radius:50%;background:#bfe8ff"></div>', at, { life: 700 }); const t = rnd(0, Math.PI * 2); fly(ctx, d, at, { x: at.x + Math.cos(t) * r, y: at.y + Math.sin(t) * r * 0.8 }, 400, { rotate: 0, ease: 'ease-out' }).then(() => d.remove()); } };
+const glitch = (h) => `<div data-sp="glitch" class="ax-glitch" style="width:${h * 0.5}px;height:${h * 0.78}px;background:repeating-linear-gradient(0deg,#000 0 10px,#1b1630 10px 13px,#000 13px 22px);box-shadow:0 0 18px #6b4bd6, inset 0 0 0 2px #2a2050"></div>`;
+const waterBall = (s = 30) => `<div data-sp="waterBall" style="width:${s}px;height:${s}px;border-radius:50%;background:radial-gradient(circle at 35% 35%,#fff,#bfe8ff 30%,#4ab0ff 70%);box-shadow:0 0 10px #4ab0ff"></div>`;
+const splash = (ctx, at, n = 10, r = 70) => { for (let i = 0; i < n; i++) { const d = spawn(ctx, '<div data-sp="splash" style="width:8px;height:8px;border-radius:50%;background:#bfe8ff"></div>', at, { life: 700 }); const t = rnd(0, Math.PI * 2); fly(ctx, d, at, { x: at.x + Math.cos(t) * r, y: at.y + Math.sin(t) * r * 0.8 }, 400, { rotate: 0, ease: 'ease-out' }).then(() => d.remove()); } };
 function waterWave(ctx, h = 0.9) { const box = sideBox(ctx); return sandWave(ctx, ctx.from, box.c, box.w + 140, box.h * h, 560, true); }
 async function waterSphere(ctx, sharks) {
   const to = ctx.tos[0]; const el = ctx.targetEls[0]; const { h } = sizeOf(el);
   lunge(ctx, to, 0.6, 600); await wait(280 * ctx.sp);
-  const s = spawn(ctx, `<div style="width:${h * 0.95}px;height:${h * 0.95}px;border-radius:50%;background:radial-gradient(circle at 35% 30%,#ffffff88,#7ec8ff66 40%,#2a7ad888);border:3px solid #bfe8ffcc;box-shadow:0 0 18px #4ab0ff"></div>`, to, { life: 2600 });
+  const s = spawn(ctx, `<div data-sp="waterSphere" style="width:${h * 0.95}px;height:${h * 0.95}px;border-radius:50%;background:radial-gradient(circle at 35% 30%,#ffffff88,#7ec8ff66 40%,#2a7ad888);border:3px solid #bfe8ffcc;box-shadow:0 0 18px #4ab0ff"></div>`, to, { life: 2600 });
   await grow(ctx, s, 300, 'scale(.2)', 'scale(1)'); splash(ctx, to, 10, h * 0.5);
   if (sharks) for (let i = 0; i < 4; i++) { const t = rnd(0, Math.PI * 2); const st = { x: to.x + Math.cos(t) * h * 0.35, y: to.y + Math.sin(t) * h * 0.35 }; const sh = spawn(ctx, ART10.shark(46), st, { life: 900 }); fly(ctx, sh, st, to, 260, { rotate: 0 }).then(() => { sh.remove(); boom(ctx, to, '#7ec8ff', 60); shakeEl(el); }); await wait(140 * ctx.sp); }
   shake(ctx); await wait(500 * ctx.sp); fade(ctx, s, 300);
@@ -3925,7 +3926,7 @@ Object.assign(ANIMS, {
     async play(ctx) {
       const to = ctx.tos[0]; const el = ctx.targetEls[0];
       const dist = Math.hypot(to.x - ctx.from.x, to.y - ctx.from.y); const d = (dist + 30) * 2;
-      const r = spawn(ctx, `<div style="width:${d}px;height:${d}px;border-radius:50%;border:5px solid #d6c4ff;background:radial-gradient(circle,#c9b3ff00 55%,#c9b3ff44 70%,#c9b3ff00 72%);box-shadow:0 0 22px #b99cff"></div>`, ctx.from, { life: 1800 });
+      const r = spawn(ctx, `<div data-sp="universal_pull" style="width:${d}px;height:${d}px;border-radius:50%;border:5px solid #d6c4ff;background:radial-gradient(circle,#c9b3ff00 55%,#c9b3ff44 70%,#c9b3ff00 72%);box-shadow:0 0 22px #b99cff"></div>`, ctx.from, { life: 1800 });
       await r.animate([{ transform: 'translate(-50%,-50%) scale(1)', opacity: 0 }, { transform: 'translate(-50%,-50%) scale(1)', opacity: 1 }], { duration: 250 * ctx.sp, fill: 'forwards' }).finished.catch(() => {});
       const k = 0.55; const end = 1 - k * (dist / (dist + 30));
       const ms = 600;
@@ -3956,7 +3957,7 @@ Object.assign(ANIMS, {
     decoy(ctx, el) {
       const f = feetOf({ arena: ctx.arena }, el);
       el.animate([{ transform: 'scaleY(1)', filter: 'none', opacity: 1, transformOrigin: '50% 100%' }, { transform: 'scaleY(.05)', filter: 'brightness(1.4) sepia(1) hue-rotate(170deg) saturate(3)', opacity: 1, offset: 0.3, transformOrigin: '50% 100%' }, { transform: 'scaleY(.05)', opacity: 0, offset: 0.8, transformOrigin: '50% 100%' }, { transform: 'scaleY(1)', opacity: 1, transformOrigin: '50% 100%' }], { duration: 1500 * ctx.sp });
-      const p = spawn(ctx, '<div style="width:150px;height:30px;border-radius:50%;background:radial-gradient(ellipse,#bfe8ffee,#4ab0ffbb 55%,#4ab0ff00 72%)"></div>', f, { life: 1600, z: 1 });
+      const p = spawn(ctx, '<div data-sp="water_mirror" style="width:150px;height:30px;border-radius:50%;background:radial-gradient(ellipse,#bfe8ffee,#4ab0ffbb 55%,#4ab0ff00 72%)"></div>', f, { life: 1600, z: 1 });
       p.animate([{ transform: 'translate(-50%,-50%) scale(.2)' }, { transform: 'translate(-50%,-50%) scale(1)', offset: 0.3 }, { transform: 'translate(-50%,-50%) scale(1)', opacity: 1, offset: 0.8 }, { transform: 'translate(-50%,-50%) scale(1)', opacity: 0 }], { duration: 1500 * ctx.sp, fill: 'forwards' });
       splash({ arena: ctx.arena, sp: ctx.sp }, { x: f.x, y: f.y - 20 }, 10, 60);
     },
@@ -3973,7 +3974,7 @@ Object.assign(ANIMS, {
     desc: 'Water pours down from above, dousing the enemy team.',
     async play(ctx) {
       const box = sideBox(ctx);
-      for (let i = 0; i < 60; i++) { const x = rnd(box.x1 - 30, box.x2 + 30); const st = { x, y: -20 }; const d = spawn(ctx, `<div style="width:${rnd(6, 12)}px;height:${rnd(22, 40)}px;border-radius:40%;background:#7ec8ffdd;box-shadow:0 0 4px #4ab0ff"></div>`, st, { life: 900 }); fly(ctx, d, st, { x, y: rnd(box.y1 + box.h * 0.4, box.y2) }, rnd(280, 380), { rotate: 0, ease: 'ease-in' }).then(() => d.remove()); await wait(8 * ctx.sp); }
+      for (let i = 0; i < 60; i++) { const x = rnd(box.x1 - 30, box.x2 + 30); const st = { x, y: -20 }; const d = spawn(ctx, `<div data-sp="great_waterfall" style="width:${rnd(6, 12)}px;height:${rnd(22, 40)}px;border-radius:40%;background:#7ec8ffdd;box-shadow:0 0 4px #4ab0ff"></div>`, st, { life: 900 }); fly(ctx, d, st, { x, y: rnd(box.y1 + box.h * 0.4, box.y2) }, rnd(280, 380), { rotate: 0, ease: 'ease-in' }).then(() => d.remove()); await wait(8 * ctx.sp); }
       await wait(250 * ctx.sp); ctx.tos.forEach((t) => splash(ctx, t, 12, 80)); shake(ctx);
     },
   },
@@ -4010,7 +4011,7 @@ Object.assign(ANIMS, {
     async play(ctx) {
       const { w, h } = ctx.userSize; const f = feetOf(ctx, ctx.userEl);
       const tier = (top, bot, half) => { const n = 9; let d = `M50 ${top}`; for (let k = 0; k <= n; k++) { const x = 50 + half * (k / n * 2 - 1) * -1; void x; } d = `M50 ${top} `; for (let k = 0; k <= n; k++) { const t = k / n; const x = 50 + half - 2 * half * t; d += `L${x.toFixed(1)} ${bot + (k % 2 ? -6 : 3)} `; } return `<path d="${d}Z" fill="#f2f2f0" stroke="#a8a8a8" stroke-width="1.6" stroke-linejoin="round"/>${Array.from({ length: 5 }, (_, k) => `<path d="M50 ${top + 4}L${50 - half * 0.8 + k * half * 0.4} ${bot - 4}" stroke="#d0d0d0" stroke-width="1"/>`).join('')}`; };
-      const svg = `<svg width="${Math.max(w * 1.25, h * 0.75)}" height="${h * 1.08}" viewBox="0 0 100 120" preserveAspectRatio="none" style="filter:drop-shadow(0 4px 4px #0008)">${tier(58, 118, 50)}${tier(30, 88, 40)}${tier(6, 58, 30)}<path d="M50 0 54 10 46 10Z" fill="#fafafa" stroke="#a8a8a8"/></svg>`;
+      const svg = `<svg data-sp="needle_jizo" width="${Math.max(w * 1.25, h * 0.75)}" height="${h * 1.08}" viewBox="0 0 100 120" preserveAspectRatio="none" style="filter:drop-shadow(0 4px 4px #0008)">${tier(58, 118, 50)}${tier(30, 88, 40)}${tier(6, 58, 30)}<path d="M50 0 54 10 46 10Z" fill="#fafafa" stroke="#a8a8a8"/></svg>`;
       const n = spawn(ctx, svg, { x: f.x, y: f.y + 6 }, { life: 1900 });
       n.style.transformOrigin = '50% 100%';
       n.style.transform = 'translate(-50%,-100%)';
@@ -4026,7 +4027,7 @@ Object.assign(ANIMS, {
   },
   dust_wind: {
     desc: 'User swings their giant fan and blows a ball of air at the target.',
-    async play(ctx) { const to = ctx.tos[0]; const b = spawn(ctx, '<div style="width:80px;height:80px;border-radius:50%;background:radial-gradient(circle,#ffffff44,#e8f8ff88 60%,#e8f8ff00 72%);border:3px solid #f4fcffcc;box-shadow:0 0 16px #bfe9ff"></div>', ctx.from, { life: 1100 }); await fly(ctx, b, ctx.from, to, 380, { rotate: 0, scale: [0.4, 1.3], ease: 'ease-in' }); b.remove(); boom(ctx, to, '#f4fcff', 150); puff(ctx, to, '#ffffff', 100); shake(ctx); },
+    async play(ctx) { const to = ctx.tos[0]; const b = spawn(ctx, '<div data-sp="dust_wind" style="width:80px;height:80px;border-radius:50%;background:radial-gradient(circle,#ffffff44,#e8f8ff88 60%,#e8f8ff00 72%);border:3px solid #f4fcffcc;box-shadow:0 0 16px #bfe9ff"></div>', ctx.from, { life: 1100 }); await fly(ctx, b, ctx.from, to, 380, { rotate: 0, scale: [0.4, 1.3], ease: 'ease-in' }); b.remove(); boom(ctx, to, '#f4fcff', 150); puff(ctx, to, '#ffffff', 100); shake(ctx); },
   },
   wind_blade_dust: { desc: 'User blows a cloud of dust at the enemies.', async play(ctx) { const { fog, go } = mistOver(ctx, '#c9b48a'); await go; ctx.targetEls.forEach((el) => el.animate([{ opacity: 1 }, { opacity: 0.5 }, { opacity: 1 }], { duration: 900 * ctx.sp })); setTimeout(() => fade(ctx, fog, 600), 600 * ctx.sp); await wait(300 * ctx.sp); } },
   pressure_damage: {
@@ -4037,10 +4038,10 @@ Object.assign(ANIMS, {
     desc: 'User forms a Rasenshuriken, flies at the target and strikes them with it; on impact it bursts into a blue dome.',
     async play(ctx) {
       const to = ctx.tos[0]; const hand = { x: ctx.from.x, y: ctx.from.y - ctx.userSize.h * 0.45 };
-      const rs = spawn(ctx, `<div style="position:relative;width:120px;height:120px"><div class="ax-spin" style="position:absolute;inset:0;animation-duration:.25s;background:conic-gradient(#e8f6ff 0 8deg,#0000 8deg 90deg,#e8f6ff 90deg 98deg,#0000 98deg 180deg,#e8f6ff 180deg 188deg,#0000 188deg 270deg,#e8f6ff 270deg 278deg,#0000 278deg);-webkit-mask:radial-gradient(circle,#0000 30%,#000 32%,#000 70%,#0000 71%);mask:radial-gradient(circle,#0000 30%,#000 32%,#000 70%,#0000 71%);filter:drop-shadow(0 0 8px #9fd8ff)"></div><div style="position:absolute;left:30px;top:30px">${ART.rasengan(60)}</div></div>`, hand, { life: 2400 });
+      const rs = spawn(ctx, `<div style="position:relative;width:120px;height:120px"><div data-sp="rasenshuriken-1" class="ax-spin" style="position:absolute;inset:0;animation-duration:.25s;background:conic-gradient(#e8f6ff 0 8deg,#0000 8deg 90deg,#e8f6ff 90deg 98deg,#0000 98deg 180deg,#e8f6ff 180deg 188deg,#0000 188deg 270deg,#e8f6ff 270deg 278deg,#0000 278deg);-webkit-mask:radial-gradient(circle,#0000 30%,#000 32%,#000 70%,#0000 71%);mask:radial-gradient(circle,#0000 30%,#000 32%,#000 70%,#0000 71%);filter:drop-shadow(0 0 8px #9fd8ff)"></div><div style="position:absolute;left:30px;top:30px">${ART.rasengan(60)}</div></div>`, hand, { life: 2400 });
       await pop(ctx, rs, 400); await wait(150 * ctx.sp);
       lunge(ctx, to, 0.72, 600); await fly(ctx, rs, hand, to, 300, { rotate: 0, ease: 'ease-in' }); rs.remove();
-      const { h } = sizeOf(ctx.targetEls[0]); const dome = spawn(ctx, `<div style="width:${h * 1.4}px;height:${h * 1.2}px;border-radius:50%;background:radial-gradient(ellipse,#ffffff 0%,#cfeeffcc 30%,#6cb8ff88 55%,#6cb8ff00 72%);box-shadow:0 0 30px #6cb8ff"></div>`, to, { life: 1500 });
+      const { h } = sizeOf(ctx.targetEls[0]); const dome = spawn(ctx, `<div data-sp="rasenshuriken-2" style="width:${h * 1.4}px;height:${h * 1.2}px;border-radius:50%;background:radial-gradient(ellipse,#ffffff 0%,#cfeeffcc 30%,#6cb8ff88 55%,#6cb8ff00 72%);box-shadow:0 0 30px #6cb8ff"></div>`, to, { life: 1500 });
       await grow(ctx, dome, 380, 'scale(.05)', 'scale(1)'); shake(ctx); await wait(250 * ctx.sp); fade(ctx, dome, 400); shakeEl(ctx.userEl);
     },
   },
@@ -4050,11 +4051,11 @@ Object.assign(ANIMS, {
   },
   vacuum_sphere: {
     desc: 'User fires a volley of small wind balls at every enemy.',
-    async play(ctx) { await Promise.all(Array.from({ length: 12 }, (_, i) => { const ti = i % ctx.tos.length; const t = ctx.tos[ti]; return wait(i * 45 * ctx.sp).then(async () => { const b = spawn(ctx, '<div style="width:22px;height:22px;border-radius:50%;background:radial-gradient(circle,#ffffff,#e8f8ff88 60%,#e8f8ff00 72%);border:2px solid #f4fcffcc"></div>', ctx.from, { life: 700 }); await fly(ctx, b, ctx.from, { x: t.x + rnd(-20, 20), y: t.y + rnd(-30, 20) }, 260, { rotate: 0, ease: 'linear' }); b.remove(); puff(ctx, t, '#ffffff', 50); shakeEl(ctx.targetEls[ti]); }); })); },
+    async play(ctx) { await Promise.all(Array.from({ length: 12 }, (_, i) => { const ti = i % ctx.tos.length; const t = ctx.tos[ti]; return wait(i * 45 * ctx.sp).then(async () => { const b = spawn(ctx, '<div data-sp="vacuum_sphere" style="width:22px;height:22px;border-radius:50%;background:radial-gradient(circle,#ffffff,#e8f8ff88 60%,#e8f8ff00 72%);border:2px solid #f4fcffcc"></div>', ctx.from, { life: 700 }); await fly(ctx, b, ctx.from, { x: t.x + rnd(-20, 20), y: t.y + rnd(-30, 20) }, 260, { rotate: 0, ease: 'linear' }); b.remove(); puff(ctx, t, '#ffffff', 50); shakeEl(ctx.targetEls[ti]); }); })); },
   },
   wind_barrier: {
     desc: 'User raises a wall of wind in front of them.',
-    async play(ctx) { const { h } = ctx.userSize; const f = feetOf(ctx, ctx.userEl); const x = f.x + (ctx.isFoe ? -48 : 48); const wall = spawn(ctx, `<div style="width:56px;height:${h * 0.95}px;border-radius:24px;background:repeating-linear-gradient(170deg,#ffffff00 0 8px,#f4fcff88 8px 11px);box-shadow:0 0 18px #bfe9ff;animation:ax-flicker .3s infinite"></div>`, { x, y: f.y + 4 }, { life: 1800 }); await rise(ctx, wall, 350); for (let i = 0; i < 6; i++) puff(ctx, { x: x + rnd(-14, 14), y: f.y - rnd(0, h * 0.9) }, '#f4fcff', 40); await wait(700 * ctx.sp); fade(ctx, wall, 300); },
+    async play(ctx) { const { h } = ctx.userSize; const f = feetOf(ctx, ctx.userEl); const x = f.x + (ctx.isFoe ? -48 : 48); const wall = spawn(ctx, `<div data-sp="wind_barrier" style="width:56px;height:${h * 0.95}px;border-radius:24px;background:repeating-linear-gradient(170deg,#ffffff00 0 8px,#f4fcff88 8px 11px);box-shadow:0 0 18px #bfe9ff;animation:ax-flicker .3s infinite"></div>`, { x, y: f.y + 4 }, { life: 1800 }); await rise(ctx, wall, 350); for (let i = 0; i < 6; i++) puff(ctx, { x: x + rnd(-14, 14), y: f.y - rnd(0, h * 0.9) }, '#f4fcff', 40); await wait(700 * ctx.sp); fade(ctx, wall, 300); },
   },
   wood_clone: {
     desc: 'When the user is struck, they turn into a wooden mannequin.',
@@ -4069,16 +4070,16 @@ Object.assign(ANIMS, {
     desc: 'User shoots wooden beams at the target that lock them in a wooden prison.',
     async play(ctx) {
       const to = ctx.tos[0]; const el = ctx.targetEls[0]; const { w, h } = sizeOf(el);
-      const beam = (len) => `<svg width="${len}" height="14" viewBox="0 0 ${len} 14"><rect x="0" y="2" width="${len}" height="10" rx="4" fill="#9b6b3e" stroke="#5a3a1e" stroke-width="2"/></svg>`;
+      const beam = (len) => `<svg data-sp="wood_prison-1" width="${len}" height="14" viewBox="0 0 ${len} 14"><rect x="0" y="2" width="${len}" height="10" rx="4" fill="#9b6b3e" stroke="#5a3a1e" stroke-width="2"/></svg>`;
       const bs = await Promise.all([-14, 0, 14].map((dy, i) => wait(i * 60 * ctx.sp).then(() => stretch(ctx, { x: ctx.from.x, y: ctx.from.y + dy }, { x: to.x, y: to.y + dy }, beam, 300, 1600))));
       bs.forEach((b) => fade(ctx, b, 250));
-      const cage = spawn(ctx, `<div style="width:${w * 0.95}px;height:${h * 0.95}px;border:6px solid #8b5a32;border-radius:8px;background:repeating-linear-gradient(90deg,#0000 0 18px,#9b6b3e 18px 26px);box-shadow:0 0 8px #000"></div>`, to, { life: 1800 });
+      const cage = spawn(ctx, `<div data-sp="wood_prison-2" style="width:${w * 0.95}px;height:${h * 0.95}px;border:6px solid #8b5a32;border-radius:8px;background:repeating-linear-gradient(90deg,#0000 0 18px,#9b6b3e 18px 26px);box-shadow:0 0 8px #000"></div>`, to, { life: 1800 });
       await grow(ctx, cage, 280, 'scaleY(.1)', 'scaleY(1)'); shake(ctx); await wait(650 * ctx.sp); fade(ctx, cage, 300);
     },
   },
   wood_spikes: {
     desc: 'Chaotic spikes of wood burst out at the target’s feet.',
-    async play(ctx) { const el = ctx.targetEls[0]; const f = feetOf(ctx, el); const { h } = sizeOf(el); const ss = Array.from({ length: 7 }, (_, i) => { const a = rnd(-30, 30); const n = spawn(ctx, `<svg width="16" height="${h * rnd(0.4, 0.8)}" viewBox="0 0 16 100" preserveAspectRatio="none"><path d="M8 0 16 100H0Z" fill="#9b6b3e" stroke="#5a3a1e" stroke-width="1.5" vector-effect="non-scaling-stroke"/></svg>`, { x: f.x + rnd(-45, 45), y: f.y + 6 }, { life: 1500 }); n.style.transformOrigin = '50% 100%'; n.animate([{ transform: `translate(-50%,-100%) rotate(${a}deg) scaleY(0)` }, { transform: `translate(-50%,-100%) rotate(${a}deg) scaleY(1)` }], { duration: 180 * ctx.sp, delay: i * 30 * ctx.sp, fill: 'both' }); return n; }); await wait(350 * ctx.sp); shake(ctx); await wait(500 * ctx.sp); ss.forEach((n) => fade(ctx, n, 300)); },
+    async play(ctx) { const el = ctx.targetEls[0]; const f = feetOf(ctx, el); const { h } = sizeOf(el); const ss = Array.from({ length: 7 }, (_, i) => { const a = rnd(-30, 30); const n = spawn(ctx, `<svg data-sp="wood_spikes" width="16" height="${h * rnd(0.4, 0.8)}" viewBox="0 0 16 100" preserveAspectRatio="none"><path d="M8 0 16 100H0Z" fill="#9b6b3e" stroke="#5a3a1e" stroke-width="1.5" vector-effect="non-scaling-stroke"/></svg>`, { x: f.x + rnd(-45, 45), y: f.y + 6 }, { life: 1500 }); n.style.transformOrigin = '50% 100%'; n.animate([{ transform: `translate(-50%,-100%) rotate(${a}deg) scaleY(0)` }, { transform: `translate(-50%,-100%) rotate(${a}deg) scaleY(1)` }], { duration: 180 * ctx.sp, delay: i * 30 * ctx.sp, fill: 'both' }); return n; }); await wait(350 * ctx.sp); shake(ctx); await wait(500 * ctx.sp); ss.forEach((n) => fade(ctx, n, 300)); },
   },
   wood_dragon: { desc: 'User fires a wooden dragon at the target.', async play(ctx) { const to = ctx.tos[0]; const d = spawn(ctx, ART10.waterDragon(210, '#9b6b3e', '#5a3a1e').replace('#ffffff88', '#6b4626'), ctx.from, { life: 1300 }); if (to.x < ctx.from.x) d.firstElementChild.style.transform = 'scaleX(-1)'; await fly(ctx, d, ctx.from, to, 520, { rotate: 0, ease: 'ease-in', arc: 30 }); d.remove(); boom(ctx, to, '#d9b38a', 160); shake(ctx); } },
   wood_golem: {
@@ -4087,7 +4088,7 @@ Object.assign(ANIMS, {
   },
   wood_wall: {
     desc: "User raises a domed wooden wall in front of the allies' side.",
-    async play(ctx) { const box = sideBox(ctx); const d = spawn(ctx, `<div style="width:${box.w + 100}px;height:${box.h * 0.8}px;border-radius:50% 50% 8px 8px / 90% 90% 8px 8px;background:repeating-linear-gradient(90deg,#0000 0 22px,#5a3a1e99 22px 25px),radial-gradient(ellipse at 50% 30%,#c08a54,#9b6b3e 55%,#6b4626);box-shadow:0 0 10px #000a;opacity:.94"></div>`, { x: box.c.x + (ctx.isFoe ? -30 : 30), y: box.y2 + 8 }, { life: 1900, z: 7 }); await rise(ctx, d, 500); await wait(700 * ctx.sp); fade(ctx, d, 400); },
+    async play(ctx) { const box = sideBox(ctx); const d = spawn(ctx, `<div data-sp="wood_wall" style="width:${box.w + 100}px;height:${box.h * 0.8}px;border-radius:50% 50% 8px 8px / 90% 90% 8px 8px;background:repeating-linear-gradient(90deg,#0000 0 22px,#5a3a1e99 22px 25px),radial-gradient(ellipse at 50% 30%,#c08a54,#9b6b3e 55%,#6b4626);box-shadow:0 0 10px #000a;opacity:.94"></div>`, { x: box.c.x + (ctx.isFoe ? -30 : 30), y: box.y2 + 8 }, { life: 1900, z: 7 }); await rise(ctx, d, 500); await wait(700 * ctx.sp); fade(ctx, d, 400); },
   },
   kurama_bomb_minato: { desc: 'A black orb with a purple aura and tiny blue and red sparks grows in front of the user, then fires at the enemies.', play: (ctx) => beastBomb(ctx) },
   yomotsu_hirasaka: {

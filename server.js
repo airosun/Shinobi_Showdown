@@ -3,7 +3,7 @@
 // it picks the seed, collects both sides' orders each turn, and sends the same
 // orders to both players, who each resolve the turn locally.
 import http from 'node:http';
-import { readFile } from 'node:fs/promises';
+import { readFile, readdir } from 'node:fs/promises';
 import { extname, join, normalize } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { randomBytes } from 'node:crypto';
@@ -15,13 +15,19 @@ const PORT = process.env.PORT || 3000;
 const TYPES = {
   '.html': 'text/html; charset=utf-8', '.js': 'text/javascript; charset=utf-8', '.css': 'text/css; charset=utf-8',
   '.json': 'application/json', '.png': 'image/png', '.jpg': 'image/jpeg', '.svg': 'image/svg+xml', '.webp': 'image/webp', '.woff2': 'font/woff2',
-  '.ico': 'image/x-icon',
+  '.ico': 'image/x-icon', '.gif': 'image/gif', '.jpeg': 'image/jpeg',
 };
 
 const server = http.createServer(async (req, res) => {
   try {
     let path = decodeURIComponent(new URL(req.url, 'http://x').pathname);
     if (path === '/healthz') { res.writeHead(200).end('ok'); return; }
+    // list the images in public/img so the client can swap in custom animation sprites
+    if (path === '/img/index.json') {
+      const files = (await readdir(join(root, 'img'), { withFileTypes: true })).filter((d) => d.isFile()).map((d) => d.name);
+      res.writeHead(200, { 'Content-Type': 'application/json', 'Cache-Control': 'no-cache' }).end(JSON.stringify(files));
+      return;
+    }
     if (path.endsWith('/')) path += 'index.html';
     const file = normalize(join(root, path));
     if (!file.startsWith(root)) { res.writeHead(403).end(); return; }

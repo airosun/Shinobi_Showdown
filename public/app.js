@@ -164,6 +164,7 @@ function render() {
   app.innerHTML = SCREENS[S.screen]();
   for (const [k, top] of kept) { const el = app.querySelector(`[data-keep-scroll="${k}"]`); if (el) el.scrollTop = top; }
   fitNames(app);
+  FX.applySprites(document.getElementById('arena'));
   if (S.screen === 'battle') { const lg = document.getElementById('blog'); if (lg) lg.scrollTop = lg.scrollHeight; }
 }
 
@@ -768,6 +769,7 @@ function redrawArena() {
   if (!ar) return;
   [...ar.children].forEach((c) => { if (!c.classList.contains('fx')) c.remove(); });
   ar.insertAdjacentHTML('afterbegin', arenaInner());
+  FX.applySprites(ar); // custom images for the Tsukuyomi moon, curse mark, etc.
   syncField();
 }
 
