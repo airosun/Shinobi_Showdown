@@ -17,7 +17,7 @@
 .ly-arena .mon .spr { position: relative; }
 .ly-faces { background: var(--panel); border: 1px solid var(--line); border-radius: var(--radius); padding: 12px 14px; display: flex; gap: 24px; align-items: center; flex-wrap: wrap; }
 .ly-faces .lbl, .ly-panel h3 { font-size: 11px; text-transform: uppercase; letter-spacing: .1em; color: var(--accent); font-weight: 800; margin: 0 0 8px; }
-.face-crop { width: 320px; height: 300px; border-radius: 10px; overflow: hidden; position: relative; cursor: grab; touch-action: none; background: #0b0806; border: 1px solid var(--line); }
+.face-crop { width: 400px; height: 340px; border-radius: 10px; overflow: hidden; position: relative; cursor: grab; touch-action: none; background: #0b0806; border: 1px solid var(--line); }
 .face-crop:active { cursor: grabbing; }
 .face-crop img { position: absolute; max-width: none; user-select: none; pointer-events: none; }
 .face-crop .crop-ring { position: absolute; left: 50%; top: 50%; width: 220px; height: 220px; margin: -110px 0 0 -110px; border-radius: 50%; border: 3px solid var(--accent); box-shadow: 0 0 0 999px #000000a8; pointer-events: none; z-index: 2; }
@@ -35,3 +35,7 @@
 .st-toast { position: fixed; left: 50%; bottom: 22px; transform: translateX(-50%); background: #1b1410f5; border: 1px solid var(--accent); color: #f3e9da; padding: 10px 16px; border-radius: 10px; z-index: 90; box-shadow: 0 10px 30px #000a; font-size: 14px; }
 .st-toast.hidden { display: none; }
 #saveState { margin-right: 10px; }
+.seg { display: inline-flex; gap: 0; }
+.seg button { border-radius: 0; }
+.seg button:first-child { border-radius: 8px 0 0 8px; }
+.seg button:last-child { border-radius: 0 8px 8px 0; }

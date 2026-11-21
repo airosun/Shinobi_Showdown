@@ -46,18 +46,32 @@ function artStyle(id, tf, back) {
   if (E.dx || E.dy) out.push(`translate:${E.dx}% ${E.dy}%`);
   return out.join(';');
 }
-function faceStyle(id, tf) {
-  const F = (tf && S.layout.faces[`${id}:tf`]) || S.layout.faces[id];
+// Portraits. Set in the Character Layout module as a window on the full battle sprite:
+// { fx, fy, fs } = the circle's centre and width, in sprite widths. Older { zoom, cx, cy } / { zoom, x, y }
+// entries reframe the pre-cut face image instead.
+function portraitOf(id, transformed) {
+  const art = S.sprites[id];
+  const tf = !!(transformed && art.transformFace);
+  const face = tf ? art.transformFace : art.face;
+  if (!face) return null;
+  const own = S.layout.faces[tf ? `${id}:tf` : id];
+  if (own && own.fs) {
+    const k = 100 / own.fs;
+    return { full: true, src: tf ? art.transform : art.front, style: `width:${+k.toFixed(2)}%;left:${+(50 - own.fx * k).toFixed(2)}%;top:${+(50 - own.fy * k).toFixed(2)}%` };
+  }
+  const F = own || (tf && S.layout.faces[id] && !S.layout.faces[id].fs ? S.layout.faces[id] : null);
+  return { src: face, style: faceStyle(F) };
+}
+function faceStyle(F) {
   if (!F) return '';
   const z = (F.zoom ?? 100) / 100;
   let cx = F.cx ?? 50; let cy = F.cy ?? 50;
-  if (F.x != null || F.y != null) { const f = Math.min(1, 1 / z); cx = (F.x ?? 50) * (1 - f) + 50 * f; cy = (F.y ?? 50) * (1 - f) + 50 * f; } // older focus-style entries
+  if (F.x != null || F.y != null) { const f = Math.min(1, 1 / z); cx = (F.x ?? 50) * (1 - f) + 50 * f; cy = (F.y ?? 50) * (1 - f) + 50 * f; }
   return `transform-origin:50% 50%;transform:scale(${z}) translate(${+(50 - cx).toFixed(2)}%, ${+(50 - cy).toFixed(2)}%)`;
 }
-function faceSrc(id, tf) { const a = art(id); return (tf && a.transformFace) || a.face; }
 function badge(id, cls = '', tf = false) {
-  const f = faceSrc(id, tf);
-  return f ? `<div class="badge face ${cls}"><img src="sprites/${esc(f)}" alt="" style="${faceStyle(id, tf && art(id).transformFace)}"></div>` : `<div class="badge ${cls}">${esc(SHINOBI_BY_ID[id].name[0])}</div>`;
+  const P = portraitOf(id, tf);
+  return P ? `<div class="badge face ${cls}"><img ${P.full ? 'class="full" ' : ''}src="sprites/${esc(P.src)}" alt="" style="${P.style}"></div>` : `<div class="badge ${cls}">${esc(SHINOBI_BY_ID[id].name[0])}</div>`;
 }
 function sprite(id, back, tf, sel) {
   const a = art(id);
@@ -71,8 +85,6 @@ const edited = (id) => Object.keys(S.layout.sprites).some((k) => k === id || k.s
 function render() {
   const d = SHINOBI_BY_ID[S.id];
   const tf = S.tf && hasTf(S.id);
-  const fk = tf && art(S.id).transformFace ? `${S.id}:tf` : S.id;
-  const FN = faceNow();
   const q = S.q.toLowerCase();
   const items = LIST.filter((s) => !q || s.name.toLowerCase().includes(q));
   const refOpts = (sel) => LIST.map((s) => `<option value="${s.id}" ${s.id === sel ? 'selected' : ''}>${esc(s.name)}</option>`).join('');
@@ -87,13 +99,13 @@ function render() {
     <div class="ly-head">
       <div><div class="lab-name">${esc(d.name)}</div><div class="muted small">Drag either middle shinobi to move them — each side is set separately · the dashed lines show where each one's feet are</div></div>
       <span class="grow"></span>
-      ${hasTf(S.id) ? `<label class="small"><input type="checkbox" id="tf" ${S.tf ? 'checked' : ''}> Transformed form</label>` : ''}
+      ${hasTf(S.id) ? `<div class="seg" role="group"><button class="small ${tf ? 'ghost' : ''}" data-act="form" data-arg="0">Normal</button><button class="small ${tf ? '' : 'ghost'}" data-act="form" data-arg="1">${esc(d.transformation?.name || 'Transformed')}</button></div>` : (d.transformation ? `<span class="muted small">${esc(d.transformation.name)} has no art of its own</span>` : '')}
       <label class="small"><input type="checkbox" id="guides" ${S.guides ? 'checked' : ''}> Guides</label>
       <label class="small muted">Beside them <select id="refL">${refOpts(S.refL)}</select><select id="refR">${refOpts(S.refR)}</select></label>
     </div>
     <div class="arena ly-arena ${S.guides ? 'guides' : ''}" id="arena"><div class="plat foe"></div><div class="plat you"></div>${lineup('you', true)}${lineup('foe', false)}</div>
     <div class="ly-faces">
-      <div><div class="lbl">Portrait — drag the picture to move it, scroll to zoom</div><div class="face-crop" id="faceEdit">${faceSrc(S.id, tf) ? `<img id="cropImg" src="sprites/${esc(faceSrc(S.id, tf))}" alt="" draggable="false"><div class="crop-ring"></div>` : '<div class="muted small" style="padding:20px">No portrait image</div>'}</div></div>
+      <div><div class="lbl">Portrait${tf ? ' (transformed)' : ''} — drag the picture to move it, scroll to zoom</div><div class="face-crop" id="faceEdit">${fullSrc() ? `<img id="cropImg" src="sprites/${esc(fullSrc())}" alt="" draggable="false"><div class="crop-ring"></div>` : '<div class="muted small" style="padding:20px">No portrait image</div>'}</div></div>
       <div><div class="lbl">As it appears in the game</div><div class="face-sizes">
         <figure>${badge(S.id, 'lg', tf)}<span>Dex / builder</span></figure>
         <figure>${badge(S.id, '', tf)}<span>Roster &amp; cards</span></figure>
@@ -110,8 +122,9 @@ ${SIDES.map((side) => { const E = effective(S.id, tf, side); const own = layoutF
     </div>`; }).join('')}
     ${hasTf(S.id) ? `<div class="sect"><div class="row" style="margin-top:0"><button class="small ghost" data-act="copyForm">Copy both sides to ${tf ? 'normal' : 'transformed'} form</button></div></div>` : ''}
     <div class="sect">
-      <h3>Portrait${tf && art(S.id).transformFace ? ' (transformed)' : ''}</h3>
-      ${[['zoom', 'Zoom', 50, 400, '%'], ['cx', 'Centre left ↔ right', 0, 100, '%'], ['cy', 'Centre top ↕ bottom', 0, 100, '%']].map(([p, label, min, max, u]) => `<div class="sl"><label>${label} <b id="v-f${p}">${FN[p]}${u}</b></label><input type="range" data-f="${p}" min="${min}" max="${max}" step="1" value="${FN[p]}"></div>`).join('')}
+      <h3>Portrait${tf ? ' (transformed)' : ''}</h3>
+      <div class="sl"><label>Zoom <b id="v-fzoom">${zoomPct()}%</b></label><input type="range" data-f="zoom" min="25" max="400" step="1" value="${zoomPct()}"></div>
+      <div class="muted small">Drag the picture under the ring to choose what shows. 100% is the original framing.</div>
       <div class="row"><button class="small ghost" data-act="resetFace">Reset</button></div>
     </div>
     <div class="sect muted small">Changes save automatically. Tell me in the chat when you're done and I'll put them in the game — or use <b>Export layout.json</b> and upload it to <code>public/data/</code>.</div>
@@ -137,7 +150,7 @@ function clean(coll, k, defs) {
   for (const [p, d] of Object.entries(defs)) if (o[p] === d || o[p] == null) delete o[p];
   if (!Object.keys(o).length) delete S.layout[coll][k];
 }
-const SDEF = { scale: 100, dx: 0, dy: 0 }; const FDEF = { zoom: 100, cx: 50, cy: 50 };
+const SDEF = { scale: 100, dx: 0, dy: 0 }; 
 // the side's own entry, seeded from what it shows now (so taking over from a shared entry changes nothing visible)
 function sideEntry(side) {
   const tf = S.tf && hasTf(S.id);
@@ -152,24 +165,22 @@ function setSprite(side, p, v) {
 }
 // a side entry equal to the defaults still has to exist if a shared entry would otherwise take over
 function keepOwn(k) { if (!S.layout.sprites[k]) { const base = k.replace(/:(you|foe)$/, ''); if (S.layout.sprites[base] || (base.endsWith(':tf') && S.layout.sprites[base.slice(0, -3)])) S.layout.sprites[k] = { scale: 100 }; } }
-function setFace(p, v) {
-  const k = faceKey();
-  S.layout.faces[k] = { ...faceNow(), [p]: v };
-  clean('faces', k, FDEF); persist('faces', k); livePaint();
+function setFace(p, v) { // only zoom comes from a slider: keep the ring's centre, change its width
+  const bs = faceBox()[2]; const F = faceNow();
+  storeFace({ ...F, fs: bs / (v / 100) }); persist('faces', faceKey()); livePaint();
 }
 // update just the styles (no full re-render) so dragging and sliders stay smooth
 function livePaint() {
   const tf = S.tf && hasTf(S.id);
   document.querySelectorAll('.mon.sel img.art').forEach((im) => { im.setAttribute('style', artStyle(S.id, tf, im.closest('.mon').classList.contains('you'))); });
-  const fs = faceStyle(S.id, tf && art(S.id).transformFace);
-  document.querySelectorAll('.face-sizes img').forEach((im) => { im.setAttribute('style', fs); });
+  const P = portraitOf(S.id, tf);
+  document.querySelectorAll('.face-sizes img').forEach((im) => { if (P) { im.className = P.full ? 'full' : ''; if (!im.src.endsWith(P.src)) im.src = `sprites/${P.src}`; im.setAttribute('style', P.style); } });
   for (const side of SIDES) {
     const E = effective(S.id, tf, side);
     for (const p of Object.keys(SDEF)) { const el = document.querySelector(`[data-s="${p}"][data-side="${side}"]`); if (el && document.activeElement !== el) el.value = E[p]; const v = $(`v-${side}-${p}`); if (v) v.textContent = `${E[p]}%`; }
   }
   paintCrop();
-  const FN = faceNow();
-  for (const p of Object.keys(FDEF)) { const el = document.querySelector(`[data-f="${p}"]`); if (el && document.activeElement !== el) el.value = FN[p]; const v = $(`v-f${p}`); if (v) v.textContent = `${FN[p]}%`; }
+  const zv = $('v-fzoom'); const zs = document.querySelector('[data-f="zoom"]'); if (zv) zv.textContent = `${zoomPct()}%`; if (zs && document.activeElement !== zs) zs.value = zoomPct();
 }
 function mountDrag() {
   document.querySelectorAll('img[data-drag]').forEach((im) => {
@@ -192,12 +203,11 @@ function mountDrag() {
   if (img.complete) paintCrop(); else img.addEventListener('load', paintCrop);
   fe.addEventListener('pointerdown', (e) => {
     e.preventDefault(); fe.setPointerCapture(e.pointerId);
-    const F = faceNow(); const E = (CROP_D * F.zoom) / 100; // picture size on screen
-    const st = { x: e.clientX, y: e.clientY, cx: F.cx, cy: F.cy };
+    const F = faceNow(); const E = CROP_D / F.fs; // one sprite width on screen
+    const st = { x: e.clientX, y: e.clientY, fx: F.fx, fy: F.fy };
     const move = (ev) => {
       // the picture follows the pointer, so the point under the ring's centre moves the other way
-      setFaceRaw('cx', Math.round(clamp(st.cx - ((ev.clientX - st.x) / E) * 100, 0, 100)));
-      setFaceRaw('cy', Math.round(clamp(st.cy - ((ev.clientY - st.y) / E) * 100, 0, 100)));
+      storeFace({ fx: clamp(st.fx - (ev.clientX - st.x) / E, -0.5, 1.5), fy: clamp(st.fy - (ev.clientY - st.y) / E, -0.5, 4), fs: F.fs });
       livePaint();
     };
     const up = () => { fe.removeEventListener('pointermove', move); fe.removeEventListener('pointerup', up); fe.removeEventListener('pointercancel', up); persist('faces', faceKey()); markList(); };
@@ -205,31 +215,38 @@ function mountDrag() {
   });
   fe.addEventListener('wheel', (e) => {
     e.preventDefault();
-    setFace('zoom', Math.round(clamp(faceNow().zoom * (e.deltaY < 0 ? 1.08 : 1 / 1.08), 50, 400)));
-    markList();
+    const F = faceNow();
+    storeFace({ ...F, fs: F.fs * (e.deltaY < 0 ? 1 / 1.08 : 1.08) }); persist('faces', faceKey()); livePaint(); markList();
   }, { passive: false });
 }
 // --- portrait cropper: the whole picture is shown, the ring is what the game's circle shows
 const CROP_D = 220; // ring diameter (px), centred in the box
-const faceKey = () => (S.tf && art(S.id).transformFace ? `${S.id}:tf` : S.id);
+const formTf = () => !!(S.tf && art(S.id).transformFace);
+const faceKey = () => (formTf() ? `${S.id}:tf` : S.id);
+const fullSrc = () => (formTf() ? art(S.id).transform : art(S.id).front);
+// the original portrait's box on the battle sprite: [centre x, centre y, size] in sprite widths
+const faceBox = () => (formTf() ? art(S.id).transformFaceBox : art(S.id).faceBox) || [0.5, 0.2, 0.4];
+// the ring as a window on the full sprite: centre (fx, fy) and width fs, in sprite widths
 function faceNow() {
-  const F = S.layout.faces[faceKey()] || {};
-  const zoom = F.zoom ?? 100;
-  if (F.x == null && F.y == null) return { zoom, cx: F.cx ?? 50, cy: F.cy ?? 50 };
-  const f = Math.min(1, 100 / zoom); // older focus-style entry → the point at the centre
-  return { zoom, cx: Math.round((F.x ?? 50) * (1 - f) + 50 * f), cy: Math.round((F.y ?? 50) * (1 - f) + 50 * f) };
+  const own = S.layout.faces[faceKey()];
+  if (own && own.fs) return { fx: own.fx, fy: own.fy, fs: own.fs };
+  const old = own || (formTf() && S.layout.faces[S.id] && !S.layout.faces[S.id].fs ? S.layout.faces[S.id] : null);
+  const [bx, by, bs] = faceBox();
+  let z = 1; let cx = 50; let cy = 50;
+  if (old) { // older entries reframed the cut-out face; express that on the full sprite
+    z = (old.zoom ?? 100) / 100; cx = old.cx ?? 50; cy = old.cy ?? 50;
+    if (old.x != null || old.y != null) { const f = Math.min(1, 1 / z); cx = (old.x ?? 50) * (1 - f) + 50 * f; cy = (old.y ?? 50) * (1 - f) + 50 * f; }
+  }
+  return { fx: bx - bs / 2 + (cx / 100) * bs, fy: by - bs / 2 + (cy / 100) * bs, fs: bs / z };
 }
-// The whole picture is shown; the ring is the game's circle. The picture covers the circle at 100% zoom,
-// and the point (cx, cy) sits at the ring's centre.
+const zoomPct = () => Math.round((100 * faceBox()[2]) / faceNow().fs);
 function paintCrop() {
   const img = $('cropImg'); if (!img || !img.naturalWidth) return;
   const F = faceNow(); const box = $('faceEdit');
-  const E = (CROP_D * F.zoom) / 100; const m = Math.min(img.naturalWidth, img.naturalHeight);
-  const W = (E * img.naturalWidth) / m; const H = (E * img.naturalHeight) / m;
-  const px = (W - E) / 2 + (F.cx / 100) * E; const py = (H - E) / 2 + (F.cy / 100) * E;
-  Object.assign(img.style, { width: `${W}px`, height: `${H}px`, left: `${box.clientWidth / 2 - px}px`, top: `${box.clientHeight / 2 - py}px` });
+  const W = CROP_D / F.fs; const H = (W * img.naturalHeight) / img.naturalWidth;
+  Object.assign(img.style, { width: `${W}px`, height: `${H}px`, left: `${box.clientWidth / 2 - F.fx * W}px`, top: `${box.clientHeight / 2 - F.fy * W}px` });
 }
-function setFaceRaw(p, v) { const k = faceKey(); S.layout.faces[k] = { ...faceNow(), [p]: v }; clean('faces', k, FDEF); }
+function storeFace(F) { S.layout.faces[faceKey()] = { fx: +F.fx.toFixed(4), fy: +F.fy.toFixed(4), fs: +clamp(F.fs, 0.03, 4).toFixed(4) }; }
 function markList() { const b = document.querySelector(`.ly-item[data-arg="${S.id}"]`); if (b && edited(S.id) && !b.querySelector('.tag')) b.insertAdjacentHTML('beforeend', '<span class="tag">set</span>'); }
 
 async function exportJson() {
@@ -246,7 +263,8 @@ document.addEventListener('click', (ev) => {
     case 'pick': S.id = b.dataset.arg; S.tf = false; render(); break;
     case 'resetSprite': { const k = skey(S.id, tf, b.dataset.arg); delete S.layout.sprites[k]; keepOwn(k); persist('sprites', k); render(); break; }
     case 'copySide': { const from = b.dataset.arg; const to = from === 'you' ? 'foe' : 'you'; const E = effective(S.id, tf, from); const k = skey(S.id, tf, to); S.layout.sprites[k] = { scale: E.scale, dx: -E.dx, dy: E.dy }; clean('sprites', k, SDEF); keepOwn(k); persist('sprites', k); render(); toast(`Copied to ${to === 'you' ? 'your' : 'the enemy'} side`); break; }
-    case 'resetFace': { const k = S.tf && art(S.id).transformFace ? `${S.id}:tf` : S.id; delete S.layout.faces[k]; persist('faces', k); render(); break; }
+    case 'resetFace': { const k = faceKey(); delete S.layout.faces[k]; persist('faces', k); render(); break; }
+    case 'form': S.tf = b.dataset.arg === '1'; render(); break;
     case 'copyForm': { for (const side of SIDES) { const k = skey(S.id, !tf, side); S.layout.sprites[k] = { ...effective(S.id, tf, side) }; clean('sprites', k, SDEF); keepOwn(k); persist('sprites', k); } toast('Copied both sides'); break; }
     case 'export': exportJson(); break;
     default:

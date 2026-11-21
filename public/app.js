@@ -81,8 +81,8 @@ function badge(def, cls = '', transformed = false) {
   const c1 = natColor(def.natures.primary);
   const c2 = def.natures.secondary ? natColor(def.natures.secondary) : '#3a2a2a';
   const art = S.sprites[def.id];
-  const face = art && ((transformed && art.transformFace) || art.face);
-  if (face) return `<div class="badge face ${cls}" style="--c1:${c1};--c2:${c2}"><img src="sprites/${esc(face)}" alt="${esc(def.name)}" loading="lazy" style="${faceStyle(def.id, transformed && art.transformFace)}"></div>`;
+  const P = art && portraitOf(def.id, transformed);
+  if (P) return `<div class="badge face ${cls}" style="--c1:${c1};--c2:${c2}"><img ${P.full ? 'class="full" ' : ''}src="sprites/${esc(P.src)}" alt="${esc(def.name)}" loading="lazy" style="${P.style}"></div>`;
   return `<div class="badge ${cls}" style="--c1:${c1};--c2:${c2}">${initials(def.name)}</div>`;
 }
 // size / position on the field and portrait framing, set in the Character Layout module
@@ -104,13 +104,27 @@ function artStyle(id, tf, back) {
   if (dx || L.dy) out.push(`translate:${dx}% ${L.dy || 0}%`);
   return out.join(';');
 }
-// portrait: zoom, and the point of the picture (cx, cy in %) that sits at the circle's centre
-function faceStyle(id, tf) {
-  const F = (tf && S.layout.faces[`${id}:tf`]) || S.layout.faces[id];
+// Portraits. Set in the Character Layout module as a window on the full battle sprite:
+// { fx, fy, fs } = the circle's centre and width, in sprite widths. Older { zoom, cx, cy } / { zoom, x, y }
+// entries reframe the pre-cut face image instead.
+function portraitOf(id, transformed) {
+  const art = S.sprites[id];
+  const tf = !!(transformed && art.transformFace);
+  const face = tf ? art.transformFace : art.face;
+  if (!face) return null;
+  const own = S.layout.faces[tf ? `${id}:tf` : id];
+  if (own && own.fs) {
+    const k = 100 / own.fs;
+    return { full: true, src: tf ? art.transform : art.front, style: `width:${+k.toFixed(2)}%;left:${+(50 - own.fx * k).toFixed(2)}%;top:${+(50 - own.fy * k).toFixed(2)}%` };
+  }
+  const F = own || (tf && S.layout.faces[id] && !S.layout.faces[id].fs ? S.layout.faces[id] : null);
+  return { src: face, style: faceStyle(F) };
+}
+function faceStyle(F) {
   if (!F) return '';
   const z = (F.zoom ?? 100) / 100;
   let cx = F.cx ?? 50; let cy = F.cy ?? 50;
-  if (F.x != null || F.y != null) { const f = Math.min(1, 1 / z); cx = (F.x ?? 50) * (1 - f) + 50 * f; cy = (F.y ?? 50) * (1 - f) + 50 * f; } // older focus-style entries
+  if (F.x != null || F.y != null) { const f = Math.min(1, 1 / z); cx = (F.x ?? 50) * (1 - f) + 50 * f; cy = (F.y ?? 50) * (1 - f) + 50 * f; }
   return `transform-origin:50% 50%;transform:scale(${z}) translate(${+(50 - cx).toFixed(2)}%, ${+(50 - cy).toFixed(2)}%)`;
 }
 /** Battle art (front view; your side is mirrored). Falls back to the badge. */

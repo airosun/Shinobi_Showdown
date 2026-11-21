@@ -4,532 +4,1312 @@
   "naruto_p1": {
    "front": "battle/naruto-part-1.webp",
    "face": "battle/naruto-part-1-face.webp",
+   "faceBox": [
+    0.2056,
+    0.2056,
+    0.4111
+   ],
    "transform": "battle/naruto-part-1-nine-tails-cloak.webp",
-   "transformFace": "battle/naruto-part-1-nine-tails-cloak-face.webp"
+   "transformFace": "battle/naruto-part-1-nine-tails-cloak-face.webp",
+   "transformFaceBox": [
+    0.6592,
+    0.388,
+    0.3792
+   ]
   },
   "naruto_ship": {
    "front": "battle/naruto-shippuden.webp",
    "face": "battle/naruto-shippuden-face.webp",
+   "faceBox": [
+    0.5,
+    0.5,
+    1.0
+   ],
    "transform": "battle/naruto-four-tails-cloak.webp",
-   "transformFace": "battle/naruto-four-tails-cloak-face.webp"
+   "transformFace": "battle/naruto-four-tails-cloak-face.webp",
+   "transformFaceBox": [
+    0.2385,
+    0.6942,
+    0.2192
+   ]
   },
   "naruto_sage": {
    "front": "battle/naruto-sage-mode.webp",
-   "face": "battle/naruto-sage-mode-face.webp"
+   "face": "battle/naruto-sage-mode-face.webp",
+   "faceBox": [
+    0.4968,
+    0.358,
+    0.7161
+   ]
   },
   "naruto_war": {
    "front": "battle/naruto-kurama-link-mode.webp",
    "face": "battle/naruto-kurama-link-mode-face.webp",
+   "faceBox": [
+    0.4875,
+    0.2198,
+    0.4396
+   ],
    "transform": "battle/naruto-sage-of-six-paths.webp",
-   "transformFace": "battle/naruto-sage-of-six-paths-face.webp"
+   "transformFace": "battle/naruto-sage-of-six-paths-face.webp",
+   "transformFaceBox": [
+    0.5007,
+    0.2894,
+    0.5789
+   ]
   },
   "sasuke_p1": {
    "front": "battle/sasuke-part-1.webp",
    "face": "battle/sasuke-part-1-face.webp",
+   "faceBox": [
+    0.7575,
+    0.2425,
+    0.485
+   ],
    "transform": "battle/sasuke-part-1-curse-mark.webp",
-   "transformFace": "battle/sasuke-part-1-curse-mark-face.webp"
+   "transformFace": "battle/sasuke-part-1-curse-mark-face.webp",
+   "transformFaceBox": [
+    0.38,
+    0.4689,
+    0.32
+   ]
   },
   "sasuke_ship": {
    "front": "battle/sasuke-shippuden.webp",
    "face": "battle/sasuke-shippuden-face.webp",
+   "faceBox": [
+    0.4599,
+    0.4269,
+    0.8538
+   ],
    "transform": "battle/sasuke-shippuden-curse-mark.webp",
-   "transformFace": "battle/sasuke-shippuden-curse-mark-face.webp"
+   "transformFace": "battle/sasuke-shippuden-curse-mark-face.webp",
+   "transformFaceBox": [
+    0.5996,
+    0.2743,
+    0.1299
+   ]
   },
   "sasuke_ms": {
    "front": "battle/sasuke-mangekyo.webp",
    "face": "battle/sasuke-mangekyo-face.webp",
+   "faceBox": [
+    0.7006,
+    0.2901,
+    0.5802
+   ],
    "transform": "battle/sasuke-susanoo.webp",
-   "transformFace": "battle/sasuke-susanoo-face.webp"
+   "transformFace": "battle/sasuke-susanoo-face.webp",
+   "transformFaceBox": [
+    0.4684,
+    0.2658,
+    0.299
+   ]
   },
   "sasuke_war": {
    "front": "battle/sasuke-eternal-mangekyo.webp",
    "face": "battle/sasuke-eternal-mangekyo-face.webp",
+   "faceBox": [
+    0.5222,
+    0.3117,
+    0.6233
+   ],
    "transform": "battle/sasuke-rinne-sharingan.webp",
-   "transformFace": "battle/sasuke-rinne-sharingan-face.webp"
+   "transformFace": "battle/sasuke-rinne-sharingan-face.webp",
+   "transformFaceBox": [
+    0.5494,
+    0.4313,
+    0.8627
+   ]
   },
   "sakura_p1": {
    "front": "battle/sakura-part-1.webp",
-   "face": "battle/sakura-part-1-face.webp"
+   "face": "battle/sakura-part-1-face.webp",
+   "faceBox": [
+    0.5822,
+    0.2555,
+    0.5109
+   ]
   },
   "sakura_shippuden": {
    "front": "battle/sakura-shippuden.webp",
-   "face": "battle/sakura-shippuden-face.webp"
+   "face": "battle/sakura-shippuden-face.webp",
+   "faceBox": [
+    0.5037,
+    0.4963,
+    0.9926
+   ]
   },
   "sakura_war": {
    "front": "battle/sakura-great-war.webp",
    "face": "battle/sakura-great-war-face.webp",
+   "faceBox": [
+    0.5,
+    0.5,
+    1.0
+   ],
    "transform": "battle/sakura-strength-of-a-hundred.webp",
-   "transformFace": "battle/sakura-strength-of-a-hundred-face.webp"
+   "transformFace": "battle/sakura-strength-of-a-hundred-face.webp",
+   "transformFaceBox": [
+    0.7027,
+    0.2432,
+    0.4865
+   ]
   },
   "kakashi_p1": {
    "front": "battle/kakashi.webp",
-   "face": "battle/kakashi-face.webp"
+   "face": "battle/kakashi-face.webp",
+   "faceBox": [
+    0.5235,
+    0.3602,
+    0.7205
+   ]
   },
   "kakashi_ship": {
    "front": "battle/kakashi.webp",
    "face": "battle/kakashi-face.webp",
+   "faceBox": [
+    0.5235,
+    0.3602,
+    0.7205
+   ],
    "transform": "battle/kakashi-mangekyo.webp",
-   "transformFace": "battle/kakashi-mangekyo-face.webp"
+   "transformFace": "battle/kakashi-mangekyo-face.webp",
+   "transformFaceBox": [
+    0.379,
+    0.3149,
+    0.6298
+   ]
   },
   "kakashi_dms": {
    "front": "battle/kakashi-double-mangekyo.webp",
    "face": "battle/kakashi-double-mangekyo-face.webp",
+   "faceBox": [
+    0.3999,
+    0.3775,
+    0.4195
+   ],
    "transform": "battle/kakashi-perfect-susanoo.webp",
-   "transformFace": "battle/kakashi-perfect-susanoo-face.webp"
+   "transformFace": "battle/kakashi-perfect-susanoo-face.webp",
+   "transformFaceBox": [
+    0.5595,
+    0.1496,
+    0.2992
+   ]
   },
   "sai": {
    "front": "battle/sai.webp",
-   "face": "battle/sai-face.webp"
+   "face": "battle/sai-face.webp",
+   "faceBox": [
+    0.5198,
+    0.2899,
+    0.5798
+   ]
   },
   "yamato": {
    "front": "battle/yamato.webp",
-   "face": "battle/yamato-face.webp"
+   "face": "battle/yamato-face.webp",
+   "faceBox": [
+    0.5,
+    0.5,
+    1.0
+   ]
   },
   "hinata_p1": {
    "front": "battle/hinata-part-1.webp",
-   "face": "battle/hinata-part-1-face.webp"
+   "face": "battle/hinata-part-1-face.webp",
+   "faceBox": [
+    0.5,
+    0.5,
+    1.0
+   ]
   },
   "hinata_ship": {
    "front": "battle/hinata-shippuden.webp",
    "face": "battle/hinata-shippuden-face.webp",
+   "faceBox": [
+    0.511,
+    0.489,
+    0.978
+   ],
    "transform": "battle/hinata-twin-lion-fist.webp",
-   "transformFace": "battle/hinata-twin-lion-fist-face.webp"
+   "transformFace": "battle/hinata-twin-lion-fist-face.webp",
+   "transformFaceBox": [
+    0.2122,
+    0.2122,
+    0.4244
+   ]
   },
   "neji_p1": {
    "front": "battle/neji-part-1.webp",
-   "face": "battle/neji-part-1-face.webp"
+   "face": "battle/neji-part-1-face.webp",
+   "faceBox": [
+    0.3709,
+    0.2969,
+    0.5937
+   ]
   },
   "neji_ship": {
    "front": "battle/neji-shippuden.webp",
-   "face": "battle/neji-shippuden-face.webp"
+   "face": "battle/neji-shippuden-face.webp",
+   "faceBox": [
+    0.5721,
+    0.4279,
+    0.8559
+   ]
   },
   "lee_p1": {
    "front": "battle/rock-lee-part-1.webp",
    "face": "battle/rock-lee-part-1-face.webp",
+   "faceBox": [
+    0.6187,
+    0.1744,
+    0.3488
+   ],
    "transform": "battle/rock-lee-gates.webp",
-   "transformFace": "battle/rock-lee-gates-face.webp"
+   "transformFace": "battle/rock-lee-gates-face.webp",
+   "transformFaceBox": [
+    0.3954,
+    0.2834,
+    0.5667
+   ]
   },
   "lee_ship": {
    "front": "battle/rock-lee-shippuden.webp",
    "face": "battle/rock-lee-shippuden-face.webp",
+   "faceBox": [
+    0.4251,
+    0.4251,
+    0.8502
+   ],
    "transform": "battle/rock-lee-shippuden-gates.webp",
-   "transformFace": "battle/rock-lee-shippuden-gates-face.webp"
+   "transformFace": "battle/rock-lee-shippuden-gates-face.webp",
+   "transformFaceBox": [
+    0.4582,
+    0.1736,
+    0.3473
+   ]
   },
   "tenten_p1": {
    "front": "battle/tenten-part-1.webp",
-   "face": "battle/tenten-part-1-face.webp"
+   "face": "battle/tenten-part-1-face.webp",
+   "faceBox": [
+    0.4484,
+    0.3154,
+    0.6308
+   ]
   },
   "tenten_ship": {
    "front": "battle/tenten-shippuden.webp",
-   "face": "battle/tenten-shippuden-face.webp"
+   "face": "battle/tenten-shippuden-face.webp",
+   "faceBox": [
+    0.6312,
+    0.2623,
+    0.5247
+   ]
   },
   "guy": {
    "front": "battle/might-guy.webp",
    "face": "battle/might-guy-face.webp",
+   "faceBox": [
+    0.5791,
+    0.4209,
+    0.8418
+   ],
    "transform": "battle/might-guy-gates.webp",
-   "transformFace": "battle/might-guy-gates-face.webp"
+   "transformFace": "battle/might-guy-gates-face.webp",
+   "transformFaceBox": [
+    0.6605,
+    0.2533,
+    0.5067
+   ]
   },
   "shino_p1": {
    "front": "battle/shino-part-1.webp",
-   "face": "battle/shino-part-1-face.webp"
+   "face": "battle/shino-part-1-face.webp",
+   "faceBox": [
+    0.4823,
+    0.2026,
+    0.4053
+   ]
   },
   "shino_ship": {
    "front": "battle/shino-shippuden.webp",
-   "face": "battle/shino-shippuden-face.webp"
+   "face": "battle/shino-shippuden-face.webp",
+   "faceBox": [
+    0.4945,
+    0.4399,
+    0.8799
+   ]
   },
   "shikamaru_p1": {
    "front": "battle/shikamaru-part-1.webp",
-   "face": "battle/shikamaru-part-1-face.webp"
+   "face": "battle/shikamaru-part-1-face.webp",
+   "faceBox": [
+    0.4881,
+    0.1605,
+    0.3209
+   ]
   },
   "shikamaru_ship": {
    "front": "battle/shikamaru-shippuden.webp",
-   "face": "battle/shikamaru-shippuden-face.webp"
+   "face": "battle/shikamaru-shippuden-face.webp",
+   "faceBox": [
+    0.5,
+    0.5,
+    1.0
+   ]
   },
   "choji_p1": {
    "front": "battle/choji-part-1.webp",
    "face": "battle/choji-part-1-face.webp",
+   "faceBox": [
+    0.4815,
+    0.3738,
+    0.7476
+   ],
    "transform": "battle/choji-butterfly.webp",
-   "transformFace": "battle/choji-butterfly-face.webp"
+   "transformFace": "battle/choji-butterfly-face.webp",
+   "transformFaceBox": [
+    0.4846,
+    0.6078,
+    0.1398
+   ]
   },
   "choji_ship": {
    "front": "battle/choji-shippuden.webp",
    "face": "battle/choji-shippuden-face.webp",
+   "faceBox": [
+    0.4695,
+    0.4695,
+    0.9391
+   ],
    "transform": "battle/choji-shippuden-butterfly.webp",
-   "transformFace": "battle/choji-shippuden-butterfly-face.webp"
+   "transformFace": "battle/choji-shippuden-butterfly-face.webp",
+   "transformFaceBox": [
+    0.3893,
+    0.5751,
+    0.1995
+   ]
   },
   "ino_p1": {
    "front": "battle/ino-part-1.webp",
-   "face": "battle/ino-part-1-face.webp"
+   "face": "battle/ino-part-1-face.webp",
+   "faceBox": [
+    0.408,
+    0.2848,
+    0.5697
+   ]
   },
   "ino_ship": {
    "front": "battle/ino-shippuden.webp",
-   "face": "battle/ino-shippuden-face.webp"
+   "face": "battle/ino-shippuden-face.webp",
+   "faceBox": [
+    0.5,
+    0.5,
+    1.0
+   ]
   },
   "kurenai": {
    "front": "battle/kurenai.webp",
-   "face": "battle/kurenai-face.webp"
+   "face": "battle/kurenai-face.webp",
+   "faceBox": [
+    0.5298,
+    0.2227,
+    0.4453
+   ]
   },
   "asuma": {
    "front": "battle/asuma.webp",
-   "face": "battle/asuma-face.webp"
+   "face": "battle/asuma-face.webp",
+   "faceBox": [
+    0.5,
+    0.5,
+    1.0
+   ]
   },
   "kiba_p1": {
    "front": "battle/kiba-part-1.webp",
-   "face": "battle/kiba-part-1-face.webp"
+   "face": "battle/kiba-part-1-face.webp",
+   "faceBox": [
+    0.1492,
+    0.2289,
+    0.2984
+   ]
   },
   "kiba_ship": {
    "front": "battle/kiba-shippuden.webp",
    "face": "battle/kiba-shippuden-face.webp",
+   "faceBox": [
+    0.4453,
+    0.4221,
+    0.8442
+   ],
    "transform": "battle/kiba-two-headed-wolf.webp",
-   "transformFace": "battle/kiba-two-headed-wolf-face.webp"
+   "transformFace": "battle/kiba-two-headed-wolf-face.webp",
+   "transformFaceBox": [
+    0.1594,
+    0.5556,
+    0.2995
+   ]
   },
   "gaara_p1": {
    "front": "battle/gaara-part-1.webp",
    "face": "battle/gaara-part-1-face.webp",
+   "faceBox": [
+    0.1599,
+    0.2975,
+    0.2994
+   ],
    "transform": "battle/gaara-partial-shukaku.webp",
-   "transformFace": "battle/gaara-partial-shukaku-face.webp"
+   "transformFace": "battle/gaara-partial-shukaku-face.webp",
+   "transformFaceBox": [
+    0.326,
+    0.8546,
+    0.2996
+   ]
   },
   "gaara_ship": {
    "front": "battle/gaara-shippuden.webp",
-   "face": "battle/gaara-shippuden-face.webp"
+   "face": "battle/gaara-shippuden-face.webp",
+   "faceBox": [
+    0.4864,
+    0.366,
+    0.7319
+   ]
   },
   "temari_p1": {
    "front": "battle/temari-part-1.webp",
-   "face": "battle/temari-part-1-face.webp"
+   "face": "battle/temari-part-1-face.webp",
+   "faceBox": [
+    0.4105,
+    0.2071,
+    0.4142
+   ]
   },
   "temari_ship": {
    "front": "battle/temari-shippuden.webp",
-   "face": "battle/temari-shippuden-face.webp"
+   "face": "battle/temari-shippuden-face.webp",
+   "faceBox": [
+    0.7344,
+    0.2656,
+    0.5312
+   ]
   },
   "kankuro_p1": {
    "front": "battle/kankuro.webp",
-   "face": "battle/kankuro-face.webp"
+   "face": "battle/kankuro-face.webp",
+   "faceBox": [
+    0.5006,
+    0.2639,
+    0.5277
+   ]
   },
   "kankuro_ship": {
    "front": "battle/kankuro-shippuden.webp",
-   "face": "battle/kankuro-shippuden-face.webp"
+   "face": "battle/kankuro-shippuden-face.webp",
+   "faceBox": [
+    0.3584,
+    0.5142,
+    0.2578
+   ]
   },
   "chiyo": {
    "front": "battle/chiyo.webp",
-   "face": "battle/chiyo-face.webp"
+   "face": "battle/chiyo-face.webp",
+   "faceBox": [
+    0.5416,
+    0.3015,
+    0.603
+   ]
   },
   "orochimaru_p1": {
    "front": "battle/orochimaru.webp",
    "face": "battle/orochimaru-face.webp",
+   "faceBox": [
+    0.5194,
+    0.4806,
+    0.9611
+   ],
    "transform": "battle/orochimaru-snake-form.webp",
-   "transformFace": "battle/orochimaru-snake-form-face.webp"
+   "transformFace": "battle/orochimaru-snake-form-face.webp",
+   "transformFaceBox": [
+    0.4284,
+    0.1505,
+    0.301
+   ]
   },
   "orochimaru_ship": {
    "front": "battle/orochimaru.webp",
    "face": "battle/orochimaru-face.webp",
+   "faceBox": [
+    0.5194,
+    0.4806,
+    0.9611
+   ],
    "transform": "battle/orochimaru-eight-branches.webp",
-   "transformFace": "battle/orochimaru-eight-branches-face.webp"
+   "transformFace": "battle/orochimaru-eight-branches-face.webp",
+   "transformFaceBox": [
+    0.5494,
+    0.484,
+    0.2994
+   ]
   },
   "kabuto_p1": {
    "front": "battle/kabuto-part-1.webp",
-   "face": "battle/kabuto-part-1-face.webp"
+   "face": "battle/kabuto-part-1-face.webp",
+   "faceBox": [
+    0.6314,
+    0.3686,
+    0.7372
+   ]
   },
   "kabuto_sage": {
    "front": "battle/kabuto-sage-mode.webp",
    "face": "battle/kabuto-sage-mode-face.webp",
+   "faceBox": [
+    0.4883,
+    0.2734,
+    0.5467
+   ],
    "transform": "battle/kabuto-dragon-sage-mode.webp",
-   "transformFace": "battle/kabuto-dragon-sage-mode-face.webp"
+   "transformFace": "battle/kabuto-dragon-sage-mode-face.webp",
+   "transformFaceBox": [
+    0.3759,
+    0.3759,
+    0.7518
+   ]
   },
   "jirobo": {
    "front": "battle/jirobo.webp",
    "face": "battle/jirobo-face.webp",
+   "faceBox": [
+    0.5674,
+    0.2226,
+    0.4451
+   ],
    "transform": "battle/jirobo-curse-mark.webp",
-   "transformFace": "battle/jirobo-curse-mark-face.webp"
+   "transformFace": "battle/jirobo-curse-mark-face.webp",
+   "transformFaceBox": [
+    0.4399,
+    0.2338,
+    0.4675
+   ]
   },
   "kidomaru": {
    "front": "battle/kidomaru.webp",
    "face": "battle/kidomaru-face.webp",
+   "faceBox": [
+    0.4995,
+    0.3428,
+    0.22
+   ],
    "transform": "battle/kidomaru-curse-mark.webp",
-   "transformFace": "battle/kidomaru-curse-mark-face.webp"
+   "transformFace": "battle/kidomaru-curse-mark-face.webp",
+   "transformFaceBox": [
+    0.6,
+    0.5219,
+    0.2193
+   ]
   },
   "sakon_ukon": {
    "front": "battle/sakon-ukon.webp",
    "face": "battle/sakon-ukon-face.webp",
+   "faceBox": [
+    0.6103,
+    0.3099,
+    0.6198
+   ],
    "transform": "battle/sakon-ukon-curse-mark.webp",
-   "transformFace": "battle/sakon-ukon-curse-mark-face.webp"
+   "transformFace": "battle/sakon-ukon-curse-mark-face.webp",
+   "transformFaceBox": [
+    0.15,
+    0.5582,
+    0.3
+   ]
   },
   "tayuya": {
    "front": "battle/tayuya.webp",
    "face": "battle/tayuya-face.webp",
+   "faceBox": [
+    0.3858,
+    0.2757,
+    0.5515
+   ],
    "transform": "battle/tayuya-curse-mark.webp",
-   "transformFace": "battle/tayuya-curse-mark-face.webp"
+   "transformFace": "battle/tayuya-curse-mark-face.webp",
+   "transformFaceBox": [
+    0.4675,
+    0.26,
+    0.52
+   ]
   },
   "kimimaro": {
    "front": "battle/kimimaro.webp",
    "face": "battle/kimimaro-face.webp",
+   "faceBox": [
+    0.5535,
+    0.3381,
+    0.6762
+   ],
    "transform": "battle/kimimaro-curse-mark.webp",
-   "transformFace": "battle/kimimaro-curse-mark-face.webp"
+   "transformFace": "battle/kimimaro-curse-mark-face.webp",
+   "transformFaceBox": [
+    0.5999,
+    0.6588,
+    0.2198
+   ]
   },
   "zabuza": {
    "front": "battle/zabuza.webp",
-   "face": "battle/zabuza-face.webp"
+   "face": "battle/zabuza-face.webp",
+   "faceBox": [
+    0.5992,
+    0.4854,
+    0.2195
+   ]
   },
   "haku": {
    "front": "battle/haku.webp",
-   "face": "battle/haku-face.webp"
+   "face": "battle/haku-face.webp",
+   "faceBox": [
+    0.5174,
+    0.4826,
+    0.9652
+   ]
   },
   "anko": {
    "front": "battle/anko.webp",
-   "face": "battle/anko-face.webp"
+   "face": "battle/anko-face.webp",
+   "faceBox": [
+    0.2427,
+    0.2427,
+    0.4854
+   ]
   },
   "danzo": {
    "front": "battle/danzo.webp",
-   "face": "battle/danzo-face.webp"
+   "face": "battle/danzo-face.webp",
+   "faceBox": [
+    0.5781,
+    0.3795,
+    0.7591
+   ]
   },
   "obito_tobi": {
    "front": "battle/tobi.webp",
-   "face": "battle/tobi-face.webp"
+   "face": "battle/tobi-face.webp",
+   "faceBox": [
+    0.5138,
+    0.4047,
+    0.8094
+   ]
   },
   "obito_masked": {
    "front": "battle/masked-man.webp",
-   "face": "battle/masked-man-face.webp"
+   "face": "battle/masked-man-face.webp",
+   "faceBox": [
+    0.414,
+    0.2103,
+    0.4206
+   ]
   },
   "zetsu_white": {
    "front": "battle/white-zetsu.webp",
-   "face": "battle/white-zetsu-face.webp"
+   "face": "battle/white-zetsu-face.webp",
+   "faceBox": [
+    0.5,
+    1.0085,
+    0.548
+   ]
   },
   "zetsu_black": {
    "front": "battle/black-zetsu.webp",
-   "face": "battle/black-zetsu-face.webp"
+   "face": "battle/black-zetsu-face.webp",
+   "faceBox": [
+    0.5094,
+    0.4474,
+    0.4474
+   ]
   },
   "kisame": {
    "front": "battle/kisame.webp",
    "face": "battle/kisame-face.webp",
+   "faceBox": [
+    0.399,
+    0.3408,
+    0.6815
+   ],
    "transform": "battle/kisame-fused.webp",
-   "transformFace": "battle/kisame-fused-face.webp"
+   "transformFace": "battle/kisame-fused-face.webp",
+   "transformFaceBox": [
+    0.2399,
+    0.5179,
+    0.2491
+   ]
   },
   "itachi": {
    "front": "battle/itachi.webp",
    "face": "battle/itachi-face.webp",
+   "faceBox": [
+    0.6148,
+    0.2978,
+    0.5956
+   ],
    "transform": "battle/itachi-susanoo.webp",
-   "transformFace": "battle/itachi-susanoo-face.webp"
+   "transformFace": "battle/itachi-susanoo-face.webp",
+   "transformFaceBox": [
+    0.5493,
+    0.4253,
+    0.3994
+   ]
   },
   "deidara": {
    "front": "battle/deidara.webp",
-   "face": "battle/deidara-face.webp"
+   "face": "battle/deidara-face.webp",
+   "faceBox": [
+    0.4683,
+    0.3664,
+    0.7328
+   ]
   },
   "hidan": {
    "front": "battle/hidan.webp",
    "face": "battle/hidan-face.webp",
+   "faceBox": [
+    0.3825,
+    0.2447,
+    0.4894
+   ],
    "transform": "battle/hidan-death-possession-blood.webp",
-   "transformFace": "battle/hidan-death-possession-blood-face.webp"
+   "transformFace": "battle/hidan-death-possession-blood-face.webp",
+   "transformFaceBox": [
+    0.6339,
+    0.2277,
+    0.4554
+   ]
   },
   "kakuzu": {
    "front": "battle/kakuzu.webp",
    "face": "battle/kakuzu-face.webp",
+   "faceBox": [
+    0.4347,
+    0.3415,
+    0.6831
+   ],
    "transform": "battle/kakuzu-earth-grudge.webp",
-   "transformFace": "battle/kakuzu-earth-grudge-face.webp"
+   "transformFace": "battle/kakuzu-earth-grudge-face.webp",
+   "transformFaceBox": [
+    0.4197,
+    0.6158,
+    0.2997
+   ]
   },
   "sasori": {
    "front": "battle/sasori.webp",
    "face": "battle/sasori-face.webp",
+   "faceBox": [
+    0.5159,
+    0.4841,
+    0.9682
+   ],
    "transform": "battle/sasori-puppet-form.webp",
-   "transformFace": "battle/sasori-puppet-form-face.webp"
+   "transformFace": "battle/sasori-puppet-form-face.webp",
+   "transformFaceBox": [
+    0.7136,
+    0.2312,
+    0.4624
+   ]
   },
   "konan": {
    "front": "battle/konan.webp",
    "face": "battle/konan-face.webp",
+   "faceBox": [
+    0.4268,
+    0.4268,
+    0.8536
+   ],
    "transform": "battle/konan-paper-angel.webp",
-   "transformFace": "battle/konan-paper-angel-face.webp"
+   "transformFace": "battle/konan-paper-angel-face.webp",
+   "transformFaceBox": [
+    0.4799,
+    0.2766,
+    0.1695
+   ]
   },
   "nagato_pain": {
    "front": "battle/pain.webp",
-   "face": "battle/pain-face.webp"
+   "face": "battle/pain-face.webp",
+   "faceBox": [
+    0.5149,
+    0.3789,
+    0.7578
+   ]
   },
   "nagato_reanimated": {
    "front": "battle/nagato.webp",
-   "face": "battle/nagato-face.webp"
+   "face": "battle/nagato-face.webp",
+   "faceBox": [
+    0.5837,
+    0.3896,
+    0.7792
+   ]
   },
   "suigetsu": {
    "front": "battle/suigetsu.webp",
-   "face": "battle/suigetsu-face.webp"
+   "face": "battle/suigetsu-face.webp",
+   "faceBox": [
+    0.4208,
+    0.4208,
+    0.8416
+   ]
   },
   "karin": {
    "front": "battle/karin.webp",
-   "face": "battle/karin-face.webp"
+   "face": "battle/karin-face.webp",
+   "faceBox": [
+    0.5,
+    0.5,
+    1.0
+   ]
   },
   "jugo": {
    "front": "battle/jugo.webp",
    "face": "battle/jugo-face.webp",
+   "faceBox": [
+    0.5131,
+    0.2917,
+    0.5834
+   ],
    "transform": "battle/jugo-sage-mode.webp",
-   "transformFace": "battle/jugo-sage-mode-face.webp"
+   "transformFace": "battle/jugo-sage-mode-face.webp",
+   "transformFaceBox": [
+    0.5986,
+    0.3029,
+    0.2496
+   ]
   },
   "hashirama": {
    "front": "battle/hashirama.webp",
    "face": "battle/hashirama-face.webp",
+   "faceBox": [
+    0.4672,
+    0.3944,
+    0.7889
+   ],
    "transform": "battle/hashirama-sage-mode.webp",
-   "transformFace": "battle/hashirama-sage-mode-face.webp"
+   "transformFace": "battle/hashirama-sage-mode-face.webp",
+   "transformFaceBox": [
+    0.6128,
+    0.2583,
+    0.5166
+   ]
   },
   "tobirama": {
    "front": "battle/tobirama.webp",
-   "face": "battle/tobirama-face.webp"
+   "face": "battle/tobirama-face.webp",
+   "faceBox": [
+    0.5207,
+    0.4793,
+    0.9586
+   ]
   },
   "hiruzen": {
    "front": "battle/hiruzen.webp",
-   "face": "battle/hiruzen-face.webp"
+   "face": "battle/hiruzen-face.webp",
+   "faceBox": [
+    0.6302,
+    0.3219,
+    0.6438
+   ]
   },
   "minato": {
    "front": "battle/minato.webp",
    "face": "battle/minato-face.webp",
+   "faceBox": [
+    0.5872,
+    0.4128,
+    0.8255
+   ],
    "transform": "battle/minato-nine-tails-chakra.webp",
-   "transformFace": "battle/minato-nine-tails-chakra-face.webp"
+   "transformFace": "battle/minato-nine-tails-chakra-face.webp",
+   "transformFaceBox": [
+    0.4653,
+    0.2147,
+    0.4293
+   ]
   },
   "tsunade": {
    "front": "battle/tsunade.webp",
    "face": "battle/tsunade-face.webp",
+   "faceBox": [
+    0.4771,
+    0.4515,
+    0.9031
+   ],
    "transform": "battle/tsunade-hundred-healings.webp",
-   "transformFace": "battle/tsunade-hundred-healings-face.webp"
+   "transformFace": "battle/tsunade-hundred-healings-face.webp",
+   "transformFaceBox": [
+    0.543,
+    0.2532,
+    0.5065
+   ]
   },
   "jiraiya": {
    "front": "battle/jiraiya.webp",
    "face": "battle/jiraiya-face.webp",
+   "faceBox": [
+    0.521,
+    0.3685,
+    0.737
+   ],
    "transform": "battle/jiraiya-sage-mode.webp",
-   "transformFace": "battle/jiraiya-sage-mode-face.webp"
+   "transformFace": "battle/jiraiya-sage-mode-face.webp",
+   "transformFaceBox": [
+    0.5185,
+    0.3809,
+    0.1992
+   ]
   },
   "raikage_a": {
    "front": "battle/a.webp",
-   "face": "battle/a-face.webp"
+   "face": "battle/a-face.webp",
+   "faceBox": [
+    0.5015,
+    0.2502,
+    0.5005
+   ]
   },
   "killer_bee": {
    "front": "battle/killer-bee.webp",
    "face": "battle/killer-bee-face.webp",
+   "faceBox": [
+    0.4817,
+    0.3047,
+    0.6094
+   ],
    "transform": "battle/gyuki.webp",
-   "transformFace": "battle/gyuki-face.webp"
+   "transformFace": "battle/gyuki-face.webp",
+   "transformFaceBox": [
+    0.5497,
+    0.4944,
+    0.1998
+   ]
   },
   "darui": {
    "front": "battle/darui.webp",
-   "face": "battle/darui-face.webp"
+   "face": "battle/darui-face.webp",
+   "faceBox": [
+    0.4744,
+    0.4744,
+    0.9487
+   ]
   },
   "karui": {
    "front": "battle/karui.webp",
-   "face": "battle/karui-face.webp"
+   "face": "battle/karui-face.webp",
+   "faceBox": [
+    0.4583,
+    0.2206,
+    0.4411
+   ]
   },
   "mei": {
    "front": "battle/mei-terumi.webp",
-   "face": "battle/mei-terumi-face.webp"
+   "face": "battle/mei-terumi-face.webp",
+   "faceBox": [
+    0.5,
+    0.5,
+    1.0
+   ]
   },
   "chojuro": {
    "front": "battle/chojuro.webp",
-   "face": "battle/chojuro-face.webp"
+   "face": "battle/chojuro-face.webp",
+   "faceBox": [
+    0.4408,
+    0.4408,
+    0.8815
+   ]
   },
   "ao": {
    "front": "battle/ao.webp",
-   "face": "battle/ao-face.webp"
+   "face": "battle/ao-face.webp",
+   "faceBox": [
+    0.5,
+    0.5,
+    1.0
+   ]
   },
   "gengetsu": {
    "front": "battle/gengetsu.webp",
-   "face": "battle/gengetsu-face.webp"
+   "face": "battle/gengetsu-face.webp",
+   "faceBox": [
+    0.4802,
+    0.4738,
+    0.9476
+   ]
   },
   "yagura": {
    "front": "battle/yagura.webp",
    "face": "battle/yagura-face.webp",
+   "faceBox": [
+    0.3494,
+    0.3766,
+    0.2486
+   ],
    "transform": "battle/isobu.webp",
-   "transformFace": "battle/isobu-face.webp"
+   "transformFace": "battle/isobu-face.webp",
+   "transformFaceBox": [
+    0.3292,
+    0.2655,
+    0.2993
+   ]
   },
   "onoki": {
    "front": "battle/onoki.webp",
-   "face": "battle/onoki-face.webp"
+   "face": "battle/onoki-face.webp",
+   "faceBox": [
+    0.566,
+    0.213,
+    0.4259
+   ]
   },
   "kurotsuchi": {
    "front": "battle/kurotsuchi.webp",
-   "face": "battle/kurotsuchi-face.webp"
+   "face": "battle/kurotsuchi-face.webp",
+   "faceBox": [
+    0.5113,
+    0.4887,
+    0.9774
+   ]
   },
   "akatsuchi": {
    "front": "battle/akatsuchi.webp",
-   "face": "battle/akatsuchi-face.webp"
+   "face": "battle/akatsuchi-face.webp",
+   "faceBox": [
+    0.4016,
+    0.3984,
+    0.7968
+   ]
   },
   "mu": {
    "front": "battle/mu.webp",
-   "face": "battle/mu-face.webp"
+   "face": "battle/mu-face.webp",
+   "faceBox": [
+    0.4933,
+    0.4453,
+    0.8906
+   ]
   },
   "obito_war": {
    "front": "battle/obito.webp",
    "face": "battle/obito-face.webp",
+   "faceBox": [
+    0.619,
+    0.3579,
+    0.7157
+   ],
    "transform": "battle/obito-ten-tails.webp",
-   "transformFace": "battle/obito-ten-tails-face.webp"
+   "transformFace": "battle/obito-ten-tails-face.webp",
+   "transformFaceBox": [
+    0.6533,
+    0.2576,
+    0.5153
+   ]
   },
   "madara_reanimated": {
    "front": "battle/madara.webp",
    "face": "battle/madara-face.webp",
+   "faceBox": [
+    0.3456,
+    0.2209,
+    0.4418
+   ],
    "transform": "battle/madara-perfect-susanoo.webp",
-   "transformFace": "battle/madara-perfect-susanoo-face.webp"
+   "transformFace": "battle/madara-perfect-susanoo-face.webp",
+   "transformFaceBox": [
+    0.4637,
+    0.2033,
+    0.4066
+   ]
   },
   "madara_six_paths": {
    "front": "battle/madara-six-paths.webp",
-   "face": "battle/madara-six-paths-face.webp"
+   "face": "battle/madara-six-paths-face.webp",
+   "faceBox": [
+    0.4396,
+    0.2711,
+    0.5421
+   ]
   },
   "kaguya": {
    "front": "battle/kaguya.webp",
-   "face": "battle/kaguya-face.webp"
+   "face": "battle/kaguya-face.webp",
+   "faceBox": [
+    0.4295,
+    0.2263,
+    0.4525
+   ]
   },
   "fu": {
    "front": "battle/fu.webp",
    "face": "battle/fu-face.webp",
+   "faceBox": [
+    0.5559,
+    0.3042,
+    0.6084
+   ],
    "transform": "battle/chomei.webp",
-   "transformFace": "battle/chomei-face.webp"
+   "transformFace": "battle/chomei-face.webp",
+   "transformFaceBox": [
+    0.4493,
+    0.1875,
+    0.2195
+   ]
   },
   "utakata": {
    "front": "battle/utakata.webp",
    "face": "battle/utakata-face.webp",
+   "faceBox": [
+    0.5,
+    0.5,
+    1.0
+   ],
    "transform": "battle/saiken.webp",
-   "transformFace": "battle/saiken-face.webp"
+   "transformFace": "battle/saiken-face.webp",
+   "transformFaceBox": [
+    0.5188,
+    0.1394,
+    0.2789
+   ]
   },
   "han": {
    "front": "battle/han.webp",
    "face": "battle/han-face.webp",
+   "faceBox": [
+    0.5397,
+    0.3923,
+    0.7846
+   ],
    "transform": "battle/kokuo.webp",
-   "transformFace": "battle/kokuo-face.webp"
+   "transformFace": "battle/kokuo-face.webp",
+   "transformFaceBox": [
+    0.1398,
+    0.5121,
+    0.2495
+   ]
   },
   "roshi": {
    "front": "battle/roshi.webp",
    "face": "battle/roshi-face.webp",
+   "faceBox": [
+    0.5,
+    0.5,
+    1.0
+   ],
    "transform": "battle/son-goku.webp",
-   "transformFace": "battle/son-goku-face.webp"
+   "transformFace": "battle/son-goku-face.webp",
+   "transformFaceBox": [
+    0.2291,
+    0.5907,
+    0.2492
+   ]
   },
   "yugito": {
    "front": "battle/yguito.webp",
    "face": "battle/yguito-face.webp",
+   "faceBox": [
+    0.5249,
+    0.4751,
+    0.9502
+   ],
    "transform": "battle/matatabi.webp",
-   "transformFace": "battle/matatabi-face.webp"
+   "transformFace": "battle/matatabi-face.webp",
+   "transformFaceBox": [
+    0.3799,
+    0.5879,
+    0.2492
+   ]
   },
   "hanzo": {
    "front": "battle/hanzo.webp",
-   "face": "battle/hanzo-face.webp"
+   "face": "battle/hanzo-face.webp",
+   "faceBox": [
+    0.5511,
+    0.3163,
+    0.6326
+   ]
   },
   "iruka": {
    "front": "battle/iruka.webp",
-   "face": "battle/iruka-face.webp"
+   "face": "battle/iruka-face.webp",
+   "faceBox": [
+    0.4274,
+    0.4274,
+    0.8547
+   ]
   },
   "konohamaru": {
    "front": "battle/konohamaru.webp",
-   "face": "battle/konohamaru-face.webp"
+   "face": "battle/konohamaru-face.webp",
+   "faceBox": [
+    0.3712,
+    0.2505,
+    0.501
+   ]
   },
   "kushina": {
    "front": "battle/kushina.webp",
-   "face": "battle/kushina-face.webp"
+   "face": "battle/kushina-face.webp",
+   "faceBox": [
+    0.5,
+    0.5,
+    1.0
+   ]
   },
   "mifune": {
    "front": "battle/mifune.webp",
-   "face": "battle/mifune-face.webp"
+   "face": "battle/mifune-face.webp",
+   "faceBox": [
+    0.5191,
+    0.3279,
+    0.6559
+   ]
   },
   "rasa": {
    "front": "battle/rasa.webp",
-   "face": "battle/rasa-face.webp"
+   "face": "battle/rasa-face.webp",
+   "faceBox": [
+    0.4754,
+    0.4647,
+    0.9295
+   ]
   },
   "shisui": {
    "front": "battle/shisui.webp",
    "face": "battle/shisui-face.webp",
+   "faceBox": [
+    0.42,
+    0.42,
+    0.84
+   ],
    "transform": "battle/shisui-susanoo.webp",
-   "transformFace": "battle/shisui-susanoo-face.webp"
+   "transformFace": "battle/shisui-susanoo-face.webp",
+   "transformFaceBox": [
+    0.5495,
+    0.124,
+    0.248
+   ]
   },
   "shizune": {
    "front": "battle/shizune.webp",
-   "face": "battle/shizune-face.webp"
+   "face": "battle/shizune-face.webp",
+   "faceBox": [
+    0.3763,
+    0.3148,
+    0.6296
+   ]
   }
  }
 }
