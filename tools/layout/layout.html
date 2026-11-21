@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Character Layout · Shinobi Showdown</title>
+  <link rel="icon" type="image/png" sizes="32x32" href="img/favicon-32.png" />
+  <link rel="stylesheet" href="style.css" />
+  <link rel="stylesheet" href="layout.css" />
+</head>
+<body>
+  <header class="topbar">
+    <div class="brand"><img class="leaf" src="img/konoha-orange.png" alt=""><span class="b1">CHARACTER</span> <span class="b2">LAYOUT</span></div>
+    <span class="grow"></span>
+    <span id="saveState" class="muted small"></span>
+    <button class="small" data-act="export" title="layout.json for public/data on GitHub">⬇ Export layout.json</button>
+  </header>
+  <main id="lay"></main>
+  <div id="toast" class="st-toast hidden"></div>
+  <script type="module" src="layout.js"></script>
+</body>
+</html>

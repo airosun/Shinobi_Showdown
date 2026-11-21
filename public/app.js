@@ -36,9 +36,15 @@ const S = {
   skip: false,
   showRules: false,
   sprites: {},
+  layout: { sprites: {}, faces: {} }, // per-character size / position / portrait zoom (Character Layout module)
   msg: null,
 };
 
+fetch('data/layout.json').then((r) => (r.ok ? r.json() : null)).then((l) => {
+  if (!l) return;
+  S.layout = { sprites: l.sprites || {}, faces: l.faces || {} };
+  if (S.screen !== 'title' && !(S.screen === 'battle' && S.phase === 'play')) { render(); if (S.screen === 'battle') syncField(); }
+}).catch(() => {});
 fetch('sprites/manifest.json').then((r) => r.json()).then((m) => {
   S.sprites = m.sprites || {};
   for (const a of Object.values(S.sprites)) for (const f of [a.front, a.transform]) if (f) new Image().src = `sprites/${f}`; // preload
@@ -76,15 +82,33 @@ function badge(def, cls = '', transformed = false) {
   const c2 = def.natures.secondary ? natColor(def.natures.secondary) : '#3a2a2a';
   const art = S.sprites[def.id];
   const face = art && ((transformed && art.transformFace) || art.face);
-  if (face) return `<div class="badge face ${cls}" style="--c1:${c1};--c2:${c2}"><img src="sprites/${esc(face)}" alt="${esc(def.name)}" loading="lazy"></div>`;
+  if (face) return `<div class="badge face ${cls}" style="--c1:${c1};--c2:${c2}"><img src="sprites/${esc(face)}" alt="${esc(def.name)}" loading="lazy" style="${faceStyle(def.id, transformed && art.transformFace)}"></div>`;
   return `<div class="badge ${cls}" style="--c1:${c1};--c2:${c2}">${initials(def.name)}</div>`;
+}
+// size / position on the field and portrait framing, set in the Character Layout module
+function artStyle(id, tf, back) {
+  const L = (tf && S.layout.sprites[`${id}:tf`]) || S.layout.sprites[id] || {};
+  const out = ['transform-origin:50% 100%'];
+  if (back) out.push('transform:scaleX(-1)');
+  const sc = (L.scale ?? 100) / 100;
+  if (sc !== 1) out.push(`scale:${sc}`);
+  // offsets are drawn for the enemy-side (unmirrored) view, so they flip with the sprite
+  if (L.dx || L.dy) out.push(`translate:${back ? -(L.dx || 0) : (L.dx || 0)}% ${L.dy || 0}%`);
+  return out.join(';');
+}
+function faceStyle(id, tf) {
+  const F = (tf && S.layout.faces[`${id}:tf`]) || S.layout.faces[id];
+  if (!F) return '';
+  const x = F.x ?? 50; const y = F.y ?? 50;
+  return `object-position:${x}% ${y}%;transform-origin:${x}% ${y}%;scale:${(F.zoom ?? 100) / 100}`;
 }
 /** Battle art (front view; your side is mirrored). Falls back to the badge. */
 function sprite(def, back, transformed = false) {
   const art = S.sprites[def.id];
   if (art && art.front) {
     const src = (transformed && art.transform) || art.front;
-    return `<img class="art" src="sprites/${esc(src)}" data-front="sprites/${esc(art.front)}" data-tf="${art.transform ? `sprites/${esc(art.transform)}` : ''}" alt="${esc(def.name)}" ${back ? 'style="transform:scaleX(-1)"' : ''}>`;
+    const tf = !!(transformed && art.transform);
+    return `<img class="art" src="sprites/${esc(src)}" data-front="sprites/${esc(art.front)}" data-tf="${art.transform ? `sprites/${esc(art.transform)}` : ''}" data-lid="${def.id}" data-back="${back ? 1 : ''}" alt="${esc(def.name)}" style="${artStyle(def.id, tf, back)}">`;
   }
   return badge(def);
 }
@@ -762,7 +786,7 @@ function syncField() {
       const art = mon.querySelector('img.art');
       if (art && art.dataset.tf) {
         const want = u.transform ? art.dataset.tf : art.dataset.front;
-        if (!art.src.endsWith(want)) art.src = want;
+        if (!art.src.endsWith(want)) { art.src = want; art.setAttribute('style', artStyle(art.dataset.lid, !!u.transform, !!art.dataset.back)); }
       }
       mon.classList.toggle('weaving', !!u.weaving);
       const hasGhost = !!mon.querySelector('.ghost');
