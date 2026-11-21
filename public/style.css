@@ -516,7 +516,7 @@ button.linkish:hover:not(:disabled) { background: none; color: var(--accent); }
 .dex-card { grid-template-columns: minmax(180px, 380px) minmax(0, 1fr); }
 .dex-info { min-width: 0; }
 @container (max-width: 860px) { .dex-cols { grid-template-columns: 1fr; } }
-@container (max-width: 600px) { .dex-card { grid-template-columns: 1fr; } .dex-card .dex-art, .dex-card > :first-child { max-width: 380px; margin: 0 auto; width: 100%; } .jstats { grid-template-columns: 1fr 1fr; } }
+@container (max-width: 600px) { .dex-card { grid-template-columns: 1fr; } .dex-card:not(.jcard) > :first-child { max-width: 380px; margin: 0 auto; width: 100%; } .jstats { grid-template-columns: 1fr 1fr; } }
 @media (max-width: 1120px) and (min-width: 901px) { .dex { grid-template-columns: 280px minmax(0, 1fr); } }
 @media (max-width: 520px) { .topbar .brand { font-size: 18px; } .page, main { padding-left: 10px; padding-right: 10px; } }
 @container (max-width: 640px) {
@@ -550,3 +550,10 @@ main { max-width: none; padding: clamp(10px, 1.2vw, 24px); }
 /* battle log and dex list stretch down to the bottom of the window */
 @media (min-width: 1061px) { .log { height: max(300px, calc(100vh - 360px)); } }
 @media (min-width: 901px) { .dex-stage { height: clamp(320px, 48vh, 640px); } }
+
+/* inner boxes always fill the card they sit in */
+.dex-card.jcard { grid-template-columns: minmax(0, 1fr); }
+.dex-card.jcard > * { min-width: 0; width: 100%; }
+.dex-stats { max-width: none; }
+.dex-block, .jstat { min-width: 0; }
+.usedby { grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); }
