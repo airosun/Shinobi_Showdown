@@ -531,3 +531,22 @@ button.linkish:hover:not(:disabled) { background: none; color: var(--accent); }
 @container (max-width: 640px) { .arena .sidelabel { font-size: 11px; gap: 4px; } .arena .sidelabel .chip { font-size: 10px; padding: 1px 6px; } }
 @media (max-width: 520px) { .dex-head .tabs .tab { font-size: 15px; padding: 4px 9px; } .dex-head { gap: 6px; } }
 .dex-side { min-width: 0; } .dex-side .row { flex-wrap: wrap; }
+
+/* ================= fill the window: panels grow with the screen ================= */
+main { max-width: none; padding: clamp(10px, 1.2vw, 24px); }
+.battle { grid-template-columns: minmax(0, 1fr) clamp(300px, 24vw, 480px); }
+.builder { grid-template-columns: minmax(0, 1fr) clamp(380px, 30vw, 580px); }
+.dex { grid-template-columns: clamp(280px, 22vw, 440px) minmax(0, 1fr); }
+.lab { max-width: none; grid-template-columns: clamp(260px, 20vw, 400px) minmax(0, 1fr); }
+@media (max-width: 1060px) { .battle { grid-template-columns: 1fr; } }
+@media (max-width: 980px) { .builder { grid-template-columns: 1fr; } }
+@media (max-width: 900px) { .dex, .lab { grid-template-columns: 1fr; } }
+/* battlefield height follows the window height */
+@media (min-width: 701px) { .arena { height: clamp(470px, 58vh, 820px); } }
+@container (min-width: 861px) {
+  .arena .spr img.art { height: clamp(140px, 21vh, 300px); max-width: clamp(160px, 24vh, 340px); }
+  .arena .mon.you .spr img.art { height: clamp(185px, 28vh, 400px); max-width: clamp(200px, 30vh, 440px); }
+}
+/* battle log and dex list stretch down to the bottom of the window */
+@media (min-width: 1061px) { .log { height: max(300px, calc(100vh - 360px)); } }
+@media (min-width: 901px) { .dex-stage { height: clamp(320px, 48vh, 640px); } }
