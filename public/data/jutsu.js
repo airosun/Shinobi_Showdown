@@ -890,7 +890,7 @@ export const JUTSU = {
     "desc": "Shapes Amaterasu's flames into spikes. 25% Burn."
   },
   "susanoo_arrow": {
-    "name": "Susanoo: Flame Arrow",
+    "name": "Susano'o: Flame Arrow",
     "category": "ninjutsu",
     "nature": "fire",
     "power": 140,
@@ -904,7 +904,7 @@ export const JUTSU = {
         "turns": 3
       }
     ],
-    "desc": "Only while transformed (Susanoo / Rinne-Sharingan).",
+    "desc": "Only while transformed (Susano'o / Rinne-Sharingan).",
     "requiresTransform": true
   },
   "sharingan_genjutsu": {
@@ -1083,7 +1083,7 @@ export const JUTSU = {
     "ignoresSub": true
   },
   "kamui_shuriken": {
-    "name": "Susanoo: Kamui Shuriken",
+    "name": "Susano'o: Kamui Shuriken",
     "category": "ninjutsu",
     "nature": null,
     "power": 165,
@@ -1091,7 +1091,7 @@ export const JUTSU = {
     "priority": 0,
     "target": "enemy",
     "effects": [],
-    "desc": "Only while Susanoo is active. Ignores Substitution.",
+    "desc": "Only while Susano'o is active. Ignores Substitution.",
     "requiresTransform": true,
     "ignoresSub": true
   },

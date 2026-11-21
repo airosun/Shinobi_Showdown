@@ -544,8 +544,8 @@ export const SHINOBI = [
         "nin": 1.2
       },
       "drawback": "exhausted",
-      "name": "Susanoo",
-      "desc": "+50% DEF, +20% NIN. Unlocks Susanoo: Flame Arrow. Exhausted afterwards."
+      "name": "Susano'o",
+      "desc": "+50% DEF, +20% NIN. Unlocks Susano'o: Flame Arrow. Exhausted afterwards."
     },
     "supportAura": {
       "name": "Hatred's Edge",
@@ -622,7 +622,7 @@ export const SHINOBI = [
       },
       "drawback": "exhausted",
       "name": "Rinne-Sharingan",
-      "desc": "+40% NIN, +35% DEF. Unlocks Susanoo: Flame Arrow. Exhausted afterwards."
+      "desc": "+40% NIN, +35% DEF. Unlocks Susano'o: Flame Arrow. Exhausted afterwards."
     },
     "supportAura": {
       "name": "Taka Leader",
@@ -1079,8 +1079,8 @@ export const SHINOBI = [
         "def": 1.4
       },
       "drawback": "exhausted",
-      "name": "Perfect Susanoo",
-      "desc": "+40% NIN, +40% DEF. Unlocks Susanoo: Kamui Shuriken. Exhausted afterwards."
+      "name": "Perfect Susano'o",
+      "desc": "+40% NIN, +40% DEF. Unlocks Susano'o: Kamui Shuriken. Exhausted afterwards."
     },
     "supportAura": {
       "name": "Team Kakashi Bond",

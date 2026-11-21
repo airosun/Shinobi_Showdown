@@ -87,7 +87,7 @@ FACE = {
     'sasuke-susanoo': (0.47, 0.29, 0.3),
     'gyuki': (0.55, 0.6, 0.2), 'yagura': (0.35, 0.25, 0.25), 'isobu': (0.33, 0.43, 0.3), 'jiraiya-sage-mode': (0.52, 0.28, 0.2),
     'white-zetsu': (0.5, 0.36, 0.55), 'black-zetsu': (0.51, 0.32, 0.45), 'kisame-fused': (0.24, 0.43, 0.25), 'itachi-susanoo': (0.55, 0.4, 0.4),
-    'kakuzu-earth-grudge': (0.42, 0.45, 0.3), 'konan-paper-angel': (0.48, 0.28, 0.17), 'jugo-sage-mode': (0.6, 0.22, 0.25), 'zabuza': (0.6, 0.37, 0.22), 'kakashi-perfect-susanoo': (0.56, 0.1, 0.3),
+    'kakuzu-earth-grudge': (0.42, 0.45, 0.3), 'konan-paper-angel': (0.48, 0.28, 0.17), 'jugo-sage-mode': (0.6, 0.22, 0.25), 'zabuza': (0.6, 0.37, 0.22), 'kakashi-perfect-susanoo': (0.79, 0.50, 0.22),
 }
 BATTLE_H = 440   # battle sprite height (px)
 AVATAR = 128     # menu portrait size (px)

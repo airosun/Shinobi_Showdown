@@ -37,7 +37,7 @@ NEW_JUTSU = {
   'kirin': J('Kirin', 'ninjutsu', 'lightning', 175, 90, -1, 'enemy', [], 'Charged. Calls down natural lightning shaped like a dragon.', charged=True),
   'amaterasu': J('Amaterasu', 'ninjutsu', 'fire', 70, 50, 0, 'enemy', [burn(1, 4)], 'Black flames wherever he looks. Always Burns (4 turns). Ignores Substitution.', ignoresSub=True),
   'blaze_kagutsuchi': J('Blaze Release: Kagutsuchi', 'ninjutsu', 'fire', 75, 55, 0, 'allEnemies', [burn(0.4)], 'Shapes Amaterasu\'s flames into spikes. 40% Burn.'),
-  'susanoo_arrow': J('Susanoo: Flame Arrow', 'ninjutsu', 'fire', 150, 60, 0, 'enemy', [burn(0.5)], 'Only while transformed (Susanoo / Rinne-Sharingan).', requiresTransform=True),
+  'susanoo_arrow': J("Susano'o: Flame Arrow", 'ninjutsu', 'fire', 150, 60, 0, 'enemy', [burn(0.5)], "Only while transformed (Susano'o / Rinne-Sharingan).", requiresTransform=True),
   'sharingan_genjutsu': J('Sharingan Genjutsu', 'genjutsu', 'yin', 0, 30, 1, 'enemy', [gen(2)], 'A glance is enough. Genjutsu for 2 turns.'),
   # Sakura
   'shuriken_volley': J('Shuriken Volley', 'taijutsu', None, 45, 0, 2, 'enemy', [], 'Basic thrown weapons.'),
@@ -51,7 +51,7 @@ NEW_JUTSU = {
   'lightning_hound': J('Lightning Beast Running', 'ninjutsu', 'lightning', 105, 45, 1, 'enemy', [para(0.2)], 'A hound of lightning. 20% Paralyze.'),
   'kamui': J('Kamui', 'ninjutsu', None, 150, 70, -1, 'enemy', [], 'Warps part of the target away. Ignores Substitution. Only with the Mangekyō active.', requiresTransform=True, ignoresSub=True),
   'kamui_raikiri': J('Kamui Raikiri', 'ninjutsu', 'lightning', 130, 60, 1, 'enemy', [para(0.2)], 'A Lightning Blade that warps through space. Ignores Substitution.', ignoresSub=True),
-  'kamui_shuriken': J('Susanoo: Kamui Shuriken', 'ninjutsu', None, 165, 70, 0, 'enemy', [], 'Only while Susanoo is active. Ignores Substitution.', requiresTransform=True, ignoresSub=True),
+  'kamui_shuriken': J("Susano'o: Kamui Shuriken", 'ninjutsu', None, 165, 70, 0, 'enemy', [], "Only while Susano'o is active. Ignores Substitution.", requiresTransform=True, ignoresSub=True),
   # Sai
   'super_beast_scroll': J('Super Beast Imitating Drawing', 'ninjutsu', 'yin', 85, 35, 0, 'enemy', [], 'Ink beasts leap off the scroll.'),
   'ink_snakes': J('Ink Snake Bind', 'ninjutsu', 'yin', 40, 30, 0, 'enemy', [bind(0.6)], '60% Bind.'),
@@ -168,12 +168,12 @@ add('sasuke_ship', 'Sasuke Uchiha', 'Shippuden', 'Shippuden', 8, 'fire', 'lightn
     ['log', 'explosiveTag'], ['chidori', 'chidori_nagashi', 'chidori_spear', 'kirin', 'great_fireball', 'phoenix_flower'], status='New')
 add('sasuke_ms', 'Sasuke Uchiha', 'Mangekyō', 'Shippuden', 9, 'fire', 'lightning', ['Striker', 'Controller'], (100, 95, 130, 80, 115, 115),
     ('Mangekyō Sharingan', 'Sees through Log Substitution. 25% genjutsu reflect. His Burns last 2 extra turns.', True),
-    T('Susanoo', 60, 3, '+50% DEF, +20% NIN. Unlocks Susanoo: Flame Arrow. Exhausted afterwards.'),
+    T("Susano'o", 60, 3, "+50% DEF, +20% NIN. Unlocks Susano'o: Flame Arrow. Exhausted afterwards."),
     A("Hatred's Edge", 'execute', '10% / 20% / 30%', 'Allies deal +{v} damage to enemies below half HP.', new=True),
     ['log', 'explosiveTag'], ['amaterasu', 'chidori_spear', 'kirin', 'great_fireball', 'sharingan_genjutsu', 'susanoo_arrow'], status='New')
 add('sasuke_war', 'Sasuke Uchiha', 'Eternal Mangekyō', 'Shippuden', 10, 'fire', 'lightning', ['Striker', 'Controller'], (110, 105, 135, 90, 120, 130),
     ('Eternal Mangekyō Sharingan', 'Sees through Log Substitution. Immune to genjutsu. His Burns last 2 extra turns.', True),
-    T('Rinne-Sharingan', 70, 3, '+40% NIN, +35% DEF. Unlocks Susanoo: Flame Arrow. Exhausted afterwards.'),
+    T('Rinne-Sharingan', 70, 3, "+40% NIN, +35% DEF. Unlocks Susano'o: Flame Arrow. Exhausted afterwards."),
     A('Taka Leader', 'stat:nin+spd', '10%+0% / 15%+5% / 25%+10%', 'Allies gain +{v1} NIN and +{v2} SPD.', new=True),
     ['log', 'explosiveTag'], ['amaterasu', 'blaze_kagutsuchi', 'kirin', 'chidori_spear', 'sharingan_genjutsu', 'susanoo_arrow'], status='New')
 # ---- Sakura
@@ -206,7 +206,7 @@ add('kakashi_ship', 'Kakashi Hatake', 'Shippuden', 'Shippuden', 9, 'lightning', 
     ['log', 'shadowClone', 'waterClone'], ['lightning_blade', 'lightning_hound', 'water_dragon', 'headhunter', 'ninja_hounds', 'demonic_illusion', 'kamui'], status='New')
 add('kakashi_dms', 'Kakashi Hatake', 'Double Eternal Mangekyō', 'Shippuden', 10, 'lightning', 'earth', ['Striker', 'Controller'], (110, 110, 135, 95, 120, 120),
     ("Obito's Gift", 'Sees through Log Substitution. Copies the first enemy jutsu that hits him. Immune to genjutsu.', True),
-    T('Perfect Susanoo', 60, 3, '+40% NIN, +40% DEF. Unlocks Susanoo: Kamui Shuriken. Exhausted afterwards.'),
+    T("Perfect Susano'o", 60, 3, "+40% NIN, +40% DEF. Unlocks Susano'o: Kamui Shuriken. Exhausted afterwards."),
     A('Team Kakashi Bond', 'stat:spd+subDiscount', '10%+20% / 15%+35% / 25%+50%', 'Allies gain +{v1} SPD and their Substitutions cost {v2} less.', new=True),
     ['log', 'shadowClone', 'waterClone'], ['kamui_raikiri', 'lightning_blade', 'water_dragon', 'ninja_hounds', 'headhunter', 'kamui_shuriken'], status='New')
 # ---- Sai / Yamato
