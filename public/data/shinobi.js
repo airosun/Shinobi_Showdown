@@ -880,7 +880,7 @@ export const SHINOBI = [
     "baseId": "kakashi",
     "name": "Kakashi Hatake",
     "era": "Shippuden",
-    "cost": 7,
+    "cost": 6,
     "natures": {
       "primary": "lightning",
       "secondary": "earth"
@@ -1233,7 +1233,7 @@ export const SHINOBI = [
     "baseId": "hinata",
     "name": "Hinata Hyuga",
     "era": "Shippuden",
-    "cost": 7,
+    "cost": 6,
     "natures": {
       "primary": null,
       "secondary": null
@@ -2613,7 +2613,7 @@ export const SHINOBI = [
     "baseId": "gaara",
     "name": "Gaara",
     "era": "Shippuden",
-    "cost": 10,
+    "cost": 9,
     "natures": {
       "primary": "magnet",
       "secondary": "wind"
@@ -2864,7 +2864,7 @@ export const SHINOBI = [
     "baseId": "kankuro",
     "name": "Kankuro",
     "era": "Shippuden",
-    "cost": 6,
+    "cost": 5,
     "natures": {
       "primary": null,
       "secondary": null
@@ -5763,7 +5763,7 @@ export const SHINOBI = [
     "baseId": "gengetsu",
     "name": "Gengetsu Hozuki",
     "era": "Shippuden",
-    "cost": 7,
+    "cost": 6,
     "natures": {
       "primary": "boil",
       "secondary": "water"
@@ -6278,12 +6278,12 @@ export const SHINOBI = [
       "secondary": "yang"
     },
     "stats": {
-      "hp": 135,
-      "tai": 130,
-      "nin": 140,
-      "def": 115,
+      "hp": 120,
+      "tai": 125,
+      "nin": 130,
+      "def": 110,
       "spd": 125,
-      "chk": 180
+      "chk": 170
     },
     "roles": [
       "Striker",
@@ -7097,7 +7097,7 @@ export const SHINOBI = [
     "baseId": "shisui",
     "name": "Shisui Uchiha",
     "era": "Part I",
-    "cost": 8,
+    "cost": 7,
     "natures": {
       "primary": "fire",
       "secondary": "yin"

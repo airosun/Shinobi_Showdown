@@ -19,6 +19,7 @@ STAT_OVERRIDES = {
     'naruto_war': (125, 110, 125, 100, 120, 160),
     'sasuke_war': (115, 110, 135, 100, 120, 130),
     'hashirama': (120, 100, 130, 110, 100, 170),  # balance pass 4: HP 130 -> 120
+    'madara_six_paths': (120, 125, 130, 110, 125, 170),  # balance pass 7: HP 135 -> 120, TAI 130 -> 125, NIN 140 -> 130, DEF 115 -> 110, CHK 180 -> 170
 }
 
 # ---- balance pass 1 (CPU sim, cost-adjusted win rates) ----
@@ -35,7 +36,9 @@ COST_OVERRIDES = {'kurenai': 5, 'sakura_war': 9, 'tenten_ship': 7, 'kakashi_p1':
                   # balance pass 5 (batch 5)
                   'roshi': 9, 'yugito': 7, 'utakata': 8, 'hiruzen': 7, 'kiba_ship': 6, 'onoki': 8, 'madara_reanimated': 12, 'han': 8, 'sasuke_ms': 7, 'kakashi_dms': 8,
                   # balance pass 6 (batch 6)
-                  'shisui': 8, 'shizune': 5, 'iruka': 4, 'choji_ship': 7, 'naruto_p1': 5, 'naruto_sage': 7, 'sakura_war': 8}
+                  'shisui': 8, 'shizune': 5, 'iruka': 4, 'choji_ship': 7, 'naruto_p1': 5, 'naruto_sage': 7, 'sakura_war': 8,
+                  # balance pass 7 (chakra rebalance: smaller chakra pools)
+                  'gaara_ship': 9, 'kakashi_ship': 6, 'kankuro_ship': 5, 'hinata_ship': 6, 'gengetsu': 6, 'shisui': 7}
 JUTSU_OVERRIDES = {
     'amaterasu': {'effects': [{'type': 'burn', 'chance': 1, 'turns': 3}], 'cost': 55, 'desc': 'Black flames wherever he looks. Always Burns (3 turns). Ignores Substitution.'},
     'katsuyu': {'effects': [{'type': 'heal', 'value': 0.15}, {'type': 'buff', 'stat': 'def', 'mult': 1.2, 'turns': 2}], 'desc': "Katsuyu's clones heal all allies 15% and give +20% DEF for 2 turns."},

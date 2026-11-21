@@ -541,7 +541,7 @@ function rulesHtml() {
       <li><b>Roles:</b><ul class="roles-list">${ROLE_ORDER.map((r) => `<li><b>${r}</b> — ${ROLE_INFO[r]}</li>`).join('')}</ul></li>
       <li><b>Milestones:</b> 25 Intel reveals an enemy loadout, 50 reveals another and makes enemy Chakra visible, 75 lets you see one enemy order before choosing.</li>
       <li><b>Win:</b> KO all 3 enemy shinobi, <i>or</i> secure 100 Intel. After turn 20, the highest Mission Score (25 per KO + Intel) wins.</li>
-      <li><b>Chakra</b> is scarce: pools are small and only ~4% comes back each turn. <b>Charge Chakra</b> restores half your pool (but you take +25% damage that turn). Out of Chakra? Throw kunai, Charge, or <b>overexert</b> — force the jutsu out anyway by paying the shortfall in HP and becoming Exhausted. Ending a turn at 0 Chakra also costs HP.</li>
+      <li><b>Chakra</b> is scarce: pools are small and only ~3% comes back each turn. <b>Charge Chakra</b> restores half your pool (but you take +25% damage that turn). Out of Chakra? Throw kunai, Charge, or <b>overexert</b> — force the jutsu out anyway by paying the shortfall in HP and becoming Exhausted. Ending a turn at 0 Chakra also costs HP.</li>
       <li><b>Resolve</b> builds as you take hits or lose allies and powers transformations.</li>
     </ul>
   </div>`;

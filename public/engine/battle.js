@@ -12,12 +12,12 @@ import { makeRng } from './rng.js';
 // ---------------------------------------------------------------------------
 export const BALANCE = {
   hpScale: 3,             // max HP = base hp * hpScale
-  chakraScale: 1.25,       // max Chakra = base chk * chakraScale
+  chakraScale: 0.85,      // max Chakra = base chk * chakraScale (smaller tank: Charge / Kunai / overexert decisions come up mid-battle)
   damageScale: 0.42,
   maxTurns: 20,
   intelToWin: 100,
   koScore: 25,            // Mission Score per KO (turn-limit tiebreak)
-  chakraRegen: 0.04,      // passive regen per turn (Charge is the real refill)
+  chakraRegen: 0.03,      // passive regen per turn (Charge is the real refill)
   chargeChakra: 0.5,
   overexertHp: 1.2,       // HP paid per missing Chakra point when overexerting
   overexertExhaust: 2,    // turns of Exhausted after overexerting
@@ -38,13 +38,14 @@ export const BALANCE = {
   exhaustedMult: 0.85,
   intelGather: 20,
   intelGatherSpecialist: 35,
-  intelKO: 15,
+  intelKO: 10,
   intelGenjutsu: 4,
   intelReveal: 1,
   resolveFromDamage: 0.7, // resolve gained per 1% max HP lost
   resolveAllyKO: 25,
   resolveSuperEffective: 8,
   maxDodge: 0.12,
+  kunaiPower: 45,
 };
 
 export const MILESTONES = [25, 50, 75];
@@ -57,7 +58,7 @@ const P_CHARGE = -2;
 
 export const KUNAI = {
   id: 'kunai', name: 'Kunai & Shuriken', category: 'taijutsu', nature: null,
-  power: 35, cost: 0, priority: P_KUNAI, target: 'enemy', effects: [],
+  power: BALANCE.kunaiPower ?? 35, cost: 0, priority: P_KUNAI, target: 'enemy', effects: [],
   desc: 'Free, fast thrown weapons. Good for baiting out Substitutions.',
 };
 // Tenten's version (Weapon Mistress): hits every enemy

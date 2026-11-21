@@ -6,7 +6,8 @@ import { SHINOBI } from '../public/data/shinobi.js';
 import { makeRng } from '../public/engine/rng.js';
 
 // try balance tweaks without editing the engine: SIM_BALANCE='{"intelGather":10}' node scripts/sim.js
-if (process.env.SIM_BALANCE) Object.assign(BALANCE, JSON.parse(process.env.SIM_BALANCE));
+import { KUNAI, KUNAI_STORM } from '../public/engine/battle.js';
+if (process.env.SIM_BALANCE) { Object.assign(BALANCE, JSON.parse(process.env.SIM_BALANCE)); if (BALANCE.kunaiPower) { KUNAI.power = BALANCE.kunaiPower; KUNAI_STORM.power = Math.round(BALANCE.kunaiPower * 0.7); } }
 const games = Number(process.argv[2] || 2000);
 const rng = makeRng(12345);
 const stats = { Elimination: 0, Intel: 0, other: 0, draw: 0, turns: 0 };

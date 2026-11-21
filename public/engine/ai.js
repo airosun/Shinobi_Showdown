@@ -3,6 +3,9 @@ import {
   availableActions, onField, getJutsu, computeDamage, slotOf, defOf, unsecuredTotal,
 } from './battle.js';
 
+export const AI_CONSERVE_DEFAULT = 2.5;
+let AI_CONSERVE = Number(globalThis.process?.env?.AI_CONSERVE ?? AI_CONSERVE_DEFAULT);
+
 export function chooseActions(state, side, rng = Math.random) {
   const actions = [];
   const chance = (p) => rng() < p;
@@ -66,7 +69,10 @@ export function chooseActions(state, side, rng = Math.random) {
       if (j.effects.some((e) => e.type === 'selfStab') && !u.link) continue;
       if (j.effects.some((e) => e.type === 'curseLink') && u.link) continue;
       // overexerting costs HP: only worth it for a knockout (or rarely when desperate)
-      const ox = (sc, lethal) => (o.overexert ? (lethal ? sc * 0.9 : sc - o.overexert * 1.6) : sc);
+      // chakra conservation: the emptier the tank, the more a jutsu's cost weighs against it (free Kunai gains ground)
+      const frac = u.chakra / Math.max(1, u.maxChakra);
+      const conserve = (sc, lethal) => (o.type === 'jutsu' && o.cost && !lethal ? sc - o.cost * AI_CONSERVE * Math.max(0, 0.75 - frac) : sc);
+      const ox = (sc, lethal) => conserve(o.overexert ? (lethal ? sc * 0.9 : sc - o.overexert * 1.6) : sc, lethal);
       const tag = (a) => (o.overexert ? { ...a, overexert: true } : a);
       if (j.target === 'enemy') {
         for (const e of enemies) {
