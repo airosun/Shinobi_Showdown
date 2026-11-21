@@ -189,7 +189,7 @@ const SCREENS = {
         <button class="big" data-act="startCpu">Vs CPU</button>
         <button class="big" data-act="openLobby">🌐 Online Battle</button>
       </div>
-      <div class="row" style="margin-top:12px"><button class="big scroll-btn" data-act="openDex">📜 Shinobi Dex</button><a class="lab-link" href="lab.html">🎬 Jutsu Animation Lab</a></div>
+      <div class="row" style="margin-top:12px"><button class="big scroll-btn" data-act="openDex">📜 Shinobi Dex</button></div>
       <div class="row" style="margin-top:14px"><button class="ghost" data-act="toggleRules">${S.showRules ? 'Hide rules' : 'How to play'}</button></div>
       ${S.showRules ? rulesHtml() : ''}
     </div>`;

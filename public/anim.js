@@ -1,6 +1,6 @@
 // Jutsu animations. One entry per jutsu that has a custom animation (requested in the kit sheet's
 // "Jutsu Animations" tab); every other jutsu falls back to the generic animation for its category.
-// Used by the battle playback (app.js) and by the Animation Lab (lab.html).
+// Used by the battle playback (app.js) and by the Animation Lab (tools/lab, published as a private artifact, not served by the site).
 import * as FX from './fx.js';
 
 const wait = (ms) => new Promise((r) => setTimeout(r, ms));

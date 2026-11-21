@@ -471,7 +471,7 @@ button.linkish:hover:not(:disabled) { background: none; color: var(--accent); }
 .lab-info { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
 .lab-info > div { background: var(--panel); border: 1px solid var(--line); border-radius: var(--radius); padding: 10px 14px; line-height: 1.45; }
 .lab-info .lbl { font-size: 10.5px; text-transform: uppercase; letter-spacing: .1em; color: var(--accent); font-weight: 800; margin-bottom: 4px; }
-.lab-link { align-self: center; color: var(--accent); font-weight: 700; text-decoration: none; border-bottom: 1px dotted var(--accent); margin-left: 10px; }
+
 
 /* Infinite Tsukuyomi: red sky + moon while its genjutsu lasts */
 .arena .tsu-sky { position: absolute; left: 0; right: 0; top: 0; height: 55%; z-index: 0; pointer-events: none; background: linear-gradient(#5a0008e0, #a0101ab0 60%, #a0101a00); animation: tsu-in .6s ease-out; }
