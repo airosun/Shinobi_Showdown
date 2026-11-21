@@ -255,4 +255,4 @@ setInterval(() => {
   for (const [code, r] of rooms) if (r.players.every((p) => !p || !p.ws) && now - r.idleSince > ROOM_TTL) rooms.delete(code);
 }, 25000).unref();
 
-server.listen(PORT, () => console.log(`Shinobi Showdown running at http://localhost:${PORT}`));
+server.listen(PORT, '0.0.0.0', () => console.log(`Shinobi Showdown listening on 0.0.0.0:${PORT}`));
