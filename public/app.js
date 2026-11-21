@@ -1,4 +1,4 @@
-// Shinobi Showdown — local hot-seat / vs CPU client.
+// Shinobi Showdown — hot-seat / vs CPU / online client.
 import { SHINOBI, SHINOBI_BY_ID, SUBSTITUTIONS, COST_CAP } from './data/shinobi.js';
 import { NATURE_LABELS, KEKKEI_GENKAI, BASIC_NATURES as CYCLE_NATURES, AMPLIFIED_BY, advantage } from './engine/natures.js';
 import * as E from './engine/battle.js';
@@ -12,10 +12,12 @@ const tip = document.getElementById('tooltip');
 const topinfo = document.getElementById('topinfo');
 
 const S = {
-  screen: 'title',          // title | builder | pass | battle | dex
+  screen: 'title',          // title | builder | pass | battle | dex | lobby
   dex: { mode: 'shinobi', id: null, era: 'all', query: '', sort: 'roster', tf: false, from: 'title', jid: null, jquery: '', jcat: 'all', jsort: 'name' },
   phase: null,              // select | play | over
-  mode: null,               // hotseat | cpu
+  mode: null,               // hotseat | cpu | online
+  me: 0,                    // online: which side this browser plays
+  net: null,                // online connection state (see Online section)
   names: ['Player 1', 'Player 2'],
   specs: [null, null],
   builder: null,
@@ -146,12 +148,14 @@ document.addEventListener('keydown', (e) => {
 });
 document.getElementById('menuBtn').addEventListener('click', () => {
   if (S.screen === 'battle' && S.phase !== 'over' && !confirm('Leave this battle?')) return;
+  if (S.mode === 'online' && S.net?.code && !confirm('Leave this online room?')) return;
+  if (S.mode === 'online') netLeave();
   S.skip = true; S.screen = 'title'; render();
 });
 
 function render() {
   tip.classList.add('hidden');
-  topinfo.textContent = S.screen === 'battle' && S.battle ? `${S.mode === 'cpu' ? 'Vs CPU' : 'Hot-seat'} · Turn ${Math.min((S.view || S.battle).turn, S.battle.maxTurns)} / ${S.battle.maxTurns}` : '';
+  topinfo.textContent = S.screen === 'battle' && S.battle ? `${modeLabel()} · Turn ${Math.min((S.view || S.battle).turn, S.battle.maxTurns)} / ${S.battle.maxTurns}` : '';
   document.getElementById('dexBtn').classList.toggle('hidden', S.screen === 'battle' || S.screen === 'pass' || S.screen === 'dex');
   document.body.dataset.screen = S.screen;
   // keep scrolled lists (Dex) where they were
@@ -182,6 +186,7 @@ const SCREENS = {
       <div class="row">
         <button class="primary big" data-act="startHotseat">Hot-Seat Battle</button>
         <button class="big" data-act="startCpu">Vs CPU</button>
+        <button class="big" data-act="openLobby">🌐 Online Battle</button>
       </div>
       <div class="row" style="margin-top:12px"><button class="big scroll-btn" data-act="openDex">📜 Shinobi Dex</button><a class="lab-link" href="lab.html">🎬 Jutsu Animation Lab</a></div>
       <div class="row" style="margin-top:14px"><button class="ghost" data-act="toggleRules">${S.showRules ? 'Hide rules' : 'How to play'}</button></div>
@@ -202,6 +207,7 @@ const SCREENS = {
     return `<div class="row" style="margin-bottom:12px">
         <h3 style="margin:0;font-size:20px">${sideName(b.side)} — build your team</h3>
         <span class="grow"></span>
+        ${S.mode === 'online' ? onlineBuilderNote() : ''}
         <label class="small muted">Name <input type="text" value="${esc(S.names[b.side])}" data-change="rename" maxlength="18"></label>
       </div>
       <div class="builder">
@@ -256,6 +262,8 @@ const SCREENS = {
 
   dex() { return dexHtml(); },
 
+  lobby() { return lobbyHtml(); },
+
   pass() {
     return `<div class="pass">
       <div class="muted">Hot-seat — hide the screen from your opponent</div>
@@ -267,6 +275,7 @@ const SCREENS = {
 
   battle() {
     return `<div class="battle">
+      ${S.mode === 'online' ? netBanner() : ''}
       <div>
         <div class="arena" id="arena">${arenaInner()}</div>
         <div class="controls" id="controls">${controlsHtml()}</div>
@@ -585,9 +594,10 @@ function supportPanel(s) {
 
 // ---------------------------------------------------------------- battlefield
 const vsNow = () => S.view || S.battle;
-function bottomSide() { return S.phase === 'select' ? S.side : 0; }
+function bottomSide() { return S.mode === 'online' ? S.me : S.phase === 'select' ? S.side : 0; }
 function viewer() {
   if (S.phase === 'over') return 'all';
+  if (S.mode === 'online') return S.me;
   if (S.phase === 'select') return S.side;
   return S.mode === 'cpu' ? 0 : null; // hot-seat playback is watched by both players
 }
@@ -742,7 +752,7 @@ function syncField() {
   }
   const m = document.getElementById('mission');
   if (m) m.innerHTML = missionHtml();
-  topinfo.textContent = `${S.mode === 'cpu' ? 'Vs CPU' : 'Hot-seat'} · Turn ${Math.min(vs.turn, S.battle.maxTurns)} / ${S.battle.maxTurns}`;
+  topinfo.textContent = `${modeLabel()} · Turn ${Math.min(vs.turn, S.battle.maxTurns)} / ${S.battle.maxTurns}`;
 }
 
 function fieldSignature(vs) {
@@ -799,8 +809,9 @@ function controlsHtml() {
     const st = S.battle;
     const w = st.winner;
     return `<div class="endbanner"><span>${w === 'draw' ? 'Draw!' : `${sideName(w)} wins!`} <span class="muted small">${esc(st.winReason || '')} · Mission Score ${E.missionScore(st, 0)} – ${E.missionScore(st, 1)}</span></span>
-      <div class="row"><button class="primary" data-act="rematch">Rematch</button><button data-act="newTeams">New teams</button><button class="ghost" data-act="toTitle">Menu</button></div></div>`;
+      ${S.mode === 'online' ? onlineOverButtons() : '<div class="row"><button class="primary" data-act="rematch">Rematch</button><button data-act="newTeams">New teams</button><button class="ghost" data-act="toTitle">Menu</button></div>'}</div>`;
   }
+  if (S.mode === 'online' && S.net && (S.net.submitted || S.net.awaitPreview)) return onlineWaitHtml();
   return commandHtml();
 }
 
@@ -958,7 +969,7 @@ async function playback(events, startSnap) {
   if (S.screen !== 'battle') return;
   S.view = null;
   S.logShown = S.battle.log.length;
-  if (S.battle.winner !== null) { S.phase = 'over'; render(); syncField(); return; }
+  if (S.battle.winner !== null) { S.phase = 'over'; if (S.mode === 'online') netSend({ t: 'over' }); render(); syncField(); return; }
   beginTurn();
 }
 
@@ -1115,6 +1126,7 @@ function beginTurn() {
 
 function nextStep() {
   const st = S.battle;
+  if (S.mode === 'online') { onlineTurn(); return; }
   if (S.step >= 2) { resolve(); return; }
   const side = S.order[S.step];
   for (const u of E.onField(st, side)) {
@@ -1149,9 +1161,9 @@ function nextStep() {
   showPass(side, `Turn ${st.turn}: choose your orders.`, go);
 }
 
-function resolve() {
+function resolve(pair) {
   const st = S.battle;
-  const actions = [...Object.values(S.choices[0]), ...Object.values(S.choices[1])];
+  const actions = pair ? [...pair[0], ...pair[1]] : [...Object.values(S.choices[0]), ...Object.values(S.choices[1])];
   const startSnap = E.snapshot(st);
   const events = [];
   E.resolveTurn(st, actions, { onLog: (entry, state) => events.push({ entry, snap: E.snapshot(state) }) });
@@ -1168,12 +1180,325 @@ function commit(action) {
   syncField();
 }
 
+// ---------------------------------------------------------------- online
+// Both browsers run the same deterministic battle from (specs, seed). The server only
+// relays: it collects each side's orders and sends the same pair to both players.
+function modeLabel() {
+  if (S.mode === 'cpu') return 'Vs CPU';
+  if (S.mode === 'online') return `Online${S.net?.code ? ` · Room ${S.net.code}` : ''}`;
+  return 'Hot-seat';
+}
+const loadName = () => { try { return localStorage.getItem('ss-name') || ''; } catch { return ''; } };
+const saveName = (n) => { try { localStorage.setItem('ss-name', n); } catch {} };
+const SESSION_KEY = 'ss-room';
+const loadSession = () => { try { return JSON.parse(sessionStorage.getItem(SESSION_KEY) || 'null'); } catch { return null; } };
+const saveSession = (v) => { try { v ? sessionStorage.setItem(SESSION_KEY, JSON.stringify(v)) : sessionStorage.removeItem(SESSION_KEY); } catch {} };
+
+function netState() {
+  if (!S.net) S.net = { ws: null, code: null, token: null, status: 'idle', connected: [false, false], ready: [false, false], error: '', joinCode: '', oppReady: false, submitted: false, awaitPreview: false, rematchSent: false, rematchAsk: false, queue: [], retry: 0 };
+  return S.net;
+}
+
+function netConnect() {
+  const n = netState();
+  if (n.ws && (n.ws.readyState === 0 || n.ws.readyState === 1)) return;
+  const ws = new WebSocket(`${location.protocol === 'https:' ? 'wss' : 'ws'}://${location.host}/ws`);
+  n.ws = ws;
+  n.status = 'connecting';
+  ws.onopen = () => {
+    n.status = 'open'; n.retry = 0;
+    if (n.code && n.token) ws.send(JSON.stringify({ t: 'rejoin', code: n.code, token: n.token }));
+    for (const m of n.queue.splice(0)) ws.send(JSON.stringify(m));
+    refreshOnline();
+  };
+  ws.onmessage = (e) => { let m; try { m = JSON.parse(e.data); } catch { return; } onNet(m); };
+  ws.onclose = () => {
+    if (n.ws !== ws) return;
+    n.ws = null;
+    if (S.mode !== 'online' || !n.code) { n.status = 'idle'; return; }
+    n.status = 'reconnecting';
+    refreshOnline();
+    setTimeout(() => { if (S.mode === 'online' && n.code && !n.ws) netConnect(); }, Math.min(8000, 1000 * 2 ** n.retry++));
+  };
+}
+function netSend(msg) {
+  const n = netState();
+  if (n.ws && n.ws.readyState === 1) n.ws.send(JSON.stringify(msg));
+  else { n.queue.push(msg); netConnect(); }
+}
+function netLeave() {
+  const n = S.net;
+  if (!n) return;
+  if (n.ws && n.ws.readyState === 1 && n.code) n.ws.send(JSON.stringify({ t: 'leave' }));
+  const ws = n.ws;
+  S.net = null; saveSession(null);
+  try { ws?.close(); } catch {}
+  if (S.mode === 'online') S.mode = null;
+  history.replaceState(null, '', location.pathname);
+}
+
+// redraw the parts of the screen that show connection state, without disturbing playback
+function refreshOnline() {
+  if (S.screen === 'lobby' || S.screen === 'builder') { render(); return; }
+  if (S.screen === 'battle' && S.phase !== 'play') {
+    const c = document.getElementById('controls');
+    if (c) c.innerHTML = controlsHtml();
+  }
+  const b = document.getElementById('netBanner');
+  if (b) b.outerHTML = netBanner();
+  else if (S.screen === 'battle') document.querySelector('.battle')?.insertAdjacentHTML('afterbegin', netBanner());
+}
+function netBanner() {
+  const n = S.net;
+  if (!n || S.mode !== 'online') return '<div id="netBanner" class="hidden"></div>';
+  let text = '';
+  if (n.status === 'reconnecting' || n.status === 'connecting') text = 'Connection lost — reconnecting…';
+  else if (n.code && n.connected[1 - S.me] === false && n.seenPeer) text = `${sideName(1 - S.me)} disconnected — waiting for them to come back…`;
+  return `<div id="netBanner" class="net-banner ${text ? '' : 'hidden'}">${esc(text)}</div>`;
+}
+
+function onNet(m) {
+  const n = netState();
+  switch (m.t) {
+    case 'room': {
+      n.code = m.code; n.token = m.token; S.me = m.side; n.connected = m.connected; n.ready = m.ready; n.error = '';
+      S.names = m.names; S.mode = 'online';
+      if (n.connected[1 - S.me]) n.seenPeer = true;
+      saveSession({ code: n.code, token: n.token });
+      history.replaceState(null, '', `${location.pathname}?room=${n.code}`);
+      if (S.screen === 'lobby' || S.screen === 'title') { newBuilder(S.me); S.builder.waiting = n.ready[S.me]; S.screen = n.ready[S.me] ? 'lobby' : 'builder'; }
+      render();
+      return;
+    }
+    case 'peer': {
+      n.connected = m.connected; n.ready = m.ready;
+      if (n.connected[1 - S.me]) n.seenPeer = true;
+      // keep my own typed name; take the opponent's from the server
+      S.names[1 - S.me] = m.names[1 - S.me];
+      if (S.battle && S.screen === 'battle') S.battle.teams[1 - S.me].name = S.names[1 - S.me];
+      refreshOnline();
+      return;
+    }
+    case 'error': n.error = m.msg; if (S.screen === 'builder' && S.builder) { S.builder.errors = [m.msg]; S.builder.waiting = false; } render(); return;
+    case 'gone': saveSession(null); n.code = null; n.token = null; n.error = 'That room has closed.'; S.mode = 'online'; S.screen = 'lobby'; history.replaceState(null, '', location.pathname); render(); return;
+    case 'left': {
+      n.error = `${S.names[1 - S.me]} left the room. Share the code to play someone else.`;
+      S.names = m.names; n.connected[1 - S.me] = false; n.ready = [false, false]; n.seenPeer = false;
+      S.battle = null; S.skip = true; S.specs = [null, null];
+      newBuilder(S.me); S.screen = 'lobby'; render();
+      return;
+    }
+    case 'start': {
+      S.specs = m.specs; S.names = m.names; S.netSeed = m.seed;
+      S.battle = E.createBattle(S.specs, { seed: m.seed, names: S.names });
+      S.logShown = S.battle.log.length; S.view = null;
+      Object.assign(n, { rematchSent: false, rematchAsk: false });
+      beginTurn();
+      return;
+    }
+    case 'sync': {
+      // a quick reconnect mid-battle: we're still in step, so just catch up
+      if (S.battle && S.netSeed === m.seed && S.screen === 'battle' && m.history.length >= S.netTurn && m.history.length <= S.netTurn + 1) {
+        if (m.history.length === S.netTurn + 1 && S.phase === 'select') onNet({ t: 'resolve', turn: S.netTurn, actions: m.history[S.netTurn] });
+        else if (S.phase === 'select' && n.submitted && !m.submitted) { n.submitted = false; onlineConfirm(); }
+        return;
+      }
+      S.netSeed = m.seed;
+      S.specs = m.specs; S.names = m.names;
+      const st = E.createBattle(S.specs, { seed: m.seed, names: S.names });
+      for (const pair of m.history) E.resolveTurn(st, [...pair[0], ...pair[1]]);
+      S.battle = st; S.view = null; S.logShown = st.log.length; S.skip = true;
+      if (st.winner !== null) { S.screen = 'battle'; S.phase = 'over'; render(); syncField(); return; }
+      n.resumeSubmitted = m.submitted;
+      beginTurn();
+      return;
+    }
+    case 'opponentReady': n.oppReady = true; refreshOnline(); return;
+    case 'preview': {
+      if (!S.battle || m.turn !== S.netTurn) return;
+      const a = m.action;
+      const u = S.battle.units[a?.actor];
+      if (u) S.preview = `${u.name} is planning: ${actionText(S.battle, a)}.`;
+      n.awaitPreview = false;
+      if (S.phase === 'select') { render(); syncField(); }
+      return;
+    }
+    case 'resolve': {
+      if (!S.battle || m.turn !== S.netTurn) return;
+      n.submitted = false; n.awaitPreview = false; n.oppReady = false;
+      S.netTurn += 1;
+      resolve(m.actions);
+      return;
+    }
+    case 'rematchAsk': n.rematchAsk = true; refreshOnline(); return;
+    case 'rebuild': {
+      S.names = m.names; S.battle = null; S.specs = [null, null];
+      n.ready = [false, false]; n.rematchSent = false; n.rematchAsk = false;
+      newBuilder(S.me); render();
+      return;
+    }
+    default:
+  }
+}
+
+// one turn of online order selection: only my side chooses
+function onlineTurn() {
+  const st = S.battle;
+  const n = netState();
+  const me = S.me;
+  S.netTurn = st.turn - 1;
+  S.choices = [{}, {}];
+  for (const u of E.onField(st, me)) {
+    const opts = E.availableActions(st, u.uid);
+    if (opts.length === 1 && (opts[0].type === 'none' || opts[0].type === 'weaveRelease')) S.choices[me][u.uid] = { actor: u.uid, type: opts[0].type };
+  }
+  S.side = me; S.pending = null; S.preview = null;
+  n.submitted = !!n.resumeSubmitted; n.resumeSubmitted = false;
+  n.awaitPreview = false; n.oppReady = false;
+  if (!n.submitted && st.teams[me].preview && !st.teams[1 - me].preview) { n.awaitPreview = true; netSend({ t: 'wantPreview', turn: S.netTurn }); }
+  const firstOpen = E.onField(st, me).find((u) => !S.choices[me][u.uid]);
+  S.actor = (firstOpen || E.onField(st, me)[0])?.uid || null;
+  S.screen = 'battle'; S.phase = 'select';
+  render(); syncField();
+  if (!n.submitted && !firstOpen && !n.awaitPreview) onlineConfirm(); // nothing to choose this turn
+}
+function onlineConfirm() {
+  const n = netState();
+  const mine = E.onField(S.battle, S.me);
+  if (!mine.every((x) => S.choices[S.me][x.uid])) return;
+  n.submitted = true;
+  netSend({ t: 'orders', turn: S.netTurn, actions: mine.map((x) => S.choices[S.me][x.uid]) });
+  render(); syncField();
+}
+function onlineReady() {
+  const n = netState();
+  S.builder.waiting = true;
+  saveName(S.names[S.me]);
+  netSend({ t: 'team', name: S.names[S.me], spec: { members: S.specs[S.me].members } });
+  n.ready[S.me] = true;
+  S.screen = 'lobby';
+  render();
+}
+
+function onlineWaitHtml() {
+  const n = S.net;
+  const st = S.battle;
+  const mine = E.onField(st, S.me);
+  const opp = sideName(1 - S.me);
+  const body = n.awaitPreview
+    ? `🕵️ <b>Intel advantage:</b> waiting for ${opp} to lock in so you can see one of their planned moves…`
+    : `Orders sent — waiting for ${opp}${n.oppReady ? '' : ' to choose'}…`;
+  return `<div class="card cmd waiting">
+    <div class="wait-line"><span class="spin"></span><span>${body}</span></div>
+    ${n.submitted ? `<div class="orders"><div class="list">${mine.map((x) => `<span class="o"><b>${esc(shortName(x.name))}:</b> ${esc(actionText(st, S.choices[S.me][x.uid] || { type: 'none' }))}</span>`).join('')}</div></div>` : ''}
+  </div>`;
+}
+function onlineOverButtons() {
+  const n = S.net || {};
+  return `<div class="row">
+    ${n.rematchAsk && !n.rematchSent ? `<span class="small">${sideName(1 - S.me)} wants a rematch!</span>` : ''}
+    <button class="primary" data-act="rematch" ${n.rematchSent ? 'disabled' : ''}>${n.rematchSent ? 'Waiting for opponent…' : 'Rematch'}</button>
+    <button data-act="newTeams">New teams</button><button class="ghost" data-act="toTitle">Leave</button></div>`;
+}
+function shareLink() { return `${location.origin}${location.pathname}?room=${S.net?.code || ''}`; }
+function onlineBuilderNote() {
+  const n = S.net || {};
+  const opp = 1 - S.me;
+  const oppTxt = !n.connected?.[opp] ? 'waiting for an opponent to join' : n.ready?.[opp] ? `${sideName(opp)} is ready` : `${sideName(opp)} is building`;
+  return `<span class="room-pill">Room <b>${esc(n.code || '…')}</b> <button class="small ghost" data-act="copyLink">Copy link</button> <span class="muted small">· ${esc(oppTxt)}</span></span>`;
+}
+
+function lobbyHtml() {
+  const n = netState();
+  const inRoom = !!n.code;
+  const opp = 1 - S.me;
+  const err = n.error ? `<div class="errors">${esc(n.error)}</div>` : '';
+  if (!inRoom) {
+    return `<div class="lobby card">
+      <h2>🌐 Online Battle</h2>
+      <p class="muted">Play a friend on another device. One of you creates a room and shares the code or link.</p>
+      <label class="small muted">Your name <input type="text" id="lobbyName" maxlength="18" value="${esc(loadName())}" placeholder="Player"></label>
+      <div class="lobby-actions">
+        <button class="primary big" data-act="createRoom">Create room</button>
+        <div class="join-row"><input type="text" id="joinCode" maxlength="4" placeholder="CODE" value="${esc(n.joinCode || '')}" autocomplete="off"><button class="big" data-act="joinRoom">Join</button></div>
+      </div>
+      ${n.status === 'connecting' ? '<p class="muted small">Connecting…</p>' : ''}
+      ${err}
+      <div class="row" style="margin-top:14px"><button class="ghost" data-act="toTitle">Back</button></div>
+    </div>`;
+  }
+  const meReady = n.ready[S.me];
+  return `<div class="lobby card">
+    <h2>Room <span class="room-code">${esc(n.code)}</span></h2>
+    <div class="share"><input type="text" readonly value="${esc(shareLink())}" id="shareLink"><button data-act="copyLink">Copy link</button></div>
+    <div class="lobby-players">
+      ${[0, 1].map((i) => `<div class="lp ${i === S.me ? 'me' : ''}"><b>${n.connected[i] || i === S.me ? sideName(i) : '—'}</b>${i === S.me ? ' (you)' : ''}
+        <span class="muted small">${!n.connected[i] && i !== S.me ? 'not here yet' : n.ready[i] ? '✓ team ready' : 'building team…'}</span></div>`).join('')}
+    </div>
+    ${err}
+    <div class="wait-line">${n.status !== 'open' ? '<span class="spin"></span>Reconnecting…' : meReady ? `<span class="spin"></span>${n.connected[opp] ? `Waiting for ${sideName(opp)} to finish their team…` : 'Waiting for an opponent to join — send them the code or link.'}` : ''}</div>
+    <div class="row" style="margin-top:14px">
+      ${meReady ? '<button data-act="editTeam">Edit my team</button>' : '<button class="primary" data-act="editTeam">Build my team</button>'}
+      <span class="grow"></span><button class="ghost" data-act="toTitle">Leave room</button>
+    </div>
+  </div>`;
+}
+
+const ONLINE_ACTIONS = {
+  openLobby() {
+    netLeave();
+    S.mode = 'online'; netState(); S.screen = 'lobby'; render(); netConnect();
+  },
+  createRoom() {
+    const name = document.getElementById('lobbyName')?.value.trim() || 'Player 1';
+    saveName(name); S.names = [name, 'Player 2'];
+    netSend({ t: 'create', name });
+  },
+  joinRoom() {
+    const code = (document.getElementById('joinCode')?.value || '').trim().toUpperCase();
+    const name = document.getElementById('lobbyName')?.value.trim() || 'Player 2';
+    netState().joinCode = code;
+    if (code.length !== 4) { S.net.error = 'Enter the 4-letter room code.'; render(); return; }
+    saveName(name);
+    netSend({ t: 'join', code, name });
+  },
+  editTeam() {
+    const n = netState();
+    if (n.ready[S.me]) { netSend({ t: 'unready' }); n.ready[S.me] = false; }
+    if (!S.builder || S.builder.side !== S.me) newBuilder(S.me);
+    S.screen = 'builder'; render();
+  },
+  copyLink() {
+    const link = shareLink();
+    navigator.clipboard?.writeText(link).then(() => {
+      document.querySelectorAll('[data-act=copyLink]').forEach((b) => { const t = b.textContent; b.textContent = 'Copied!'; setTimeout(() => { b.textContent = t; }, 1200); });
+    }).catch(() => { document.getElementById('shareLink')?.select(); });
+  },
+};
+
+// reopen an online room after a refresh, or jump into the lobby from a shared link
+function bootOnline() {
+  const params = new URLSearchParams(location.search);
+  const code = (params.get('room') || '').toUpperCase();
+  const sess = loadSession();
+  if (sess && (!code || sess.code === code)) {
+    S.mode = 'online';
+    const n = netState(); n.code = sess.code; n.token = sess.token;
+    S.screen = 'lobby';
+    netConnect();
+    return;
+  }
+  if (code) {
+    S.mode = 'online'; const n = netState(); n.joinCode = code; S.screen = 'lobby'; netConnect();
+  }
+}
+
 // ---------------------------------------------------------------- actions
 const ACTIONS = {
   startHotseat() { S.mode = 'hotseat'; S.names = ['Player 1', 'Player 2']; S.specs = [null, null]; newBuilder(0); render(); },
   startCpu() { S.mode = 'cpu'; S.names = ['Player 1', 'CPU']; S.specs = [null, randomTeam()]; newBuilder(0); render(); },
   toggleRules() { S.showRules = !S.showRules; render(); },
-  toTitle() { S.screen = 'title'; render(); },
+  toTitle() { if (S.mode === 'online') netLeave(); S.screen = 'title'; render(); },
   openDex() { S.dex.from = S.screen === 'dex' ? S.dex.from : S.screen; S.screen = 'dex'; render(); window.scrollTo(0, 0); },
   closeDex() { S.screen = S.dex.from && S.dex.from !== 'dex' && S.dex.from !== 'battle' ? S.dex.from : 'title'; render(); },
   dexMode(m) { S.dex.mode = m; render(); },
@@ -1188,7 +1513,7 @@ const ACTIONS = {
   bRole(v) { S.builder.role = v; render(); },
   bNature(v) { S.builder.nature = v; render(); },
   bSort(v) { S.builder.sort = v; render(); },
-  rename(v) { S.names[S.builder.side] = v.trim() || `Player ${S.builder.side + 1}`; },
+  rename(v) { S.names[S.builder.side] = v.trim() || `Player ${S.builder.side + 1}`; if (S.mode === 'online') { saveName(S.names[S.me]); netSend({ t: 'name', name: S.names[S.me] }); } },
   era(e) { S.builder.era = e; render(); },
   pick(id) {
     const b = S.builder;
@@ -1216,6 +1541,7 @@ const ACTIONS = {
     const errs = E.validateTeam({ members: b.members });
     if (errs.length) { b.errors = errs; render(); return; }
     S.specs[b.side] = { name: S.names[b.side], members: b.members };
+    if (S.mode === 'online') { onlineReady(); return; }
     if (S.mode === 'hotseat' && b.side === 0) {
       showPass(1, 'Build your team in secret.', () => { newBuilder(1); render(); });
       return;
@@ -1253,7 +1579,7 @@ const ACTIONS = {
     commit(action);
   },
   cancelTarget() { S.pending = null; render(); syncField(); },
-  confirm() { S.step += 1; nextStep(); },
+  confirm() { if (S.mode === 'online') { onlineConfirm(); return; } S.step += 1; nextStep(); },
   advance(_, el, e) { if (e.target.closest('button')) return; advanceNow?.(); },
   toggleSpeed() {
     S.speed = S.speed === 1 ? 0.5 : S.speed === 0.5 ? 0.25 : 1;
@@ -1262,11 +1588,14 @@ const ACTIONS = {
     if (b) b.textContent = `Speed ${speedLabel()}`;
   },
   skipPlayback() { S.skip = true; advanceNow?.(); },
-  rematch() { startBattle(); },
+  ...ONLINE_ACTIONS,
+  rematch() { if (S.mode === 'online') { S.net.rematchSent = true; netSend({ t: 'rematch' }); render(); return; } startBattle(); },
   newTeams() {
+    if (S.mode === 'online') { netSend({ t: 'newTeams' }); return; }
     if (S.mode === 'cpu') S.specs[1] = randomTeam();
     newBuilder(0); render();
   },
 };
 
+bootOnline();
 render();
