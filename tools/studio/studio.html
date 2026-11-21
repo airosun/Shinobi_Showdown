@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Sprite &amp; Animation Studio · Shinobi Showdown</title>
+  <link rel="icon" type="image/png" sizes="32x32" href="img/favicon-32.png" />
+  <link rel="stylesheet" href="style.css" />
+  <link rel="stylesheet" href="studio.css" />
+</head>
+<body>
+  <header class="topbar">
+    <div class="brand"><img class="leaf" src="img/konoha-orange.png" alt=""><span class="b1">SPRITE &amp;</span> <span class="b2">ANIMATION STUDIO</span></div>
+    <nav class="st-tabs">
+      <button data-act="tab" data-arg="anim" class="active">🎬 Animations</button>
+      <button data-act="tab" data-arg="image">🖌️ Images</button>
+    </nav>
+    <span class="grow"></span>
+    <span id="saveState" class="muted small"></span>
+    <button class="small" data-act="exportAll" title="Everything you've changed, ready to upload to GitHub">⬇ Export all changes</button>
+  </header>
+  <main id="studio"></main>
+  <div id="toast" class="st-toast hidden"></div>
+  <script src="vendor/html2canvas.min.js"></script>
+  <script src="vendor/jszip.min.js"></script>
+  <script type="module" src="studio.js"></script>
+</body>
+</html>

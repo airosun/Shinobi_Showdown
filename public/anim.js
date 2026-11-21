@@ -4129,14 +4129,18 @@ export function genericPlay(ctx) {
  * Resolves when the hit lands. Returns true if a custom animation ran.
  */
 export async function playJutsu(arena, j, userEl, targetEls, { sp = 1, sideEls = [], isFoe = false } = {}) {
-  const ctx = { arena, j, userEl, targetEls, sideEls, sp, isFoe, from: FX.centerOf(userEl, arena), tos: targetEls.map((t) => FX.centerOf(t, arena)) };
+  // a speed set in the Sprite & Animation Studio (2 = twice as fast)
+  const ctx = { arena, j, userEl, targetEls, sideEls, sp: sp / FX.jutsuSpeed(j.id), isFoe, from: FX.centerOf(userEl, arena), tos: targetEls.map((t) => FX.centerOf(t, arena)) };
   ctx.userSize = sizeOf(userEl);
   const a = ANIMS[j.id];
-  if (a && targetEls.length) {
-    try { await a.play(ctx); return true; } catch (err) { console.error('anim', j.id, err); }
-  }
-  await genericPlay(ctx);
-  return false;
+  FX.setCurrentJutsu(j.id);
+  try {
+    if (a && targetEls.length) {
+      try { await a.play(ctx); return true; } catch (err) { console.error('anim', j.id, err); }
+    }
+    await genericPlay(ctx);
+    return false;
+  } finally { FX.setCurrentJutsu(null); }
 }
 
 /** Play a jutsu-specific Decoy pop (e.g. Bubble Clone), if any. Returns true if it handled it. */

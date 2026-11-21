@@ -59,30 +59,68 @@ function trimSprite(name, url) {
   img.src = url;
 }
 export function spriteUrl(name, jutsuId = null) { return (jutsuId && OVR[`${jutsuId}__${name}`]) || OVR[name] || null; }
-/** Swap drawn pieces inside root (and root itself) for the user's images where one exists. */
+/** Set (or clear with null) a custom image for a piece, e.g. from the Sprite Studio. */
+export function setSpriteOverride(name, url) { if (url) OVR[name] = url; else delete OVR[name]; }
+
+// ---------------------------------------------------------------- animation tweaks
+// Per-jutsu adjustments made in the Sprite & Animation Studio, saved as data/anim_tweaks.json:
+// { "<jutsu id>": { speed: 1.5, pieces: { "<piece name>": { scale, dx, dy, rotate, flipX, flipY, hue, sat, bright, opacity, hide } } } }
+let TWEAKS = {};
+if (typeof fetch !== 'undefined') fetch('data/anim_tweaks.json').then((r) => (r.ok ? r.json() : {})).then((t) => { if (t && typeof t === 'object') TWEAKS = t; }).catch(() => {});
+export function setAnimTweaks(t) { TWEAKS = t || {}; }
+export function jutsuSpeed(jutsuId) { const v = TWEAKS[jutsuId]?.speed; return v > 0 ? v : 1; }
+let CURRENT = null; // the jutsu whose animation is playing (so shared helpers know whose tweaks apply)
+export function setCurrentJutsu(id) { CURRENT = id; }
+let HOOK = null; // studio hook: called for every piece placed (el, name, jutsuId)
+export function onSpritePlaced(fn) { HOOK = fn; }
+
+function tweakPiece(el, t) {
+  if (!t) return;
+  if (t.hide) { el.style.visibility = 'hidden'; return; }
+  const sc = (t.scale ?? 100) / 100;
+  if (sc !== 1 || t.flipX || t.flipY) el.style.scale = `${sc * (t.flipX ? -1 : 1)} ${sc * (t.flipY ? -1 : 1)}`;
+  if (t.rotate) el.style.rotate = `${t.rotate}deg`;
+  if (t.dx || t.dy) el.style.translate = `${t.dx || 0}px ${t.dy || 0}px`;
+  const f = [];
+  if (t.hue) f.push(`hue-rotate(${t.hue}deg)`);
+  if (t.sat != null && t.sat !== 100) f.push(`saturate(${t.sat}%)`);
+  if (t.bright != null && t.bright !== 100) f.push(`brightness(${t.bright}%)`);
+  if (t.opacity != null && t.opacity !== 100) f.push(`opacity(${t.opacity}%)`);
+  if (f.length) el.style.filter = `${el.style.filter || ''} ${f.join(' ')}`.trim();
+}
+
+/** Swap drawn pieces inside root (and root itself) for custom images, then apply any tweaks. */
 export function applySprites(root, jutsuId = null) {
-  if (!root || !Object.keys(OVR).length) return;
+  if (!root) return;
+  const jid = jutsuId || CURRENT;
+  const tw = jid && TWEAKS[jid]?.pieces;
+  if (!Object.keys(OVR).length && !tw && !HOOK) return;
   const els = [...(root.dataset?.sp ? [root] : []), ...root.querySelectorAll('[data-sp]')];
-  for (const el of els) {
-    const url = spriteUrl(el.dataset.sp, jutsuId);
-    if (!url) continue;
-    if (el.tagName.toLowerCase() === 'svg') {
-      const img = document.createElement('img');
-      img.src = url;
-      img.dataset.sp = el.dataset.sp;
-      img.dataset.ovr = '1';
-      const cls = el.getAttribute('class'); if (cls) img.setAttribute('class', cls);
-      img.setAttribute('style', el.getAttribute('style') || '');
-      const w = el.getAttribute('width'); const h = el.getAttribute('height');
-      if (w) img.style.width = `${parseFloat(w)}px`;
-      if (h) img.style.height = `${parseFloat(h)}px`;
-      img.style.objectFit = 'contain'; img.style.display = 'block';
-      el.replaceWith(img);
-    } else {
-      el.dataset.ovr = '1';
-      el.style.background = `url("${url}") center / contain no-repeat`;
-      el.style.border = 'none'; el.style.borderRadius = '0'; el.style.boxShadow = 'none'; el.style.clipPath = 'none';
+  for (let el of els) {
+    const name = el.dataset.sp;
+    const url = spriteUrl(name, jid);
+    if (url && el.dataset.ovr !== '1') {
+      if (el.tagName.toLowerCase() === 'svg') {
+        const img = document.createElement('img');
+        img.src = url;
+        img.dataset.sp = name;
+        img.dataset.ovr = '1';
+        const cls = el.getAttribute('class'); if (cls) img.setAttribute('class', cls);
+        img.setAttribute('style', el.getAttribute('style') || '');
+        const w = el.getAttribute('width'); const h = el.getAttribute('height');
+        if (w) img.style.width = `${parseFloat(w)}px`;
+        if (h) img.style.height = `${parseFloat(h)}px`;
+        img.style.objectFit = 'contain'; img.style.display = 'block';
+        el.replaceWith(img);
+        el = img;
+      } else {
+        el.dataset.ovr = '1';
+        el.style.background = `url("${url}") center / contain no-repeat`;
+        el.style.border = 'none'; el.style.borderRadius = '0'; el.style.boxShadow = 'none'; el.style.clipPath = 'none';
+      }
     }
+    if (tw) tweakPiece(el, tw[name]);
+    if (HOOK) { try { HOOK(el, name, jid); } catch { /* studio only */ } }
   }
 }
 const NO_SPRITE = new Set(['pop', 'banner', 'log']);
