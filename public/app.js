@@ -204,7 +204,7 @@ const SCREENS = {
     const selBase = selMember && SHINOBI_BY_ID[selMember.id].baseId;
     const q = (b.query || '').toLowerCase();
     const roster = sortRoster(SHINOBI.filter((s) => (b.era === 'all' || s.era === b.era) && (!q || s.name.toLowerCase().includes(q) || s.roles.join(' ').toLowerCase().includes(q))
-      && (!b.role || s.roles.includes(b.role)) && (!b.nature || hasAffinity(s, b.nature))), b.sort);
+      && (!b.role || s.roles.includes(b.role)) && (!b.nature || hasAffinity(s, b.nature))), b.sort || 'name');
     return `<div class="row" style="margin-bottom:12px">
         <h3 style="margin:0;font-size:20px">${sideName(b.side)} — build your team</h3>
         <span class="grow"></span>
@@ -222,7 +222,7 @@ const SCREENS = {
           <div class="row roster-filters">
             <label class="small muted">Role <select data-change="bRole"><option value="">All roles</option>${ROLES.map((r) => `<option ${b.role === r ? 'selected' : ''}>${r}</option>`).join('')}</select></label>
             <label class="small muted">Affinity <select data-change="bNature"><option value="">All natures</option>${AFFINITIES.map((n) => `<option value="${n}" ${b.nature === n ? 'selected' : ''}>${NATURE_LABELS[n] || n}</option>`).join('')}<option value="none" ${b.nature === 'none' ? 'selected' : ''}>Non-elemental</option></select></label>
-            <label class="small muted">Sort <select data-change="bSort">${[['roster', 'Roster order'], ['role', 'Role'], ['nature', 'Chakra affinity'], ['cost', 'Cost'], ['name', 'Name']].map(([k, l]) => `<option value="${k}" ${(b.sort || 'roster') === k ? 'selected' : ''}>${l}</option>`).join('')}</select></label>
+            <label class="small muted">Sort <select data-change="bSort">${[['roster', 'Roster order'], ['role', 'Role'], ['nature', 'Chakra affinity'], ['cost', 'Cost'], ['name', 'Name']].map(([k, l]) => `<option value="${k}" ${(b.sort || 'name') === k ? 'selected' : ''}>${l}</option>`).join('')}</select></label>
             <span class="small muted">${roster.length} shown</span>
             ${b.role ? `<span class="small role-note">${b.role}: ${ROLE_INFO[b.role] || ''}</span>` : ''}
           </div>
@@ -241,7 +241,14 @@ const SCREENS = {
             }).join('')}
           </div>
         </div>
-        <div class="card">
+        <div class="card team-panel">
+          <div class="row team-actions">
+            <button data-act="randomTeam">Random team</button>
+            <button class="ghost" data-act="clearTeam">Clear</button>
+            <span class="grow"></span>
+            <button class="primary" data-act="ready">Ready</button>
+          </div>
+          ${b.errors.length ? `<div class="errors">${b.errors.map(esc).join('<br>')}</div>` : ''}
           <div class="slots">
             ${members.map((m, i) => `<button class="slot ${i === 3 ? 'support' : ''} ${b.sel === i ? 'sel' : ''}" data-act="selSlot" data-arg="${i}">
               <div class="lbl">${i === 3 ? 'Support' : `Active ${i + 1}`}</div>
@@ -251,13 +258,6 @@ const SCREENS = {
           <div class="row small"><span>Team cost</span><span class="grow"></span><b>${cost} / ${COST_CAP}</b></div>
           <div class="costbar ${cost > COST_CAP ? 'over' : ''}"><i style="width:${pct(cost, COST_CAP)}%"></i></div>
           ${selMember ? memberEditor(selMember, b.sel) : `<div class="muted small">Pick a shinobi from the roster for ${b.sel === 3 ? 'the support slot' : `active slot ${b.sel + 1}`}.</div>`}
-          ${b.errors.length ? `<div class="errors">${b.errors.map(esc).join('<br>')}</div>` : ''}
-          <div class="row" style="margin-top:12px">
-            <button data-act="randomTeam">Random team</button>
-            <button class="ghost" data-act="clearTeam">Clear</button>
-            <span class="grow"></span>
-            <button class="primary" data-act="ready">Ready</button>
-          </div>
         </div>
       </div>`;
   },
@@ -545,6 +545,8 @@ function rulesHtml() {
       <li><b>Support:</b> never enters the battle — it's a 3v3. It gives the team a passive that grows as your cell falls (stage 1 with 3 standing, stage 2 with 2, stage 3 with 1).</li>
       <li><b>Turns:</b> both players pick orders in secret, then actions play out one by one — Stances first, then by priority (+3 … −2), then by SPD. Click the text box to advance; change the speed (1× / 2× / 4×) or skip the turn.</li>
       <li><b>Natures:</b> Fire › Wind › Lightning › Earth › Water › Fire (×1.5 / ×0.75). Jutsu matching your primary nature get ×1.25, secondary ×1.1. Kekkei genkai count as all of their parent natures (see the Natures tab in the Dex).</li>
+      <li><b>Support skill:</b> your support also has one jutsu it can use from the rear (the Support tab when giving orders): free, can't be hit, ${Math.round(E.BALANCE.supportPower * 100)}% power, then a cooldown.</li>
+      <li><b>Bind &amp; Paralyze</b> count the turn they land — a 1-turn Bind only stops a shinobi who hasn't acted yet — so those jutsu act a step faster (+1 priority).</li>
       <li><b>Jutsu Clash:</b> two ninjutsu aimed at each other collide — the stronger nature breaks through at 70% power.</li>
       <li><b>Collaboration:</b> Wind then Fire (or Water then Lightning) on the same target in one turn = ×1.3.</li>
       <li><b>Substitution:</b> a Stance that negates the first single-target hit. Repeating it lowers the odds (100/50/25%). Area attacks are only halved; Sharingan sees through logs; genjutsu ignores it.</li>
@@ -618,7 +620,8 @@ function selectionTargets() {
   if (S.phase !== 'select' || !S.pending) return null;
   const j = E.getJutsu(S.pending.jutsuId);
   // Reincarnation targets a fallen ally; everything else a standing one
-  return { side: j.target === 'ally' ? S.side : 1 - S.side, fallen: j.effects.some((e) => e.type === 'revive') };
+  const allySide = j.target === 'ally' || (S.pending.type === 'supportSkill' && j.target === 'self');
+  return { side: allySide ? S.side : 1 - S.side, fallen: j.effects.some((e) => e.type === 'revive') };
 }
 
 function sideMons(vs, side, isFoe, sel) {
@@ -831,13 +834,51 @@ function commandHtml() {
     <div class="cmd-head">
       ${head}
       <span class="grow"></span>
-      <div class="who-tabs">${mine.map((x) => `<button class="who-tab ${x.uid === S.actor ? 'active' : ''}" data-act="selActor" data-arg="${x.uid}">${badge(SHINOBI_BY_ID[x.id])}${esc(shortName(x.name))}${S.choices[side][x.uid] ? '<span class="ok">✓</span>' : ''}</button>`).join('')}</div>
+      <div class="who-tabs">${mine.map((x) => `<button class="who-tab ${x.uid === S.actor ? 'active' : ''}" data-act="selActor" data-arg="${x.uid}">${badge(SHINOBI_BY_ID[x.id])}${esc(shortName(x.name))}${S.choices[side][x.uid] ? '<span class="ok">✓</span>' : ''}</button>`).join('')}${supportTab(st, side)}</div>
     </div>
-    ${u ? actionSections(st, u) : ''}
+    ${u ? (u.uid === st.teams[side].supportUid ? supportSection(st, side) : actionSections(st, u)) : ''}
     <div class="orders">
-      <div class="list">${mine.map((x) => `<span class="o ${S.choices[side][x.uid] ? '' : 'none'}"><b>${esc(shortName(x.name))}:</b> ${S.choices[side][x.uid] ? esc(actionText(st, S.choices[side][x.uid])) : '—'}</span>`).join('')}</div>
+      <div class="list">${mine.map((x) => `<span class="o ${S.choices[side][x.uid] ? '' : 'none'}"><b>${esc(shortName(x.name))}:</b> ${S.choices[side][x.uid] ? esc(actionText(st, S.choices[side][x.uid])) : '—'}</span>`).join('')}${supportOrder(st, side)}</div>
       <button class="primary" data-act="confirm" ${allChosen ? '' : 'disabled'}>Confirm orders</button>
     </div>
+  </div>`;
+}
+
+// ---- support skill (ordered alongside the actives, from the rear)
+function supportTab(st, side) {
+  const sk = E.supportSkillState(st, side);
+  if (!sk.jutsu) return '';
+  const sup = st.units[sk.uid];
+  const chosen = S.choices[side][sk.uid];
+  const state = chosen ? '<span class="ok">✓</span>' : sk.disabled ? `<span class="cd">${sk.readyIn ? `⏳${sk.readyIn}` : '—'}</span>` : '<span class="rdy">●</span>';
+  return `<button class="who-tab sup-tab ${sk.uid === S.actor ? 'active' : ''} ${sk.disabled ? 'cooling' : ''}" data-act="selActor" data-arg="${sk.uid}" title="Support skill: ${esc(sk.jutsu.name)}${sk.disabled ? ` (${esc(sk.disabled)})` : ''}">${badge(SHINOBI_BY_ID[sup.id])}Support${state}</button>`;
+}
+function supportOrder(st, side) {
+  const sk = E.supportSkillState(st, side);
+  const a = sk.uid && S.choices[side][sk.uid];
+  return a ? `<span class="o sup"><b>${esc(shortName(st.units[sk.uid].name))} (support):</b> ${esc(actionText(st, a))}</span>` : '';
+}
+function supportSection(st, side) {
+  const sk = E.supportSkillState(st, side);
+  const sup = st.units[sk.uid];
+  const d = SHINOBI_BY_ID[sup.id];
+  const j = sk.jutsu;
+  const chosen = S.choices[side][sk.uid];
+  const pow = j.power ? Math.round(j.power * E.BALANCE.supportPower) : 0;
+  const tgt = j.target === 'self' ? '1 ally' : TARGET_LABEL[j.target];
+  const cdText = sk.once ? 'Once per battle' : `Cooldown ${sk.cooldown} turns`;
+  return `<div class="sections sup-sections">
+    <div class="sect"><h2>Support skill <span class="hint muted">${esc(d.name)} acts from the rear: free, can't be hit, ${Math.round(E.BALANCE.supportPower * 100)}% power</span></h2>
+      <div class="moves">
+        <button class="move-btn ${chosen ? 'on' : ''}" style="--c:${FX.jutsuColor(j)}" data-act="chooseSupport" ${sk.disabled ? 'disabled' : ''} ${tipAttr(jutsuTip(j, 0) + `<br><b>From the rear:</b> no Chakra, ${pow ? `POW ${pow}, ` : ''}${cdText.toLowerCase()}. Intel it gains is secured at once.`)}>
+          <span class="mn">${esc(j.name)} ${natChip(j.nature)}</span>
+          <span class="mi">${pow ? `POW ${pow}` : j.category.toUpperCase()} · free · ${priLabel(j.priority)} · ${tgt} · ${cdText}</span>
+          ${sk.disabled ? `<span class="why">${esc(sk.disabled)}</span>` : ''}
+        </button>
+        ${chosen ? '<button class="opt-btn" data-act="clearSupport"><span>Hold it this turn</span><span class="mi">save the skill for later</span></button>' : ''}
+      </div>
+    </div>
+    <div class="others"><div class="sect"><h2>Passive</h2><div class="small"><b>${esc(d.supportAura.name)}:</b> ${esc(E.auraDesc(d.supportAura, E.activeAura(st, side)?.stage || 1))}</div></div></div>
   </div>`;
 }
 
@@ -924,6 +965,12 @@ function actionText(st, a) {
     case 'release': return 'Release genjutsu';
     case 'transform': return E.defOf(u).transformation.name;
     case 'none': return 'Bound';
+    case 'supportSkill': {
+      const j = E.getJutsu(E.defOf(u).supportSkill.jutsu);
+      const revive = j.effects.some((e) => e.type === 'revive');
+      const t = j.target === 'enemy' ? ` → ${tname(1 - u.side)}` : (j.target === 'ally' || j.target === 'self' || revive) ? ` → ${tname(u.side)}` : '';
+      return `${j.name}${t}`;
+    }
     default: return a.type;
   }
 }
@@ -975,6 +1022,38 @@ async function playback(events, startSnap) {
   beginTurn();
 }
 
+// big "X uses Y!" card over the arena whenever someone acts, so moves are easy to follow
+function actionCallout(arena, e) {
+  let what = null;
+  if (e.kind === 'action' && e.jutsu) what = E.getJutsu(e.jutsu).name;
+  else if (e.act) what = e.act;
+  else if (e.kind === 'intel' && /\(reconnaissance\)/.test(e.text)) what = 'Gather Intel';
+  if (!what || !arena) return;
+  const u = e.u && vsNow().units[e.u];
+  arena.querySelectorAll('.act-callout').forEach((x) => x.remove());
+  const side = u ? u.side : e.side;
+  const el = document.createElement('div');
+  el.className = `act-callout s${side ?? 'x'}`;
+  el.innerHTML = `${u ? `<span class="who">${esc(u.name)}${e.rear ? ' · from the rear' : ''}</span>` : ''}<span class="what">${esc(what)}</span>`;
+  arena.appendChild(el);
+  setTimeout(() => el.classList.add('out'), Math.max(500, 1500 * S.speed));
+  setTimeout(() => el.remove(), Math.max(800, 1500 * S.speed) + 400);
+}
+
+// a support acting from the rear steps in behind its cell for the length of its skill
+function showRear(arena, uid) {
+  const vs = vsNow();
+  const u = vs.units[uid];
+  if (!u || document.getElementById(`mon-${uid}`)) return null;
+  const isFoe = u.side !== bottomSide();
+  const d = SHINOBI_BY_ID[u.id];
+  arena.insertAdjacentHTML('beforeend', `<div class="mon rear ${isFoe ? 'foe' : 'you'}" id="mon-${uid}"><div class="spr ${S.sprites[d.id]?.front ? 'has-art' : ''}">${sprite(d, !isFoe, false)}</div></div>`);
+  const el = document.getElementById(`mon-${uid}`);
+  requestAnimationFrame(() => el.classList.add('in'));
+  return el;
+}
+function hideRear(el) { el.classList.remove('in'); setTimeout(() => el.remove(), 300); }
+
 async function playEvent(ev, apply) {
   const e = ev.entry;
   const arena = document.getElementById('arena');
@@ -991,10 +1070,13 @@ async function playEvent(ev, apply) {
     return;
   }
   setText(e);
+  actionCallout(arena, e);
 
   // the attacker moves before the HP changes
   if (e.kind === 'action' && e.jutsu) {
     const j = E.getJutsu(e.jutsu);
+    const rearEl = e.rear ? showRear(arena, e.u) : null;
+    if (rearEl) await pause(260);
     const user = monEl(e.u);
     const targets = (e.targets || []).map(monEl).filter(Boolean);
     if (user) {
@@ -1002,6 +1084,7 @@ async function playEvent(ev, apply) {
       const sideCls = tMon?.classList.contains('foe') ? 'foe' : 'you';
       const sideEls = [...arena.querySelectorAll(`.mon.${sideCls}:not(.down) .spr`)];
       const custom = await playJutsu(arena, j, user, targets, { sp, sideEls, isFoe: !!user.closest('.mon')?.classList.contains('foe') });
+      if (rearEl) hideRear(rearEl);
       apply();
       await pause(custom ? (e.collab ? 900 : 650) : (e.collab ? 1050 : 850));
       return;
@@ -1377,7 +1460,8 @@ function onlineConfirm() {
   const mine = E.onField(S.battle, S.me);
   if (!mine.every((x) => S.choices[S.me][x.uid])) return;
   n.submitted = true;
-  netSend({ t: 'orders', turn: S.netTurn, actions: mine.map((x) => S.choices[S.me][x.uid]) });
+  const supUid = S.battle.teams[S.me].supportUid;
+  netSend({ t: 'orders', turn: S.netTurn, actions: [...mine.map((x) => S.choices[S.me][x.uid]), ...(S.choices[S.me][supUid] ? [S.choices[S.me][supUid]] : [])] });
   render(); syncField();
 }
 function onlineReady() {
@@ -1591,6 +1675,22 @@ const ACTIONS = {
     commit(action);
   },
   cancelTarget() { S.pending = null; render(); syncField(); },
+  chooseSupport() {
+    const st = S.battle;
+    const sk = E.supportSkillState(st, S.side);
+    if (sk.disabled) return;
+    const j = sk.jutsu;
+    const action = { actor: sk.uid, type: 'supportSkill', jutsuId: j.id };
+    if (j.target === 'enemy' || j.target === 'ally' || j.target === 'self') {
+      const revive = j.effects.some((e) => e.type === 'revive');
+      const candidates = revive ? st.teams[S.side].slots.map((id) => st.units[id]).filter((x) => x.ko)
+        : j.target === 'enemy' ? E.onField(st, 1 - S.side) : E.onField(st, S.side);
+      if (candidates.length === 1) action.target = { slot: E.slotOf(st, candidates[0]) };
+      else { S.pending = action; render(); syncField(); return; }
+    }
+    S.choices[S.side][sk.uid] = action; render(); syncField();
+  },
+  clearSupport() { const sk = E.supportSkillState(S.battle, S.side); delete S.choices[S.side][sk.uid]; render(); syncField(); },
   confirm() { if (S.mode === 'online') { onlineConfirm(); return; } S.step += 1; nextStep(); },
   advance(_, el, e) { if (e.target.closest('button')) return; advanceNow?.(); },
   toggleSpeed() {

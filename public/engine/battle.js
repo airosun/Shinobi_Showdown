@@ -48,6 +48,7 @@ export const BALANCE = {
   kunaiPower: 45,
   intelDropOnHit: 0.5,    // share of unsecured Intel lost when an enemy hit lands
   intelDropAllAt: 0.25,   // a hit for this share of max HP (or a critical) drops all of it
+  supportPower: 0.7,      // support skills hit at 70% power from the rear
 };
 
 export const MILESTONES = [25, 50, 75];
@@ -401,6 +402,39 @@ export function availableActions(state, uid) {
 }
 
 // ---------------------------------------------------------------------------
+// Support skills: one jutsu the support can use from the rear, on a cooldown
+// ---------------------------------------------------------------------------
+/** { jutsu, cooldown, once, ready, readyIn, disabled, targetType } for a side's support skill. */
+export function supportSkillState(state, side) {
+  const team = state.teams[side];
+  const sup = state.units[team.supportUid];
+  const sk = defOf(sup).supportSkill;
+  if (!sk) return { disabled: 'No support skill' };
+  const j = getJutsu(sk.jutsu);
+  const readyAt = team.supportReady || 1;
+  const readyIn = Math.max(0, readyAt - state.turn);
+  let disabled = null;
+  if (sk.once && team.supportUsed) disabled = 'Already used this battle';
+  else if (readyIn > 0) disabled = `Ready in ${readyIn} turn${readyIn > 1 ? 's' : ''}`;
+  else if (j.effects.some((e) => e.type === 'revive') && !team.slots.some((id) => state.units[id].ko)) disabled = 'No fallen ally';
+  else if (!onField(state, side).length) disabled = 'No one left to support';
+  const targetType = j.target === 'self' ? 'ally' : j.target;
+  return { uid: sup.uid, jutsu: j, cooldown: sk.cooldown, once: !!sk.once, readyIn, disabled, targetType };
+}
+
+function useSupportSkill(state, sup, action) {
+  const side = sup.side;
+  const st = supportSkillState(state, side);
+  if (st.disabled) return;
+  const team = state.teams[side];
+  if (st.once) team.supportUsed = true;
+  else team.supportReady = state.turn + st.cooldown;
+  sup.flags.fromRear = true;
+  performJutsu(state, sup, st.jutsu, action.target, {});
+  sup.flags.fromRear = false;
+}
+
+// ---------------------------------------------------------------------------
 // Intel
 // ---------------------------------------------------------------------------
 function enemyGuardFactor(state, side) {
@@ -418,6 +452,12 @@ function awardIntel(state, unit, amount, reason) {
   amt = Math.round(amt * f);
   if (amt <= 0) {
     log(state, `${unit.name}'s intel was blocked by enemy guards.`, 'intel', unit);
+    return;
+  }
+  // Ino reads minds: her Intel is secured on the spot. Support skills work from the safety of the rear.
+  if (traitOf(unit) === 'yamanaka' || unit.flags.fromRear) {
+    state.teams[unit.side].securedIntel += amt;
+    log(state, `${unit.name} gathered ${amt} Intel${reason ? ` (${reason})` : ''} — secured at once.`, 'intel', unit, { amount: amt, secured: amt, minor: reason?.startsWith('revealed') });
     return;
   }
   unit.unsecured.push({ amount: amt, turn: state.turn });
@@ -496,6 +536,7 @@ export function computeDamage(state, att, def, jutsu, ctx = {}) {
   }
   const bonus = jutsu.effects.find((e) => e.type === 'bonusVsBound');
   if (bonus && def.statuses.bind) dmg *= bonus.value;
+  if (att.flags.fromRear) dmg *= BALANCE.supportPower;
   if (ctx.collab) dmg *= BALANCE.collabMult;
   if (ctx.clashWinner) dmg *= BALANCE.clashWinnerMult;
   if (def.flags.vulnerable) dmg *= BALANCE.vulnerableMult;
@@ -511,6 +552,7 @@ export function computeDamage(state, att, def, jutsu, ctx = {}) {
 // msg: text logged AFTER the HP change (so playback snapshots show the new HP), before any KO.
 function dealDamage(state, target, amount, source, msg = null, extra = {}) {
   if (target.ko || amount <= 0) return;
+  if (target.uid === state.teams[target.side].supportUid) return; // the support stays out of reach in the rear
   target.hp = Math.max(0, target.hp - amount);
   let survived = false;
   if (target.hp === 0 && target.survives > 0) {
@@ -593,7 +635,8 @@ const NEGATIVE = ['burn', 'poison', 'paralyze', 'bind', 'genjutsu'];
 function applyStatus(state, unit, name, turns) {
   // a status applied after the unit already acted this turn should still
   // matter next turn
-  const t = turns + (unit.flags.acted ? 1 : 0);
+  // Bind and Paralyze count the turn they land: a 1-turn Bind only lasts the rest of this turn
+  const t = turns + (unit.flags.acted && name !== 'bind' && name !== 'paralyze' ? 1 : 0);
   const cur = unit.statuses[name];
   unit.statuses[name] = { ...(cur || {}), turns: Math.max(cur?.turns || 0, t) };
 }
@@ -604,14 +647,18 @@ function applyStatus(state, unit, name, turns) {
 function resolveTargets(state, actor, jutsu, target) {
   const rng = state.rng;
   switch (jutsu.target) {
-    case 'self': return [actor];
-    case 'allAllies': return onField(state, actor.side);
-    case 'allEnemies': return onField(state, other(actor.side));
+    case 'self':
+      if (!actor.flags.fromRear) return [actor];
+      // a support's self-only jutsu goes to the chosen ally instead
+      // falls through
     case 'ally': {
       const uid = target ? state.teams[actor.side].slots[target.slot] : null;
       const u = uid && state.units[uid];
-      return [u && !u.ko ? u : actor];
+      if (u && !u.ko) return [u];
+      return actor.flags.fromRear ? onField(state, actor.side).slice(0, 1) : [actor];
     }
+    case 'allAllies': return onField(state, actor.side);
+    case 'allEnemies': return onField(state, other(actor.side));
     case 'enemy':
     default: {
       const enemies = onField(state, other(actor.side));
@@ -647,7 +694,7 @@ function performJutsu(state, actor, jutsu, target, ctx = {}) {
   if (!targets.length) { log(state, `${actor.name}'s ${jutsu.name} has no target.`, 'info', actor); return; }
   const aoe = jutsu.target === 'allEnemies';
   const offensive = jutsu.target === 'enemy' || aoe;
-  log(state, `${actor.name} uses ${jutsu.name}!${ctx.collabNote || ''}`, 'action', actor, { jutsu: jutsu.id, targets: targets.map((t) => t.uid), collab: !!ctx.collab });
+  log(state, `${actor.name} uses ${jutsu.name}${actor.flags.fromRear ? ' from the rear' : ''}!${ctx.collabNote || ''}`, 'action', actor, { jutsu: jutsu.id, targets: targets.map((t) => t.uid), collab: !!ctx.collab, rear: !!actor.flags.fromRear });
   if (!isKunai(jutsu)) revealJutsu(state, actor, jutsu.id, offensive ? targets[0] : null);
 
   for (const tgt of targets) {
@@ -795,7 +842,7 @@ function performJutsu(state, actor, jutsu, target, ctx = {}) {
 
   // self effects that apply once
   for (const eff of jutsu.effects) {
-    if (eff.type === 'recoil' && !actor.ko) {
+    if (eff.type === 'recoil' && !actor.ko && !actor.flags.fromRear) {
       const r = Math.round(actor.maxHp * eff.value);
       dealDamage(state, actor, r, null, `${actor.name} takes ${r} recoil.`);
     }
@@ -988,9 +1035,9 @@ function performRevive(state, actor, jutsu, target) {
   const eff = jutsu.effects.find((e) => e.type === 'revive');
   let t = target ? state.units[team.slots[target.slot]] : null;
   if (!t || !t.ko) t = team.slots.map((id) => state.units[id]).find((u) => u.ko);
-  log(state, `${actor.name} uses ${jutsu.name}!`, 'action', actor, { jutsu: jutsu.id, targets: t ? [t.uid] : [] });
+  log(state, `${actor.name} uses ${jutsu.name}${actor.flags.fromRear ? ' from the rear' : ''}!`, 'action', actor, { jutsu: jutsu.id, targets: t ? [t.uid] : [], rear: !!actor.flags.fromRear });
   revealJutsu(state, actor, jutsu.id, null);
-  if (!t || actor.reviveUsed) { log(state, `There is no fallen ally to bring back.`, 'info', actor); return; }
+  if (!t || (actor.reviveUsed && !actor.flags.fromRear)) { log(state, `There is no fallen ally to bring back.`, 'info', actor); return; }
   actor.reviveUsed = true;
   t.ko = false;
   t.hp = Math.round(t.maxHp * eff.value);
@@ -1000,7 +1047,7 @@ function performRevive(state, actor, jutsu, target) {
   t.buffs = [];
   t.flags = { acted: true };
   log(state, `${t.name} is brought back to life with ${t.hp} HP!`, 'heal', t, { amount: t.hp, revive: true });
-  const cost = Math.floor(actor.hp / 2);
+  const cost = actor.flags.fromRear ? 0 : Math.floor(actor.hp / 2);
   if (cost) dealDamage(state, actor, cost, null, `${actor.name} gives up ${cost} HP of their own life force.`);
 }
 
@@ -1095,6 +1142,14 @@ export function resolveTurn(state, actions, { onLog = null } = {}) {
       entries.push({ unit: u, action, priority: actionPriority(state, u, action), spd: stat(state, u, 'spd'), tie: rng() });
     }
   }
+  // support skills: ordered alongside the actives, acted out from the rear
+  for (const side of [0, 1]) {
+    const sup = state.units[state.teams[side].supportUid];
+    const a = actions.find((x) => x.actor === sup.uid && x.type === 'supportSkill');
+    if (!a || supportSkillState(state, side).disabled) continue;
+    const j = getJutsu(defOf(sup).supportSkill.jutsu);
+    entries.push({ unit: sup, action: a, priority: j.priority, spd: stat(state, sup, 'spd'), tie: rng(), rear: true });
+  }
   // vulnerability that lasts the whole turn
   for (const e of entries) {
     if (e.action.type === 'charge' || e.unit.weaving) e.unit.flags.vulnerable = true;
@@ -1108,8 +1163,9 @@ export function resolveTurn(state, actions, { onLog = null } = {}) {
   for (const e of entries) {
     const u = e.unit;
     const a = e.action;
-    if (u.ko || slotOf(state, u) === -1) continue;
     if (state.winner !== null) break;
+    if (e.rear) { useSupportSkill(state, u, a); continue; }
+    if (u.ko || slotOf(state, u) === -1) continue;
     if (cancelled.has(u.uid)) { u.flags.acted = true; continue; }
 
     if (a.type === 'none') {
@@ -1150,19 +1206,19 @@ function executeAction(state, u, a, clashes, cancelled, entries) {
       const p = BALANCE.subChain[Math.min(u.subStreak, BALANCE.subChain.length - 1)];
       if (state.rng() < p) {
         u.flags.subUp = u.substitution;
-        log(state, `${u.name} readies a ${SUBSTITUTIONS[u.substitution].name}.`, 'sub', u);
+        log(state, `${u.name} readies a ${SUBSTITUTIONS[u.substitution].name}.`, 'sub', u, { act: SUBSTITUTIONS[u.substitution].name });
       } else {
-        log(state, `${u.name}'s substitution fails (used too often)!`, 'sub', u);
+        log(state, `${u.name}'s substitution fails (used too often)!`, 'sub', u, { act: SUBSTITUTIONS[u.substitution].name });
       }
       return;
     }
     case 'guard':
       u.flags.guarding = true;
-      log(state, `${u.name} stands guard${isSensor(u) ? ' (sensor)' : ''}.`, 'info', u);
+      log(state, `${u.name} stands guard${isSensor(u) ? ' (sensor)' : ''}.`, 'info', u, { act: 'Guard' });
       return;
     case 'release':
       delete u.statuses.genjutsu;
-      log(state, `${u.name}: "Release!" The genjutsu shatters.`, 'status', u);
+      log(state, `${u.name}: "Release!" The genjutsu shatters.`, 'status', u, { act: 'Release!' });
       return;
     case 'transform': {
       const t = defOf(u).transformation;
@@ -1172,7 +1228,7 @@ function executeAction(state, u, a, clashes, cancelled, entries) {
       if (t.charged) {
         u.weaving = { kind: 'transform', startedTurn: state.turn };
         u.flags.vulnerable = true;
-        log(state, `${u.name} stands still, gathering energy for ${t.name}...`, 'special', u, { weave: 'transform' });
+        log(state, `${u.name} stands still, gathering energy for ${t.name}...`, 'special', u, { weave: 'transform', act: t.name });
       } else {
         activateTransform(state, u);
       }
@@ -1181,7 +1237,7 @@ function executeAction(state, u, a, clashes, cancelled, entries) {
     case 'charge': {
       const amt = Math.min(u.maxChakra - u.chakra, Math.round(u.maxChakra * BALANCE.chargeChakra));
       u.chakra += amt;
-      log(state, `${u.name} charges Chakra (+${amt}).`, 'info', u);
+      log(state, `${u.name} charges Chakra (+${amt}).`, 'info', u, { act: 'Charge Chakra' });
       if (traitOf(u) === 'akimichi') {
         const h = heal(state, u, 0.1);
         if (h) log(state, `${u.name} snacks and recovers ${h} HP.`, 'heal', u, { amount: h });
@@ -1198,6 +1254,7 @@ function executeAction(state, u, a, clashes, cancelled, entries) {
     case 'weaveRelease': {
       let jutsu; let target = a.target;
       if (a.type === 'weaveRelease') {
+        if (!u.weaving || u.weaving.kind !== 'jutsu') return; // interrupted earlier this turn
         jutsu = getJutsu(u.weaving.jutsuId); target = u.weaving.target; u.weaving = null;
       } else {
         jutsu = getJutsu(a.type === 'kunai' ? (traitOf(u) === 'weaponMistress' ? 'kunai_storm' : 'kunai') : a.jutsuId);
@@ -1217,7 +1274,7 @@ function executeAction(state, u, a, clashes, cancelled, entries) {
         }
         if (jutsu.charged) {
           u.weaving = { kind: 'jutsu', jutsuId: jutsu.id, target, startedTurn: state.turn };
-          log(state, `${u.name} begins weaving signs for ${jutsu.name}...`, 'special', u, { weave: jutsu.id });
+          log(state, `${u.name} begins weaving signs for ${jutsu.name}...`, 'special', u, { weave: jutsu.id, act: jutsu.name });
           revealJutsu(state, u, jutsu.id, null);
           return;
         }
@@ -1277,7 +1334,7 @@ function activateTransform(state, u) {
   const t = defOf(u).transformation;
   u.transform = { turnsLeft: t.turns, since: state.turn };
   if (t.onActivate?.chakraPct) u.chakra = Math.min(u.maxChakra, u.chakra + Math.round(u.maxChakra * t.onActivate.chakraPct));
-  log(state, `${u.name} activates ${t.name}!`, 'special', u, { transform: true });
+  log(state, `${u.name} activates ${t.name}!`, 'special', u, { transform: true, act: t.name });
 }
 
 function endOfTurn(state) {

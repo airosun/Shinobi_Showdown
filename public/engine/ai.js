@@ -1,6 +1,6 @@
 // Heuristic CPU ("Normal", and the balance sim) plus the lookahead CPU ("Hard") below.
 import {
-  availableActions, onField, getJutsu, computeDamage, slotOf, defOf, unsecuredTotal,
+  availableActions, onField, getJutsu, computeDamage, slotOf, defOf, unsecuredTotal, supportSkillState,
 } from './battle.js';
 
 export const AI_CONSERVE_DEFAULT = 2.5;
@@ -104,7 +104,47 @@ export function chooseActions(state, side, rng = Math.random) {
     const pick = scored.length > 1 && chance(0.25) ? scored[1] : scored[0];
     actions.push(pick.action);
   }
+  const sup = supportPick(state, side, rng);
+  if (sup) actions.push(sup);
   return actions;
+}
+
+/** Heuristic support-skill order: use it when it's ready and has a sensible target. */
+export function supportPick(state, side, rng = Math.random) {
+  const sk = supportSkillState(state, side);
+  if (sk.disabled) return null;
+  const j = sk.jutsu;
+  const allies = onField(state, side);
+  const enemies = onField(state, 1 - side);
+  const a = { actor: sk.uid, type: 'supportSkill', jutsuId: j.id };
+  const has = (t) => j.effects.some((e) => e.type === t);
+  if (has('revive')) {
+    const fallen = state.teams[side].slots.map((id) => state.units[id]).find((x) => x.ko);
+    return fallen ? { ...a, target: { slot: slotOf(state, fallen) } } : null;
+  }
+  if (j.target === 'ally' || j.target === 'self') {
+    const healing = has('heal') || has('cleanse') || has('restoreChakra');
+    const pickA = healing
+      ? allies.slice().sort((x, y) => (x.hp / x.maxHp - (Object.keys(x.statuses).length ? 0.3 : 0)) - (y.hp / y.maxHp - (Object.keys(y.statuses).length ? 0.3 : 0)))[0]
+      : allies[Math.floor(rng() * allies.length)];
+    if (healing && pickA.hp > pickA.maxHp * 0.7 && !Object.keys(pickA.statuses).length && !(has('restoreChakra') && pickA.chakra < pickA.maxChakra * 0.5)) return null;
+    return { ...a, target: { slot: slotOf(state, pickA) } };
+  }
+  if (j.target === 'allAllies') {
+    if (has('heal') && !allies.some((x) => x.hp < x.maxHp * 0.75)) return rng() < 0.3 ? a : null;
+    return a;
+  }
+  if (j.target === 'enemy') {
+    let best = null; let bs = -1;
+    for (const e of enemies) {
+      let sc = j.power ? computeDamage(state, state.units[sk.uid], e, j, { noRandom: true }).damage : 30;
+      if (has('bind') && e.statuses.bind) sc *= 0.3;
+      if (j.power && sc >= e.hp) sc *= 2;
+      if (sc > bs) { bs = sc; best = e; }
+    }
+    return best ? { ...a, target: { slot: slotOf(state, best) } } : null;
+  }
+  return a; // allEnemies
 }
 
 // ---------------------------------------------------------------------------
@@ -176,6 +216,7 @@ export function evaluate(state, side) {
       // Intel still in hand can be lost if this shinobi falls
       tv += W.unsecured * unsecuredTotal(u) * (0.6 + 0.4 * hpF);
     }
+    if (!supportSkillState(state, s).disabled) tv += 8; // a skill in hand has some value
     const intel = team.securedIntel;
     tv += W.intel * intel + (intel >= 75 ? 25 : 0) + (intel >= 90 ? 40 : 0);
     if (state.turn > state.maxTurns - 3) tv += 1.5 * missionScore(state, s);
@@ -231,16 +272,29 @@ export function chooseActionsSmart(state, side, rng = Math.random, { samples = 6
     let tot = 0;
     for (const sc of scen) {
       const c = cloneState(state, sc.seed);
-      try { resolveTurn(c, [...p.values(), ...sc.enemy].map((a) => ({ ...a }))); } catch { return -Infinity; }
+      try { resolveTurn(c, [...p.values(), ...sc.enemy].filter(Boolean).map((a) => ({ ...a }))); } catch { return -Infinity; }
       tot += evaluate(c, side);
     }
     return tot / scen.length;
   };
   const cands = new Map(mine.map((u) => [u.uid, candidates(state, u)]));
+  // the support skill: hold it, or use it on any legal target
+  const sk = supportSkillState(state, side);
+  if (!sk.disabled) {
+    const base = { actor: sk.uid, type: 'supportSkill', jutsuId: sk.jutsu.id };
+    const j = sk.jutsu;
+    const revive = j.effects.some((e) => e.type === 'revive');
+    const pool = revive ? state.teams[side].slots.map((id) => state.units[id]).filter((x) => x.ko)
+      : j.target === 'enemy' ? onField(state, 1 - side) : (j.target === 'ally' || j.target === 'self') ? mine : null;
+    const list = [null, ...(pool ? pool.map((t) => ({ ...base, target: { slot: slotOf(state, t) } })) : [base])];
+    cands.set(sk.uid, list);
+    if (!plan.has(sk.uid)) plan.set(sk.uid, null);
+  }
+  const movers = [...mine, ...(sk.disabled ? [] : [state.units[sk.uid]])];
   let best = score(plan);
   for (let pass = 0; pass < passes; pass++) {
     let improved = false;
-    for (const u of mine) {
+    for (const u of movers) {
       const list = cands.get(u.uid);
       if (list.length <= 1) { if (list[0]) plan.set(u.uid, list[0]); continue; }
       const cur = plan.get(u.uid);
@@ -256,7 +310,7 @@ export function chooseActionsSmart(state, side, rng = Math.random, { samples = 6
     }
     if (!improved) break;
   }
-  return mine.map((u) => plan.get(u.uid)).filter(Boolean);
+  return movers.map((u) => plan.get(u.uid)).filter(Boolean);
 }
 
 /**

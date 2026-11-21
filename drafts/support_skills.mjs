@@ -10,6 +10,8 @@ export const PICKS = {
   raikage_a: 'guillotine_drop', darui: 'black_panther', mu: 'mu_invisibility', guy: 'dynamic_entry', kakashi_dms: 'kamui_raikiri',
 };
 export const POWER_MULT = 0.7;
+// balance pass 8 (after the first support-skill sims)
+export const COOLDOWN_OVERRIDES = { jugo: 3, kabuto_p1: 4, kimimaro: 3, choji_p1: 4, choji_ship: 3, karin: 4, asuma: 2, kabuto_sage: 5 };
 export function cooldown(j) {
   if (j.effects.some((e) => e.type === 'revive')) return 'Once';
   let cd = Math.ceil(j.cost / 15);
@@ -27,7 +29,7 @@ for (const s of SHINOBI) {
   const pow = j.power ? Math.round(j.power * POWER_MULT) : '';
   let eff = j.desc;
   if (j.target === 'self') eff = eff.replace(/^(\+)/, 'Target ally gets +');
-  rows.push([s.name, s.cost, `${s.supportAura.name}`, j.name, tgt, pow, j.priority > 0 ? `+${j.priority}` : `${j.priority}`, eff, cooldown(j), '']);
+  rows.push([s.name, s.cost, `${s.supportAura.name}`, j.name, tgt, pow, j.priority > 0 ? `+${j.priority}` : `${j.priority}`, eff, COOLDOWN_OVERRIDES[s.id] ?? cooldown(j), '']);
   rows[rows.length - 1].id = j.id;
 }
 writeFileSync('/tmp/support_rows.json', JSON.stringify(rows));

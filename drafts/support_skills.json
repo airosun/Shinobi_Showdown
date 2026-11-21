@@ -125,11 +125,11 @@
  },
  "choji_p1": {
   "jutsu": "partial_expansion",
-  "cooldown": 2
+  "cooldown": 4
  },
  "choji_ship": {
   "jutsu": "partial_expansion",
-  "cooldown": 2
+  "cooldown": 3
  },
  "ino_p1": {
   "jutsu": "mind_body_disturbance",
@@ -145,7 +145,7 @@
  },
  "asuma": {
   "jutsu": "wind_blade_dust",
-  "cooldown": 3
+  "cooldown": 2
  },
  "gaara_p1": {
   "jutsu": "sand_coffin",
@@ -185,11 +185,11 @@
  },
  "kabuto_p1": {
   "jutsu": "mystical_palm",
-  "cooldown": 3
+  "cooldown": 4
  },
  "kabuto_sage": {
   "jutsu": "white_rage",
-  "cooldown": 4
+  "cooldown": 5
  },
  "jirobo": {
   "jutsu": "earth_dome",
@@ -209,7 +209,7 @@
  },
  "kimimaro": {
   "jutsu": "larch_dance",
-  "cooldown": 2
+  "cooldown": 3
  },
  "zabuza": {
   "jutsu": "hidden_mist",
@@ -285,11 +285,11 @@
  },
  "karin": {
   "jutsu": "adamantine_chains",
-  "cooldown": 3
+  "cooldown": 4
  },
  "jugo": {
   "jutsu": "cell_share",
-  "cooldown": 2
+  "cooldown": 3
  },
  "hashirama": {
   "jutsu": "deep_forest",

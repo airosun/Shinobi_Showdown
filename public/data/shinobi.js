@@ -81,6 +81,11 @@ export const SHINOBI = [
           ]
         }
       ]
+    },
+    "supportSkill": {
+      "jutsu": "multi_shadow_clone",
+      "cooldown": 3,
+      "once": false
     }
   },
   {
@@ -156,6 +161,11 @@ export const SHINOBI = [
           ]
         }
       ]
+    },
+    "supportSkill": {
+      "jutsu": "multi_shadow_clone",
+      "cooldown": 3,
+      "once": false
     }
   },
   {
@@ -229,6 +239,11 @@ export const SHINOBI = [
           ]
         }
       ]
+    },
+    "supportSkill": {
+      "jutsu": "shadow_clone_scouts",
+      "cooldown": 2,
+      "once": false
     }
   },
   {
@@ -312,6 +327,11 @@ export const SHINOBI = [
           ]
         }
       ]
+    },
+    "supportSkill": {
+      "jutsu": "kurama_transfer",
+      "cooldown": 3,
+      "once": false
     }
   },
   {
@@ -385,6 +405,11 @@ export const SHINOBI = [
           "stat": "nin"
         }
       ]
+    },
+    "supportSkill": {
+      "jutsu": "chidori",
+      "cooldown": 5,
+      "once": false
     }
   },
   {
@@ -458,6 +483,11 @@ export const SHINOBI = [
           ]
         }
       ]
+    },
+    "supportSkill": {
+      "jutsu": "chidori_nagashi",
+      "cooldown": 4,
+      "once": false
     }
   },
   {
@@ -530,6 +560,11 @@ export const SHINOBI = [
           ]
         }
       ]
+    },
+    "supportSkill": {
+      "jutsu": "sharingan_genjutsu",
+      "cooldown": 2,
+      "once": false
     }
   },
   {
@@ -612,6 +647,11 @@ export const SHINOBI = [
           "stat": "spd"
         }
       ]
+    },
+    "supportSkill": {
+      "jutsu": "blaze_kagutsuchi",
+      "cooldown": 5,
+      "once": false
     }
   },
   {
@@ -670,6 +710,11 @@ export const SHINOBI = [
           ]
         }
       ]
+    },
+    "supportSkill": {
+      "jutsu": "genjutsu_dispel",
+      "cooldown": 2,
+      "once": false
     }
   },
   {
@@ -730,6 +775,11 @@ export const SHINOBI = [
           ]
         }
       ]
+    },
+    "supportSkill": {
+      "jutsu": "poison_extraction",
+      "cooldown": 2,
+      "once": false
     }
   },
   {
@@ -810,6 +860,11 @@ export const SHINOBI = [
           ]
         }
       ]
+    },
+    "supportSkill": {
+      "jutsu": "katsuyu",
+      "cooldown": 4,
+      "once": false
     }
   },
   {
@@ -873,6 +928,11 @@ export const SHINOBI = [
           "stat": "spd"
         }
       ]
+    },
+    "supportSkill": {
+      "jutsu": "ninja_hounds",
+      "cooldown": 3,
+      "once": false
     }
   },
   {
@@ -957,6 +1017,11 @@ export const SHINOBI = [
           "stat": "nin"
         }
       ]
+    },
+    "supportSkill": {
+      "jutsu": "ninja_hounds",
+      "cooldown": 3,
+      "once": false
     }
   },
   {
@@ -1039,6 +1104,11 @@ export const SHINOBI = [
           ]
         }
       ]
+    },
+    "supportSkill": {
+      "jutsu": "kamui_raikiri",
+      "cooldown": 5,
+      "once": false
     }
   },
   {
@@ -1098,6 +1168,11 @@ export const SHINOBI = [
           ]
         }
       ]
+    },
+    "supportSkill": {
+      "jutsu": "ink_snakes",
+      "cooldown": 2,
+      "once": false
     }
   },
   {
@@ -1158,6 +1233,11 @@ export const SHINOBI = [
           ]
         }
       ]
+    },
+    "supportSkill": {
+      "jutsu": "wood_wall",
+      "cooldown": 3,
+      "once": false
     }
   },
   {
@@ -1226,6 +1306,11 @@ export const SHINOBI = [
           "stat": "def"
         }
       ]
+    },
+    "supportSkill": {
+      "jutsu": "byakugan_scan",
+      "cooldown": 2,
+      "once": false
     }
   },
   {
@@ -1295,6 +1380,11 @@ export const SHINOBI = [
           ]
         }
       ]
+    },
+    "supportSkill": {
+      "jutsu": "byakugan_scan",
+      "cooldown": 2,
+      "once": false
     }
   },
   {
@@ -1354,6 +1444,11 @@ export const SHINOBI = [
           ]
         }
       ]
+    },
+    "supportSkill": {
+      "jutsu": "byakugan_scan",
+      "cooldown": 2,
+      "once": false
     }
   },
   {
@@ -1423,6 +1518,11 @@ export const SHINOBI = [
           ]
         }
       ]
+    },
+    "supportSkill": {
+      "jutsu": "byakugan_scan",
+      "cooldown": 2,
+      "once": false
     }
   },
   {
@@ -1494,6 +1594,11 @@ export const SHINOBI = [
           "stat": "tai"
         }
       ]
+    },
+    "supportSkill": {
+      "jutsu": "leaf_rising_wind",
+      "cooldown": 2,
+      "once": false
     }
   },
   {
@@ -1565,6 +1670,11 @@ export const SHINOBI = [
           ]
         }
       ]
+    },
+    "supportSkill": {
+      "jutsu": "drunken_fist",
+      "cooldown": 2,
+      "once": false
     }
   },
   {
@@ -1623,6 +1733,11 @@ export const SHINOBI = [
           ]
         }
       ]
+    },
+    "supportSkill": {
+      "jutsu": "smoke_bomb",
+      "cooldown": 2,
+      "once": false
     }
   },
   {
@@ -1683,6 +1798,11 @@ export const SHINOBI = [
           ]
         }
       ]
+    },
+    "supportSkill": {
+      "jutsu": "smoke_bomb",
+      "cooldown": 2,
+      "once": false
     }
   },
   {
@@ -1763,6 +1883,11 @@ export const SHINOBI = [
           "stat": "tai"
         }
       ]
+    },
+    "supportSkill": {
+      "jutsu": "dynamic_entry",
+      "cooldown": 2,
+      "once": false
     }
   },
   {
@@ -1822,6 +1947,11 @@ export const SHINOBI = [
           ]
         }
       ]
+    },
+    "supportSkill": {
+      "jutsu": "dynamic_marking",
+      "cooldown": 2,
+      "once": false
     }
   },
   {
@@ -1891,6 +2021,11 @@ export const SHINOBI = [
           ]
         }
       ]
+    },
+    "supportSkill": {
+      "jutsu": "dynamic_marking",
+      "cooldown": 2,
+      "once": false
     }
   },
   {
@@ -1950,6 +2085,11 @@ export const SHINOBI = [
           ]
         }
       ]
+    },
+    "supportSkill": {
+      "jutsu": "insect_sphere",
+      "cooldown": 2,
+      "once": false
     }
   },
   {
@@ -2010,6 +2150,11 @@ export const SHINOBI = [
           ]
         }
       ]
+    },
+    "supportSkill": {
+      "jutsu": "insect_tornado",
+      "cooldown": 4,
+      "once": false
     }
   },
   {
@@ -2070,6 +2215,11 @@ export const SHINOBI = [
           ]
         }
       ]
+    },
+    "supportSkill": {
+      "jutsu": "battle_analysis",
+      "cooldown": 2,
+      "once": false
     }
   },
   {
@@ -2131,6 +2281,11 @@ export const SHINOBI = [
           ]
         }
       ]
+    },
+    "supportSkill": {
+      "jutsu": "shadow_stitching",
+      "cooldown": 4,
+      "once": false
     }
   },
   {
@@ -2208,6 +2363,11 @@ export const SHINOBI = [
           ]
         }
       ]
+    },
+    "supportSkill": {
+      "jutsu": "partial_expansion",
+      "cooldown": 4,
+      "once": false
     }
   },
   {
@@ -2279,6 +2439,11 @@ export const SHINOBI = [
           ]
         }
       ]
+    },
+    "supportSkill": {
+      "jutsu": "partial_expansion",
+      "cooldown": 3,
+      "once": false
     }
   },
   {
@@ -2306,7 +2471,7 @@ export const SHINOBI = [
     "trait": {
       "id": "yamanaka",
       "name": "Yamanaka Mind Clan",
-      "desc": "Her genjutsu that land grant +3 extra Intel and are 15% more accurate."
+      "desc": "Her genjutsu that land grant +3 extra Intel and are 15% more accurate. Intel she gains is secured instantly."
     },
     "substitutions": [
       "log"
@@ -2337,6 +2502,11 @@ export const SHINOBI = [
           ]
         }
       ]
+    },
+    "supportSkill": {
+      "jutsu": "mind_body_disturbance",
+      "cooldown": 2,
+      "once": false
     }
   },
   {
@@ -2364,7 +2534,7 @@ export const SHINOBI = [
     "trait": {
       "id": "yamanaka",
       "name": "Yamanaka Mind Clan",
-      "desc": "Her genjutsu that land grant +3 extra Intel and are 15% more accurate."
+      "desc": "Her genjutsu that land grant +3 extra Intel and are 15% more accurate. Intel she gains is secured instantly."
     },
     "substitutions": [
       "log"
@@ -2405,6 +2575,11 @@ export const SHINOBI = [
           ]
         }
       ]
+    },
+    "supportSkill": {
+      "jutsu": "mind_destruction",
+      "cooldown": 3,
+      "once": false
     }
   },
   {
@@ -2471,6 +2646,11 @@ export const SHINOBI = [
           ]
         }
       ]
+    },
+    "supportSkill": {
+      "jutsu": "tree_binding",
+      "cooldown": 3,
+      "once": false
     }
   },
   {
@@ -2534,6 +2714,11 @@ export const SHINOBI = [
           ]
         }
       ]
+    },
+    "supportSkill": {
+      "jutsu": "wind_blade_dust",
+      "cooldown": 2,
+      "once": false
     }
   },
   {
@@ -2606,6 +2791,11 @@ export const SHINOBI = [
           "stat": "def"
         }
       ]
+    },
+    "supportSkill": {
+      "jutsu": "sand_coffin",
+      "cooldown": 2,
+      "once": false
     }
   },
   {
@@ -2677,6 +2867,11 @@ export const SHINOBI = [
           "stat": "def"
         }
       ]
+    },
+    "supportSkill": {
+      "jutsu": "kazekage_shield",
+      "cooldown": 3,
+      "once": false
     }
   },
   {
@@ -2735,6 +2930,11 @@ export const SHINOBI = [
           ]
         }
       ]
+    },
+    "supportSkill": {
+      "jutsu": "wind_barrier",
+      "cooldown": 2,
+      "once": false
     }
   },
   {
@@ -2798,6 +2998,11 @@ export const SHINOBI = [
           ]
         }
       ]
+    },
+    "supportSkill": {
+      "jutsu": "wind_barrier",
+      "cooldown": 2,
+      "once": false
     }
   },
   {
@@ -2857,6 +3062,11 @@ export const SHINOBI = [
           ]
         }
       ]
+    },
+    "supportSkill": {
+      "jutsu": "crow_embrace",
+      "cooldown": 2,
+      "once": false
     }
   },
   {
@@ -2918,6 +3128,11 @@ export const SHINOBI = [
           ]
         }
       ]
+    },
+    "supportSkill": {
+      "jutsu": "salamander_shield",
+      "cooldown": 3,
+      "once": false
     }
   },
   {
@@ -2979,6 +3194,11 @@ export const SHINOBI = [
           ]
         }
       ]
+    },
+    "supportSkill": {
+      "jutsu": "antidote",
+      "cooldown": 2,
+      "once": false
     }
   },
   {
@@ -3051,6 +3271,11 @@ export const SHINOBI = [
           ]
         }
       ]
+    },
+    "supportSkill": {
+      "jutsu": "five_pronged_seal",
+      "cooldown": 3,
+      "once": false
     }
   },
   {
@@ -3123,6 +3348,11 @@ export const SHINOBI = [
           ]
         }
       ]
+    },
+    "supportSkill": {
+      "jutsu": "hidden_snake_hands",
+      "cooldown": 3,
+      "once": false
     }
   },
   {
@@ -3191,6 +3421,11 @@ export const SHINOBI = [
           ]
         }
       ]
+    },
+    "supportSkill": {
+      "jutsu": "mystical_palm",
+      "cooldown": 4,
+      "once": false
     }
   },
   {
@@ -3272,6 +3507,11 @@ export const SHINOBI = [
           ]
         }
       ]
+    },
+    "supportSkill": {
+      "jutsu": "white_rage",
+      "cooldown": 5,
+      "once": false
     }
   },
   {
@@ -3341,6 +3581,11 @@ export const SHINOBI = [
           ]
         }
       ]
+    },
+    "supportSkill": {
+      "jutsu": "earth_dome",
+      "cooldown": 3,
+      "once": false
     }
   },
   {
@@ -3411,6 +3656,11 @@ export const SHINOBI = [
           ]
         }
       ]
+    },
+    "supportSkill": {
+      "jutsu": "summon_spider",
+      "cooldown": 4,
+      "once": false
     }
   },
   {
@@ -3481,6 +3731,11 @@ export const SHINOBI = [
           ]
         }
       ]
+    },
+    "supportSkill": {
+      "jutsu": "rashomon",
+      "cooldown": 3,
+      "once": false
     }
   },
   {
@@ -3550,6 +3805,11 @@ export const SHINOBI = [
           ]
         }
       ]
+    },
+    "supportSkill": {
+      "jutsu": "phantom_sound_chains",
+      "cooldown": 4,
+      "once": false
     }
   },
   {
@@ -3621,6 +3881,11 @@ export const SHINOBI = [
           ]
         }
       ]
+    },
+    "supportSkill": {
+      "jutsu": "larch_dance",
+      "cooldown": 3,
+      "once": false
     }
   },
   {
@@ -3681,6 +3946,11 @@ export const SHINOBI = [
           ]
         }
       ]
+    },
+    "supportSkill": {
+      "jutsu": "hidden_mist",
+      "cooldown": 3,
+      "once": false
     }
   },
   {
@@ -3741,6 +4011,11 @@ export const SHINOBI = [
           ]
         }
       ]
+    },
+    "supportSkill": {
+      "jutsu": "ice_mirrors",
+      "cooldown": 4,
+      "once": false
     }
   },
   {
@@ -3812,6 +4087,11 @@ export const SHINOBI = [
           ]
         }
       ]
+    },
+    "supportSkill": {
+      "jutsu": "hidden_snake_hands",
+      "cooldown": 3,
+      "once": false
     }
   },
   {
@@ -3819,7 +4099,7 @@ export const SHINOBI = [
     "baseId": "danzo",
     "name": "Danzo Shimura",
     "era": "Shippuden",
-    "cost": 9,
+    "cost": 8,
     "natures": {
       "primary": "wind",
       "secondary": "water"
@@ -3881,6 +4161,11 @@ export const SHINOBI = [
           ]
         }
       ]
+    },
+    "supportSkill": {
+      "jutsu": "summon_baku",
+      "cooldown": 4,
+      "once": false
     }
   },
   {
@@ -3941,6 +4226,11 @@ export const SHINOBI = [
           ]
         }
       ]
+    },
+    "supportSkill": {
+      "jutsu": "tobi_antics",
+      "cooldown": 2,
+      "once": false
     }
   },
   {
@@ -4002,6 +4292,11 @@ export const SHINOBI = [
           ]
         }
       ]
+    },
+    "supportSkill": {
+      "jutsu": "gedo_chains",
+      "cooldown": 3,
+      "once": false
     }
   },
   {
@@ -4059,6 +4354,11 @@ export const SHINOBI = [
           ]
         }
       ]
+    },
+    "supportSkill": {
+      "jutsu": "spore_grab",
+      "cooldown": 2,
+      "once": false
     }
   },
   {
@@ -4117,6 +4417,11 @@ export const SHINOBI = [
           ]
         }
       ]
+    },
+    "supportSkill": {
+      "jutsu": "spore_clone",
+      "cooldown": 2,
+      "once": false
     }
   },
   {
@@ -4189,6 +4494,11 @@ export const SHINOBI = [
           ]
         }
       ]
+    },
+    "supportSkill": {
+      "jutsu": "shark_dance",
+      "cooldown": 4,
+      "once": false
     }
   },
   {
@@ -4261,6 +4571,11 @@ export const SHINOBI = [
           ]
         }
       ]
+    },
+    "supportSkill": {
+      "jutsu": "tsukuyomi",
+      "cooldown": 4,
+      "once": false
     }
   },
   {
@@ -4321,6 +4636,11 @@ export const SHINOBI = [
           ]
         }
       ]
+    },
+    "supportSkill": {
+      "jutsu": "c4_karura",
+      "cooldown": 5,
+      "once": false
     }
   },
   {
@@ -4328,7 +4648,7 @@ export const SHINOBI = [
     "baseId": "hidan",
     "name": "Hidan",
     "era": "Shippuden",
-    "cost": 6,
+    "cost": 7,
     "natures": {
       "primary": null,
       "secondary": null
@@ -4391,6 +4711,11 @@ export const SHINOBI = [
           "stat": "tai"
         }
       ]
+    },
+    "supportSkill": {
+      "jutsu": "triple_scythe",
+      "cooldown": 2,
+      "once": false
     }
   },
   {
@@ -4461,6 +4786,11 @@ export const SHINOBI = [
           ]
         }
       ]
+    },
+    "supportSkill": {
+      "jutsu": "searing_migraine",
+      "cooldown": 5,
+      "once": false
     }
   },
   {
@@ -4532,6 +4862,11 @@ export const SHINOBI = [
           ]
         }
       ]
+    },
+    "supportSkill": {
+      "jutsu": "iron_sand_world_order",
+      "cooldown": 4,
+      "once": false
     }
   },
   {
@@ -4603,6 +4938,11 @@ export const SHINOBI = [
           ]
         }
       ]
+    },
+    "supportSkill": {
+      "jutsu": "paper_butterflies",
+      "cooldown": 3,
+      "once": false
     }
   },
   {
@@ -4664,6 +5004,11 @@ export const SHINOBI = [
           "stat": "nin"
         }
       ]
+    },
+    "supportSkill": {
+      "jutsu": "shinra_tensei",
+      "cooldown": 6,
+      "once": false
     }
   },
   {
@@ -4723,6 +5068,11 @@ export const SHINOBI = [
           ]
         }
       ]
+    },
+    "supportSkill": {
+      "jutsu": "samsara_revival",
+      "cooldown": 0,
+      "once": true
     }
   },
   {
@@ -4784,6 +5134,11 @@ export const SHINOBI = [
           ]
         }
       ]
+    },
+    "supportSkill": {
+      "jutsu": "great_water_arm",
+      "cooldown": 2,
+      "once": false
     }
   },
   {
@@ -4842,6 +5197,11 @@ export const SHINOBI = [
           ]
         }
       ]
+    },
+    "supportSkill": {
+      "jutsu": "adamantine_chains",
+      "cooldown": 4,
+      "once": false
     }
   },
   {
@@ -4912,6 +5272,11 @@ export const SHINOBI = [
           ]
         }
       ]
+    },
+    "supportSkill": {
+      "jutsu": "cell_share",
+      "cooldown": 3,
+      "once": false
     }
   },
   {
@@ -4985,6 +5350,11 @@ export const SHINOBI = [
           ]
         }
       ]
+    },
+    "supportSkill": {
+      "jutsu": "deep_forest",
+      "cooldown": 5,
+      "once": false
     }
   },
   {
@@ -5046,6 +5416,11 @@ export const SHINOBI = [
           "stat": "spd"
         }
       ]
+    },
+    "supportSkill": {
+      "jutsu": "water_formation_wall",
+      "cooldown": 3,
+      "once": false
     }
   },
   {
@@ -5107,6 +5482,11 @@ export const SHINOBI = [
           ]
         }
       ]
+    },
+    "supportSkill": {
+      "jutsu": "mud_wall",
+      "cooldown": 3,
+      "once": false
     }
   },
   {
@@ -5178,6 +5558,11 @@ export const SHINOBI = [
           ]
         }
       ]
+    },
+    "supportSkill": {
+      "jutsu": "ftg_rasengan",
+      "cooldown": 4,
+      "once": false
     }
   },
   {
@@ -5250,6 +5635,11 @@ export const SHINOBI = [
           ]
         }
       ]
+    },
+    "supportSkill": {
+      "jutsu": "katsuyu",
+      "cooldown": 4,
+      "once": false
     }
   },
   {
@@ -5323,6 +5713,11 @@ export const SHINOBI = [
           ]
         }
       ]
+    },
+    "supportSkill": {
+      "jutsu": "toad_oil_flame",
+      "cooldown": 5,
+      "once": false
     }
   },
   {
@@ -5382,6 +5777,11 @@ export const SHINOBI = [
           "stat": "tai"
         }
       ]
+    },
+    "supportSkill": {
+      "jutsu": "guillotine_drop",
+      "cooldown": 4,
+      "once": false
     }
   },
   {
@@ -5453,6 +5853,11 @@ export const SHINOBI = [
           ]
         }
       ]
+    },
+    "supportSkill": {
+      "jutsu": "ink_creation",
+      "cooldown": 2,
+      "once": false
     }
   },
   {
@@ -5511,6 +5916,11 @@ export const SHINOBI = [
           ]
         }
       ]
+    },
+    "supportSkill": {
+      "jutsu": "black_panther",
+      "cooldown": 4,
+      "once": false
     }
   },
   {
@@ -5518,7 +5928,7 @@ export const SHINOBI = [
     "baseId": "karui",
     "name": "Karui",
     "era": "Shippuden",
-    "cost": 5,
+    "cost": 6,
     "natures": {
       "primary": "lightning",
       "secondary": null
@@ -5568,6 +5978,11 @@ export const SHINOBI = [
           ]
         }
       ]
+    },
+    "supportSkill": {
+      "jutsu": "karui_flurry",
+      "cooldown": 2,
+      "once": false
     }
   },
   {
@@ -5638,6 +6053,11 @@ export const SHINOBI = [
           ]
         }
       ]
+    },
+    "supportSkill": {
+      "jutsu": "solid_fog",
+      "cooldown": 4,
+      "once": false
     }
   },
   {
@@ -5697,6 +6117,11 @@ export const SHINOBI = [
           ]
         }
       ]
+    },
+    "supportSkill": {
+      "jutsu": "hiramekarei_guard",
+      "cooldown": 2,
+      "once": false
     }
   },
   {
@@ -5756,6 +6181,11 @@ export const SHINOBI = [
           ]
         }
       ]
+    },
+    "supportSkill": {
+      "jutsu": "ao_sensing",
+      "cooldown": 2,
+      "once": false
     }
   },
   {
@@ -5815,6 +6245,11 @@ export const SHINOBI = [
           ]
         }
       ]
+    },
+    "supportSkill": {
+      "jutsu": "clam_mirage",
+      "cooldown": 4,
+      "once": false
     }
   },
   {
@@ -5886,6 +6321,11 @@ export const SHINOBI = [
           ]
         }
       ]
+    },
+    "supportSkill": {
+      "jutsu": "coral_palm",
+      "cooldown": 3,
+      "once": false
     }
   },
   {
@@ -5893,7 +6333,7 @@ export const SHINOBI = [
     "baseId": "onoki",
     "name": "Onoki",
     "era": "Shippuden",
-    "cost": 8,
+    "cost": 7,
     "natures": {
       "primary": "dust",
       "secondary": "earth"
@@ -5946,6 +6386,11 @@ export const SHINOBI = [
           "stat": "def"
         }
       ]
+    },
+    "supportSkill": {
+      "jutsu": "lightened_boulder",
+      "cooldown": 2,
+      "once": false
     }
   },
   {
@@ -6004,6 +6449,11 @@ export const SHINOBI = [
           ]
         }
       ]
+    },
+    "supportSkill": {
+      "jutsu": "stone_wall",
+      "cooldown": 3,
+      "once": false
     }
   },
   {
@@ -6061,6 +6511,11 @@ export const SHINOBI = [
           ]
         }
       ]
+    },
+    "supportSkill": {
+      "jutsu": "stone_wall",
+      "cooldown": 3,
+      "once": false
     }
   },
   {
@@ -6119,6 +6574,11 @@ export const SHINOBI = [
           ]
         }
       ]
+    },
+    "supportSkill": {
+      "jutsu": "mu_invisibility",
+      "cooldown": 2,
+      "once": false
     }
   },
   {
@@ -6193,6 +6653,11 @@ export const SHINOBI = [
           "stat": "nin"
         }
       ]
+    },
+    "supportSkill": {
+      "jutsu": "gedo_chains",
+      "cooldown": 3,
+      "once": false
     }
   },
   {
@@ -6265,6 +6730,11 @@ export const SHINOBI = [
           ]
         }
       ]
+    },
+    "supportSkill": {
+      "jutsu": "deep_forest",
+      "cooldown": 5,
+      "once": false
     }
   },
   {
@@ -6324,6 +6794,11 @@ export const SHINOBI = [
           ]
         }
       ]
+    },
+    "supportSkill": {
+      "jutsu": "infinite_tsukuyomi",
+      "cooldown": 6,
+      "once": false
     }
   },
   {
@@ -6385,6 +6860,11 @@ export const SHINOBI = [
           ]
         }
       ]
+    },
+    "supportSkill": {
+      "jutsu": "expansive_tsb",
+      "cooldown": 6,
+      "once": false
     }
   },
   {
@@ -6455,6 +6935,11 @@ export const SHINOBI = [
           ]
         }
       ]
+    },
+    "supportSkill": {
+      "jutsu": "scale_powder",
+      "cooldown": 3,
+      "once": false
     }
   },
   {
@@ -6526,6 +7011,11 @@ export const SHINOBI = [
           ]
         }
       ]
+    },
+    "supportSkill": {
+      "jutsu": "acid_bubbles",
+      "cooldown": 3,
+      "once": false
     }
   },
   {
@@ -6595,6 +7085,11 @@ export const SHINOBI = [
           ]
         }
       ]
+    },
+    "supportSkill": {
+      "jutsu": "steam_punch",
+      "cooldown": 2,
+      "once": false
     }
   },
   {
@@ -6665,6 +7160,11 @@ export const SHINOBI = [
           ]
         }
       ]
+    },
+    "supportSkill": {
+      "jutsu": "magma_wall",
+      "cooldown": 3,
+      "once": false
     }
   },
   {
@@ -6738,6 +7238,11 @@ export const SHINOBI = [
           ]
         }
       ]
+    },
+    "supportSkill": {
+      "jutsu": "cat_fireballs",
+      "cooldown": 4,
+      "once": false
     }
   },
   {
@@ -6796,6 +7301,11 @@ export const SHINOBI = [
           ]
         }
       ]
+    },
+    "supportSkill": {
+      "jutsu": "summon_ibuse",
+      "cooldown": 5,
+      "once": false
     }
   },
   {
@@ -6855,6 +7365,11 @@ export const SHINOBI = [
           ]
         }
       ]
+    },
+    "supportSkill": {
+      "jutsu": "trap_tags",
+      "cooldown": 2,
+      "once": false
     }
   },
   {
@@ -6862,7 +7377,7 @@ export const SHINOBI = [
     "baseId": "konohamaru",
     "name": "Konohamaru Sarutobi",
     "era": "Shippuden",
-    "cost": 5,
+    "cost": 6,
     "natures": {
       "primary": "wind",
       "secondary": "fire"
@@ -6913,6 +7428,11 @@ export const SHINOBI = [
           ]
         }
       ]
+    },
+    "supportSkill": {
+      "jutsu": "fire_ash",
+      "cooldown": 4,
+      "once": false
     }
   },
   {
@@ -6974,6 +7494,11 @@ export const SHINOBI = [
           "stat": "tai"
         }
       ]
+    },
+    "supportSkill": {
+      "jutsu": "chain_lash",
+      "cooldown": 4,
+      "once": false
     }
   },
   {
@@ -7032,6 +7557,11 @@ export const SHINOBI = [
           ]
         }
       ]
+    },
+    "supportSkill": {
+      "jutsu": "iai_flash",
+      "cooldown": 4,
+      "once": false
     }
   },
   {
@@ -7090,6 +7620,11 @@ export const SHINOBI = [
           ]
         }
       ]
+    },
+    "supportSkill": {
+      "jutsu": "gold_dust_wall",
+      "cooldown": 3,
+      "once": false
     }
   },
   {
@@ -7161,6 +7696,11 @@ export const SHINOBI = [
           ]
         }
       ]
+    },
+    "supportSkill": {
+      "jutsu": "kotoamatsukami",
+      "cooldown": 5,
+      "once": false
     }
   },
   {
@@ -7219,6 +7759,11 @@ export const SHINOBI = [
           ]
         }
       ]
+    },
+    "supportSkill": {
+      "jutsu": "antidote",
+      "cooldown": 2,
+      "once": false
     }
   }
 ];

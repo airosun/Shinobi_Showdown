@@ -38,7 +38,7 @@ COST_OVERRIDES = {'kurenai': 5, 'sakura_war': 9, 'tenten_ship': 7, 'kakashi_p1':
                   # balance pass 6 (batch 6)
                   'shisui': 8, 'shizune': 5, 'iruka': 4, 'choji_ship': 7, 'naruto_p1': 5, 'naruto_sage': 7, 'sakura_war': 8,
                   # balance pass 7 (chakra rebalance: smaller chakra pools)
-                  'gaara_ship': 9, 'kakashi_ship': 6, 'kankuro_ship': 5, 'hinata_ship': 6, 'gengetsu': 6, 'shisui': 7}
+                  'gaara_ship': 9, 'kakashi_ship': 6, 'kankuro_ship': 5, 'hinata_ship': 6, 'gengetsu': 6, 'shisui': 7, 'danzo': 8, 'konohamaru': 6, 'karui': 6, 'onoki': 7, 'hidan': 7}
 JUTSU_OVERRIDES = {
     'amaterasu': {'effects': [{'type': 'burn', 'chance': 1, 'turns': 3}], 'cost': 55, 'desc': 'Black flames wherever he looks. Always Burns (3 turns). Ignores Substitution.'},
     'katsuyu': {'effects': [{'type': 'heal', 'value': 0.15}, {'type': 'buff', 'stat': 'def', 'mult': 1.2, 'turns': 2}], 'desc': "Katsuyu's clones heal all allies 15% and give +20% DEF for 2 turns."},
@@ -93,7 +93,7 @@ JUTSU_OVERRIDES = {
     'poison_mist': {'power': 40, 'effects': [{'type': 'poison', 'chance': 0.4, 'turns': 3}], 'desc': 'Breathes a cloud of poison. 40% Poison.'},
 }
 VITALITY = 'Regenerates 8% max HP each turn. +30% max Chakra.'
-TRAIT_DESC_OVERRIDES = {'Endless Chakra': 'Reanimated with the Rinnegan: regenerates 4% HP and 5% Chakra per turn and is immune to Poison.', 'Rinne-Sharingan': 'Sees through Log Substitution and Decoys, immune to genjutsu. His taijutsu strike a second time for 25% damage (Limbo shadows).', 'Akimichi Appetite': 'Charge Chakra also heals 10% max HP.', 'Kikaichu Host': 'His attacks that hit drain 6% Chakra. Immune to Chakra drain.','Weapon Mistress': 'Her Kunai & Shuriken hit all enemies.', 'Gale Mastery': 'Her area Wind jutsu deal +15% damage.', 'Hashirama Cells': 'Regenerates 4% HP per turn.', 'Lightning Release Armor': 'Takes 10% less damage, and his taijutsu ignore 15% DEF.', 'Flying Thunder God': 'His single-target jutsu gain +1 priority, and he dodges single-target attacks 15% more often.', 'Kamui Intangibility': 'Single-target attacks have a 20% chance to pass straight through him.', 'Reanimated Body': 'Regenerates 6% HP per turn and is immune to Poison. Rinnegan: sees through Log Substitution and Decoys.',
+TRAIT_DESC_OVERRIDES = {'Yamanaka Mind Clan': 'Her genjutsu that land grant +3 extra Intel and are 15% more accurate. Intel she gains is secured instantly.', 'Endless Chakra': 'Reanimated with the Rinnegan: regenerates 4% HP and 5% Chakra per turn and is immune to Poison.', 'Rinne-Sharingan': 'Sees through Log Substitution and Decoys, immune to genjutsu. His taijutsu strike a second time for 25% damage (Limbo shadows).', 'Akimichi Appetite': 'Charge Chakra also heals 10% max HP.', 'Kikaichu Host': 'His attacks that hit drain 6% Chakra. Immune to Chakra drain.','Weapon Mistress': 'Her Kunai & Shuriken hit all enemies.', 'Gale Mastery': 'Her area Wind jutsu deal +15% damage.', 'Hashirama Cells': 'Regenerates 4% HP per turn.', 'Lightning Release Armor': 'Takes 10% less damage, and his taijutsu ignore 15% DEF.', 'Flying Thunder God': 'His single-target jutsu gain +1 priority, and he dodges single-target attacks 15% more often.', 'Kamui Intangibility': 'Single-target attacks have a 20% chance to pass straight through him.', 'Reanimated Body': 'Regenerates 6% HP per turn and is immune to Poison. Rinnegan: sees through Log Substitution and Decoys.',
                         'Mangekyō Sharingan': 'Sees through Log Substitution. 25% genjutsu reflect. His Burns last 1 extra turn.',
                         'Eternal Mangekyō Sharingan': 'Sees through Log Substitution. Immune to genjutsu. His Burns last 1 extra turn.'}
 LOADOUT_OVERRIDES = {'naruto_war': ['kurama_rasengan', 'thrown_rasenshuriken', 'chakra_arm', 'tailed_beast_bomb'],
@@ -407,6 +407,17 @@ PART1_TAG = {'naruto_p1','sasuke_p1','sakura_p1','kakashi_p1','hinata_p1','neji_
 for e in out:
     if e['era'] == 'Part 1': e['era'] = 'Part I'
     if e['id'] in PART1_TAG: e['name'] += ' (Part I)'
+
+# Bind / Paralyze moves act one step faster (their durations count the turn they land: see applyStatus)
+for jid, j in jutsu.items():
+    if any(e.get('type') in ('bind', 'paralyze') for e in j.get('effects', [])) and j.get('priority', 0) < 3:
+        j['priority'] = j.get('priority', 0) + 1
+
+# Support skills: one jutsu from each shinobi's own list, usable from the support slot on a cooldown
+SUPPORT_SKILLS = json.load(open(os.path.join(os.path.dirname(__file__), 'support_skills.json')))
+for e in out:
+    sk = SUPPORT_SKILLS[e['id']]
+    e['supportSkill'] = {'jutsu': sk['jutsu'], 'cooldown': 0 if sk['cooldown'] == 'Once' else sk['cooldown'], 'once': sk['cooldown'] == 'Once'}
 
 def js(o): return json.dumps(o, ensure_ascii=False, indent=2)
 

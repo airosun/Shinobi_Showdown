@@ -187,7 +187,7 @@ export const JUTSU = {
     "nature": "lightning",
     "power": 110,
     "cost": 50,
-    "priority": 1,
+    "priority": 2,
     "target": "enemy",
     "effects": [
       {
@@ -308,7 +308,7 @@ export const JUTSU = {
     "nature": "lightning",
     "power": 115,
     "cost": 50,
-    "priority": 1,
+    "priority": 2,
     "target": "enemy",
     "effects": [
       {
@@ -338,7 +338,7 @@ export const JUTSU = {
     "nature": "earth",
     "power": 70,
     "cost": 25,
-    "priority": 0,
+    "priority": 1,
     "target": "enemy",
     "effects": [
       {
@@ -375,7 +375,7 @@ export const JUTSU = {
     "nature": null,
     "power": 50,
     "cost": 40,
-    "priority": 0,
+    "priority": 1,
     "target": "enemy",
     "effects": [
       {
@@ -490,7 +490,7 @@ export const JUTSU = {
     "nature": "yin",
     "power": 0,
     "cost": 35,
-    "priority": 0,
+    "priority": 1,
     "target": "enemy",
     "effects": [
       {
@@ -583,7 +583,7 @@ export const JUTSU = {
     "nature": "magnet",
     "power": 70,
     "cost": 30,
-    "priority": 0,
+    "priority": 1,
     "target": "enemy",
     "effects": [
       {
@@ -662,7 +662,7 @@ export const JUTSU = {
     "nature": "yin",
     "power": 0,
     "cost": 35,
-    "priority": 0,
+    "priority": 1,
     "target": "enemy",
     "effects": [
       {
@@ -721,7 +721,7 @@ export const JUTSU = {
     "nature": null,
     "power": 50,
     "cost": 5,
-    "priority": 2,
+    "priority": 3,
     "target": "enemy",
     "effects": [
       {
@@ -766,7 +766,7 @@ export const JUTSU = {
     "nature": null,
     "power": 80,
     "cost": 25,
-    "priority": 1,
+    "priority": 2,
     "target": "enemy",
     "effects": [
       {
@@ -815,7 +815,7 @@ export const JUTSU = {
     "nature": "lightning",
     "power": 65,
     "cost": 35,
-    "priority": 1,
+    "priority": 2,
     "target": "allEnemies",
     "effects": [
       {
@@ -1040,7 +1040,7 @@ export const JUTSU = {
     "nature": "lightning",
     "power": 105,
     "cost": 45,
-    "priority": 1,
+    "priority": 2,
     "target": "enemy",
     "effects": [
       {
@@ -1070,7 +1070,7 @@ export const JUTSU = {
     "nature": "lightning",
     "power": 130,
     "cost": 60,
-    "priority": 1,
+    "priority": 2,
     "target": "enemy",
     "effects": [
       {
@@ -1112,7 +1112,7 @@ export const JUTSU = {
     "nature": "yin",
     "power": 40,
     "cost": 30,
-    "priority": 0,
+    "priority": 1,
     "target": "enemy",
     "effects": [
       {
@@ -1171,7 +1171,7 @@ export const JUTSU = {
     "nature": "wood",
     "power": 50,
     "cost": 40,
-    "priority": 0,
+    "priority": 1,
     "target": "enemy",
     "effects": [
       {
@@ -1521,7 +1521,7 @@ export const JUTSU = {
     "nature": null,
     "power": 50,
     "cost": 20,
-    "priority": 1,
+    "priority": 2,
     "target": "enemy",
     "effects": [
       {
@@ -1695,7 +1695,7 @@ export const JUTSU = {
     "nature": null,
     "power": 40,
     "cost": 30,
-    "priority": 0,
+    "priority": 1,
     "target": "enemy",
     "effects": [
       {
@@ -1770,7 +1770,7 @@ export const JUTSU = {
     "nature": null,
     "power": 60,
     "cost": 45,
-    "priority": -1,
+    "priority": 0,
     "target": "enemy",
     "effects": [
       {
@@ -1787,7 +1787,7 @@ export const JUTSU = {
     "nature": "yin",
     "power": 55,
     "cost": 40,
-    "priority": 0,
+    "priority": 1,
     "target": "allEnemies",
     "effects": [
       {
@@ -1805,7 +1805,7 @@ export const JUTSU = {
     "nature": "yin",
     "power": 0,
     "cost": 45,
-    "priority": 0,
+    "priority": 1,
     "target": "allEnemies",
     "effects": [
       {
@@ -1889,7 +1889,7 @@ export const JUTSU = {
     "nature": null,
     "power": 45,
     "cost": 15,
-    "priority": 1,
+    "priority": 2,
     "target": "allEnemies",
     "effects": [
       {
@@ -1926,7 +1926,7 @@ export const JUTSU = {
     "nature": "yin",
     "power": 60,
     "cost": 40,
-    "priority": 0,
+    "priority": 1,
     "target": "enemy",
     "effects": [
       {
@@ -2205,7 +2205,7 @@ export const JUTSU = {
     "nature": null,
     "power": 60,
     "cost": 30,
-    "priority": 0,
+    "priority": 1,
     "target": "enemy",
     "effects": [
       {
@@ -2310,7 +2310,7 @@ export const JUTSU = {
     "nature": null,
     "power": 90,
     "cost": 30,
-    "priority": 0,
+    "priority": 1,
     "target": "enemy",
     "effects": [
       {
@@ -2362,7 +2362,7 @@ export const JUTSU = {
     "nature": null,
     "power": 40,
     "cost": 25,
-    "priority": 1,
+    "priority": 2,
     "target": "enemy",
     "effects": [
       {
@@ -2586,7 +2586,7 @@ export const JUTSU = {
     "nature": null,
     "power": 80,
     "cost": 45,
-    "priority": 0,
+    "priority": 1,
     "target": "allEnemies",
     "effects": [
       {
@@ -2632,7 +2632,7 @@ export const JUTSU = {
     "nature": "earth",
     "power": 0,
     "cost": 40,
-    "priority": 0,
+    "priority": 1,
     "target": "enemy",
     "effects": [
       {
@@ -2675,7 +2675,7 @@ export const JUTSU = {
     "nature": null,
     "power": 0,
     "cost": 35,
-    "priority": 1,
+    "priority": 2,
     "target": "allEnemies",
     "effects": [
       {
@@ -2727,7 +2727,7 @@ export const JUTSU = {
     "nature": null,
     "power": 60,
     "cost": 35,
-    "priority": 0,
+    "priority": 1,
     "target": "allEnemies",
     "effects": [
       {
@@ -2929,7 +2929,7 @@ export const JUTSU = {
     "nature": "water",
     "power": 0,
     "cost": 40,
-    "priority": 0,
+    "priority": 1,
     "target": "enemy",
     "effects": [
       {
@@ -2968,7 +2968,7 @@ export const JUTSU = {
     "nature": "ice",
     "power": 95,
     "cost": 50,
-    "priority": 0,
+    "priority": 1,
     "target": "enemy",
     "effects": [
       {
@@ -2997,7 +2997,7 @@ export const JUTSU = {
     "nature": "ice",
     "power": 40,
     "cost": 35,
-    "priority": 0,
+    "priority": 1,
     "target": "enemy",
     "effects": [
       {
@@ -3177,7 +3177,7 @@ export const JUTSU = {
     "nature": "yin",
     "power": 0,
     "cost": 40,
-    "priority": 0,
+    "priority": 1,
     "target": "enemy",
     "effects": [
       {
@@ -3228,7 +3228,7 @@ export const JUTSU = {
     "nature": "wood",
     "power": 55,
     "cost": 20,
-    "priority": 0,
+    "priority": 1,
     "target": "enemy",
     "effects": [
       {
@@ -3265,7 +3265,7 @@ export const JUTSU = {
     "nature": "yin",
     "power": 0,
     "cost": 40,
-    "priority": 0,
+    "priority": 1,
     "target": "enemy",
     "effects": [
       {
@@ -3336,7 +3336,7 @@ export const JUTSU = {
     "nature": "water",
     "power": 50,
     "cost": 55,
-    "priority": 0,
+    "priority": 1,
     "target": "enemy",
     "effects": [
       {
@@ -3622,7 +3622,7 @@ export const JUTSU = {
     "nature": null,
     "power": 65,
     "cost": 25,
-    "priority": 1,
+    "priority": 2,
     "target": "enemy",
     "effects": [
       {
@@ -3673,7 +3673,7 @@ export const JUTSU = {
     "nature": "magnet",
     "power": 0,
     "cost": 45,
-    "priority": 0,
+    "priority": 1,
     "target": "allEnemies",
     "effects": [
       {
@@ -3805,7 +3805,7 @@ export const JUTSU = {
     "nature": "yin",
     "power": 40,
     "cost": 30,
-    "priority": 1,
+    "priority": 2,
     "target": "enemy",
     "effects": [
       {
@@ -3826,7 +3826,7 @@ export const JUTSU = {
     "nature": "yin",
     "power": 165,
     "cost": 100,
-    "priority": -1,
+    "priority": 0,
     "target": "allEnemies",
     "effects": [
       {
@@ -3948,7 +3948,7 @@ export const JUTSU = {
     "nature": "yang",
     "power": 0,
     "cost": 45,
-    "priority": 0,
+    "priority": 1,
     "target": "enemy",
     "effects": [
       {
@@ -4052,7 +4052,7 @@ export const JUTSU = {
     "nature": "wood",
     "power": 75,
     "cost": 50,
-    "priority": 0,
+    "priority": 1,
     "target": "allEnemies",
     "effects": [
       {
@@ -4356,7 +4356,7 @@ export const JUTSU = {
     "nature": "earth",
     "power": 40,
     "cost": 40,
-    "priority": 0,
+    "priority": 1,
     "target": "enemy",
     "effects": [
       {
@@ -4446,7 +4446,7 @@ export const JUTSU = {
     "nature": "yin",
     "power": 40,
     "cost": 30,
-    "priority": 1,
+    "priority": 2,
     "target": "enemy",
     "effects": [
       {
@@ -4490,7 +4490,7 @@ export const JUTSU = {
     "nature": "lightning",
     "power": 110,
     "cost": 45,
-    "priority": 0,
+    "priority": 1,
     "target": "enemy",
     "effects": [
       {
@@ -4726,7 +4726,7 @@ export const JUTSU = {
     "nature": "water",
     "power": 75,
     "cost": 35,
-    "priority": 0,
+    "priority": 1,
     "target": "enemy",
     "effects": [
       {
@@ -4840,7 +4840,7 @@ export const JUTSU = {
     "nature": "lava",
     "power": 0,
     "cost": 40,
-    "priority": 0,
+    "priority": 1,
     "target": "enemy",
     "effects": [
       {
@@ -5065,7 +5065,7 @@ export const JUTSU = {
     "nature": "yin",
     "power": 180,
     "cost": 110,
-    "priority": -1,
+    "priority": 0,
     "target": "allEnemies",
     "effects": [
       {
@@ -5154,7 +5154,7 @@ export const JUTSU = {
     "nature": "yang",
     "power": 40,
     "cost": 30,
-    "priority": 1,
+    "priority": 2,
     "target": "enemy",
     "effects": [
       {
@@ -5272,7 +5272,7 @@ export const JUTSU = {
     "nature": "water",
     "power": 0,
     "cost": 35,
-    "priority": 1,
+    "priority": 2,
     "target": "enemy",
     "effects": [
       {
@@ -5541,7 +5541,7 @@ export const JUTSU = {
     "nature": null,
     "power": 50,
     "cost": 25,
-    "priority": 1,
+    "priority": 2,
     "target": "enemy",
     "effects": [
       {
@@ -5696,7 +5696,7 @@ export const JUTSU = {
     "nature": "yang",
     "power": 75,
     "cost": 40,
-    "priority": 0,
+    "priority": 1,
     "target": "allEnemies",
     "effects": [
       {
@@ -5798,7 +5798,7 @@ export const JUTSU = {
     "nature": "magnet",
     "power": 0,
     "cost": 40,
-    "priority": 0,
+    "priority": 1,
     "target": "enemy",
     "effects": [
       {

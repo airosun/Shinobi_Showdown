@@ -577,3 +577,32 @@ main { max-width: none; padding: clamp(10px, 1.2vw, 24px); }
 @keyframes ss-spin { to { transform: rotate(360deg); } }
 .room-pill { display: inline-flex; align-items: center; gap: 6px; padding: 4px 10px; border-radius: 999px; background: rgba(255,255,255,.06); margin-right: 12px; }
 .net-banner { grid-column: 1 / -1; padding: 8px 12px; border-radius: 8px; background: #5a2a14; color: #ffd8b0; font-weight: 600; text-align: center; }
+
+/* team builder: the team panel (Ready, slots, cost, selected shinobi) stays in view while the roster scrolls */
+.builder { align-items: start; }
+.builder > .team-panel { position: sticky; top: 72px; max-height: calc(100vh - 88px); overflow-y: auto; overscroll-behavior: contain; }
+.team-panel .team-actions { position: sticky; top: -14px; z-index: 2; margin: -14px -14px 10px; padding: 12px 14px; background: var(--panel, #1c1510); border-bottom: 1px solid var(--line, #3a2c20); }
+@media (max-width: 900px) { .builder > .team-panel { position: static; max-height: none; } }
+
+/* support skill tab in the command panel */
+.who-tab.sup-tab { border-style: dashed; }
+.who-tab.sup-tab .rdy { color: var(--good, #3ddc84); margin-left: 4px; font-size: 10px; }
+.who-tab.sup-tab .cd { margin-left: 4px; font-size: 12px; opacity: .8; }
+.who-tab.sup-tab.cooling { opacity: .75; }
+.orders .o.sup { font-style: italic; }
+.arena .mon.rear { z-index: 4; opacity: 0; transition: opacity .25s; pointer-events: none; }
+.arena .mon.rear.in { opacity: 1; }
+.arena .mon.rear.you { left: 59%; top: 90%; }
+.arena .mon.rear.foe { left: 44%; top: 40%; }
+.arena .mon.rear .spr { filter: drop-shadow(0 0 12px #9fd3ff) drop-shadow(0 0 3px #fff); transform: scale(.78); transform-origin: bottom center; }
+
+/* action callout */
+.arena .act-callout { position: absolute; left: 56%; top: 4%; transform: translateX(-50%); z-index: 30; pointer-events: none; display: flex; flex-direction: column; align-items: center; gap: 2px;
+  padding: 10px 26px 12px; border-radius: 10px; background: #fff8e8f2; color: #2a1c10; border: 3px solid #c94a3a; box-shadow: 0 6px 22px #000a, inset 0 0 0 2px #fff;
+  animation: callout-in .22s ease-out; max-width: 80%; text-align: center; }
+.arena .act-callout.s0 { border-color: #3b82f6; }
+.arena .act-callout.s1 { border-color: #e4572e; }
+.arena .act-callout .who { font-size: 13px; font-weight: 700; opacity: .75; }
+.arena .act-callout .what { font-family: var(--font-display, inherit); font-size: clamp(18px, 2.2vw, 30px); font-weight: 800; line-height: 1.1; }
+.arena .act-callout.out { opacity: 0; transform: translate(-50%, -8px); transition: opacity .35s, transform .35s; }
+@keyframes callout-in { from { opacity: 0; transform: translate(-50%, -14px) scale(.96); } to { opacity: 1; transform: translateX(-50%); } }
