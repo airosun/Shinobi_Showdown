@@ -515,7 +515,7 @@ export const ANIMS = {
       const box = sideBox(ctx);
       const top = { x: box.c.x, y: -60 };
       const b = spawn(ctx, ART.teardrop(), top, { life: 1600 });
-      await fly(ctx, b, top, { x: box.c.x, y: box.c.y }, 600, { ease: 'ease-in' });
+      await fly(ctx, b, top, { x: box.c.x, y: box.c.y }, 600, { rotate: 0, ease: 'ease-in' });
       b.remove();
       const d = box.w + 140;
       const e = spawn(ctx, `<div data-sp="c3_bomb" style="width:${d}px;height:${d * 0.6}px;border-radius:50%;background:radial-gradient(ellipse,#fff 0%,#ffe9a0 25%,#ffb340 50%,#ff7a1a00 72%)"></div>`, box.c, { life: 1400 });
