@@ -137,12 +137,12 @@ main { padding: 16px; max-width: 1320px; margin: 0 auto; }
     radial-gradient(46px 52px at 95% 100%, #1d3a24 98%, transparent 100%); opacity: .9; }
 .arena .plat { position: absolute; transform: translate(-50%, -50%); border-radius: 50%; z-index: 1; pointer-events: none;
   background: radial-gradient(ellipse at 50% 40%, #8a7a58 0%, #6e6044 55%, #554a34 70%, transparent 71%); box-shadow: inset 0 -6px 12px #0003; }
-.arena .plat.foe { left: 71%; top: 43%; width: 440px; height: 76px; }
-.arena .plat.you { left: 30%; top: 98%; width: 640px; height: 130px; }
+.arena .plat.foe { left: 72.5%; top: 47%; width: 540px; height: 80px; }
+.arena .plat.you { left: 29%; top: 98%; width: 760px; height: 130px; }
 .arena .mon { position: absolute; transform: translate(-50%, -100%); z-index: 2; display: flex; flex-direction: column; align-items: center; transition: filter .3s; }
 .arena .mon.you { z-index: 3; }
-.arena .mon.foe.p0 { left: 57%; top: 45%; } .arena .mon.foe.p1 { left: 71%; top: 41.5%; } .arena .mon.foe.p2 { left: 85%; top: 45%; }
-.arena .mon.you.p0 { left: 11%; top: 97%; } .arena .mon.you.p1 { left: 29%; top: 101%; } .arena .mon.you.p2 { left: 47%; top: 97%; }
+.arena .mon.foe.p0 { left: 56%; top: 49%; } .arena .mon.foe.p1 { left: 72.5%; top: 45.5%; } .arena .mon.foe.p2 { left: 89%; top: 49%; }
+.arena .mon.you.p0 { left: 7%; top: 97%; } .arena .mon.you.p1 { left: 28%; top: 101%; } .arena .mon.you.p2 { left: 49%; top: 97%; }
 .arena .spr { position: relative; transition: transform .15s; }
 .arena .spr .badge { width: 92px; height: 92px; font-size: 30px; border: 3px solid #0008; }
 .arena .mon.you .spr .badge { width: 132px; height: 132px; font-size: 42px; }
@@ -503,15 +503,15 @@ button.linkish:hover:not(:disabled) { background: none; color: var(--accent); }
   .arena .spr img.art { height: 140px; max-width: 160px; }
   .arena .mon.you .spr img.art { height: 185px; max-width: 200px; }
   .arena .hud { width: min(310px, 45%); }
-  .arena .mon.you.p0 { left: 10%; } .arena .mon.you.p1 { left: 26%; } .arena .mon.you.p2 { left: 42%; }
+  .arena .mon.you.p0 { left: 7%; } .arena .mon.you.p1 { left: 26%; } .arena .mon.you.p2 { left: 45%; }
   .hpcard .nm .nat { display: none; }
 }
 @container (max-width: 640px) {
   .arena .spr img.art { height: 100px; max-width: 115px; }
   .arena .mon.you .spr img.art { height: 130px; max-width: 140px; }
   .arena .hud { width: 49%; }
-  .arena .mon.you.p0 { left: 9%; } .arena .mon.you.p1 { left: 24%; } .arena .mon.you.p2 { left: 39%; }
-  .arena .mon.foe.p0 { left: 62%; } .arena .mon.foe.p1 { left: 76%; } .arena .mon.foe.p2 { left: 90%; }
+  .arena .mon.you.p0 { left: 7%; } .arena .mon.you.p1 { left: 24%; } .arena .mon.you.p2 { left: 41%; }
+  .arena .mon.foe.p0 { left: 59%; } .arena .mon.foe.p1 { left: 75%; } .arena .mon.foe.p2 { left: 91%; }
 }
 /* the Dex detail column shrinks with the window */
 .dex-main { container-type: inline-size; min-width: 0; }
