@@ -95,13 +95,15 @@ test('consecutive substitutions lose reliability', () => {
   assert.ok(st.log.some((l) => l.text.includes('substitution fails')));
 });
 
-test('a successful Gather secures its Intel at once, plus whatever was carried', () => {
+test('a successful Gather secures what was carried; the new Intel stays unsecured', () => {
   const st = battle(T0, T1);
   st.units['1-2'].unsecured.push({ amount: 10, turn: 1 });
   resolveTurn(st, [{ actor: '1-3', type: 'none' }, { actor: '1-2', type: 'gather' }]);
-  // Shikamaru: Infiltrator gather * 1.25 (200 IQ) + the 10 he carried + Ino's relay (stage 1 = 2)
-  assert.equal(st.teams[1].securedIntel, Math.round(BALANCE.intelGatherSpecialist * 1.25) + 10 + 2);
-  assert.equal(st.units['1-2'].unsecured.length, 0);
+  assert.equal(st.teams[1].securedIntel, 10 + 2); // the 10 carried + Ino's relay (stage 1 = 2)
+  // Shikamaru: Infiltrator gather * 1.25 (200 IQ), unsecured until the end of next turn
+  assert.equal(st.units['1-2'].unsecured[0].amount, Math.round(BALANCE.intelGatherSpecialist * 1.25));
+  resolveTurn(st, []);
+  assert.equal(st.teams[1].securedIntel, 10 + 4 + Math.round(BALANCE.intelGatherSpecialist * 1.25));
 });
 
 test('a spy KO\'d before securing loses their Intel', () => {
@@ -118,7 +120,7 @@ test('Gather Intel is stopped by a single-target move', () => {
   const st = battle(T0, T1);
   resolveTurn(st, [{ actor: '1-2', type: 'gather' }, { actor: '0-0', type: 'kunai', target: { slot: 2 } }]);
   assert.ok(st.log.some((l) => l.text.includes("couldn't gather Intel")));
-  assert.equal(st.teams[1].securedIntel, 2);
+  assert.equal(st.units['1-2'].unsecured.length, 0);
 });
 
 test('area attacks do not stop Gather Intel or knock Intel loose', () => {
@@ -132,8 +134,8 @@ test('area attacks do not stop Gather Intel or knock Intel loose', () => {
 
 test('Guard halves enemy Intel gains', () => {
   const st = battle(T0, T1);
-  resolveTurn(st, [{ actor: '1-3', type: 'none' }, { actor: '1-2', type: 'gather' }, { actor: '0-1', type: 'guard' }]);
-  assert.equal(st.teams[1].securedIntel, Math.round(BALANCE.intelGatherSpecialist * 1.25 * 0.5) + 2);
+  resolveTurn(st, [{ actor: '1-2', type: 'gather' }, { actor: '0-1', type: 'guard' }]);
+  assert.equal(st.units['1-2'].unsecured[0].amount, Math.round(BALANCE.intelGatherSpecialist * 1.25 * 0.5));
 });
 
 test('Jutsu Clash: Water overpowers Fire', () => {

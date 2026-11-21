@@ -550,7 +550,7 @@ function rulesHtml() {
       <li><b>Jutsu Clash:</b> two ninjutsu aimed at each other collide — the stronger nature breaks through at 70% power.</li>
       <li><b>Collaboration:</b> Wind then Fire (or Water then Lightning) on the same target in one turn = ×1.3.</li>
       <li><b>Substitution:</b> a Stance that negates the first single-target hit. Repeating it lowers the odds (100/50/25%). Area attacks are only halved; Sharingan sees through logs; genjutsu ignores it.</li>
-      <li><b>Intel:</b> Gather Intel (+${E.BALANCE.intelGather}, or +${E.BALANCE.intelGatherSpecialist} for Sensors and Infiltrators), land genjutsu, reveal enemy jutsu and score KOs (+${E.BALANCE.intelKO}). Intel from anything but Gather is <i>unsecured</i> until the carrier survives the end of the next turn. A successful Gather secures what it finds <i>and</i> everything that shinobi was carrying, on the spot. Only <b>single-target</b> moves interfere: one aimed at a gatherer stops the Gather, and a single-target hit on a carrier knocks half their unsecured Intel loose (a big hit or a critical drops all of it). A KO loses it all. Guard halves enemy Intel gains (a Sensor on guard quarters them).</li>
+      <li><b>Intel:</b> Gather Intel (+${E.BALANCE.intelGather}, or +${E.BALANCE.intelGatherSpecialist} for Sensors and Infiltrators), land genjutsu, reveal enemy jutsu and score KOs (+${E.BALANCE.intelKO}). New Intel is <i>unsecured</i> until the carrier survives the end of the next turn. A successful Gather also sends home everything that shinobi was already carrying (secured at once). Only <b>single-target</b> moves interfere: one aimed at a gatherer stops the Gather, and a single-target hit on a carrier knocks half their unsecured Intel loose (a big hit or a critical drops all of it). A KO loses it all. Guard halves enemy Intel gains (a Sensor on guard quarters them).</li>
       <li><b>Roles:</b><ul class="roles-list">${ROLE_ORDER.map((r) => `<li><b>${r}</b> — ${ROLE_INFO[r]}</li>`).join('')}</ul></li>
       <li><b>Milestones:</b> 25 Intel reveals an enemy loadout, 50 reveals another and makes enemy Chakra visible, 75 lets you see one enemy order before choosing.</li>
       <li><b>Win:</b> KO all 3 enemy shinobi, <i>or</i> secure 100 Intel. There is no turn limit. If both sides get there in the same turn, the higher Mission Score (25 per KO + Intel) wins.</li>
@@ -913,7 +913,7 @@ function actionSections(st, u) {
   const SUB = {
     kunai: (o) => { const k = E.getJutsu(o.jutsuId); return `POW ${k.power} · free · +2${k.target === 'allEnemies' ? ' · all enemies' : ''}`; },
     charge: () => `+${Math.round(E.BALANCE.chargeChakra * 100)}% Chakra · −2 · vulnerable`,
-    gather: () => `+${(E.defOf(u).roles.some((r) => r === 'Sensor' || r === 'Infiltrator') ? E.BALANCE.intelGatherSpecialist : E.BALANCE.intelGather) + E.auraVal(S.battle, u.side, 'gatherBonus')} Intel, secured · −1 · single-target hit stops it`,
+    gather: () => `+${(E.defOf(u).roles.some((r) => r === 'Sensor' || r === 'Infiltrator') ? E.BALANCE.intelGatherSpecialist : E.BALANCE.intelGather) + E.auraVal(S.battle, u.side, 'gatherBonus')} Intel · secures what you carry · −1`,
     substitute: (o) => `CK ${o.cost} · Stance${o.note ? ` · ${o.note}` : ''}`,
     guard: () => 'Stance · halve enemy Intel',
     release: () => 'Stance · break genjutsu',
@@ -922,7 +922,7 @@ function actionSections(st, u) {
   const TIPS = {
     kunai: KUNAI_TIP,
     charge: 'Restore half of your max Chakra (it resolves last). You take +25% damage this turn. Passive regen is small, so this is how you refill.',
-    gather: `Priority −1. Gain ${E.BALANCE.intelGather} Intel (${E.BALANCE.intelGatherSpecialist} for Sensors and Infiltrators) and secure it on the spot, along with any unsecured Intel you were carrying. Only a single-target move aimed at you earlier this turn stops it.`,
+    gather: `Priority −1. Gain ${E.BALANCE.intelGather} Intel (${E.BALANCE.intelGatherSpecialist} for Sensors and Infiltrators) A successful Gather also secures any unsecured Intel you were already carrying; the new Intel is unsecured until the end of next turn. Only a single-target move aimed at you earlier this turn stops it.`,
     substitute: `${SUBSTITUTIONS[u.substitution].desc} Success drops to 50% / 25% if used on consecutive turns. Area attacks are only halved.`,
     guard: 'Stance. Enemy Intel gains are halved this turn (quartered if a Sensor guards), and you take 25% less damage.',
     release: 'Stance. Break free of genjutsu.',

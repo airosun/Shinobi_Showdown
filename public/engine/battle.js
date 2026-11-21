@@ -48,7 +48,8 @@ export const BALANCE = {
   kunaiPower: 45,
   intelDropOnHit: 0.5,    // share of unsecured Intel lost when an enemy hit lands
   intelDropAllAt: 0.25,   // a hit for this share of max HP (or a critical) drops all of it
-  supportPower: 0.7,      // support skills hit at 70% power from the rear
+  supportPower: 0.7,
+      // support skills hit at 70% power from the rear
 };
 
 export const MILESTONES = [25, 50, 75];
@@ -1251,14 +1252,15 @@ function executeAction(state, u, a, clashes, cancelled, entries) {
     case 'gather': {
       // only a single-target move can stop a gatherer: the opponent has to read who is scouting
       if (u.flags.singleHit) { log(state, `${u.name} was singled out and couldn't gather Intel!`, 'intel', u, { act: 'Gather Intel' }); return; }
-      awardIntel(state, u, (isSpecialist(u) ? BALANCE.intelGatherSpecialist : BALANCE.intelGather) + auraVal(state, u.side, 'gatherBonus') + (GATHER[traitOf(u)] || 0), 'reconnaissance');
-      // a successful gather sends everything this shinobi is carrying home: it is all secured at once
+      // a successful gather sends home what this shinobi was already carrying (secured at once);
+      // the new Intel it finds stays unsecured until the end of next turn
       const carried = unsecuredTotal(u);
       if (carried) {
         state.teams[u.side].securedIntel += carried;
         u.unsecured = [];
-        log(state, `${u.name} secures ${carried} Intel for the team.`, 'intel', u, { secured: carried });
+        log(state, `${u.name} sends home ${carried} Intel — secured.`, 'intel', u, { secured: carried, act: 'Gather Intel' });
       }
+      awardIntel(state, u, (isSpecialist(u) ? BALANCE.intelGatherSpecialist : BALANCE.intelGather) + auraVal(state, u.side, 'gatherBonus') + (GATHER[traitOf(u)] || 0), 'reconnaissance');
       return;
     }
     case 'kunai':
