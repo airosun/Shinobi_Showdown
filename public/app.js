@@ -111,6 +111,8 @@ document.addEventListener('mousemove', (e) => {
 
 // click dispatcher
 document.addEventListener('click', (e) => {
+  const pop = document.getElementById('stPop');
+  if (pop && !e.target.closest('[data-act="statusInfo"]')) pop.style.display = 'none';
   const el = e.target.closest('[data-act]');
   if (!el || el.disabled) return;
   ACTIONS[el.dataset.act]?.(el.dataset.arg, el, e);
@@ -611,7 +613,7 @@ function arenaInner() {
   const vs = vsNow();
   const me = bottomSide();
   const sel = selectionTargets();
-  const tsu = Object.values(vs.units).some((u) => !u.ko && u.statuses?.genjutsu?.tsukuyomi);
+  const tsu = vs.tsukuyomi > 0 || Object.values(vs.units).some((u) => !u.ko && u.statuses?.genjutsu?.tsukuyomi);
   return `${tsu ? `<div class="tsu-sky"></div><div class="tsu-moon">${TSUKUYOMI_MOON(130)}</div>` : ''}<div class="plat foe"></div><div class="plat you"></div>
     ${sideMons(vs, 1 - me, true, sel)}${sideMons(vs, me, false, sel)}
     ${sideHud(vs, 1 - me, true, sel)}${sideHud(vs, me, false, sel)}`;
@@ -698,8 +700,23 @@ function hpCard(vs, u, pickableSide, pos) {
   </div>`;
 }
 
+const STATUS_DESC = {
+  burn: 'Takes fire damage at the end of each turn.',
+  poison: 'Takes poison damage at the end of each turn.',
+  paralyze: 'May be unable to act.',
+  bind: "Can't act. Weaving is interrupted.",
+  genjutsu: 'May lose their action to the illusion. Release! breaks it.',
+  exhausted: 'Worn out: all stats −15% until it wears off.',
+};
+// how long a status has left, in plain words (statuses tick down at the end of each turn)
+function statusLeft(s) {
+  const n = s?.turns ?? 0;
+  if (n <= 1) return 'Wears off at the end of this turn';
+  if (n === 2) return 'Lasts through the end of next turn (2 turns left, counting this one)';
+  return `${n} turns left, counting this one`;
+}
 function statusHtml(u) {
-  return Object.keys(u.statuses).map((k) => `<span class="st st-${k}" title="${STATUS_NAME[k]}">${STATUS_LABEL[k] || k}</span>`).join(' ');
+  return Object.entries(u.statuses).map(([k, s]) => `<span class="st st-${k}" data-act="statusInfo" data-arg="${u.uid}|${k}" data-tip="${esc(`<b>${STATUS_NAME[k] || k}</b> — ${statusLeft(s)}<div class="tip-s">${STATUS_DESC[k] || ''}</div>`)}">${STATUS_LABEL[k] || k}<small>${s.turns ?? ''}</small></span>`).join(' ');
 }
 
 function cardChips(vs, u) {
@@ -1677,6 +1694,21 @@ const ACTIONS = {
     commit(action);
   },
   cancelTarget() { S.pending = null; render(); syncField(); },
+  statusInfo(arg, el, e) {
+    e?.stopPropagation?.();
+    const [uid, k] = arg.split('|');
+    const u = vsNow().units[uid];
+    const s = u?.statuses?.[k];
+    if (!s) return;
+    let pop = document.getElementById('stPop');
+    if (!pop) { pop = document.createElement('div'); pop.id = 'stPop'; pop.className = 'st-pop'; document.body.appendChild(pop); }
+    pop.innerHTML = `<b>${esc(u.name)}: ${STATUS_NAME[k] || k}</b><div>${statusLeft(s)}${s.tsukuyomi ? ' (Infinite Tsukuyomi)' : ''}</div><div class="muted small">${STATUS_DESC[k] || ''}</div>`;
+    const r = el.getBoundingClientRect();
+    pop.style.display = 'block';
+    pop.style.left = `${Math.max(8, Math.min(window.innerWidth - pop.offsetWidth - 8, r.left))}px`;
+    pop.style.top = `${r.bottom + 6 + pop.offsetHeight > window.innerHeight ? r.top - pop.offsetHeight - 6 : r.bottom + 6}px`;
+    clearTimeout(pop._t); pop._t = setTimeout(() => { pop.style.display = 'none'; }, 4000);
+  },
   chooseSupport() {
     const st = S.battle;
     const sk = E.supportSkillState(st, S.side);

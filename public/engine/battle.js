@@ -232,7 +232,7 @@ function log(state, text, kind = 'info', who = null, extra = null) {
 /** Plain-data copy of everything the UI draws (for step-by-step playback). */
 export function snapshot(state) {
   return JSON.parse(JSON.stringify({
-    turn: state.turn, maxTurns: state.maxTurns, winner: state.winner, winReason: state.winReason,
+    turn: state.turn, maxTurns: state.maxTurns, winner: state.winner, winReason: state.winReason, tsukuyomi: state.tsukuyomi || 0,
     units: state.units, teams: state.teams,
   }));
 }
@@ -892,7 +892,11 @@ function performGenjutsu(state, actor, tgt, jutsu) {
     applyEffect(state, caster, victim, eff, jutsu);
   }
   // Infinite Tsukuyomi: the red moon stays up while its genjutsu lasts
-  if (jutsu.id === 'infinite_tsukuyomi' && victim.statuses.genjutsu) victim.statuses.genjutsu.tsukuyomi = true;
+  if (jutsu.id === 'infinite_tsukuyomi' && victim.statuses.genjutsu) {
+    victim.statuses.genjutsu.tsukuyomi = true;
+    // the red sky and moon stay up for the genjutsu's full length, even if victims break free early
+    state.tsukuyomi = Math.max(state.tsukuyomi || 0, victim.statuses.genjutsu.turns);
+  }
   // Mind Transfer: Ino's body slumps while she holds the target
   if (jutsu.id === 'mind_transfer' && caster === actor && victim.statuses.bind) victim.statuses.bind.mind = actor.uid;
   if (caster === actor) {
@@ -1352,6 +1356,7 @@ function activateTransform(state, u) {
 }
 
 function endOfTurn(state) {
+  if (state.tsukuyomi > 0) state.tsukuyomi -= 1;
   const B = BALANCE;
   for (const u of Object.values(state.units)) {
     if (u.ko || u.uid === state.teams[u.side].supportUid) continue;

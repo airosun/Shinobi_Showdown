@@ -606,3 +606,9 @@ main { max-width: none; padding: clamp(10px, 1.2vw, 24px); }
 .arena .act-callout .what { font-family: var(--font-display, inherit); font-size: clamp(18px, 2.2vw, 30px); font-weight: 800; line-height: 1.1; }
 .arena .act-callout.out { opacity: 0; transform: translate(-50%, -8px); transition: opacity .35s, transform .35s; }
 @keyframes callout-in { from { opacity: 0; transform: translate(-50%, -14px) scale(.96); } to { opacity: 1; transform: translateX(-50%); } }
+
+/* status chips: click for the duration left */
+.st { cursor: pointer; }
+.st small { font-size: 9px; margin-left: 2px; opacity: .85; }
+.st-pop { position: fixed; z-index: 60; display: none; max-width: 260px; padding: 8px 11px; border-radius: 8px; background: #1b1410f5; color: #f3e9da; border: 1px solid #ff8c1a; box-shadow: 0 8px 24px #000a; font-size: 13px; line-height: 1.35; }
+.st-pop b { display: block; margin-bottom: 2px; }
