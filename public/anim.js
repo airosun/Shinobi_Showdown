@@ -636,6 +636,17 @@ async function stretch(ctx, a, b, mk, ms = 380, life = 2600) {
   await n.animate([{ transform: `translate(0,-50%) rotate(${ang(a, b)}deg) scaleX(0)` }, { transform: `translate(0,-50%) rotate(${ang(a, b)}deg) scaleX(1)` }], { duration: ms * ctx.sp, easing: 'ease-out', fill: 'forwards' }).finished.catch(() => {});
   return n;
 }
+/** A komainu (or any ink drawing) bursting into ink: a splat plus flying droplets. */
+function inkBurst(ctx, at, size = 90) {
+  const pts = Array.from({ length: 14 }, (_, i) => { const t = (i / 14) * Math.PI * 2; const r = 50 * (i % 2 ? rnd(0.55, 0.75) : rnd(0.85, 1)); return `${(60 + Math.cos(t) * r).toFixed(1)},${(60 + Math.sin(t) * r).toFixed(1)}`; });
+  const splat = spawn(ctx, `<svg data-sp="inkBurst-splat" width="${size}" height="${size}" viewBox="0 0 120 120" style="overflow:visible"><polygon points="${pts.join(' ')}" fill="#111" stroke="#111" stroke-width="10" stroke-linejoin="round"/><circle cx="60" cy="60" r="22" fill="#000"/></svg>`, at, { life: 1100 });
+  splat.animate([{ transform: `translate(-50%,-50%) scale(.2) rotate(${rnd(0, 90)}deg)`, opacity: 1 }, { transform: 'translate(-50%,-50%) scale(1.1)', opacity: 0.95, offset: 0.25 }, { transform: 'translate(-50%,-50%) scale(1.25)', opacity: 0 }], { duration: 750 * ctx.sp, easing: 'ease-out', fill: 'forwards' });
+  for (let i = 0; i < 10; i++) {
+    const t = rnd(0, Math.PI * 2); const d = rnd(size * 0.5, size * 1.1); const r = rnd(5, 11);
+    const drop = spawn(ctx, `<div data-sp="inkBurst-drop" style="width:${r}px;height:${r * 1.25}px;border-radius:50% 50% 50% 50% / 60% 60% 40% 40%;background:#111"></div>`, at, { life: 1000 });
+    drop.animate([{ transform: 'translate(-50%,-50%) scale(.6)', opacity: 1 }, { transform: `translate(calc(-50% + ${Math.cos(t) * d}px), calc(-50% + ${Math.sin(t) * d + 26}px)) scale(1)`, opacity: 0 }], { duration: rnd(500, 750) * ctx.sp, easing: 'cubic-bezier(.2,.7,.4,1)', fill: 'forwards' });
+  }
+}
 /** A flickering zig-zag lightning bolt between a and b. */
 function bolt(ctx, a, b, { color = '#9fd8ff', glow = '#4aa3ff', core = '#fff', ms = 450, width = 3 } = {}) {
   const len = Math.hypot(b.x - a.x, b.y - a.y);
@@ -3758,8 +3769,8 @@ Object.assign(ANIMS, {
     async play(ctx) { const box = sideBox(ctx); const at = { x: box.c.x + (ctx.isFoe ? -40 : 40), y: box.y2 + 10 }; smokeCloud(ctx, { x: at.x, y: at.y - 80 }, 160); const g = spawn(ctx, ART9.gate(Math.min(260, box.h * 0.9)), at, { life: 2200, z: 7 }); await rise(ctx, g, 420); await wait(900 * ctx.sp); fade(ctx, g, 350); },
   },
   super_beast_scroll: {
-    desc: 'User sends three white, thick-outlined ink komainu at the enemy.',
-    async play(ctx) { const to = ctx.tos[0]; await Promise.all([0, 1, 2].map((i) => wait(i * 110 * ctx.sp).then(async () => { const st = { x: ctx.from.x, y: ctx.from.y + (i - 1) * 24 }; const k = spawn(ctx, ART9.komainu(80), st, { life: 1300 }); if (to.x < st.x) k.firstElementChild.style.transform = 'scaleX(-1)'; await fly(ctx, k, st, { x: to.x + rnd(-14, 14), y: to.y + (i - 1) * 16 }, 380, { rotate: 0, arc: 30 }); k.remove(); boom(ctx, to, '#ffffff', 80); shake(ctx); }))); },
+    desc: 'User sends three white, thick-outlined ink komainu at the enemy; each bursts into ink on hit.',
+    async play(ctx) { const to = ctx.tos[0]; await Promise.all([0, 1, 2].map((i) => wait(i * 110 * ctx.sp).then(async () => { const st = { x: ctx.from.x, y: ctx.from.y + (i - 1) * 24 }; const k = spawn(ctx, ART9.komainu(80), st, { life: 1300 }); if (to.x < st.x) k.firstElementChild.style.transform = 'scaleX(-1)'; await fly(ctx, k, st, { x: to.x + rnd(-14, 14), y: to.y + (i - 1) * 16 }, 380, { rotate: 0, arc: 30 }); k.remove(); inkBurst(ctx, { x: to.x + rnd(-14, 14), y: to.y + (i - 1) * 16 }, 80); shake(ctx); }))); },
   },
   super_expansion: {
     desc: 'User grows massive, then slams down on the target.',
