@@ -306,12 +306,22 @@ export const ANIMS = {
     desc: 'A black lightning strike shaped like a panther flies from the user to the target.',
     async play(ctx) {
       const to = ctx.tos[0];
-      const bolt = `<svg data-sp="black_panther" width="110" height="50" viewBox="0 0 110 50" style="filter:drop-shadow(0 0 6px #8a5cff)"><path d="M0 26 22 18 30 30 50 14 58 28 78 12 84 22 100 8 110 18 96 30 104 32 84 44 78 34 60 46 52 34 34 46 26 34 8 40Z" fill="#0d0b12" stroke="#b49bff" stroke-width="1.5"/><path d="M96 12l6-10 4 10M86 14l2-10 6 8" stroke="#b49bff" stroke-width="2" fill="none"/></svg>`;
-      const b = spawn(ctx, bolt, ctx.from, { life: 1200 });
+      const panther = `<svg data-sp="black_panther" width="110" height="50" viewBox="0 0 110 50" style="filter:drop-shadow(0 0 6px #8a5cff)"><path d="M0 26 22 18 30 30 50 14 58 28 78 12 84 22 100 8 110 18 96 30 104 32 84 44 78 34 60 46 52 34 34 46 26 34 8 40Z" fill="#0d0b12" stroke="#b49bff" stroke-width="1.5"/><path d="M96 12l6-10 4 10M86 14l2-10 6 8" stroke="#b49bff" stroke-width="2" fill="none"/></svg>`;
+      // black lightning: dark bolts with a violet glow and core
+      const BL = { color: '#120d1c', glow: '#8a5cff', core: '#c9b6ff' };
+      const crackle = (at, r, n, ms, width = 3) => { for (let i = 0; i < n; i++) { const t = rnd(0, Math.PI * 2); bolt(ctx, at, { x: at.x + Math.cos(t) * r * rnd(0.6, 1), y: at.y + Math.sin(t) * r * rnd(0.6, 1) }, { ...BL, ms, width }); } };
+      for (let i = 0; i < 4; i++) setTimeout(() => crackle(ctx.from, 70, 3, 140), i * 80 * ctx.sp); // charges up on the user
+      await wait(300 * ctx.sp);
+      const b = spawn(ctx, panther, ctx.from, { life: 1200 });
+      const t0 = performance.now(); const dur = 360 * ctx.sp;
+      const trail = setInterval(() => { const p = between(ctx.from, to, Math.min(1, (performance.now() - t0) / dur)); crackle(p, 60, 2, 130); }, 50);
       await fly(ctx, b, ctx.from, to, 360);
+      clearInterval(trail);
       b.remove();
       boom(ctx, to, '#6d4bd6', 130);
+      for (let i = 0; i < 3; i++) setTimeout(() => crackle(to, 95, 3, 200, 4), i * 90 * ctx.sp);
       shake(ctx);
+      await wait(300 * ctx.sp);
     },
   },
   crow_embrace: {
@@ -627,10 +637,10 @@ async function stretch(ctx, a, b, mk, ms = 380, life = 2600) {
   return n;
 }
 /** A flickering zig-zag lightning bolt between a and b. */
-function bolt(ctx, a, b, { color = '#9fd8ff', glow = '#4aa3ff', ms = 450, width = 3 } = {}) {
+function bolt(ctx, a, b, { color = '#9fd8ff', glow = '#4aa3ff', core = '#fff', ms = 450, width = 3 } = {}) {
   const len = Math.hypot(b.x - a.x, b.y - a.y);
   const path = () => { let d = 'M0 20'; const n = Math.max(4, Math.round(len / 22)); for (let i = 1; i < n; i++) d += ` L${(len * i) / n} ${20 + rnd(-12, 12)}`; return `${d} L${len} 20`; };
-  const n = spawn(ctx, `<svg data-sp="bolt" width="${len}" height="40" viewBox="0 0 ${len} 40" style="filter:drop-shadow(0 0 6px ${glow})"><path d="${path()}" stroke="${color}" stroke-width="${width}" fill="none" stroke-linejoin="round"/><path d="${path()}" stroke="#fff" stroke-width="1.2" fill="none"/></svg>`, a, { life: ms + 200 });
+  const n = spawn(ctx, `<svg data-sp="bolt" width="${len}" height="40" viewBox="0 0 ${len} 40" style="filter:drop-shadow(0 0 6px ${glow})"><path d="${path()}" stroke="${color}" stroke-width="${width}" fill="none" stroke-linejoin="round"/><path d="${path()}" stroke="${core}" stroke-width="1.2" fill="none"/></svg>`, a, { life: ms + 200 });
   n.style.transformOrigin = '0 50%';
   n.style.transform = `translate(0,-50%) rotate(${ang(a, b)}deg)`;
   const iv = setInterval(() => { const ps = n.querySelectorAll('path'); ps[0]?.setAttribute('d', path()); ps[1]?.setAttribute('d', path()); }, 60);
@@ -859,7 +869,8 @@ Object.assign(ANIMS, {
       [-1, 1].forEach((side) => [-24, 0, 24].forEach((rot, i) => {
         const w = spawn(ctx, `<div class="ax-flap" style="animation-duration:.16s">${ART2.wing(h * 0.42)}</div>`, at, { life: 1800, z: 5 });
         w.style.transformOrigin = '0 50%';
-        w.style.transform = `translate(0,-50%) rotate(${side < 0 ? 180 - rot : rot}deg)`;
+        // right wings as drawn; left wings are the right ones mirrored left-to-right
+        w.style.transform = side < 0 ? `translate(0,-50%) rotate(${-rot}deg) scaleX(-1)` : `translate(0,-50%) rotate(${rot}deg)`;
         w.animate([{ opacity: 0 }, { opacity: 1 }], { duration: (200 + i * 80) * ctx.sp, fill: 'forwards' });
         ws.push(w);
       }));
@@ -3203,7 +3214,7 @@ Object.assign(ANIMS, {
   insect_tackle: {
     desc: 'User flies in and strikes the target with their bug wings.',
     async play(ctx) {
-      const { h } = ctx.userSize; const ws = [-1, 1].map((side) => { const w = spawn(ctx, `<div class="ax-flap" style="animation-duration:.12s">${ART2.wing(h * 0.42)}</div>`, ctx.from, { life: 1300, z: 5 }); w.style.transformOrigin = '0 50%'; w.style.transform = `translate(0,-50%) rotate(${side < 0 ? 200 : -20}deg)`; return w; });
+      const { h } = ctx.userSize; const ws = [-1, 1].map((side) => { const w = spawn(ctx, `<div class="ax-flap" style="animation-duration:.12s">${ART2.wing(h * 0.42)}</div>`, ctx.from, { life: 1300, z: 5 }); w.style.transformOrigin = '0 50%'; w.style.transform = side < 0 ? 'translate(0,-50%) rotate(20deg) scaleX(-1)' : 'translate(0,-50%) rotate(-20deg)'; return w; });
       await wait(250 * ctx.sp); ws.forEach((w) => fade(ctx, w, 200));
       const to = await lunging(ctx, 0.72, 460); slashArc(ctx, to, { color: '#ffe9a8', glow: '#ffcf5a', size: 120, rot: 20 }); shake(ctx);
     },
