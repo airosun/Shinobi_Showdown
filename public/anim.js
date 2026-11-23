@@ -1412,13 +1412,13 @@ Object.assign(ANIMS, {
     },
   },
   earth_spear: {
-    desc: 'An earth wall grows from the ground in front of the user.',
+    desc: 'The user gains a dark aura.',
     async play(ctx) {
-      const { w, h } = sizeOf(ctx.userEl); const f = feetOf(ctx, ctx.userEl);
-      const wall = spawn(ctx, `<div data-sp="earth_spear" style="width:${Math.max(70, w * 0.75)}px;height:${h * 0.85}px;border-radius:14px 14px 4px 4px;background:repeating-linear-gradient(165deg,#0000 0 18px,#4e3e3077 18px 21px),linear-gradient(#a8957e,#6e5e4c);box-shadow:inset 0 -10px 18px #3e3226,0 0 10px #000a"></div>`, { x: f.x + (ctx.isFoe ? -26 : 26), y: f.y + 4 }, { life: 1700 });
-      await rise(ctx, wall, 420);
-      await wait(600 * ctx.sp);
-      fade(ctx, wall, 350);
+      const el = ctx.userEl; const { w, h } = sizeOf(el); const at = FX.centerOf(el, ctx.arena); const ms = 1300;
+      const n = spawn(ctx, `<div data-sp="earth_spear-aura" style="width:${w * 1.5}px;height:${h * 1.2}px;border-radius:45%;background:radial-gradient(ellipse,#0b080fcc 0%,#1a1024aa 38%,#2a183a55 56%,#2a183a00 70%);filter:blur(6px)"></div>`, at, { life: ms + 500, z: 1 });
+      n.animate([{ opacity: 0, transform: 'translate(-50%,-50%) scale(.8)' }, { opacity: 1, transform: 'translate(-50%,-50%) scale(1.05)', offset: 0.3 }, { opacity: 0.85, transform: 'translate(-50%,-50%) scale(1)', offset: 0.75 }, { opacity: 0, transform: 'translate(-50%,-50%) scale(1.1)' }], { duration: ms * ctx.sp, fill: 'forwards' });
+      el.animate([{ filter: 'none' }, { filter: 'drop-shadow(0 0 8px #000) drop-shadow(0 0 22px #3a1f55) brightness(.7)', offset: 0.35 }, { filter: 'drop-shadow(0 0 8px #000) drop-shadow(0 0 22px #3a1f55) brightness(.7)', offset: 0.75 }, { filter: 'none' }], { duration: ms * ctx.sp });
+      await wait(700 * ctx.sp);
     },
   },
   golem: {
