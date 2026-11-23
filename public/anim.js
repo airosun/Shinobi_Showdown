@@ -3750,7 +3750,7 @@ Object.assign(ANIMS, {
       const to = ctx.tos[0]; const at = { x: ctx.from.x + (ctx.isFoe ? -60 : 60), y: ctx.from.y };
       smokeCloud(ctx, at, 140); await wait(150 * ctx.sp);
       const body = await stretch(ctx, at, between(at, to, 0.86), (len) => `<svg data-sp="summon_manda" width="${len}" height="44" viewBox="0 0 ${len} 44" style="filter:drop-shadow(0 0 4px #000)"><path d="M0 22H${len}" stroke="#6a3a9a" stroke-width="36" stroke-linecap="round"/><path d="M0 22H${len}" stroke="#4a2070" stroke-width="12" stroke-dasharray="14 10"/></svg>`, 340, 1800);
-      const head = spawn(ctx, ART3.snake(130).replaceAll('#e8e6dc', '#7a4aaa').replaceAll('#dcd8c8', '#5a3a8a'), between(at, to, 0.86), { life: 1600 });
+      const head = spawn(ctx, ART3.snake(130).replace('data-sp="art-snake"', 'data-sp="summon_manda-head"').replaceAll('#e8e6dc', '#7a4aaa').replaceAll('#dcd8c8', '#5a3a8a'), between(at, to, 0.86), { life: 1600 }); // Manda's own head, separate from the other snakes
       head.style.transform = `translate(-20%,-50%) rotate(${ang(at, to)}deg)`; head.style.transformOrigin = '20% 50%';
       boom(ctx, to, '#b44bff', 160); shake(ctx);
       setTimeout(() => { fade(ctx, body, 300); fade(ctx, head, 300); smokeCloud(ctx, at, 110); }, 500 * ctx.sp); await wait(400 * ctx.sp);
