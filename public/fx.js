@@ -125,9 +125,15 @@ export function applySprites(root, jutsuId = null) {
 }
 const NO_SPRITE = new Set(['pop', 'banner', 'log']);
 
+// A shinobi's box as drawn: the art inside it carries the size/position set in the Character Layout module,
+// which the outer box doesn't reflect, so effects measure the art when there is one.
+export function artRect(el) {
+  const img = el?.querySelector?.('img.art');
+  return (img || el).getBoundingClientRect();
+}
 export function centerOf(el, arena) {
   const a = arena.getBoundingClientRect();
-  const r = el.getBoundingClientRect();
+  const r = artRect(el);
   return { x: r.left - a.left + r.width / 2, y: r.top - a.top + r.height / 2 };
 }
 

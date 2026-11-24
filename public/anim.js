@@ -73,8 +73,8 @@ const lunge = (ctx, to, k = 0.55, ms = 520) => {
   return { x: ctx.from.x + dx, y: ctx.from.y + dy };
 };
 const between = (a, b, t) => ({ x: a.x + (b.x - a.x) * t, y: a.y + (b.y - a.y) * t });
-const feetOf = (ctx, el) => { const r = el.getBoundingClientRect(); const a = ctx.arena.getBoundingClientRect(); return { x: r.left - a.left + r.width / 2, y: r.bottom - a.top - 8 }; };
-const sizeOf = (el) => { const r = el.getBoundingClientRect(); return { w: r.width, h: r.height }; };
+const feetOf = (ctx, el) => { const r = FX.artRect(el); const a = ctx.arena.getBoundingClientRect(); return { x: r.left - a.left + r.width / 2, y: r.bottom - a.top - 8 }; };
+const sizeOf = (el) => { const r = FX.artRect(el); return { w: r.width, h: r.height }; };
 const userImg = (ctx) => ctx.userEl.querySelector('img.art, img');
 const ghostOf = (ctx, at, opacity = 0.55) => {
   const img = userImg(ctx);
@@ -87,7 +87,7 @@ const ghostOf = (ctx, at, opacity = 0.55) => {
 function sideBox(ctx) {
   const els = ctx.sideEls.length ? ctx.sideEls : ctx.targetEls;
   const a = ctx.arena.getBoundingClientRect();
-  const rs = els.map((e) => e.getBoundingClientRect());
+  const rs = els.map((e) => FX.artRect(e));
   const x1 = Math.min(...rs.map((r) => r.left)) - a.left; const x2 = Math.max(...rs.map((r) => r.right)) - a.left;
   const y1 = Math.min(...rs.map((r) => r.top)) - a.top; const y2 = Math.max(...rs.map((r) => r.bottom)) - a.top;
   return { x1, x2, y1, y2, c: { x: (x1 + x2) / 2, y: (y1 + y2) / 2 }, w: x2 - x1, h: y2 - y1 };
@@ -2965,7 +2965,7 @@ Object.assign(ANIMS, {
 export function poisonBubbles(arena, el, { sp = 1 } = {}) {
   if (!el) return;
   const ctx = { arena, sp };
-  const r = el.getBoundingClientRect(); const a = arena.getBoundingClientRect();
+  const r = FX.artRect(el); const a = arena.getBoundingClientRect();
   const top = { x: r.left - a.left + r.width / 2, y: r.top - a.top + r.height * 0.12 };
   for (let i = 0; i < 12; i++) {
     setTimeout(() => {
