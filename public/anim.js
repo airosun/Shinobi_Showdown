@@ -3749,7 +3749,7 @@ Object.assign(ANIMS, {
     async play(ctx) {
       const at = { x: ctx.from.x + (ctx.isFoe ? -90 : 90), y: ctx.from.y };
       const sp = await summonPuff(ctx, at, ART9.bigSpider(180));
-      await Promise.all(ctx.tos.flatMap((t, i) => [0, 1, 2].map((k) => wait((k * 80 + i * 40) * ctx.sp).then(async () => { const s = spawn(ctx, ART.spider().replaceAll('#fafafa', '#222').replaceAll('#f4f4f4', '#222').replace('#bbb', '#000'), at, { life: 1200 }); await fly(ctx, s, at, { x: t.x + rnd(-24, 24), y: t.y + rnd(-30, 30) }, 420, { rotate: 0, arc: 60 }); setTimeout(() => fade(ctx, s, 250), 300 * ctx.sp); shakeEl(ctx.targetEls[i]); }))));
+      await Promise.all(ctx.tos.flatMap((t, i) => [0, 1, 2].map((k) => wait((k * 80 + i * 40) * ctx.sp).then(async () => { const s = spawn(ctx, ART.spider().replace('data-sp="art-spider"', 'data-sp="summon_spider-baby"').replaceAll('#fafafa', '#222').replaceAll('#f4f4f4', '#222').replace('#bbb', '#000'), at, { life: 1200 }); await fly(ctx, s, at, { x: t.x + rnd(-24, 24), y: t.y + rnd(-30, 30) }, 420, { rotate: 0, arc: 60 }); setTimeout(() => fade(ctx, s, 250), 300 * ctx.sp); shakeEl(ctx.targetEls[i]); }))));
       await wait(300 * ctx.sp); smokeCloud(ctx, at, 120); sp.remove();
     },
   },
