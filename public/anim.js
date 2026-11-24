@@ -94,12 +94,21 @@ function sideBox(ctx) {
 }
 
 // ---------------------------------------------------------------- art (inline SVG)
+// Each kind of fire is its own sprite so it can be redrawn separately:
+// three groups: flame-orange (ordinary fire / Burn), flame-black (Amaterasu, Kagutsuchi, Susano'o's flame arrow), flame-blue (blue fire).
+function flameKind(c1) {
+  const c = String(c1).toLowerCase();
+  if (c === '#000' || c === '#000000' || c === '#111') return 'flame-black';
+  if (c === '#2f7bff') return 'flame-blue';
+  if (c === '#7a2bd6') return 'flame-black';
+  return 'flame-orange';
+}
 const ART = {
   star: (s = 26, c = '#c9ced6') => `<svg data-sp="art-star" width="${s}" height="${s}" viewBox="-10 -10 20 20" class="ax-spin"><path d="M0-10 2-2 10 0 2 2 0 10-2 2-10 0-2-2Z" fill="${c}" stroke="#555" stroke-width=".8"/><circle r="1.8" fill="#333"/></svg>`,
   bone: (l = 70) => `<svg data-sp="art-bone-1" width="${l}" height="16" viewBox="0 0 70 16"><path d="M0 8 Q30 1 70 8 Q30 15 0 8Z" fill="#f4f1e8" stroke="#cfc8b4"/></svg>`,
   spike: (l = 60, c = '#151515') => `<svg data-sp="art-spike" width="${l}" height="14" viewBox="0 0 60 14"><path d="M0 2 60 7 0 12Z" fill="${c}" stroke="#7a5cff" stroke-width=".8"/></svg>`,
   missile: () => `<svg data-sp="art-missile" width="46" height="14" viewBox="0 0 46 14"><path d="M8 3h28l8 4-8 4H8Z" fill="#9aa3ad" stroke="#555"/><path d="M8 3 3 0v14l5-3" fill="#6b737c"/><path d="M3 4-8 7 3 10Z" fill="#ff9a3c"/></svg>`,
-  flame: (s = 40, c1 = '#000', c2 = '#7a2bd6') => `<svg data-sp="art-flame" width="${s}" height="${s * 1.3}" viewBox="0 0 40 52" class="ax-flicker"><path d="M20 52C6 52 0 42 4 30 7 22 12 18 12 8c6 4 10 10 10 16 2-4 2-8 1-12 9 6 15 16 13 26-2 10-8 14-16 14Z" fill="${c1}" stroke="${c2}" stroke-width="2.5"/></svg>`,
+  flame: (s = 40, c1 = '#000', c2 = '#7a2bd6') => `<svg data-sp="${flameKind(c1)}" width="${s}" height="${s * 1.3}" viewBox="0 0 40 52" class="ax-flicker"><path d="M20 52C6 52 0 42 4 30 7 22 12 18 12 8c6 4 10 10 10 16 2-4 2-8 1-12 9 6 15 16 13 26-2 10-8 14-16 14Z" fill="${c1}" stroke="${c2}" stroke-width="2.5"/></svg>`,
   bubble: (s = 22) => `<svg data-sp="art-bubble" width="${s}" height="${s}" viewBox="0 0 20 20"><circle cx="10" cy="10" r="9" fill="#bfe8ff33" stroke="#e6f7ff" stroke-width="1.2"/><circle cx="7" cy="6" r="2" fill="#fff" opacity=".8"/></svg>`,
   axe: () => `<svg data-sp="art-axe" width="56" height="44" viewBox="0 0 56 44"><path d="M0 22h34" stroke="#8a6a52" stroke-width="7" stroke-linecap="round"/><path d="M30 4c14 2 24 10 24 18S44 40 30 42c4-6 5-13 5-20S34 10 30 4Z" fill="#c9b8a8" stroke="#6b5444" stroke-width="2"/></svg>`,
   palm: () => `<svg data-sp="art-palm" width="48" height="48" viewBox="0 0 48 48"><circle cx="24" cy="24" r="20" fill="#fff6" stroke="#fff" stroke-width="3"/><path d="M16 30V18m6 12V14m6 16V15m6 15V19" stroke="#fff" stroke-width="3" stroke-linecap="round"/></svg>`,
